@@ -4770,6 +4770,56 @@ def index():
         installed_plugins=plugin_manager.get_installed_plugins()
     )
 
+
+@app.route('/api/ivr/get-tree', methods=['GET'])
+def api_ivr_get_tree():
+    cfg = load_integrations()
+    ivr_tree = cfg.get('ivr_tree', {
+        'enabled': True,
+        'debug_enabled': True,
+        'debug_exten': '888',
+        'nodes': [{
+            'id': 'main',
+            'title': 'Главное меню (greeting.wav)',
+            'audio_file': 'greeting_main.wav',
+            'timeout_sec': 7,
+            'timeout_action': 'operator',
+            'timeout_target': 'ALL',
+            'branches': [
+                {'digit': '1', 'title': 'Отдел продаж (RU)', 'action': 'operator', 'target': '101'},
+                {'digit': '2', 'title': 'Support (EN)', 'action': 'operator', 'target': '102'},
+                {'digit': '3', 'title': 'VIP Desk', 'action': 'operator', 'target': '103'}
+            ]
+        }]
+    })
+    return jsonify({'success': True, 'ivr_tree': ivr_tree})
+
+@app.route('/api/ivr/save-canvas', methods=['POST'])
+def api_ivr_save_canvas():
+    try:
+        data = request.get_json(force=True)
+        if not data:
+            return jsonify({'success': False, 'error': 'Empty JSON payload'}), 400
+
+        cfg = load_integrations()
+        if 'ivr_tree' not in cfg:
+            cfg['ivr_tree'] = {}
+
+        if 'enabled' in data:
+            cfg['ivr_tree']['enabled'] = bool(data['enabled'])
+        if 'debug_exten' in data:
+            cfg['ivr_tree']['debug_exten'] = str(data['debug_exten']).strip()
+        if 'nodes' in data and isinstance(data['nodes'], list):
+            cfg['ivr_tree']['nodes'] = data['nodes']
+        if 'canvas_layout' in data:
+            cfg['ivr_tree']['canvas_layout'] = data['canvas_layout']
+
+        save_integrations(cfg)
+        generate_dialplan_from_tree()
+        return jsonify({'success': True, 'message': 'IVR граф успешно сохранен и применен в Asterisk!'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/settings/ivr-builder', methods=['POST'])
 def save_ivr_builder():
     cfg = load_integrations()
