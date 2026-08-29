@@ -5651,4 +5651,4 @@ if __name__ == '__main__':
         threading.Thread(target=network_guardian_startup_check, daemon=True).start()
     except Exception:
         pass
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8888)
