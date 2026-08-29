@@ -104,10 +104,44 @@ graph TD
 * **`storage-gdrive-yandex`**: Синхронизация с Google Диском и Яндекс.Диском.
 * **`storage-auto-cleaner`**: Автоматическая ротация и очистка дискового пространства по квотам.
 
-### 🤖 4.6. Искусственный интеллект (AI & Speech Analytics)
-* **`ai-whisper-transcribe`**: Автоматическое распознавание речи и перевод звонков в текст (Whisper AI).
-* **`ai-sentiment-analytics`**: Анализ тональности, оценка соблюдения скриптов оператором и генерация краткой выжимки (Summary) в CRM через Gemini / GPT.
-* **`ai-voice-bot`**: Умный голосовой AI-ассистент первого уровня поддержки.
+### 🤖 4.6. Искусственный интеллект и Нейросети (Hybrid AI Speech & Analytics Engine)
+
+Платформа предоставляет универсальный **Гибридный AI-движок (Hybrid AI Gateway)** с возможностью гибкого переключения между локальными легковесными моделями и любыми удаленными нейросетями через кастомный API-эндпоинт:
+
+```mermaid
+graph TD
+    Audio[".wav стереозапись звонка"] --> Splitter["Разделение каналов<br/>(L: Оператор, R: Клиент)"]
+    Splitter --> AIGateway["AI Gateway Engine"]
+    
+    subgraph Mode1 ["Режим 1: Локальная нейросеть (Self-Hosted On-Premise)"]
+        LocalWhisper["Faster-Whisper / Whisper.cpp<br/>(Локально на CPU/GPU сервера)"]
+        LocalLLM["Ollama / Llama.cpp<br/>(Локальный анализ и саммари)"]
+    end
+
+    subgraph Mode2 ["Режим 2: Удаленный AI-провайдер (Custom Remote Provider)"]
+        RemoteSTT["OpenAI Whisper / Yandex SpeechKit / Groq / AssemblyAI"]
+        RemoteLLM["Custom OpenAI-compatible API Endpoint<br/>(OpenAI, Google Gemini, Anthropic Claude, OpenRouter, DeepSeek)"]
+    end
+
+    AIGateway -->|Локальный инференс| Mode1
+    AIGateway -->|Удаленный API-хост| Mode2
+    
+    Mode1 --> Output["Транскрипт + Саммари + Оценка в CRM и Telegram"]
+    Mode2 --> Output
+```
+
+#### Ключевые возможности AI-модулей:
+1. **Поддержка любых провайдеров (Custom Provider URL / Endpoint):**
+   * Возможность указать базовый URL удаленного шлюза (например, корпоративный `https://api.mycompany.ai/v1`, `https://openrouter.ai/api/v1`, `https://api.groq.com/openai/v1` или локальный `http://192.168.1.100:11434/v1`).
+   * Поддержка API-ключей, кастомных заголовков и прокси-соединений.
+2. **Локальный режим (100% приватность и On-Premise):**
+   * Работа без выхода в интернет с использованием оптимизированного `faster-whisper` (модели `tiny`, `base`, `small`) и локальной LLM (`Ollama` с моделями Qwen / Llama 3 / Mistral).
+3. **Двухканальная расшифровка по ролям (Diarization):**
+   * Благодаря раздельной стереозаписи левый канал расшифровывается как «Оператор», а правый — как «Клиент», формируя структурированный диалог.
+4. **Анализ диалога и оценка качества (LLM Scoring):**
+   * Автоматическое извлечение договоренностей, ключевых тем и контактных данных.
+   * Оценка тональности клиента (позитив, нейтрально, конфликт) и соблюдения скрипта оператором.
+   * Прикрепление краткой выжимки (Summary) и полного текста в таймлайн сделки amoCRM / Битрикс24 и в тело Telegram-уведомления.
 
 ---
 
