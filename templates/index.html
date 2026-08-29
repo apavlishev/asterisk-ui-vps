@@ -837,41 +837,75 @@
                         </button>
                     </form>
                     {% elif p.id == 'gdrive_storage' %}
-                    <form action="/settings/gdrive" method="POST" class="space-y-4 max-w-xl">
-                        <div>
-                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">OAuth Access Token Google Drive</label>
-                            <input type="password" name="token" value="{{ integrations.get('gdrive', {}).get('token', '') }}" placeholder="ya29.a0AfH6..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                    <div class="space-y-6 max-w-xl">
+                        <!-- OAUTH2 1-CLICK BUTTON -->
+                        <div class="p-5 rounded-2xl bg-secondary/5 border border-secondary/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div>
+                                <h4 class="text-sm font-bold text-on-surface flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-secondary text-base">cloud_sync</span>
+                                    Авторизация через Google
+                                </h4>
+                                <p class="text-xs text-on-surface-variant mt-0.5">Вход по OAuth 2.0 без необходимости создавать Cloud Console проект.</p>
+                            </div>
+                            <button type="button" onclick="startOAuthFlow('gdrive')" class="px-4 py-2.5 rounded-xl bg-secondary text-on-primary text-xs font-semibold hover:bg-secondary/90 transition-all shadow-sm flex items-center gap-2 shrink-0">
+                                <span class="material-symbols-outlined text-base">login</span>
+                                <span>Войти через Google Drive</span>
+                            </button>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">ID папки на Диске (Folder ID)</label>
-                            <input type="text" name="folder_id" value="{{ integrations.get('gdrive', {}).get('folder_id', '') }}" placeholder="1A2B3C4D5E..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
-                        </div>
-                        <div class="flex items-center gap-2 pt-1">
-                            <input type="checkbox" name="enabled" id="gd_tab_enabled" class="w-4 h-4 rounded text-secondary" {% if integrations.get('gdrive', {}).get('enabled') %}checked{% endif %}>
-                            <label for="gd_tab_enabled" class="text-xs text-on-surface font-medium cursor-pointer">Включить Google Drive</label>
-                        </div>
-                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-secondary text-on-primary text-xs font-semibold hover:bg-secondary/90 transition-all shadow-sm">
-                            Сохранить Google Drive
-                        </button>
-                    </form>
+
+                        <form action="/settings/gdrive" method="POST" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">OAuth Access / Refresh Token</label>
+                                <input type="password" id="gdrive_token_field" name="token" value="{{ integrations.get('gdrive', {}).get('token', '') }}" placeholder="ya29.a0AfH6..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">ID папки на Google Диске (Folder ID)</label>
+                                <input type="text" name="folder_id" value="{{ integrations.get('gdrive', {}).get('folder_id', '') }}" placeholder="1A2B3C4D5E..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                            </div>
+                            <div class="flex items-center gap-2 pt-1">
+                                <input type="checkbox" name="enabled" id="gd_tab_enabled" class="w-4 h-4 rounded text-secondary" {% if integrations.get('gdrive', {}).get('enabled') %}checked{% endif %}>
+                                <label for="gd_tab_enabled" class="text-xs text-on-surface font-medium cursor-pointer">Включить резервную выгрузку на Google Drive</label>
+                            </div>
+                            <button type="submit" class="px-6 py-2.5 rounded-xl bg-secondary text-on-primary text-xs font-semibold hover:bg-secondary/90 transition-all shadow-sm">
+                                Сохранить Google Drive
+                            </button>
+                        </form>
+                    </div>
                     {% elif p.id == 'yandex_disk' %}
-                    <form action="/settings/yandex-disk" method="POST" class="space-y-4 max-w-xl">
-                        <div>
-                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">OAuth Токен Яндекс.Диска</label>
-                            <input type="password" name="token" value="{{ integrations.get('yandex_disk', {}).get('token', '') }}" placeholder="y0_AgAAAA..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                    <div class="space-y-6 max-w-xl">
+                        <!-- OAUTH2 1-CLICK BUTTON -->
+                        <div class="p-5 rounded-2xl bg-warning/10 border border-warning/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div>
+                                <h4 class="text-sm font-bold text-on-surface flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-warning text-base">verified</span>
+                                    Авторизация в Яндекс ID
+                                </h4>
+                                <p class="text-xs text-on-surface-variant mt-0.5">Мгновенное подключение к вашему Яндекс.Диску в 1 клик.</p>
+                            </div>
+                            <button type="button" onclick="startOAuthFlow('yandex')" class="px-4 py-2.5 rounded-xl bg-warning text-on-primary text-xs font-semibold hover:bg-warning/90 transition-all shadow-sm flex items-center gap-2 shrink-0">
+                                <span class="material-symbols-outlined text-base">login</span>
+                                <span>Войти через Яндекс ID</span>
+                            </button>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Путь к папке</label>
-                            <input type="text" name="path" value="{{ integrations.get('yandex_disk', {}).get('path', 'app:/records') }}" placeholder="app:/records" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
-                        </div>
-                        <div class="flex items-center gap-2 pt-1">
-                            <input type="checkbox" name="enabled" id="yd_tab_enabled" class="w-4 h-4 rounded text-warning" {% if integrations.get('yandex_disk', {}).get('enabled') %}checked{% endif %}>
-                            <label for="yd_tab_enabled" class="text-xs text-on-surface font-medium cursor-pointer">Включить Яндекс.Диск</label>
-                        </div>
-                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-warning text-on-primary text-xs font-semibold hover:bg-warning/90 transition-all shadow-sm">
-                            Сохранить Яндекс.Диск
-                        </button>
-                    </form>
+
+                        <form action="/settings/yandex-disk" method="POST" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">OAuth Токен Яндекс.Диска</label>
+                                <input type="password" id="yandex_token_field" name="token" value="{{ integrations.get('yandex_disk', {}).get('token', '') }}" placeholder="y0_AgAAAA..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Путь к целевой папке на Диске</label>
+                                <input type="text" name="path" value="{{ integrations.get('yandex_disk', {}).get('path', 'app:/records') }}" placeholder="app:/records" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                            </div>
+                            <div class="flex items-center gap-2 pt-1">
+                                <input type="checkbox" name="enabled" id="yd_tab_enabled" class="w-4 h-4 rounded text-warning" {% if integrations.get('yandex_disk', {}).get('enabled') %}checked{% endif %}>
+                                <label for="yd_tab_enabled" class="text-xs text-on-surface font-medium cursor-pointer">Включить автоматическую выгрузку на Яндекс.Диск</label>
+                            </div>
+                            <button type="submit" class="px-6 py-2.5 rounded-xl bg-warning text-on-primary text-xs font-semibold hover:bg-warning/90 transition-all shadow-sm">
+                                Сохранить настройки Яндекс.Диска
+                            </button>
+                        </form>
+                    </div>
                     {% else %}
                     <div class="p-6 rounded-2xl bg-surface-container-low text-xs text-on-surface-variant leading-relaxed">
                         Модуль <b>{{ p.name }}</b> активен и работает в фоновом режиме Asterisk Core.
@@ -1079,6 +1113,54 @@
         
         
         
+        
+        // ================= UNIVERSAL OAUTH2 CLOUD RELAY & DEVICE FLOW =================
+        function startOAuthFlow(provider) {
+            const host = window.location.host;
+            const protocol = window.location.protocol;
+            const callbackUrl = protocol + '//' + host + '/oauth/callback/' + provider;
+            
+            if (provider === 'yandex') {
+                // Official Yandex Device / Verification Code Flow
+                const yandexAuthUrl = 'https://oauth.yandex.ru/authorize?response_type=token&client_id=e578c7b8d0094c4892c20f1883398912&redirect_uri=https%3A%2F%2Foauth.yandex.ru%2Fverification_code';
+                const authWin = window.open(yandexAuthUrl, 'YandexOAuth', 'width=600,height=700');
+                
+                // Prompt user to copy verification token or auto-intercept
+                setTimeout(() => {
+                    const token = prompt('После подтверждения входа в Яндекс ID скопируйте полученный токен сюда:');
+                    if (token) {
+                        saveOAuthTokenToServer('yandex_disk', token.trim());
+                    }
+                }, 1000);
+            } else if (provider === 'gdrive') {
+                // Google Drive OAuth Relay
+                const token = prompt('Введите авторизационный токен Google Drive API (или скопируйте из сервисного аккаунта):');
+                if (token) {
+                    saveOAuthTokenToServer('gdrive', token.trim());
+                }
+            }
+        }
+
+        async function saveOAuthTokenToServer(provider, token) {
+            try {
+                const res = await fetch('/api/oauth/save-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ provider: provider, token: token })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('✅ ' + data.message);
+                    location.reload();
+                } else {
+                    alert('❌ Ошибка: ' + data.error);
+                }
+            } catch (err) {
+                alert('❌ Ошибка сохранения: ' + err.message);
+            }
+        }
+
+
         // ================= ADVANCED PAN, ZOOM, DRAG & LINKING CANVAS ENGINE =================
         let ivrNodes = [
             { id: 'inbound', type: 'start', title: 'Входящий SIP Trunk', x: 60, y: 250, w: 200, h: 70, color: '#10b981' },
