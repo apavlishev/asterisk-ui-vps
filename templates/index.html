@@ -1204,28 +1204,77 @@
             {% for p in installed_plugins %}
             <div id="tab-plugin-{{ p.id }}" class="tab-pane space-y-6">
                 <div class="bg-surface rounded-2xl p-8 border border-outline/30 shadow-sm">
+                    <!-- HEADER: STATUS & CONTROL ACTIONS (TOGGLE & UNINSTALL) -->
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-6 border-b border-surface-container">
                         <div class="flex items-center gap-4">
-                            <div class="w-14 h-14 rounded-2xl bg-{{ p.color }}-container/20 text-{{ p.color }} flex items-center justify-center">
+                            <div class="w-14 h-14 rounded-2xl bg-{{ p.color }}-container/20 text-{{ p.color }} flex items-center justify-center shrink-0">
                                 <span class="material-symbols-outlined text-3xl">{{ p.icon }}</span>
                             </div>
                             <div>
                                 <div class="flex items-center gap-2">
                                     <h1 class="text-2xl font-bold text-on-surface">{{ p.name }}</h1>
+                                    {% if p.id not in integrations.get('plugins_disabled', []) %}
                                     <span class="text-xs px-2.5 py-0.5 rounded-full bg-success/10 text-success font-semibold flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-[12px]">check_circle</span> Активен
+                                        <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span> Активен
                                     </span>
+                                    {% else %}
+                                    <span class="text-xs px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-semibold flex items-center gap-1 border border-outline/30">
+                                        <span class="w-2 h-2 rounded-full bg-gray-400"></span> Отключен
+                                    </span>
+                                    {% endif %}
                                 </div>
                                 <p class="text-xs text-on-surface-variant font-mono mt-0.5">ID: {{ p.id }} &bull; Версия: {{ p.version }} &bull; Автор: {{ p.author }}</p>
                             </div>
                         </div>
-                        <form action="/plugin/uninstall/{{ p.id }}" method="POST" onsubmit="return confirm('Удалить расширение {{ p.name }}?');">
-                            <button type="submit" class="px-4 py-2 rounded-xl text-error hover:bg-error/10 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-error/20">
-                                <span class="material-symbols-outlined text-base">delete</span>
-                                Удалить модуль
-                            </button>
-                        </form>
+
+                        <div class="flex items-center gap-3">
+                            <!-- TOGGLE ENABLE / DISABLE BUTTON -->
+                            <form action="/plugins/toggle/{{ p.id }}" method="POST" class="inline">
+                                {% if p.id not in integrations.get('plugins_disabled', []) %}
+                                <button type="submit" class="px-4 py-2 rounded-xl bg-warning/10 text-warning hover:bg-warning/20 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-warning/30" title="Временно отключить выполнение логики модуля">
+                                    <span class="material-symbols-outlined text-base">pause</span>
+                                    <span>Отключить модуль</span>
+                                </button>
+                                {% else %}
+                                <button type="submit" class="px-4 py-2 rounded-xl bg-success text-on-primary hover:bg-success/90 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm" title="Активировать модуль в работу">
+                                    <span class="material-symbols-outlined text-base">play_arrow</span>
+                                    <span>Включить модуль</span>
+                                </button>
+                                {% endif %}
+                            </form>
+
+                            <!-- UNINSTALL BUTTON -->
+                            <form action="/plugins/delete/{{ p.id }}" method="POST" onsubmit="return confirm('Удалить расширение {{ p.name }}? Код плагина будет удален с сервера.');" class="inline">
+                                <button type="submit" class="px-4 py-2 rounded-xl text-error hover:bg-error/10 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-error/20" title="Полностью удалить модуль">
+                                    <span class="material-symbols-outlined text-base">delete</span>
+                                    <span>Удалить модуль</span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
+
+                    <!-- WORKSPACE CONTAINER WITH BLUR OVERLAY WHEN DISABLED -->
+                    <div class="relative">
+                        {% if p.id in integrations.get('plugins_disabled', []) %}
+                        <!-- TRANSLUCENT OVERLAY FOR DISABLED MODULE -->
+                        <div class="absolute inset-0 bg-surface/75 backdrop-blur-[3px] z-30 rounded-2xl flex flex-col items-center justify-center p-8 text-center border border-outline/30 shadow-inner">
+                            <div class="w-16 h-16 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center mb-3 shadow-md border border-outline/40">
+                                <span class="material-symbols-outlined text-3xl">power_off</span>
+                            </div>
+                            <h3 class="text-base font-bold text-on-surface mb-1">Модуль «{{ p.name }}» временно отключен</h3>
+                            <p class="text-xs text-on-surface-variant max-w-md mb-5 leading-relaxed">
+                                Фоновые процессы, хуки и выполнение обработчиков приостановлены. Все настройки и учетные данные сохранены.
+                            </p>
+                            <form action="/plugins/toggle/{{ p.id }}" method="POST">
+                                <button type="submit" class="px-6 py-2.5 rounded-xl bg-success text-on-primary text-xs font-bold hover:bg-success/90 transition-all shadow-md flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[18px]">play_circle</span>
+                                    <span>Включить модуль в работу</span>
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+
+                        <div class="{{ 'opacity-40 pointer-events-none select-none filter blur-[1px]' if p.id in integrations.get('plugins_disabled', []) else '' }} space-y-6">
 
                     <!-- PLUGIN SETTINGS FORM CONTENT -->
                     {% if p.id == 'amocrm_pro' %}
@@ -1572,6 +1621,8 @@
                         Модуль <b>{{ p.name }}</b> активен и работает в фоновом режиме Asterisk Core.
                     </div>
                     {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
             {% endfor %}
