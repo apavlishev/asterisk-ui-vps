@@ -5762,13 +5762,6 @@ def self_heal_pbx_environment():
 
 self_heal_pbx_environment()
 
-if __name__ == '__main__':
-    try:
-        threading.Thread(target=network_guardian_startup_check, daemon=True).start()
-    except Exception:
-        pass
-    app.run(host='0.0.0.0', port=8888)
-
 
 @app.route('/plugin/install-zip', methods=['POST'])
 def handle_install_plugin_zip():
@@ -5798,3 +5791,13 @@ def handle_uninstall_plugin(plugin_id):
     success, msg = plugin_manager.uninstall_plugin(plugin_id)
     flash(msg)
     return redirect(url_for('index'))
+
+
+if __name__ == '__main__':
+    try:
+        threading.Thread(target=network_guardian_startup_check, daemon=True).start()
+    except Exception:
+        pass
+    app.run(host='0.0.0.0', port=8888)
+
+
