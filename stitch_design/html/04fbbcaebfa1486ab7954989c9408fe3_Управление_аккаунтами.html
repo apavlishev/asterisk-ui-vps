@@ -1,0 +1,322 @@
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={theme:{extend:{"colors":{"secondary":"#0051d5","background":"#f8f9ff","error-container":"#ffdad6","on-primary-fixed-variant":"#3f465c","outline-variant":"#c6c6cd","on-secondary":"#ffffff","on-secondary-fixed-variant":"#003ea8","tertiary-fixed-dim":"#4edea3","secondary-container":"#316bf3","on-primary":"#ffffff","outline":"#76777d","primary-fixed":"#dae2fd","on-tertiary":"#ffffff","on-primary-container":"#7c839b","surface-dim":"#cbdbf5","on-error-container":"#93000a","error":"#ba1a1a","surface-variant":"#d3e4fe","inverse-primary":"#bec6e0","primary":"#000000","tertiary-fixed":"#6ffbbe","on-tertiary-fixed-variant":"#005236","surface":"#f8f9ff","primary-container":"#131b2e","surface-container-high":"#dce9ff","surface-container-highest":"#d3e4fe","surface-container":"#e5eeff","on-tertiary-fixed":"#002113","on-surface-variant":"#45464d","on-surface":"#0b1c30","surface-container-low":"#eff4ff","surface-bright":"#f8f9ff","tertiary-container":"#002113","on-error":"#ffffff","surface-container-lowest":"#ffffff","on-tertiary-container":"#009668","inverse-surface":"#213145","surface-tint":"#565e74","primary-fixed-dim":"#bec6e0","on-secondary-container":"#fefcff","secondary-fixed-dim":"#b4c5ff","on-secondary-fixed":"#00174b","on-background":"#0b1c30","inverse-on-surface":"#eaf1ff","on-primary-fixed":"#131b2e","tertiary":"#000000","secondary-fixed":"#dbe1ff"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"md":"16px","gutter":"16px","max-width":"1440px","lg":"24px","unit":"4px","sm":"8px","xs":"4px","xl":"32px","margin-page":"24px"},"fontFamily":{"body-lg":["Inter"],"label-caps":["Inter"],"body-md":["Inter"],"code-md":["JetBrains Mono"],"display-lg":["Inter"],"headline-sm":["Inter"],"body-sm":["Inter"],"headline-md":["Inter"]},"fontSize":{"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"label-caps":["11px",{"lineHeight":"16px","letterSpacing":"0.05em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"code-md":["13px",{"lineHeight":"20px","fontWeight":"400"}],"display-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-md":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}]}}}}</script><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/></head><body class="bg-background font-body-md text-on-surface"><aside class="fixed left-0 top-0 h-full w-64 bg-primary-container z-50 flex flex-col shadow-lg"><div class="h-16 flex items-center px-lg border-b border-on-primary-container/10"><div class="flex items-center gap-sm"><div class="w-8 h-8 bg-secondary rounded flex items-center justify-center"><span class="material-symbols-outlined text-on-secondary">settings_phone</span></div><span class="font-headline-sm text-on-primary-fixed tracking-tight">PBX Core</span></div></div><nav class="flex-1 py-md overflow-y-auto" data-active-classes="bg-secondary/10 border-l-2 border-secondary text-secondary"><a class="flex items-center gap-md px-lg py-md text-on-primary-container hover:bg-on-primary-container/5 transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined">dashboard</span><span class="font-body-md">Dashboard</span></a><a aria-current="page" class="flex items-center gap-md px-lg py-md transition-colors bg-secondary/10 border-l-2 border-secondary text-secondary" data-path="accounts" href="#"><span class="material-symbols-outlined">account_circle</span><span class="font-body-md">Accounts</span></a><a class="flex items-center gap-md px-lg py-md text-on-primary-container hover:bg-on-primary-container/5 transition-colors" data-path="marketplace" href="#"><span class="material-symbols-outlined">storefront</span><span class="font-body-md">Marketplace</span></a><a class="flex items-center gap-md px-lg py-md text-on-primary-container hover:bg-on-primary-container/5 transition-colors" data-path="plugins" href="#"><span class="material-symbols-outlined">extension</span><span class="font-body-md">Plugins</span></a><a class="flex items-center gap-md px-lg py-md text-on-primary-container hover:bg-on-primary-container/5 transition-colors" data-path="licensing-updates" href="#"><span class="material-symbols-outlined">new_releases</span><span class="font-body-md">Licensing &amp; Updates</span></a><a class="flex items-center gap-md px-lg py-md text-on-primary-container hover:bg-on-primary-container/5 transition-colors" data-path="backups" href="#"><span class="material-symbols-outlined">backup</span><span class="font-body-md">Backups</span></a><a class="flex items-center gap-md px-lg py-md text-on-primary-container hover:bg-on-primary-container/5 transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined">settings</span><span class="font-body-md">Settings</span></a></nav></aside><div class="pl-64 w-full"><header class="fixed top-0 left-64 right-0 h-16 bg-surface/80 backdrop-blur-md z-40 border-b border-outline-variant/30 px-lg flex items-center justify-between"><div class="flex-1 max-w-xl"><div class="relative group"><span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span><input class="w-full h-10 bg-surface-container-low border border-outline-variant rounded-lg pl-10 pr-4 text-body-md focus:outline-none focus:ring-2 focus:ring-secondary/50" placeholder="Search commands, extensions, or numbers..." type="text"/></div></div><div class="flex items-center gap-lg ml-lg"><button class="text-on-surface-variant hover:text-secondary transition-colors relative"><span class="material-symbols-outlined">notifications</span><span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full"></span></button><div class="flex items-center gap-md pl-lg border-l border-outline-variant"><div class="text-right hidden sm:block"><div class="text-body-sm font-bold text-on-surface leading-none">Admin User</div><div class="text-[10px] text-on-surface-variant uppercase tracking-widest">Super Administrator</div></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="relative pt-16 min-h-screen bg-background p-margin-page"><div class="flex flex-col w-full relative">
+<div class="flex flex-col lg:flex-row gap-lg">
+<!-- Left Sidebar / Stats & Quick Actions (Fixed Width) -->
+<div class="w-full lg:w-72 flex-shrink-0 flex flex-col gap-lg">
+<div class="bg-surface p-md shadow-sm border border-outline-variant/30 relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute -right-8 -top-8 w-32 h-32 bg-secondary/5 rounded-full blur-2xl group-hover:bg-secondary/10 transition-colors"></div>
+<div class="flex justify-between items-start relative z-10">
+<div>
+<div class="font-label-caps text-on-surface-variant uppercase mb-xs">Active Users</div>
+<div class="font-display-lg text-on-surface mb-unit">1,248</div>
+<div class="font-body-sm text-tertiary-container flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span>+12 this week</span>
+</div>
+</div>
+<div class="w-10 h-10 bg-secondary-container rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container">group</span>
+</div>
+</div>
+</div>
+<div class="bg-surface p-md shadow-sm border border-outline-variant/30">
+<div class="font-label-caps text-on-surface-variant uppercase mb-md">System Health</div>
+<div class="space-y-sm">
+<div class="flex justify-between items-center">
+<span class="font-body-sm text-on-surface">Registration Latency</span>
+<span class="font-code-md text-on-surface">12ms</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-fixed-dim w-1/4"></div>
+</div>
+<div class="flex justify-between items-center mt-sm">
+<span class="font-body-sm text-on-surface">Active Calls</span>
+<span class="font-code-md text-on-surface">342</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-3/4"></div>
+</div>
+</div>
+</div>
+<!-- Quick Add Button -->
+<button class="bg-secondary text-on-secondary font-headline-sm h-12 flex items-center justify-center gap-sm shadow-sm hover:bg-secondary/90 transition-colors relative overflow-hidden group" onclick="document.getElementById('add-account-modal').classList.remove('hidden')">
+<span class="relative z-10 flex items-center gap-sm">
+<span class="material-symbols-outlined">person_add</span>
+                    Provision Account
+                </span>
+<div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform"></div>
+</button>
+<!-- Permissions Nav -->
+<div class="bg-surface shadow-sm border border-outline-variant/30 flex flex-col">
+<div class="px-md py-sm bg-surface-container-low border-b border-outline-variant/30 font-label-caps text-on-surface-variant">Access Control</div>
+<button class="flex items-center justify-between p-md hover:bg-surface-container-low transition-colors text-left group">
+<span class="font-body-md text-on-surface group-hover:text-secondary transition-colors">Roles &amp; Policies</span>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors">chevron_right</span>
+</button>
+<button class="flex items-center justify-between p-md border-t border-outline-variant/10 hover:bg-surface-container-low transition-colors text-left group">
+<span class="font-body-md text-on-surface group-hover:text-secondary transition-colors">Authentication Providers</span>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors">chevron_right</span>
+</button>
+<button class="flex items-center justify-between p-md border-t border-outline-variant/10 hover:bg-surface-container-low transition-colors text-left group">
+<span class="font-body-md text-on-surface group-hover:text-secondary transition-colors">API Keys</span>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Main Content Area (Fluid) -->
+<div class="flex-1 flex flex-col gap-lg min-w-0">
+<!-- Filter Bar -->
+<div class="bg-surface shadow-sm border border-outline-variant/30 p-xs flex items-center gap-xs overflow-x-auto">
+<div class="relative flex-1 min-w-[200px] ml-xs">
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-outline text-[18px]">filter_list</span>
+<input class="w-full h-8 bg-surface-container-lowest border border-outline-variant/50 rounded pl-8 pr-2 font-body-sm text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" placeholder="Filter by Name, Extension, or MAC..." type="text"/>
+</div>
+<div class="h-6 w-px bg-outline-variant/30 mx-sm"></div>
+<div class="flex gap-xs">
+<button class="px-sm py-xs bg-secondary-container/10 border border-secondary text-secondary font-label-caps rounded flex items-center gap-xs">
+                        All
+                    </button>
+<button class="px-sm py-xs bg-surface-container-low border border-outline-variant text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-caps rounded flex items-center gap-xs">
+                        Admin
+                    </button>
+<button class="px-sm py-xs bg-surface-container-low border border-outline-variant text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-caps rounded flex items-center gap-xs">
+                        Agent
+                    </button>
+<button class="px-sm py-xs bg-surface-container-low border border-outline-variant text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-caps rounded flex items-center gap-xs">
+                        Inactive
+                    </button>
+</div>
+</div>
+<!-- Data Table -->
+<div class="bg-surface shadow-sm border border-outline-variant/30 flex flex-col overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse min-w-[800px]">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant/50">
+<th class="py-sm px-md font-label-caps text-on-surface-variant uppercase w-12 text-center">
+<input class="accent-secondary w-4 h-4" type="checkbox"/>
+</th>
+<th class="py-sm px-md font-label-caps text-on-surface-variant uppercase">Identity</th>
+<th class="py-sm px-md font-label-caps text-on-surface-variant uppercase">Ext / URI</th>
+<th class="py-sm px-md font-label-caps text-on-surface-variant uppercase">Role / Group</th>
+<th class="py-sm px-md font-label-caps text-on-surface-variant uppercase">Status</th>
+<th class="py-sm px-md font-label-caps text-on-surface-variant uppercase text-right">Last Registration</th>
+<th class="py-sm px-md font-label-caps text-on-surface-variant uppercase w-16"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="py-md px-md text-center">
+<input class="accent-secondary w-4 h-4" type="checkbox"/>
+</td>
+<td class="py-md px-md">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center font-headline-sm text-on-primary-container">E</div>
+<div>
+<div class="font-headline-sm text-on-surface">Eleanor Vance</div>
+<div class="font-body-sm text-on-surface-variant">eleanor.v@pbx.core</div>
+</div>
+</div>
+</td>
+<td class="py-md px-md font-code-md text-on-surface">
+                                    1001
+                                </td>
+<td class="py-md px-md">
+<div class="flex flex-col gap-xs">
+<span class="font-body-sm text-on-surface">Super Admin</span>
+<span class="font-label-caps text-on-surface-variant bg-surface-container px-1 py-0.5 rounded w-fit">IT Support</span>
+</div>
+</td>
+<td class="py-md px-md">
+<div class="inline-flex items-center gap-xs px-2 py-1 bg-tertiary-container/10 rounded font-label-caps text-on-tertiary-container">
+<div class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></div>
+                                        Registered
+                                    </div>
+</td>
+<td class="py-md px-md text-right">
+<div class="font-body-md text-on-surface">192.168.1.45</div>
+<div class="font-body-sm text-on-surface-variant">2 mins ago</div>
+</td>
+<td class="py-md px-md text-right">
+<button class="text-outline hover:text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="py-md px-md text-center">
+<input class="accent-secondary w-4 h-4" type="checkbox"/>
+</td>
+<td class="py-md px-md">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-surface-variant flex items-center justify-center font-headline-sm text-on-surface-variant">M</div>
+<div>
+<div class="font-headline-sm text-on-surface">Marcus Reed</div>
+<div class="font-body-sm text-on-surface-variant">m.reed@pbx.core</div>
+</div>
+</div>
+</td>
+<td class="py-md px-md font-code-md text-on-surface">
+                                    1045
+                                </td>
+<td class="py-md px-md">
+<div class="flex flex-col gap-xs">
+<span class="font-body-sm text-on-surface">Agent</span>
+<span class="font-label-caps text-on-surface-variant bg-surface-container px-1 py-0.5 rounded w-fit">Sales East</span>
+</div>
+</td>
+<td class="py-md px-md">
+<div class="inline-flex items-center gap-xs px-2 py-1 bg-tertiary-container/10 rounded font-label-caps text-on-tertiary-container">
+<div class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></div>
+                                        Registered
+                                    </div>
+</td>
+<td class="py-md px-md text-right">
+<div class="font-body-md text-on-surface">10.0.4.22</div>
+<div class="font-body-sm text-on-surface-variant">45 mins ago</div>
+</td>
+<td class="py-md px-md text-right">
+<button class="text-outline hover:text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 (Inactive) -->
+<tr class="bg-surface-container-lowest hover:bg-surface-container-low transition-colors group opacity-75">
+<td class="py-md px-md text-center">
+<input class="accent-secondary w-4 h-4" type="checkbox"/>
+</td>
+<td class="py-md px-md">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center font-headline-sm text-outline">L</div>
+<div>
+<div class="font-headline-sm text-on-surface line-through decoration-outline">Conference Rm C</div>
+<div class="font-body-sm text-on-surface-variant">conf.c@pbx.core</div>
+</div>
+</div>
+</td>
+<td class="py-md px-md font-code-md text-on-surface">
+                                    8003
+                                </td>
+<td class="py-md px-md">
+<div class="flex flex-col gap-xs">
+<span class="font-body-sm text-on-surface">Endpoint</span>
+<span class="font-label-caps text-on-surface-variant bg-surface-container px-1 py-0.5 rounded w-fit">Facilities</span>
+</div>
+</td>
+<td class="py-md px-md">
+<div class="inline-flex items-center gap-xs px-2 py-1 bg-surface-container rounded font-label-caps text-on-surface-variant">
+<div class="w-1.5 h-1.5 rounded-full bg-outline"></div>
+                                        Unreachable
+                                    </div>
+</td>
+<td class="py-md px-md text-right">
+<div class="font-body-md text-on-surface">--</div>
+<div class="font-body-sm text-on-surface-variant">Offline for 12 days</div>
+</td>
+<td class="py-md px-md text-right">
+<button class="text-outline hover:text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="bg-surface-container-low border-t border-outline-variant/30 p-sm flex justify-between items-center">
+<span class="font-body-sm text-on-surface-variant">Showing 1 to 3 of 1,248</span>
+<div class="flex gap-xs">
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant text-on-surface-variant hover:bg-surface-container transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Modal (Hidden by default) -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center hidden" id="add-account-modal">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-primary-container/40 backdrop-blur-sm" onclick="document.getElementById('add-account-modal').classList.add('hidden')"></div>
+<!-- Modal Content -->
+<div class="relative bg-surface shadow-xl border border-outline-variant/30 w-full max-w-2xl flex flex-col max-h-[921px]">
+<div class="px-lg py-md border-b border-outline-variant/30 flex justify-between items-center bg-surface-container-low">
+<h2 class="font-headline-md text-on-surface">Provision New Account</h2>
+<button class="text-outline hover:text-on-surface transition-colors" onclick="document.getElementById('add-account-modal').classList.add('hidden')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-lg overflow-y-auto">
+<form class="space-y-lg">
+<!-- Section: Identity -->
+<div>
+<h3 class="font-label-caps text-on-surface-variant uppercase mb-sm border-b border-outline-variant/20 pb-xs">Identity Profile</h3>
+<div class="grid grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="font-body-sm text-on-surface">Display Name</label>
+<input class="w-full h-10 bg-surface-container-lowest border border-outline-variant/50 rounded px-3 font-body-md text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" placeholder="e.g., John Doe" type="text"/>
+</div>
+<div class="space-y-xs">
+<label class="font-body-sm text-on-surface">SIP URI / Username</label>
+<input class="w-full h-10 bg-surface-container-lowest border border-outline-variant/50 rounded px-3 font-body-md text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" placeholder="j.doe" type="text"/>
+</div>
+</div>
+</div>
+<!-- Section: Routing -->
+<div>
+<h3 class="font-label-caps text-on-surface-variant uppercase mb-sm border-b border-outline-variant/20 pb-xs">Routing &amp; Topology</h3>
+<div class="grid grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="font-body-sm text-on-surface">Extension Number</label>
+<input class="w-full h-10 bg-surface-container-lowest border border-outline-variant/50 rounded px-3 font-code-md text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" placeholder="1XXX" type="number"/>
+</div>
+<div class="space-y-xs">
+<label class="font-body-sm text-on-surface">Context</label>
+<select class="w-full h-10 bg-surface-container-lowest border border-outline-variant/50 rounded px-3 font-body-md text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary">
+<option>default-internal</option>
+<option>external-restricted</option>
+<option>guest-wifi</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Section: Security -->
+<div>
+<h3 class="font-label-caps text-on-surface-variant uppercase mb-sm border-b border-outline-variant/20 pb-xs">Authentication</h3>
+<div class="space-y-md">
+<div class="space-y-xs">
+<label class="font-body-sm text-on-surface">SIP Secret</label>
+<div class="relative">
+<input class="w-full h-10 bg-surface-container-lowest border border-outline-variant/50 rounded pl-3 pr-10 font-code-md text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" type="password" value="auto-generated-string-here"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface" type="button">
+<span class="material-symbols-outlined text-[18px]">autorenew</span>
+</button>
+</div>
+</div>
+<label class="flex items-center gap-sm cursor-pointer group">
+<div class="w-4 h-4 border border-outline-variant rounded bg-surface-container-lowest flex items-center justify-center group-hover:border-secondary transition-colors">
+<div class="w-2 h-2 bg-secondary rounded-sm hidden"></div>
+</div>
+<span class="font-body-sm text-on-surface">Require SRTP / TLS Transport</span>
+</label>
+</div>
+</div>
+</form>
+</div>
+<div class="px-lg py-md border-t border-outline-variant/30 flex justify-end gap-md bg-surface-container-low">
+<button class="px-lg h-10 border border-outline-variant text-on-surface-variant font-headline-sm hover:bg-surface-container transition-colors" onclick="document.getElementById('add-account-modal').classList.add('hidden')">
+                    Cancel
+                </button>
+<button class="px-lg h-10 bg-secondary text-on-secondary font-headline-sm hover:bg-secondary/90 transition-colors shadow-sm">
+                    Commit Changes
+                </button>
+</div>
+</div>
+</div>
+</div></main></div></body></html>

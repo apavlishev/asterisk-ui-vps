@@ -1,3 +1,6 @@
+import license_mgr
+import marketplace_data
+from flask import render_template
 import secrets
 import time
 import os
@@ -4642,8 +4645,11 @@ def index():
         sip_trunks.append(t_copy)
     available_gateways = get_available_gateways(integrations)
     amocrm_user_mapping = integrations.get('amocrm', {}).get('user_mapping', {})
-    return render_template_string(
-        HTML_TEMPLATE,
+    license_info = license_mgr.load_license()
+    max_users = license_mgr.get_max_allowed_users()
+    plugins = marketplace_data.MARKETPLACE_PLUGINS
+    return render_template(
+        'index.html',
         accounts=accounts,
         integrations=integrations,
         ring_groups=ring_groups,
@@ -4654,6 +4660,9 @@ def index():
         inbound_target=inbound_target,
         ivr_tree=ivr_tree,
         host=host,
+        license=license_info,
+        max_users=max_users,
+        marketplace_plugins=plugins,
         current_version=get_current_version(),
         get_system_network_info=get_system_network_info
     )
@@ -5056,6 +5065,10 @@ def sip_save():
             updated = True
             break
     if not updated:
+        max_users = license_mgr.get_max_allowed_users()
+        if len(accounts) >= max_users:
+            flash(f'Достигнут лимит пользователей ({max_users}). Для добавления новых абонентов активируйте пакет Multi-SIP в Маркетплейсе.')
+            return redirect(url_for('index'))
         accounts.append({'exten': exten, 'password': password, 'context': 'from-internal'})
     
     out = ["[transport-udp]", "type=transport", "protocol=udp", "bind=0.0.0.0:5060", ""]
