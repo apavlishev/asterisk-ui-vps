@@ -748,26 +748,61 @@
                         <thead>
                             <tr class="bg-surface-container-low border-b border-surface-container text-on-surface-variant font-semibold text-xs uppercase tracking-wider">
                                 <th class="px-6 py-4">Название транка</th>
-                                <th class="px-6 py-4">Хост / Порт</th>
+                                <th class="px-6 py-4">Хост / Провайдер</th>
                                 <th class="px-6 py-4">Логин / CID</th>
-                                <th class="px-6 py-4">Сетевой статус</th>
+                                <th class="px-6 py-4">1. Использование</th>
+                                <th class="px-6 py-4">2. Статус регистрации</th>
                                 <th class="px-6 py-4 text-right">Действия</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-surface-container">
                             {% for t in sip_trunks %}
                             <tr class="hover:bg-surface-container-low/40 transition-colors">
-                                <td class="px-6 py-4 font-bold text-on-surface">{{ t.name }}</td>
-                                <td class="px-6 py-4 font-mono text-on-surface-variant">{{ t.host }}:{{ t.port }}</td>
-                                <td class="px-6 py-4 font-mono text-on-surface-variant">{{ t.username }}</td>
                                 <td class="px-6 py-4">
-                                    <span class="text-xs font-semibold text-{{ 'success' if t.network_status.online else 'error' }}">
-                                        {{ t.network_status.status_text }}
-                                    </span>
+                                    <div class="font-bold text-on-surface text-sm">{{ t.name }}</div>
+                                    <div class="text-[10px] font-mono text-on-surface-variant">{{ t.id }}</div>
                                 </td>
+                                <td class="px-6 py-4 font-mono text-on-surface text-xs font-semibold">{{ t.host }}:{{ t.port }}</td>
+                                <td class="px-6 py-4 font-mono text-on-surface-variant text-xs">
+                                    <div>{{ t.username }}</div>
+                                    {% if t.callerid %}<div class="text-[10px] text-primary">CID: {{ t.callerid }}</div>{% endif %}
+                                </td>
+                                
+                                <!-- STATUS 1: ИСПОЛЬЗУЕТСЯ ИЛИ НЕТ -->
+                                <td class="px-6 py-4">
+                                    <form action="/settings/sip-trunks/toggle/{{ t.id }}" method="POST" class="inline">
+                                        <button type="submit" class="px-3 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 {{ 'bg-success/10 text-success border border-success/20 hover:bg-success/20' if t.get('enabled', True) else 'bg-surface-container-high text-on-surface-variant border border-outline/30 hover:bg-surface-container' }}" title="Нажмите для переключения">
+                                            <span class="w-2 h-2 rounded-full {{ 'bg-success' if t.get('enabled', True) else 'bg-gray-400' }}"></span>
+                                            <span>{{ 'Используется' if t.get('enabled', True) else 'Отключен' }}</span>
+                                        </button>
+                                    </form>
+                                </td>
+
+                                <!-- STATUS 2: АВТОРИЗОВАН, НЕТ, ИДЕТ ПОДКЛЮЧЕНИЕ -->
+                                <td class="px-6 py-4">
+                                    {% if not t.get('enabled', True) %}
+                                    <span class="text-xs px-2.5 py-1 rounded-lg bg-surface-container text-on-surface-variant font-mono">⚪ Выключен</span>
+                                    {% elif t.network_status.status_type == 'registered' %}
+                                    <span class="text-xs px-2.5 py-1 rounded-lg bg-success/10 text-success font-semibold border border-success/20 flex items-center gap-1.5 w-fit">
+                                        <span class="material-symbols-outlined text-[15px]">verified</span>
+                                        <span>Авторизован</span>
+                                    </span>
+                                    {% elif t.network_status.status_type == 'connecting' %}
+                                    <span class="text-xs px-2.5 py-1 rounded-lg bg-warning/10 text-warning font-semibold border border-warning/20 flex items-center gap-1.5 w-fit animate-pulse">
+                                        <span class="material-symbols-outlined text-[15px] animate-spin">sync</span>
+                                        <span>Идет подключение...</span>
+                                    </span>
+                                    {% else %}
+                                    <span class="text-xs px-2.5 py-1 rounded-lg bg-error/10 text-error font-semibold border border-error/20 flex items-center gap-1.5 w-fit">
+                                        <span class="material-symbols-outlined text-[15px]">error</span>
+                                        <span>Не авторизован</span>
+                                    </span>
+                                    {% endif %}
+                                </td>
+
                                 <td class="px-6 py-4 text-right">
                                     <form action="/settings/sip-trunks/delete/{{ t.id }}" method="POST" onsubmit="return confirm('Удалить транк {{ t.name }}?');" class="inline">
-                                        <button type="submit" class="p-2 rounded-lg text-error hover:bg-error/10 transition-colors">
+                                        <button type="submit" class="p-2 rounded-lg text-error hover:bg-error/10 transition-colors" title="Удалить транк">
                                             <span class="material-symbols-outlined text-[18px]">delete</span>
                                         </button>
                                     </form>

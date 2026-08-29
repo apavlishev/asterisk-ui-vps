@@ -3642,7 +3642,7 @@ def get_trunks_status():
     pjsip_reg_out = run_asterisk('pjsip show registrations')
     for line in pjsip_reg_out.splitlines():
         parts = line.split()
-        if len(parts) >= 3:
+        if len(parts) >= 2:
             t_reg_name = parts[0].split('/')[0]
             clean_name = t_reg_name.replace('reg_', '').replace('_reg', '')
             
@@ -3650,26 +3650,44 @@ def get_trunks_status():
             host_val = host_match.group(1) if host_match else ''
             
             if 'Registered' in line:
-                val = {'online': True, 'status_text': '🟢 В сети (Registered)', 'color': '#10b981'}
-                status_map[t_reg_name] = val
-                status_map[clean_name] = val
-                status_map[f"trunk_{clean_name}"] = val
-                if host_val:
-                    status_map[host_val] = val
-                    status_map[host_val.split(':')[0]] = val
-            elif 'Rejected' in line or 'Failed' in line:
-                val = {'online': False, 'status_text': '🔴 Ошибка авторизации (Rejected)', 'color': '#ef4444'}
-                status_map[t_reg_name] = val
-                status_map[clean_name] = val
-                status_map[f"trunk_{clean_name}"] = val
-                if host_val:
-                    status_map[host_val] = val
-                    status_map[host_val.split(':')[0]] = val
-            elif 'Unregistered' in line:
-                val = {'online': False, 'status_text': '⚪ Не зарегистрирован', 'color': '#94a3b8'}
-                status_map[t_reg_name] = val
-                status_map[clean_name] = val
-                status_map[f"trunk_{clean_name}"] = val
+                val = {
+                    'online': True,
+                    'status_type': 'registered',
+                    'status_text': 'Авторизован',
+                    'status_badge': '🟢 Авторизован (200 OK)',
+                    'color': 'success'
+                }
+            elif 'Request Sent' in line or 'Trying' in line or 'Auth. Sent' in line:
+                val = {
+                    'online': False,
+                    'status_type': 'connecting',
+                    'status_text': 'Идет подключение...',
+                    'status_badge': '🟡 Идет подключение...',
+                    'color': 'warning'
+                }
+            elif 'Rejected' in line or 'Failed' in line or 'Forbidden' in line:
+                val = {
+                    'online': False,
+                    'status_type': 'rejected',
+                    'status_text': 'Не авторизован (Ошибка)',
+                    'status_badge': '🔴 Ошибка авторизации (Rejected)',
+                    'color': 'error'
+                }
+            else:
+                val = {
+                    'online': False,
+                    'status_type': 'unregistered',
+                    'status_text': 'Не подключен',
+                    'status_badge': '⚪ Не подключен',
+                    'color': 'on-surface-variant'
+                }
+            
+            status_map[t_reg_name] = val
+            status_map[clean_name] = val
+            status_map[f"trunk_{clean_name}"] = val
+            if host_val:
+                status_map[host_val] = val
+                status_map[host_val.split(':')[0]] = val
 
     # 2. Check PJSIP Endpoints for RTT ping & availability
     pjsip_ep_out = run_asterisk('pjsip show endpoints')
@@ -3683,9 +3701,25 @@ def get_trunks_status():
             if 'Avail' in line:
                 rtt_m = re.search(r'Avail\s+([0-9.]+)', line)
                 rtt_str = f" ({int(float(rtt_m.group(1)))} ms)" if rtt_m else ""
-                status_map[current_ep] = {'online': True, 'status_text': f'🟢 В сети{rtt_str}', 'color': '#10b981'}
+                if current_ep not in status_map or status_map[current_ep]['status_type'] == 'unregistered':
+                    status_map[current_ep] = {
+                        'online': True,
+                        'status_type': 'registered',
+                        'status_text': f'В сети{rtt_str}',
+                        'status_badge': f'🟢 В сети{rtt_str}',
+                        'color': 'success'
+                    }
             elif 'Unavail' in line and current_ep not in status_map:
-                status_map[current_ep] = {'online': False, 'status_text': '🔴 Не в сети (Unreachable)', 'color': '#ef4444'}
+                status_map[current_ep] = {
+                    'online': False,
+                    'status_type': 'rejected',
+                    'status_text': 'Недоступен',
+                    'status_badge': '🔴 Недоступен (Offline)',
+                    'color': 'error'
+                }
+
+    return status_map
+
 
     # 3. Check IAX2 Peers
     iax_peers_out = run_asterisk('iax2 show peers')
