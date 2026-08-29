@@ -1,124 +1,83 @@
-# Marketplace Plugin Catalog Definition
+import os
+import json
 
-MARKETPLACE_PLUGINS = [
-    {
-        "id": "neural_transcribe",
-        "name": "Neural Transcribe & AI Analytics",
-        "category": "ai",
-        "category_name": "AI & Voice",
-        "version": "v2.4.1",
-        "icon": "graphic_eq",
-        "color": "primary",
-        "rating": "4.9 (1.2k)",
-        "price": "$19",
-        "price_sub": "/ mo",
-        "installed": True,
-        "update_available": False,
-        "description": "Real-time AI voice transcription (Local Whisper / Custom OpenAI API) with dual-channel speaker diarization and sentiment analysis. Supports 40+ languages."
-    },
-    {
-        "id": "amocrm_pro",
-        "name": "amoCRM Pro Integration & Drive",
-        "category": "crm",
-        "category_name": "CRM Integrations",
-        "version": "v3.2.0",
-        "icon": "sync_alt",
-        "color": "secondary",
-        "rating": "4.9 (2.4k)",
-        "price": "$15",
-        "price_sub": "/ mo",
-        "installed": True,
-        "update_available": False,
-        "description": "Deep 2-way sync with amoCRM API v4, auto-lead creation, audio upload to amoCRM Drive and native timeline web-player."
-    },
-    {
-        "id": "telegram_alerts",
-        "name": "Telegram Smart Alerts & Proxy",
-        "category": "notifications",
-        "category_name": "Productivity",
-        "version": "v2.1.0",
-        "icon": "send",
-        "color": "warning",
-        "rating": "4.8 (1.9k)",
-        "price": "$9",
-        "price_sub": "/ mo",
-        "installed": True,
-        "update_available": False,
-        "description": "Multi-user instant call dispatching, reverse proxy failover for UAE/RU restrictions, inline audio player links."
-    },
-    {
-        "id": "ivr_visual_designer",
-        "name": "Visual IVR Tree & Schedule Router",
-        "category": "voice",
-        "category_name": "AI & Voice",
-        "version": "v2.0.0",
-        "icon": "account_tree",
-        "color": "tertiary",
-        "rating": "4.8 (850)",
-        "price": "$12",
-        "price_sub": "/ mo",
-        "installed": True,
-        "update_available": False,
-        "description": "Interactive drag-and-drop IVR menu builder, DTMF key branching, working hours and holiday schedule routing."
-    },
-    {
-        "id": "user_expansion_50",
-        "name": "Multi-SIP Extension Pack (50 Users)",
-        "category": "core",
-        "category_name": "Capacity & Core",
-        "version": "v1.5.0",
-        "icon": "group_add",
-        "color": "primary",
-        "rating": "5.0 (3.1k)",
-        "price": "$29",
-        "price_sub": "one-time",
-        "installed": False,
-        "update_available": False,
-        "description": "Expands your base Free Core limit from 2 SIP extensions up to 50 active internal subscribers."
-    },
-    {
-        "id": "bitrix24_rest",
-        "name": "Bitrix24 REST Telephony Connector",
-        "category": "crm",
-        "category_name": "CRM Integrations",
-        "version": "v1.8.0",
-        "icon": "hub",
-        "color": "secondary",
-        "rating": "4.7 (620)",
-        "price": "$15",
-        "price_sub": "/ mo",
-        "installed": False,
-        "update_available": False,
-        "description": "REST API connector for Bitrix24 on-premise and cloud. Real-time incoming call card popups and audio sync."
-    },
-    {
-        "id": "secure_vault_storage",
-        "name": "Secure Vault S3 & FTP Storage",
-        "category": "storage",
-        "category_name": "Security & Compliance",
-        "version": "v3.1.0",
-        "icon": "enhanced_encryption",
-        "color": "error",
-        "rating": "4.8 (2.1k)",
-        "price": "$10",
-        "price_sub": "/ mo",
-        "installed": False,
-        "update_available": True,
-        "description": "Automated call archive sync to AWS S3, Yandex Cloud, Google Drive or FTP with automated quota rotation."
-    },
-    {
-        "id": "fail2ban_geoip",
-        "name": "GeoIP Shield & Fail2ban Pro",
-        "category": "security",
-        "category_name": "Security & Compliance",
-        "version": "v2.0.4",
-        "icon": "shield",
-        "color": "error",
-        "rating": "4.9 (1.5k)",
-        "price": "Free",
-        "price_sub": "",
-        "installed": False,
-        "update_available": False,
-        "description": "Automated SIP brute-force attack prevention, intelligent IP banning and country-based GeoIP filtering."
-    }
-]
+PLUGINS_DIR = os.path.join(os.path.dirname(__file__), 'plugins')
+
+def load_marketplace_plugins(active_plugin_ids=None):
+    """Dynamically reads all plugin manifests from /plugins folder."""
+    if active_plugin_ids is None:
+        active_plugin_ids = []
+
+    plugins = []
+    if os.path.exists(PLUGINS_DIR):
+        for entry in os.listdir(PLUGINS_DIR):
+            manifest_path = os.path.join(PLUGINS_DIR, entry, 'manifest.json')
+            if os.path.exists(manifest_path):
+                try:
+                    with open(manifest_path, 'r', encoding='utf-8') as f:
+                        meta = json.load(f)
+                    p_id = meta.get('id')
+                    meta['installed'] = (p_id in active_plugin_ids)
+                    meta['dir_name'] = entry
+                    plugins.append(meta)
+                except Exception as e:
+                    print(f"Error loading plugin {entry}: {e}")
+
+    # Built-in extra marketplace catalog items
+    extra_items = [
+        {
+            "id": "neural_transcribe",
+            "name": "Neural Transcribe & AI Analytics",
+            "category": "ai",
+            "category_name": "AI & Voice",
+            "version": "v2.4.1",
+            "icon": "graphic_eq",
+            "color": "primary",
+            "rating": "4.9 (1.2k)",
+            "price": "$19",
+            "price_sub": "/ mo",
+            "installed": ("neural_transcribe" in active_plugin_ids),
+            "description": "Real-time AI voice transcription (Local Whisper / Custom OpenAI API) with dual-channel speaker diarization and sentiment analysis."
+        },
+        {
+            "id": "user_expansion_50",
+            "name": "Multi-SIP Extension Pack (50 Users)",
+            "category": "core",
+            "category_name": "Capacity & Core",
+            "version": "v1.5.0",
+            "icon": "group_add",
+            "color": "primary",
+            "rating": "5.0 (3.1k)",
+            "price": "$29",
+            "price_sub": "one-time",
+            "installed": ("user_expansion_50" in active_plugin_ids),
+            "description": "Expands your base Free Core limit from 2 SIP extensions up to 50 active internal subscribers."
+        },
+        {
+            "id": "ivr_visual_designer",
+            "name": "Visual IVR Tree & Schedule Router",
+            "category": "voice",
+            "category_name": "AI & Voice",
+            "version": "v2.0.0",
+            "icon": "account_tree",
+            "color": "tertiary",
+            "rating": "4.8 (850)",
+            "price": "$12",
+            "price_sub": "/ mo",
+            "installed": ("ivr_visual_designer" in active_plugin_ids),
+            "description": "Interactive drag-and-drop IVR menu builder, DTMF key branching, working hours and holiday schedule routing."
+        }
+    ]
+
+    existing_ids = {p['id'] for p in plugins}
+    for item in extra_items:
+        if item['id'] not in existing_ids:
+            plugins.append(item)
+
+    return plugins
+
+if __name__ == '__main__':
+    loaded = load_marketplace_plugins(['amocrm_pro', 'telegram_alerts'])
+    print(f"Loaded {len(loaded)} plugins:")
+    for p in loaded:
+        print(f"- [{p['id']}] {p['name']} (Installed: {p.get('installed')})")

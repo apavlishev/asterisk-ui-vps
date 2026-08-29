@@ -1,0 +1,15 @@
+{
+  "id": "telegram_alerts",
+  "name": "Telegram Smart Alerts & Proxy",
+  "category": "notifications",
+  "category_name": "Productivity",
+  "version": "v2.1.0",
+  "author": "Logic Core Team",
+  "icon": "send",
+  "color": "warning",
+  "rating": "4.8 (1.9k)",
+  "price": "$9",
+  "price_sub": "/ mo",
+  "description": "Мгновенные оповещения о входящих и исходящих звонках нескольким сотрудникам и в группы, обход блокировок через защищенный реверс-прокси, кликабельные ссылки на аудиозаписи.",
+  "entry_point": "plugin_main.py"
+}

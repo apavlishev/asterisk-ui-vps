@@ -1,0 +1,15 @@
+{
+  "id": "yandex_disk",
+  "name": "Яндекс.Диск Облачный Архив",
+  "category": "storage",
+  "category_name": "Storage & Media",
+  "version": "v2.1.0",
+  "author": "Logic Core Team",
+  "icon": "cloud_done",
+  "color": "warning",
+  "rating": "4.9 (1.8k)",
+  "price": "$8",
+  "price_sub": "/ mo",
+  "description": "Прямая выгрузка аудиозаписей разговоров на Яндекс.Диск через OAuth REST API в защищенную корпоративную папку.",
+  "entry_point": "plugin_main.py"
+}

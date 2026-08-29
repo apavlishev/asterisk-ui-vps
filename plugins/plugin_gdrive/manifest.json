@@ -1,0 +1,15 @@
+{
+  "id": "gdrive_storage",
+  "name": "Google Drive Cloud Archive",
+  "category": "storage",
+  "category_name": "Storage & Media",
+  "version": "v2.2.0",
+  "author": "Logic Core Team",
+  "icon": "add_to_drive",
+  "color": "secondary",
+  "rating": "4.9 (1.6k)",
+  "price": "$10",
+  "price_sub": "/ mo",
+  "description": "Резервное копирование записей звонков в облачную папку Google Drive через Google REST API с управлением квотами и постоянным хранением.",
+  "entry_point": "plugin_main.py"
+}

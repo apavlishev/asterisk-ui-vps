@@ -5127,6 +5127,19 @@ def save_ftp():
     flash('Настройки FTP-хранилища и HTTP-ссылок успешно сохранены!')
     return redirect(url_for('index'))
 
+
+@app.route('/settings/yandex-disk', methods=['POST'])
+def save_yandex_disk():
+    cfg = load_integrations()
+    if 'yandex_disk' not in cfg:
+        cfg['yandex_disk'] = {}
+    cfg['yandex_disk']['enabled'] = True if request.form.get('enabled') else False
+    cfg['yandex_disk']['token'] = request.form.get('token', '').strip()
+    cfg['yandex_disk']['path'] = request.form.get('path', 'app:/records').strip()
+    save_integrations(cfg)
+    flash('Настройки Яндекс.Диска сохранены!')
+    return redirect(url_for('index'))
+
 @app.route('/settings/gdrive', methods=['POST'])
 def save_gdrive():
     cfg = load_integrations()

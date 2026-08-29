@@ -1,0 +1,15 @@
+{
+  "id": "amocrm_pro",
+  "name": "amoCRM Pro Integration & Drive",
+  "category": "crm",
+  "category_name": "CRM Integrations",
+  "version": "v3.2.0",
+  "author": "Logic Core Team",
+  "icon": "sync_alt",
+  "color": "secondary",
+  "rating": "4.9 (2.4k)",
+  "price": "$15",
+  "price_sub": "/ mo",
+  "description": "Сквозная синхронизация с amoCRM (API v4), автосоздание сделок и контактов, нативная выгрузка аудиозаписей в amoCRM Drive с плеером в таймлайне.",
+  "entry_point": "plugin_main.py"
+}

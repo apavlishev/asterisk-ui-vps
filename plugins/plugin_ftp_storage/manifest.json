@@ -1,0 +1,15 @@
+{
+  "id": "ftp_storage",
+  "name": "FTP & Web Storage Sync",
+  "category": "storage",
+  "category_name": "Storage & Media",
+  "version": "v2.0.1",
+  "author": "Logic Core Team",
+  "icon": "cloud_upload",
+  "color": "primary",
+  "rating": "4.8 (1.1k)",
+  "price": "$7",
+  "price_sub": "/ mo",
+  "description": "Автоматическая выгрузка WAV-записей разговоров на удаленный FTP-сервер с мгновенной генерацией публичных HTTP/HTTPS ссылок для CRM и аудиоплееров.",
+  "entry_point": "plugin_main.py"
+}
