@@ -5408,13 +5408,35 @@ def save_amocrm():
     enabled = True if request.form.get('enabled') else False
     send_internal = True if request.form.get('send_internal') else False
     
-    routing_mode = request.form.get('routing_mode', 'by_operator')
+    routing_mode = request.form.get('routing_mode', 'by_channel')
     pipeline_id = request.form.get('pipeline_id', '').strip()
     status_id = request.form.get('status_id', '').strip()
     
     audio_mode = request.form.get('audio_mode', 'cloud_link')
     cloud_provider = request.form.get('cloud_provider', 'auto')
     
+    # 1. Parse individual channel / trunk mappings
+    channel_mapping = {}
+    for k, v in request.form.items():
+        if k.startswith('chan_pipeline_') and v.strip():
+            c_key = k.replace('chan_pipeline_', '')
+            st_val = request.form.get(f'chan_status_{c_key}', '').strip()
+            channel_mapping[c_key] = {
+                'pipeline_id': v.strip(),
+                'status_id': st_val
+            }
+
+    # 2. Parse individual operator / participant mappings
+    operator_pipeline_mapping = {}
+    for k, v in request.form.items():
+        if k.startswith('op_pipeline_') and v.strip():
+            ext = k.replace('op_pipeline_', '')
+            st_val = request.form.get(f'op_status_{ext}', '').strip()
+            operator_pipeline_mapping[ext] = {
+                'pipeline_id': v.strip(),
+                'status_id': st_val
+            }
+
     if 'amocrm' not in cfg:
         cfg['amocrm'] = {}
         
@@ -5427,9 +5449,11 @@ def save_amocrm():
     cfg['amocrm']['status_id'] = status_id
     cfg['amocrm']['audio_mode'] = audio_mode
     cfg['amocrm']['cloud_provider'] = cloud_provider
+    cfg['amocrm']['channel_mapping'] = channel_mapping
+    cfg['amocrm']['operator_pipeline_mapping'] = operator_pipeline_mapping
     
     save_integrations(cfg)
-    flash('Все параметры интеграции amoCRM успешно сохранены!')
+    flash('Все параметры мульти-канальной маршрутизации amoCRM успешно сохранены!')
     return redirect(url_for('index'))
 
 
