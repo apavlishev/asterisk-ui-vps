@@ -99,6 +99,13 @@
                 <span class="material-symbols-outlined mr-4 text-warning">integration_instructions</span>
                 <span class="text-sm font-medium">Интеграции CRM</span>
             </button>
+            <button onclick="switchTab('security')" id="nav-security" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
+                <span class="material-symbols-outlined mr-4 text-error">lock_person</span>
+                <span class="text-sm font-medium">Безопасность & Доступ</span>
+                {% if not auth_enabled %}
+                <span class="ml-auto w-2 h-2 rounded-full bg-error animate-pulse" title="Парольная защита отключена"></span>
+                {% endif %}
+            </button>
             <button onclick="switchTab('calls')" id="nav-calls" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-primary">history</span>
                 <span class="text-sm font-medium">Журнал вызовов</span>
@@ -140,8 +147,13 @@
                 <div class="h-6 w-[1px] bg-surface-container"></div>
                 <div class="text-xs text-right hidden sm:block">
                     <div class="font-medium text-on-surface">{{ host }}</div>
-                    <div class="text-[10px] text-on-surface-variant font-mono">v{{ current_version }}</div>
+                    <div class="text-[10px] text-on-surface-variant font-mono">Client IP: {{ client_ip }}</div>
                 </div>
+                {% if auth_enabled %}
+                <a href="/logout" class="p-2 rounded-full hover:bg-error/10 text-error transition-colors" title="Выйти из системы">
+                    <span class="material-symbols-outlined text-[20px]">logout</span>
+                </a>
+                {% endif %}
             </div>
         </header>
 
@@ -662,6 +674,55 @@
                 </div>
             </div>
 
+        
+            <!-- ================= TAB 9: SECURITY & ACCESS ================= -->
+            <div id="tab-security" class="tab-pane space-y-6">
+                <div class="bg-surface rounded-2xl p-8 border border-outline/30 shadow-sm max-w-2xl">
+                    <div class="flex items-center gap-4 mb-6 pb-4 border-b border-surface-container">
+                        <div class="w-12 h-12 rounded-2xl bg-error/10 text-error flex items-center justify-center">
+                            <span class="material-symbols-outlined text-2xl">shield_lock</span>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-on-surface">Парольная защита панели</h2>
+                            <p class="text-xs text-on-surface-variant">Ограничение доступа к панели управления при открытом внешнем IP</p>
+                        </div>
+                    </div>
+
+                    <form action="/settings/security/auth" method="POST" class="space-y-6">
+                        <div class="flex items-center justify-between p-4 rounded-xl bg-surface-container-low border border-outline/20">
+                            <div>
+                                <div class="text-sm font-bold text-on-surface">Включить авторизацию по логину и паролю</div>
+                                <div class="text-xs text-on-surface-variant mt-0.5">При переходе на панель с внешних IP потребуется ввести пароль</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="enabled" value="1" class="sr-only peer" {% if auth_enabled %}checked{% endif %}>
+                                <div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Имя пользователя (Логин)</label>
+                                <input type="text" name="username" value="{{ auth_username }}" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Новый пароль</label>
+                                <input type="password" name="password" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-surface-container-low/50 border border-outline/20 text-xs text-on-surface-variant space-y-1 font-mono">
+                            <div>Ваш текущий IP: <b class="text-on-surface">{{ client_ip }}</b> ({{ "Локальный / VPN" if is_client_local else "Внешний публичный IP" }})</div>
+                            <div>Статус защиты: <b class="{{ 'text-success' if auth_enabled else 'text-error' }}">{{ "АКТИВНА" if auth_enabled else "ОТКЛЮЧЕНА (Вход без пароля)" }}</b></div>
+                        </div>
+
+                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:bg-primary/90 transition-all shadow-sm">
+                            Сохранить настройки безопасности
+                        </button>
+                    </form>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -778,5 +839,51 @@
             switchTab(saved);
         });
     </script>
+
+    <!-- MODAL: PROMPT SET PASSWORD (NON-LOCAL IP DETECTED) -->
+    {% if show_security_prompt %}
+    <div id="modal-security-alert" class="fixed inset-0 bg-on-surface/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+        <div class="bg-surface rounded-3xl max-w-lg w-full p-8 border border-error/30 shadow-2xl space-y-6 animate-fadeIn">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-error/10 text-error flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-3xl">warning</span>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-on-surface">Защитите панель управления!</h3>
+                    <p class="text-xs text-on-surface-variant mt-0.5">Обнаружено подключение с внешнего IP-адреса <b class="font-mono text-on-surface">{{ client_ip }}</b></p>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-error/5 border border-error/20 text-xs text-on-surface leading-relaxed space-y-2">
+                <p>
+                    Панель Asterisk UI доступна в глобальной сети без пароля. Для предотвращения несанкционированного доступа рекомендуется прямо сейчас установить логин и пароль администратора.
+                </p>
+            </div>
+
+            <form action="/settings/security/auth" method="POST" class="space-y-4">
+                <input type="hidden" name="enabled" value="1">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Имя пользователя (Логин)</label>
+                    <input type="text" name="username" value="admin" required class="w-full px-4 py-2.5 rounded-xl bg-background border border-outline text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Пароль администратора</label>
+                    <input type="password" name="password" placeholder="Введите надежный пароль" required class="w-full px-4 py-2.5 rounded-xl bg-background border border-outline text-sm">
+                </div>
+
+                <div class="pt-2 flex justify-between items-center gap-3">
+                    <button type="submit" name="dismiss_prompt" value="1" class="px-4 py-2 text-xs font-medium text-on-surface-variant hover:text-on-surface transition-colors">
+                        Напомнить позже
+                    </button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:bg-primary/90 transition-all shadow-md">
+                        Включить защиту
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
 </body>
 </html>

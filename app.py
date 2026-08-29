@@ -1,3 +1,91 @@
+
+def is_local_ip(ip):
+    if not ip:
+        return True
+    if ip in ['127.0.0.1', '::1', 'localhost']:
+        return True
+    try:
+        ip_obj = ipaddress.ip_address(ip)
+        return ip_obj.is_private or ip_obj.is_loopback
+    except Exception:
+        return False
+
+def get_client_ip():
+    if request.headers.get('X-Forwarded-For'):
+        return request.headers.get('X-Forwarded-For').split(',')[0].strip()
+    return request.remote_addr or '127.0.0.1'
+
+@app.before_request
+def check_security_and_auth():
+    if request.path.startswith('/static') or request.path == '/login' or request.path.startswith('/api/'):
+        return None
+
+    cfg = load_integrations()
+    auth_cfg = cfg.get('security_auth', {})
+    if auth_cfg.get('enabled', False):
+        if not session.get('logged_in'):
+            return redirect(url_for('login_page'))
+    return None
+
+@app.route('/login', methods=['GET', 'POST'])
+def login_page():
+    cfg = load_integrations()
+    auth_cfg = cfg.get('security_auth', {})
+    
+    if request.method == 'POST':
+        user = request.form.get('username', '').strip()
+        pwd = request.form.get('password', '').strip()
+        
+        cfg_user = auth_cfg.get('username', 'admin')
+        cfg_pwd = auth_cfg.get('password', 'admin')
+        
+        if user == cfg_user and pwd == cfg_pwd:
+            session['logged_in'] = True
+            session['username'] = user
+            flash('Авторизация успешна!')
+            return redirect(url_for('index'))
+        else:
+            flash('Неверный логин или пароль!')
+            return render_template('login.html', error="Неверный логин или пароль")
+
+    return render_template('login.html')
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout_page():
+    session.clear()
+    flash('Вы успешно вышли из системы.')
+    return redirect(url_for('login_page'))
+
+@app.route('/settings/security/auth', methods=['POST'])
+def save_security_auth():
+    cfg = load_integrations()
+    enabled = True if request.form.get('enabled') else False
+    username = request.form.get('username', 'admin').strip()
+    password = request.form.get('password', '').strip()
+
+    if 'security_auth' not in cfg:
+        cfg['security_auth'] = {}
+
+    cfg['security_auth']['enabled'] = enabled
+    if username:
+        cfg['security_auth']['username'] = username
+    if password:
+        cfg['security_auth']['password'] = password
+    
+    if request.form.get('dismiss_prompt'):
+        cfg['security_auth']['prompt_dismissed'] = True
+
+    save_integrations(cfg)
+    
+    if enabled:
+        session['logged_in'] = True
+        session['username'] = username
+        flash('Парольная защита панели успешно активирована!')
+    else:
+        flash('Настройки безопасности сохранены.')
+        
+    return redirect(url_for('index'))
+
 import license_mgr
 import marketplace_data
 from flask import render_template
@@ -4648,8 +4736,19 @@ def index():
     license_info = license_mgr.load_license()
     max_users = license_mgr.get_max_allowed_users()
     plugins = marketplace_data.MARKETPLACE_PLUGINS
+    client_ip = get_client_ip()
+    is_client_local = is_local_ip(client_ip)
+    auth_cfg = integrations.get('security_auth', {})
+    auth_enabled = auth_cfg.get('enabled', False)
+    prompt_dismissed = auth_cfg.get('prompt_dismissed', False)
+    show_security_prompt = (not is_client_local) and (not auth_enabled) and (not prompt_dismissed)
     return render_template(
         'index.html',
+        client_ip=client_ip,
+        is_client_local=is_client_local,
+        auth_enabled=auth_enabled,
+        auth_username=auth_cfg.get('username', 'admin'),
+        show_security_prompt=show_security_prompt,
         accounts=accounts,
         integrations=integrations,
         ring_groups=ring_groups,
