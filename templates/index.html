@@ -1564,6 +1564,24 @@
             }
         });
 
+        
+        // Auto-draw Canvas on DOM Ready & Resize
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('ivrCanvas');
+            if (canvas && window.ResizeObserver) {
+                const ro = new ResizeObserver(() => {
+                    if (canvas.offsetParent !== null && typeof redrawCanvas === 'function') {
+                        const container = canvas.parentElement;
+                        const dpr = window.devicePixelRatio || 1;
+                        canvas.width = container.clientWidth * dpr;
+                        canvas.height = container.clientHeight * dpr;
+                        redrawCanvas();
+                    }
+                });
+                ro.observe(canvas.parentElement);
+            }
+        });
+
         function switchTab(tabId) {
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active-nav-item'));
@@ -1575,6 +1593,15 @@
             if (targetNav) targetNav.classList.add('active-nav-item');
             
             localStorage.setItem('active_tab_vps', tabId);
+
+            // Auto-initialize IVR Canvas whenever IVR tab is opened
+            if (tabId === 'ivr') {
+                setTimeout(() => {
+                    if (typeof initIvrCanvas === 'function') {
+                        initIvrCanvas();
+                    }
+                }, 50);
+            }
         }
 
         // Restore active tab
