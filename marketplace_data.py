@@ -81,3 +81,5 @@ if __name__ == '__main__':
     print(f"Loaded {len(loaded)} plugins:")
     for p in loaded:
         print(f"- [{p['id']}] {p['name']} (Installed: {p.get('installed')})")
+
+MARKETPLACE_PLUGINS = load_marketplace_plugins()

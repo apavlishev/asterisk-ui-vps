@@ -4737,7 +4737,7 @@ def index():
     amocrm_user_mapping = integrations.get('amocrm', {}).get('user_mapping', {})
     license_info = license_mgr.load_license()
     max_users = license_mgr.get_max_allowed_users()
-    plugins = marketplace_data.MARKETPLACE_PLUGINS
+    plugins = marketplace_data.load_marketplace_plugins(license_info.get('active_plugins', []))
     client_ip = get_client_ip()
     is_client_local = is_local_ip(client_ip)
     auth_cfg = integrations.get('security_auth', {})
