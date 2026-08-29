@@ -111,72 +111,102 @@
             </button>
         </div>
 
-        <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group active-nav-item">
-                <span class="material-symbols-outlined mr-4 text-primary">dashboard</span>
-                <span class="text-sm font-medium sidebar-text">Дашборд</span>
-            </button>
-            <button onclick="switchTab('accounts')" id="nav-accounts" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
-                <span class="material-symbols-outlined mr-4 text-secondary">group</span>
-                <span class="text-sm font-medium sidebar-text">SIP Абоненты</span>
-                <span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-surface-container-high font-mono sidebar-badge">{{ accounts|length }}/{{ max_users }}</span>
-            </button>
-            <button onclick="switchTab('marketplace')" id="nav-marketplace" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
-                <span class="material-symbols-outlined mr-4 text-warning">shopping_bag</span>
-                <span class="text-sm font-medium sidebar-text">Маркетплейс</span>
-                <span class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-warning/10 text-warning font-bold uppercase sidebar-badge">Store</span>
-            </button>
-            <button onclick="switchTab('licensing')" id="nav-licensing" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
-                <span class="material-symbols-outlined mr-4 text-success">verified_user</span>
-                <span class="text-sm font-medium sidebar-text">Лицензия & OTA</span>
-            </button>
-            <button onclick="switchTab('trunks')" id="nav-trunks" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
-                <span class="material-symbols-outlined mr-4 text-primary">settings_ethernet</span>
-                <span class="text-sm font-medium sidebar-text">SIP Транки</span>
-            </button>
-            <button onclick="switchTab('ivr')" id="nav-ivr" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
-                <span class="material-symbols-outlined mr-4 text-secondary">account_tree</span>
-                <span class="text-sm font-medium sidebar-text">IVR Конструктор</span>
-            </button>
-            <!-- РАСКРЫВАЮЩИЙСЯ БЛОК: РАСШИРЕНИЯ И ПЛАГИНЫ -->
-            <div class="pt-2">
-                <button type="button" onclick="toggleExtensionsMenu()" id="btn-extensions-parent" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
-                    <div class="flex items-center">
-                        <span class="material-symbols-outlined mr-4 text-primary">extension</span>
-                        <span class="text-sm font-semibold text-on-surface sidebar-text">Расширения</span>
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <span class="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">{{ installed_plugins|length }}</span>
-                        <span id="ext-arrow" class="material-symbols-outlined text-xs text-on-surface-variant transition-transform">expand_more</span>
-                    </div>
-                </button>
+                <nav class="flex-1 px-3 py-3 space-y-4 overflow-y-auto">
+            
+            <!-- GROUP 1: МОНИТОРИНГ & АНАЛИТИКА -->
+            <div class="space-y-1">
+                <div class="px-3 pb-1 text-[10px] uppercase font-bold tracking-wider text-on-surface-variant/70 sidebar-text">Мониторинг</div>
                 
-                <!-- Подменю установленных плагинов -->
-                <div id="extensions-submenu" class="mt-1 pl-6 pr-2 space-y-1">
-                    {% for p in installed_plugins %}
-                    <button onclick="switchTab('plugin-{{ p.id }}')" id="nav-plugin-{{ p.id }}" class="nav-btn w-full flex items-center px-4 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group text-left">
-                        <span class="material-symbols-outlined mr-3 text-base text-{{ p.color }}">{{ p.icon }}</span>
-                        <span class="text-xs font-medium truncate">{{ p.name }}</span>
-                    </button>
-                    {% endfor %}
-                    {% if not installed_plugins %}
-                    <div class="px-4 py-2 text-[11px] text-on-surface-variant italic">
-                        Нет установленных плагинов
-                    </div>
-                    {% endif %}
-                </div>
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group active-nav-item" title="Дашборд">
+                    <span class="material-symbols-outlined mr-3.5 text-primary text-[22px]">dashboard</span>
+                    <span class="text-xs font-semibold sidebar-text">Дашборд</span>
+                </button>
+
+                <button onclick="switchTab('calls')" id="nav-calls" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="Журнал вызовов">
+                    <span class="material-symbols-outlined mr-3.5 text-primary text-[22px]">history</span>
+                    <span class="text-xs font-semibold sidebar-text">Журнал вызовов</span>
+                </button>
             </div>
-            <button onclick="switchTab('security')" id="nav-security" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
-                <span class="material-symbols-outlined mr-4 text-error">lock_person</span>
-                <span class="text-sm font-medium sidebar-text">Безопасность & Доступ</span>
-                {% if not auth_enabled %}
-                <span class="ml-auto w-2 h-2 rounded-full bg-error animate-pulse" title="Парольная защита отключена"></span>
-                {% endif %}
-            </button>
-            <button onclick="switchTab('calls')" id="nav-calls" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
-                <span class="material-symbols-outlined mr-4 text-primary">history</span>
-                <span class="text-sm font-medium sidebar-text">Журнал вызовов</span>
-            </button>
+
+            <!-- GROUP 2: ТЕЛЕФОНИЯ & МАРШРУТИЗАЦИЯ -->
+            <div class="space-y-1">
+                <div class="px-3 pb-1 text-[10px] uppercase font-bold tracking-wider text-on-surface-variant/70 sidebar-text">Телефония</div>
+                
+                <button onclick="switchTab('accounts')" id="nav-accounts" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="SIP Абоненты">
+                    <span class="material-symbols-outlined mr-3.5 text-secondary text-[22px]">group</span>
+                    <span class="text-xs font-semibold sidebar-text">SIP Абоненты</span>
+                    <span class="ml-auto text-[11px] px-2 py-0.5 rounded-full bg-surface-container-high font-mono sidebar-badge">{{ accounts|length }}/{{ max_users }}</span>
+                </button>
+
+                <button onclick="switchTab('trunks')" id="nav-trunks" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="SIP Транки">
+                    <span class="material-symbols-outlined mr-3.5 text-primary text-[22px]">settings_ethernet</span>
+                    <span class="text-xs font-semibold sidebar-text">SIP Транки</span>
+                </button>
+
+                <button onclick="switchTab('ivr')" id="nav-ivr" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="IVR Конструктор">
+                    <span class="material-symbols-outlined mr-3.5 text-secondary text-[22px]">account_tree</span>
+                    <span class="text-xs font-semibold sidebar-text">IVR Конструктор</span>
+                </button>
+            </div>
+
+            <!-- GROUP 3: ЭКОСИСТЕМА & ПЛАГИНЫ -->
+            <div class="space-y-1">
+                <div class="px-3 pb-1 text-[10px] uppercase font-bold tracking-wider text-on-surface-variant/70 sidebar-text">Экосистема</div>
+
+                <!-- РАСКРЫВАЮЩИЙСЯ БЛОК: РАСШИРЕНИЯ -->
+                <div>
+                    <button type="button" onclick="toggleExtensionsMenu()" id="btn-extensions-parent" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="Расширения">
+                        <div class="flex items-center">
+                            <span class="material-symbols-outlined mr-3.5 text-primary text-[22px]">extension</span>
+                            <span class="text-xs font-semibold text-on-surface sidebar-text">Расширения</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold sidebar-badge">{{ installed_plugins|length }}</span>
+                            <span id="ext-arrow" class="material-symbols-outlined text-xs text-on-surface-variant transition-transform">expand_more</span>
+                        </div>
+                    </button>
+                    
+                    <!-- Подменю установленных плагинов -->
+                    <div id="extensions-submenu" class="mt-1 pl-4 pr-1 space-y-1">
+                        {% for p in installed_plugins %}
+                        <button onclick="switchTab('plugin-{{ p.id }}')" id="nav-plugin-{{ p.id }}" class="nav-btn w-full flex items-center px-3 py-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group text-left">
+                            <span class="material-symbols-outlined mr-2.5 text-base text-{{ p.color }}">{{ p.icon }}</span>
+                            <span class="text-[11px] font-medium truncate">{{ p.name }}</span>
+                        </button>
+                        {% endfor %}
+                        {% if not installed_plugins %}
+                        <div class="px-3 py-1.5 text-[11px] text-on-surface-variant italic">
+                            Нет установленных плагинов
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <button onclick="switchTab('marketplace')" id="nav-marketplace" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="Маркетплейс">
+                    <span class="material-symbols-outlined mr-3.5 text-warning text-[22px]">shopping_bag</span>
+                    <span class="text-xs font-semibold sidebar-text">Маркетплейс</span>
+                    <span class="ml-auto text-[9px] px-1.5 py-0.5 rounded-full bg-warning/10 text-warning font-bold uppercase sidebar-badge">Store</span>
+                </button>
+            </div>
+
+            <!-- GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ -->
+            <div class="space-y-1">
+                <div class="px-3 pb-1 text-[10px] uppercase font-bold tracking-wider text-on-surface-variant/70 sidebar-text">Администрирование</div>
+
+                <button onclick="switchTab('security')" id="nav-security" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="Безопасность & Доступ">
+                    <span class="material-symbols-outlined mr-3.5 text-error text-[22px]">lock_person</span>
+                    <span class="text-xs font-semibold sidebar-text">Безопасность & Доступ</span>
+                    {% if not auth_enabled %}
+                    <span class="ml-auto w-2 h-2 rounded-full bg-error animate-pulse sidebar-badge" title="Парольная защита отключена"></span>
+                    {% endif %}
+                </button>
+
+                <button onclick="switchTab('licensing')" id="nav-licensing" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="Лицензия & OTA">
+                    <span class="material-symbols-outlined mr-3.5 text-success text-[22px]">verified_user</span>
+                    <span class="text-xs font-semibold sidebar-text">Лицензия & OTA</span>
+                </button>
+            </div>
+
         </nav>
 
         <div class="p-4 border-t border-surface-container bg-surface-container-low/30">
