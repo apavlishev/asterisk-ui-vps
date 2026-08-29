@@ -1410,7 +1410,7 @@
                             </div>
 
                             <!-- SECTION C: FALLBACK GENERAL PIPELINE -->
-                            <div class="pt-2 border-t border-outline/20 space-y-3">
+                            <div id="amo-section-default" class="pt-2 border-t border-outline/20 space-y-3">
                                 <h4 class="text-xs font-bold text-on-surface">Общая резервная воронка (Fallback по умолчанию):</h4>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
@@ -4110,7 +4110,31 @@
         // ================= AMOCRM PIPELINES & STATUSES SELECT2 ENGINE =================
         let loadedAmoPipelines = [];
 
-        async function loadAmoPipelinesAndPopulate() {
+        async 
+        // ================= DYNAMIC AMOCRM ROUTING SECTIONS TOGGLER =================
+        function toggleAmoRoutingView(mode) {
+            const secChannels = document.getElementById('amo-section-channels');
+            const secOperators = document.getElementById('amo-section-operators');
+            const secDefault = document.getElementById('amo-section-default');
+
+            if (!secChannels || !secOperators) return;
+
+            if (mode === 'by_channel') {
+                secChannels.classList.remove('hidden');
+                secOperators.classList.add('hidden');
+                if (secDefault) secDefault.classList.remove('hidden');
+            } else if (mode === 'by_operator') {
+                secChannels.classList.add('hidden');
+                secOperators.classList.remove('hidden');
+                if (secDefault) secDefault.classList.remove('hidden');
+            } else if (mode === 'default') {
+                secChannels.classList.add('hidden');
+                secOperators.classList.add('hidden');
+                if (secDefault) secDefault.classList.remove('hidden');
+            }
+        }
+
+        function loadAmoPipelinesAndPopulate() {
             try {
                 const res = await fetch('/api/amocrm/pipelines');
                 const data = await res.json();
@@ -4166,6 +4190,8 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadAmoPipelinesAndPopulate();
+            const curMode = document.getElementById('amo-routing-mode');
+            if (curMode) toggleAmoRoutingView(curMode.value);
         });
 </script>
 </body>
