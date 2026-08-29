@@ -1038,10 +1038,39 @@
                             Сохранить FTP
                         </button>
                     </form>
-                                        {% elif p.id == 'gdrive_storage' %}
+                                                            {% elif p.id == 'gdrive_storage' %}
                     <div class="space-y-6 max-w-xl">
                         
-                        <!-- OFFICIAL GOOGLE IDENTITY BRANDED BUTTON -->
+                        {% if gdrive_account.valid %}
+                        <!-- AUTHORIZED GOOGLE ACCOUNT PROFILE CARD -->
+                        <div class="p-6 rounded-2xl bg-surface border border-secondary/40 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center shrink-0">
+                                    <svg class="w-6 h-6" viewBox="0 0 24 24">
+                                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-sm font-bold text-on-surface">{{ gdrive_account.display_name }}</h4>
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-success/10 text-success font-bold flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-[12px]">verified</span> Подключен
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-on-surface-variant font-mono mt-0.5">{{ gdrive_account.email }}</p>
+                                    <p class="text-[11px] text-on-surface-variant mt-1">Занято на Диске: <b class="text-on-surface">{{ gdrive_account.used_gb }} ГБ</b> (Лимит: {{ gdrive_account.total_gb }} ГБ)</p>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="startOfficialGoogleAuth()" class="px-3.5 py-1.5 rounded-xl border border-outline/30 text-xs font-semibold text-on-surface-variant hover:bg-surface-container transition-colors shrink-0">
+                                Сменить аккаунт
+                            </button>
+                        </div>
+                        {% else %}
+                        <!-- OFFICIAL GOOGLE IDENTITY BRANDED LOGIN BUTTON (NOT AUTHORIZED) -->
                         <div class="p-6 rounded-2xl bg-surface border border-outline/40 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <div class="space-y-1">
                                 <h4 class="text-sm font-bold text-on-surface flex items-center gap-2">
@@ -1056,7 +1085,6 @@
                                 <p class="text-xs text-on-surface-variant">Авторизуйтесь через официальный аккаунт Google для архивации звонков.</p>
                             </div>
                             
-                            <!-- Standard Google Identity Button -->
                             <button type="button" onclick="startOfficialGoogleAuth()" class="h-11 px-5 rounded-full bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 font-medium text-xs flex items-center gap-3 shadow-sm hover:shadow transition-all shrink-0">
                                 <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -1067,6 +1095,7 @@
                                 <span>Войти с аккаунтом Google</span>
                             </button>
                         </div>
+                        {% endif %}
 
                         <form action="/settings/gdrive" method="POST" class="space-y-4">
                             <div>
@@ -1089,7 +1118,31 @@
                     {% elif p.id == 'yandex_disk' %}
                     <div class="space-y-6 max-w-xl">
                         
-                        <!-- OFFICIAL YANDEX ID BRANDED BUTTON -->
+                        {% if yandex_account.valid %}
+                        <!-- AUTHORIZED YANDEX ACCOUNT PROFILE CARD -->
+                        <div class="p-6 rounded-2xl bg-surface border border-[#fc3f1d]/40 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-2xl bg-[#fc3f1d]/10 text-[#fc3f1d] flex items-center justify-center font-bold text-xl shrink-0">
+                                    Я
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-sm font-bold text-on-surface">{{ yandex_account.display_name }}</h4>
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-success/10 text-success font-bold flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-[12px]">verified</span> Подключен
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-on-surface-variant font-mono mt-0.5">{{ yandex_account.login }}</p>
+                                    <p class="text-[11px] text-on-surface-variant mt-1">Доступно на Диске: <b class="text-on-surface">{{ yandex_account.free_gb }} ГБ</b> (Всего: {{ yandex_account.total_gb }} ГБ)</p>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="startOfficialYandexAuth()" class="px-3.5 py-1.5 rounded-xl border border-outline/30 text-xs font-semibold text-on-surface-variant hover:bg-surface-container transition-colors shrink-0">
+                                Сменить аккаунт
+                            </button>
+                        </div>
+                        {% else %}
+                        <!-- OFFICIAL YANDEX ID BRANDED LOGIN BUTTON (NOT AUTHORIZED) -->
                         <div class="p-6 rounded-2xl bg-surface border border-outline/40 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <div class="space-y-1">
                                 <h4 class="text-sm font-bold text-on-surface flex items-center gap-2">
@@ -1099,12 +1152,12 @@
                                 <p class="text-xs text-on-surface-variant">Прямой вход через экосистему Яндекс ID для доступа к диску.</p>
                             </div>
                             
-                            <!-- Standard Official Yandex ID Button -->
                             <button type="button" onclick="startOfficialYandexAuth()" class="h-11 px-5 rounded-full bg-[#fc3f1d] text-white hover:bg-[#e03718] font-medium text-xs flex items-center gap-3 shadow-sm hover:shadow transition-all shrink-0">
                                 <div class="w-5 h-5 rounded-full bg-white text-[#fc3f1d] flex items-center justify-center font-bold text-xs shrink-0">Я</div>
                                 <span>Войти с Яндекс ID</span>
                             </button>
                         </div>
+                        {% endif %}
 
                         <form action="/settings/yandex-disk" method="POST" class="space-y-4">
                             <div>

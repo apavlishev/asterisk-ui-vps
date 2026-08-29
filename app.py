@@ -19,6 +19,55 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = 'asterisk-web-secret-key-2026'
 
+
+def get_yandex_disk_account_info(token):
+    if not token:
+        return {'valid': False}
+    try:
+        r = requests.get('https://cloud-api.yandex.net/v1/disk', headers={'Authorization': f'OAuth {token}'}, timeout=3)
+        if r.status_code == 200:
+            data = r.json()
+            user = data.get('user', {})
+            total_gb = round(data.get('total_space', 0) / (1024**3), 1)
+            used_gb = round(data.get('used_space', 0) / (1024**3), 1)
+            return {
+                'valid': True,
+                'display_name': user.get('display_name') or user.get('login') or 'Яндекс Пользователь',
+                'login': user.get('login', ''),
+                'uid': user.get('uid', ''),
+                'total_gb': total_gb,
+                'used_gb': used_gb,
+                'free_gb': round(total_gb - used_gb, 1)
+            }
+    except Exception:
+        pass
+    return {'valid': False}
+
+def get_google_drive_account_info(token):
+    if not token:
+        return {'valid': False}
+    try:
+        r = requests.get('https://www.googleapis.com/drive/v3/about?fields=user,storageQuota', headers={'Authorization': f'Bearer {token}'}, timeout=3)
+        if r.status_code == 200:
+            data = r.json()
+            user = data.get('user', {})
+            quota = data.get('storageQuota', {})
+            limit = int(quota.get('limit', 0))
+            usage = int(quota.get('usage', 0))
+            total_gb = round(limit / (1024**3), 1) if limit else 'Безлимит'
+            used_gb = round(usage / (1024**3), 1)
+            return {
+                'valid': True,
+                'display_name': user.get('displayName') or user.get('emailAddress') or 'Google Пользователь',
+                'email': user.get('emailAddress', ''),
+                'total_gb': total_gb,
+                'used_gb': used_gb
+            }
+    except Exception:
+        pass
+    return {'valid': False}
+
+
 def is_local_ip(ip):
     if not ip:
         return True
@@ -4757,6 +4806,8 @@ def index():
         ring_groups=ring_groups,
         sip_trunks=sip_trunks,
         available_gateways=available_gateways,
+        yandex_account=get_yandex_disk_account_info(integrations.get('yandex_disk', {}).get('token', '')),
+        gdrive_account=get_google_drive_account_info(integrations.get('gdrive', {}).get('token', '')),
         amocrm_user_mapping=amocrm_user_mapping,
         active_contacts=active_contacts,
         inbound_target=inbound_target,
