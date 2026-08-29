@@ -5048,365 +5048,45 @@ def api_storage_test_integrity():
 @app.route('/api/ivr/save-canvas', methods=['POST'])
 def api_ivr_save_canvas():
     try:
-        data = request.get_json(force=True)
+        data = request.get_json(force=True) or {}
         if not data:
             return jsonify({'success': False, 'error': 'Empty JSON payload'}), 400
 
         cfg = load_integrations()
-        if 'ivr_tree' not in cfg:
-            cfg['ivr_tree'] = {}
+        if 'ivr_trees' not in cfg:
+            cfg['ivr_trees'] = {}
 
-        if 'enabled' in data:
-            cfg['ivr_tree']['enabled'] = bool(data['enabled'])
-        if 'debug_exten' in data:
-            cfg['ivr_tree']['debug_exten'] = str(data['debug_exten']).strip()
-        if 'nodes' in data and isinstance(data['nodes'], list):
-            cfg['ivr_tree']['nodes'] = data['nodes']
-        if 'canvas_layout' in data:
-            cfg['ivr_tree']['canvas_layout'] = data['canvas_layout']
+        trunk_key = data.get('trunk_key', 'default').strip()
+        
+        # Build tree structure
+        target_tree = {}
+        if 'ivr_tree' in data and isinstance(data['ivr_tree'], dict):
+            target_tree = data['ivr_tree']
+        else:
+            target_tree = {
+                'enabled': bool(data.get('enabled', True)),
+                'debug_exten': str(data.get('debug_exten', '888')).strip(),
+                'nodes': data.get('nodes', []),
+                'canvas_layout': data.get('canvas_layout', {})
+            }
+
+        # Store in specific trunk slot
+        cfg['ivr_trees'][trunk_key] = target_tree
+        if trunk_key == 'default':
+            cfg['ivr_tree'] = target_tree
 
         save_integrations(cfg)
         generate_dialplan_from_tree()
-        return jsonify({'success': True, 'message': 'IVR граф успешно сохранен и применен в Asterisk!'})
+        generate_pjsip_conf()
+        
+        return jsonify({
+            'success': True,
+            'message': f'IVR схема для маршрута «{trunk_key}» успешно сохранена и применена в Asterisk!'
+        })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/settings/ivr-builder', methods=['POST'])
-def save_ivr_builder():
-    cfg = load_integrations()
-    ivr_enabled = True if request.form.get('ivr_enabled') else False
-    debug_enabled = True if request.form.get('debug_enabled') else False
-    debug_exten = request.form.get('debug_exten', '888').strip()
-    wh_enabled = True if request.form.get('wh_enabled') else False
-    wh_start = request.form.get('wh_start', '09:00').strip()
-    wh_end = request.form.get('wh_end', '18:00').strip()
-    wh_days = request.form.get('wh_days', 'mon-fri').strip()
-    existing_wh_audio = request.form.get('existing_wh_audio', '')
-    
-    wh_audio_name = existing_wh_audio
-    if 'wh_audio_file' in request.files:
-        f = request.files['wh_audio_file']
-        if f and f.filename:
-            os.makedirs(SOUNDS_DIR, exist_ok=True)
-            clean_name = 'offhours_greeting.wav'
-            tmp_path = os.path.join('/tmp', secure_filename(f.filename))
-            f.save(tmp_path)
-            target_wav = os.path.join(SOUNDS_DIR, clean_name)
-            subprocess.run([
-                'ffmpeg', '-y', '-i', tmp_path,
-                '-ar', '8000', '-ac', '1', '-acodec', 'pcm_s16le',
-                target_wav
-            ])
-            subprocess.run(['chown', 'asterisk:asterisk', target_wav])
-            wh_audio_name = clean_name
-            try:
-                os.remove(tmp_path)
-            except Exception:
-                pass
 
-    
-    nodes = []
-    for k, title_val in request.form.items():
-        if k.startswith('node_title_'):
-            node_id = k.replace('node_title_', '').strip()
-            timeout_sec = int(request.form.get(f'node_timeout_{node_id}', 7))
-            timeout_action = request.form.get(f'node_timeout_action_{node_id}', 'operator')
-            timeout_target = request.form.get(f'node_timeout_target_{node_id}', 'ALL')
-            existing_audio = request.form.get(f'existing_audio_{node_id}', '')
-
-            audio_file_name = existing_audio
-            file_key = f'audio_file_{node_id}'
-            if file_key in request.files:
-                f = request.files[file_key]
-                if f and f.filename:
-                    os.makedirs(SOUNDS_DIR, exist_ok=True)
-                    clean_name = f'greeting_{node_id}.wav'
-                    tmp_path = os.path.join('/tmp', secure_filename(f.filename))
-                    f.save(tmp_path)
-                    target_wav = os.path.join(SOUNDS_DIR, clean_name)
-                    subprocess.run([
-                        'ffmpeg', '-y', '-i', tmp_path,
-                        '-ar', '8000', '-ac', '1', '-acodec', 'pcm_s16le',
-                        target_wav
-                    ])
-                    subprocess.run(['chown', 'asterisk:asterisk', target_wav])
-                    audio_file_name = clean_name
-                    try:
-                        os.remove(tmp_path)
-                    except Exception:
-                        pass
-
-            digits = request.form.getlist(f'node_{node_id}_digit[]')
-            titles = request.form.getlist(f'node_{node_id}_title[]')
-            actions = request.form.getlist(f'node_{node_id}_action[]')
-            targets = request.form.getlist(f'node_{node_id}_target[]')
-
-            branches = []
-            for i in range(len(digits)):
-                branches.append({
-                    'digit': digits[i].strip(),
-                    'title': titles[i].strip() if i < len(titles) else '',
-                    'action': actions[i].strip() if i < len(actions) else 'operator',
-                    'target': targets[i].strip() if i < len(targets) else 'ALL'
-                })
-
-            nodes.append({
-                'id': node_id,
-                'title': title_val.strip(),
-                'audio_file': audio_file_name,
-                'timeout_sec': timeout_sec,
-                'timeout_action': timeout_action,
-                'timeout_target': timeout_target,
-                'branches': branches
-            })
-
-    nodes.sort(key=lambda x: 0 if x['id'] == 'main' else 1)
-
-    cfg['ivr_tree'] = {
-        'enabled': ivr_enabled,
-        'debug_enabled': debug_enabled,
-        'debug_exten': debug_exten,
-        'work_hours': {
-            'enabled': wh_enabled,
-            'start': wh_start,
-            'end': wh_end,
-            'days': wh_days,
-            'audio_file': wh_audio_name
-        },
-        'nodes': nodes
-    }
-    save_integrations(cfg)
-    generate_dialplan_from_tree()
-    flash(f'Схема IVR сохранена! Debug-номер для проверки: {debug_exten}')
-    return redirect(url_for('index'))
-
-@app.route('/custom-audio/<filename>')
-def serve_custom_audio(filename):
-    safe_name = os.path.basename(filename)
-    return send_from_directory(SOUNDS_DIR, safe_name, mimetype='audio/wav')
-
-@app.route('/settings/inbound-routing', methods=['POST'])
-def save_inbound_routing():
-    target = request.form.get('target', 'ALL').strip()
-    cfg = load_integrations()
-    if 'routing' not in cfg:
-        cfg['routing'] = {}
-    cfg['routing']['inbound_target'] = target
-    save_integrations(cfg)
-    generate_dialplan_from_tree()
-    flash(f'Маршрутизация входящих успешно обновлена: {target}')
-    return redirect(url_for('index'))
-
-@app.route('/api/amocrm/pipelines')
-def api_amocrm_pipelines():
-    cfg = load_integrations()
-    amo = cfg.get('amocrm', {})
-    subdomain = amo.get('subdomain', '').strip()
-    token = amo.get('token', '').strip()
-    
-    if not subdomain or not token:
-        return jsonify({'pipelines': []})
-
-    try:
-        url = f"https://{subdomain}.amocrm.ru/api/v4/leads/pipelines"
-        headers = {"Authorization": f"Bearer {token}"}
-        r = requests.get(url, headers=headers, timeout=5)
-        if r.status_code == 200:
-            res_data = r.json()
-            raw_pipelines = res_data.get('_embedded', {}).get('pipelines', [])
-            pipelines = []
-            for p in raw_pipelines:
-                statuses = []
-                for s in p.get('_embedded', {}).get('statuses', []):
-                    statuses.append({'id': s['id'], 'name': s['name']})
-                pipelines.append({'id': p['id'], 'name': p['name'], 'statuses': statuses})
-            return jsonify({'pipelines': pipelines})
-    except Exception as e:
-        return jsonify({'error': str(e), 'pipelines': []})
-
-    return jsonify({'pipelines': []})
-
-@app.route('/audio/<filename>')
-def serve_audio(filename):
-    safe_name = os.path.basename(filename)
-    file_path = os.path.join(RECORD_DIR, safe_name)
-    if os.path.exists(file_path):
-        return send_from_directory(RECORD_DIR, safe_name, mimetype='audio/wav')
-    abort(404)
-
-@app.route('/api/realtime')
-def api_realtime():
-    accounts = load_sip_accounts()
-    active_contacts = get_online_contacts()
-    auth_logs = get_auth_logs()
-    recent_calls = get_recent_calls()
-    active_channels_parsed = get_human_active_channels()
-    active_contacts_detailed = get_human_sip_sockets()
-    modem_parsed = get_modem_parsed()
-    amocrm_logs = get_amocrm_logs()
-    server_time = datetime.datetime.now().strftime('%H:%M:%S')
-
-    return jsonify({
-        'accounts': accounts,
-        'active_contacts': active_contacts,
-        'auth_logs': auth_logs,
-        'calls': recent_calls,
-        'active_channels_parsed': active_channels_parsed,
-        'active_contacts_detailed': active_contacts_detailed,
-        'modem_parsed': modem_parsed,
-        'amocrm_logs': amocrm_logs,
-        'server_time': server_time
-    })
-
-@app.route('/settings/amocrm', methods=['POST'])
-def save_amocrm():
-    cfg = load_integrations()
-    enabled = True if request.form.get('enabled') else False
-    send_internal = True if request.form.get('send_internal') else False
-    subdomain = request.form.get('subdomain', '').strip()
-    token = request.form.get('token', '').strip()
-    pipeline_id = request.form.get('pipeline_id', '').strip()
-    status_id = request.form.get('status_id', '').strip()
-
-    cfg['amocrm'] = {
-        'enabled': enabled,
-        'send_internal': send_internal,
-        'subdomain': subdomain,
-        'token': token,
-        'pipeline_id': pipeline_id,
-        'status_id': status_id
-    }
-    save_integrations(cfg)
-    flash('Настройки amoCRM сохранены!')
-    return redirect(url_for('index'))
-
-@app.route('/action/clear-amocrm-log', methods=['POST'])
-def clear_amocrm_log():
-    try:
-        with open(AMOCRM_LOG, 'w', encoding='utf-8') as f:
-            f.write(f"[{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Log cleared by user.\n")
-        flash('Лог amoCRM успешно очищен!')
-    except Exception as e:
-        flash(f'Ошибка очистки: {e}')
-    return redirect(url_for('index'))
-
-
-
-@app.route('/api/test-ftp', methods=['POST'])
-def api_test_ftp():
-    import ftplib
-    host = request.form.get('host', '').strip()
-    port = request.form.get('port', '21').strip()
-    user = request.form.get('username', '').strip()
-    password = request.form.get('password', '').strip()
-    remote_path = request.form.get('remote_path', '').strip()
-    http_base = request.form.get('http_base_url', '').strip()
-
-    log_lines = []
-    log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Инициализация подключения к {host}:{port}...")
-
-    if not host:
-        return jsonify({"status": "error", "log": "❌ Ошибка: Укажите FTP Хост (IP или домен)!"})
-
-    try:
-        p = int(port) if port.isdigit() else 21
-        ftp = ftplib.FTP()
-        ftp.connect(host, p, timeout=8)
-        log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] TCP соединение с сокетом {host}:{p} успешно открыто.")
-        
-        ftp.login(user or 'anonymous', password or '')
-        log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Авторизация пользователя '{user or 'anonymous'}' успешна. Ответ сервера: {ftp.getwelcome()}")
-
-        if remote_path and remote_path.strip('/'):
-            log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Переход в каталог: {remote_path}...")
-            for part in remote_path.strip('/').split('/'):
-                try:
-                    ftp.cwd(part)
-                except Exception:
-                    log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Каталог {part} не найден, создаем директорию MKD...")
-                    ftp.mkd(part)
-                    ftp.cwd(part)
-            log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Текущая рабочая папка на FTP: {ftp.pwd()}")
-
-        # Test write a tiny test file
-        test_fn = 'test_ping.txt'
-        from io import BytesIO
-        bio = BytesIO(b"Asterisk PBX FTP Storage Test OK")
-        ftp.storbinary(f"STOR {test_fn}", bio)
-        log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Тестовый файл {test_fn} успешно записан на FTP!")
-
-        try:
-            ftp.delete(test_fn)
-            log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Очистка тестового файла завершена.")
-        except Exception:
-            pass
-
-        ftp.quit()
-        log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Сессия FTP корректно закрыта.")
-
-        if http_base:
-            log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Пример публичной ссылки на запись: {http_base.rstrip('/')}/20260828-154540_sample.wav")
-
-        log_lines.append(f"\n✅ ВСЕ ТЕСТЫ ПРОЙДЕНЫ УСПЕШНО! FTP-сервер полностью готов к выгрузке звонков.")
-        return jsonify({"status": "ok", "log": "\n".join(log_lines)})
-
-    except Exception as e:
-        log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] ❌ СБОЙ ПОДКЛЮЧЕНИЯ: {str(e)}")
-        return jsonify({"status": "error", "log": "\n".join(log_lines)})
-
-
-@app.route('/api/test-telegram', methods=['POST'])
-def api_test_telegram():
-    token = request.form.get('token', '').strip()
-    chat_ids_raw = request.form.get('chat_id', '').strip()
-
-    log_lines = []
-    log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Проверка настроек Telegram...")
-
-    if not token:
-        return jsonify({"status": "error", "log": "❌ Ошибка: Введите Bot Token!"})
-    if not chat_ids_raw:
-        return jsonify({"status": "error", "log": "❌ Ошибка: Укажите хотя бы один Chat ID!"})
-
-    chat_ids = [c.strip() for c in re.split(r'[,\s\n]+', chat_ids_raw) if c.strip()]
-    log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Получатели ({len(chat_ids)} шт.): {', '.join(chat_ids)}")
-
-    # Check bot info
-    try:
-        me_url = f"{TG_BASE_URL}/bot{token}/getMe"
-        r = requests.get(me_url, timeout=5)
-        if r.status_code != 200:
-            return jsonify({"status": "error", "log": f"❌ Ошибка токена: {r.text}"})
-        bot_info = r.json().get('result', {})
-        log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Бот авторизован: @{bot_info.get('username')} ({bot_info.get('first_name')}) [URL: {TG_BASE_URL}]")
-    except Exception as e:
-        log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] ❌ Ошибка связи с Telegram: {e}")
-        return jsonify({"status": "error", "log": "\n".join(log_lines)})
-
-    success_count = 0
-    test_msg = f"🔔 <b>Тестовое уведомление от Asterisk PBX</b>\n\n✅ Интеграция настроена корректно!\n🕒 Время: <code>{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</code>"
-
-    for cid in chat_ids:
-        try:
-            send_url = f"{TG_BASE_URL}/bot{token}/sendMessage"
-            payload = {"chat_id": cid, "text": test_msg, "parse_mode": "HTML"}
-            res = requests.post(send_url, json=payload, timeout=6)
-            if res.status_code == 200:
-                log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Сообщение в чат <code>{cid}</code>: ✅ ДОСТАВЛЕНО (200 OK)")
-                success_count += 1
-            else:
-                log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Сообщение в чат <code>{cid}</code>: ❌ Ошибка ({res.status_code}) -> {res.text}")
-        except Exception as e:
-            log_lines.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Сообщение в чат <code>{cid}</code>: ❌ Исключение: {e}")
-
-    if success_count > 0:
-        log_lines.append(f"\n✅ Успешно отправлено {success_count} из {len(chat_ids)} получателям.")
-        return jsonify({"status": "ok", "log": "\n".join(log_lines)})
-    else:
-        log_lines.append(f"\n❌ Ни одно сообщение не было доставлено.")
-        return jsonify({"status": "error", "log": "\n".join(log_lines)})
-
-@app.route('/settings/ftp', methods=['POST'])
 def save_ftp():
     cfg = load_integrations()
     enabled = True if request.form.get('enabled') else False
