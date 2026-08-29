@@ -6018,6 +6018,27 @@ def api_ivr_play_audio(filename):
     return jsonify({'success': False, 'error': 'Audio file not found'}), 404
 
 
+
+@app.route('/settings/ai-whisper', methods=['POST'])
+def save_ai_whisper():
+    cfg = load_integrations()
+    if 'ai_whisper' not in cfg:
+        cfg['ai_whisper'] = {}
+        
+    cfg['ai_whisper']['enabled'] = bool(request.form.get('enabled'))
+    cfg['ai_whisper']['stt_engine'] = request.form.get('stt_engine', 'openai_whisper')
+    cfg['ai_whisper']['api_key'] = request.form.get('api_key', '').strip()
+    cfg['ai_whisper']['llm_model'] = request.form.get('llm_model', 'gpt-4o-mini')
+    cfg['ai_whisper']['min_duration'] = int(request.form.get('min_duration', 5))
+    cfg['ai_whisper']['prompt_template'] = request.form.get('prompt_template', '').strip()
+    cfg['ai_whisper']['diarization'] = bool(request.form.get('diarization'))
+    cfg['ai_whisper']['send_to_crm'] = bool(request.form.get('send_to_crm'))
+    
+    save_integrations(cfg)
+    flash('Настройки Neural Speech AI & Whisper успешно сохранены!')
+    return redirect(url_for('index'))
+
+
 if __name__ == '__main__':
     try:
         threading.Thread(target=network_guardian_startup_check, daemon=True).start()

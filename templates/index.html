@@ -1470,6 +1470,95 @@
                             <pre id="storage-test-pre-yandex_disk" class="text-[11px] font-mono text-on-surface-variant p-3 bg-surface-container-low rounded-xl overflow-x-auto max-h-56 leading-relaxed whitespace-pre-wrap"></pre>
                         </div>
                     </div>
+                                        {% elif p.id == 'ai_whisper' or p.id == 'neural_transcribe' %}
+                    <div class="space-y-6 max-w-2xl">
+                        <div class="p-6 rounded-2xl bg-surface border border-primary/40 shadow-sm flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold text-xl shrink-0">
+                                <span class="material-symbols-outlined text-2xl">graphic_eq</span>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <h4 class="text-sm font-bold text-on-surface">Neural Speech AI & Analytics Core</h4>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-success/10 text-success font-bold flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[12px]">verified</span> v2.5.0 Активен
+                                    </span>
+                                </div>
+                                <p class="text-xs text-on-surface-variant leading-relaxed">
+                                    Автоматическая расшифровка звонков (Speech-to-Text), разделение реплик оператора и клиента (Диаризация L/R) и нейросетевой анализ качества диалога.
+                                </p>
+                            </div>
+                        </div>
+
+                        <form action="/settings/ai-whisper" method="POST" class="space-y-5 bg-surface p-6 rounded-2xl border border-outline/30 shadow-sm">
+                            
+                            <!-- ENGINE SELECTOR -->
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">Нейросетевой движок распознавания (STT Engine)</label>
+                                <select name="stt_engine" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-semibold text-on-surface">
+                                    <option value="openai_whisper" {% if integrations.get('ai_whisper', {}).get('stt_engine') == 'openai_whisper' %}selected{% endif %}>⚡ OpenAI Whisper API (Быстрое облако, высокая точность)</option>
+                                    <option value="groq_whisper" {% if integrations.get('ai_whisper', {}).get('stt_engine') == 'groq_whisper' %}selected{% endif %}>🚀 Groq Whisper Large-v3 (Сверхбыстрое распознавание ~0.5 сек)</option>
+                                    <option value="local_whisper" {% if integrations.get('ai_whisper', {}).get('stt_engine') == 'local_whisper' %}selected{% endif %}>🔒 Локальный Faster-Whisper (На сервере, без отправки в облако)</option>
+                                    <option value="yandex_speechkit" {% if integrations.get('ai_whisper', {}).get('stt_engine') == 'yandex_speechkit' %}selected{% endif %}>🇷🇺 Yandex SpeechKit Pro (Оптимально для RU)</option>
+                                </select>
+                            </div>
+
+                            <!-- API KEY -->
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">API Ключ (OpenAI / Groq / Yandex)</label>
+                                <input type="password" name="api_key" value="{{ integrations.get('ai_whisper', {}).get('api_key', '') }}" placeholder="sk-proj-..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                                <p class="text-[11px] text-on-surface-variant/70 mt-1">Оставьте пустым при использовании локального движка Faster-Whisper.</p>
+                            </div>
+
+                            <!-- LLM MODEL FOR SUMMARY -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">LLM Модель для анализа</label>
+                                    <select name="llm_model" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs font-semibold text-on-surface">
+                                        <option value="gpt-4o-mini" {% if integrations.get('ai_whisper', {}).get('llm_model') == 'gpt-4o-mini' %}selected{% endif %}>GPT-4o Mini (Рекомендуется)</option>
+                                        <option value="gpt-4o" {% if integrations.get('ai_whisper', {}).get('llm_model') == 'gpt-4o' %}selected{% endif %}>GPT-4o (Максимальная точность)</option>
+                                        <option value="llama-3.3-70b" {% if integrations.get('ai_whisper', {}).get('llm_model') == 'llama-3.3-70b' %}selected{% endif %}>Llama 3.3 70B (Groq / Open-Source)</option>
+                                        <option value="claude-3-5-haiku" {% if integrations.get('ai_whisper', {}).get('llm_model') == 'claude-3-5-haiku' %}selected{% endif %}>Claude 3.5 Haiku</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Минимальная длина звонка (сек)</label>
+                                    <input type="number" name="min_duration" value="{{ integrations.get('ai_whisper', {}).get('min_duration', 5) }}" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                                </div>
+                            </div>
+
+                            <!-- PROMPT TEMPLATE -->
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Промпт для оценки качества и суммаризации</label>
+                                <textarea name="prompt_template" rows="4" class="w-full p-3.5 rounded-xl bg-surface-container-low border border-outline text-xs font-mono leading-relaxed" placeholder="Сделай краткое резюме звонка, определи договоренности, настроение клиента и оцени работу оператора от 1 до 100%.">{{ integrations.get('ai_whisper', {}).get('prompt_template', 'Сделай краткое резюме диалога за 2-3 предложения, выдели ключевые договоренности и оцени качество обслуживания оператора от 1 до 100%.') }}</textarea>
+                            </div>
+
+                            <!-- TOGGLES -->
+                            <div class="space-y-2 pt-1 border-t border-surface-container-low">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" name="enabled" id="ai_whisper_enabled" class="w-4 h-4 rounded text-primary" {% if integrations.get('ai_whisper', {}).get('enabled', True) %}checked{% endif %}>
+                                    <label for="ai_whisper_enabled" class="text-xs text-on-surface font-semibold cursor-pointer">Включить автоматическую транскрибацию завершенных вызовов</label>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" name="diarization" id="ai_whisper_diarization" class="w-4 h-4 rounded text-primary" {% if integrations.get('ai_whisper', {}).get('diarization', True) %}checked{% endif %}>
+                                    <label for="ai_whisper_diarization" class="text-xs text-on-surface-variant font-medium cursor-pointer">Стерео-диаризация каналов (L: Оператор, R: Клиент)</label>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" name="send_to_crm" id="ai_whisper_send_to_crm" class="w-4 h-4 rounded text-primary" {% if integrations.get('ai_whisper', {}).get('send_to_crm', True) %}checked{% endif %}>
+                                    <label for="ai_whisper_send_to_crm" class="text-xs text-on-surface-variant font-medium cursor-pointer">Отправлять расшифровку и резюме в примечание сделки amoCRM</label>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3 pt-3">
+                                <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition-all shadow-sm">
+                                    Сохранить настройки Speech AI
+                                </button>
+                                <button type="button" onclick="testAiWhisperEngine()" class="px-4 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-xs font-semibold text-on-surface border border-outline/30 flex items-center gap-1.5 transition-colors shadow-sm">
+                                    <span class="material-symbols-outlined text-[16px] text-primary">play_circle</span>
+                                    <span>Тест распознавания</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                     {% else %}
                     <div class="p-6 rounded-2xl bg-surface-container-low text-xs text-on-surface-variant leading-relaxed">
                         Модуль <b>{{ p.name }}</b> активен и работает в фоновом режиме Asterisk Core.
