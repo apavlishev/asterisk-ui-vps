@@ -1793,17 +1793,29 @@
         
         // // ================= UNIVERSAL OAUTH2 CLOUD RELAY & DEVICE FLOW =
 
-        // // ================= OFFICIAL BRANDED AUTH HANDLERS (YANDEX & GOOGLE) // =================
+        
+        // ================= OFFICIAL BRANDED AUTH HANDLERS (YANDEX ID & GOOGLE) =================
+        const YANDEX_CLIENT_ID = '684950c1e0f54dcda75fa5af56eeb553';
+
         function startOfficialYandexAuth() {
-            // Official Yandex ID Authorization flow
-            const yandexAuthUrl = 'https://oauth.yandex.ru/authorize?response_type=token&client_id=e578c7b8d0094c4892c20f1883398912&redirect_uri=https%3A%2F%2Foauth.yandex.ru%2Fverification_code';
-            const authWin = window.open(yandexAuthUrl, 'YandexOAuth', 'width=620,height=720,menubar=no,toolbar=no');
+            // Direct OAuth2 authorization redirect with Verification Code
+            const yandexAuthUrl = `https://oauth.yandex.ru/authorize?response_type=token&client_id=${YANDEX_CLIENT_ID}&redirect_uri=https%3A%2F%2Foauth.yandex.ru%2Fverification_code`;
             
+            // Open branded popup
+            const width = 640;
+            const height = 720;
+            const left = (window.screen.width - width) / 2;
+            const top = (window.screen.height - height) / 2;
+            const authWin = window.open(yandexAuthUrl, 'YandexOAuth', `width=${width},height=${height},top=${top},left=${left},menubar=no,toolbar=no`);
+
+            // Open inline prompt for the confirmation code / token
             setTimeout(() => {
-                const token = prompt('🔑 Подтвердите доступ в открывшемся окне Яндекс ID и вставьте полученный токен:');
+                const token = prompt('🔑 Скопируйте полученный в окне Яндекс ID код/токен и вставьте сюда:');
                 if (token && token.trim()) {
-                    document.getElementById('yandex_token_field').value = token.trim();
-                    saveOAuthTokenToServer('yandex_disk', token.trim());
+                    const cleanToken = token.trim();
+                    const tokenField = document.getElementById('yandex_token_field');
+                    if (tokenField) tokenField.value = cleanToken;
+                    saveOAuthTokenToServer('yandex_disk', cleanToken);
                 }
             }, 1200);
         }
@@ -1825,7 +1837,7 @@
             
             if (provider === 'yandex') {
                 // Official Yandex Device / Verification Code Flow
-                const yandexAuthUrl = 'https://oauth.yandex.ru/authorize?response_type=token&client_id=e578c7b8d0094c4892c20f1883398912&redirect_uri=https%3A%2F%2Foauth.yandex.ru%2Fverification_code';
+                const yandexAuthUrl = 'https://oauth.yandex.ru/authorize?response_type=token&client_id=684950c1e0f54dcda75fa5af56eeb553&redirect_uri=https%3A%2F%2Foauth.yandex.ru%2Fverification_code';
                 const authWin = window.open(yandexAuthUrl, 'YandexOAuth', 'width=600,height=700');
                 
                 // Prompt user to copy verification token or auto-intercept

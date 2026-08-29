@@ -5908,10 +5908,25 @@ def oauth_callback(provider):
 
 @app.route('/api/oauth/save-token', methods=['POST'])
 def api_oauth_save_token():
-    """Allows client-side OAuth popups / extensions to inject verified tokens directly."""
+    """Allows client-side OAuth popups / extensions to inject verified tokens or exchange verification codes directly."""
     data = request.get_json(force=True) or {}
     provider = data.get('provider')
     token = data.get('token', '').strip()
+
+    # If user passed a 7-8 digit verification code from oauth.yandex.ru/verification_code, exchange it automatically
+    if provider in ['yandex', 'yandex_disk'] and token and not token.startswith(('y0_', 'AgAA', 'AQAA')):
+        try:
+            exchange_res = requests.post('https://oauth.yandex.ru/token', data={
+                'grant_type': 'authorization_code',
+                'code': token,
+                'client_id': '684950c1e0f54dcda75fa5af56eeb553',
+                'client_secret': '9c36f07b22094f17a60fe2cd62eac522'
+            }, timeout=10)
+            token_json = exchange_res.json()
+            if 'access_token' in token_json:
+                token = token_json['access_token']
+        except Exception as err:
+            print(f"Error exchanging Yandex code: {err}")
     
     if not provider or not token:
         return jsonify({'success': False, 'error': 'Invalid provider or token'}), 400
