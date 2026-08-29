@@ -95,10 +95,34 @@
                 <span class="material-symbols-outlined mr-4 text-secondary">account_tree</span>
                 <span class="text-sm font-medium">IVR Конструктор</span>
             </button>
-            <button onclick="switchTab('integrations')" id="nav-integrations" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
-                <span class="material-symbols-outlined mr-4 text-warning">integration_instructions</span>
-                <span class="text-sm font-medium">Интеграции CRM</span>
-            </button>
+            <!-- РАСКРЫВАЮЩИЙСЯ БЛОК: РАСШИРЕНИЯ И ПЛАГИНЫ -->
+            <div class="pt-2">
+                <button type="button" onclick="toggleExtensionsMenu()" id="btn-extensions-parent" class="w-full flex items-center justify-between px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
+                    <div class="flex items-center">
+                        <span class="material-symbols-outlined mr-4 text-primary">extension</span>
+                        <span class="text-sm font-semibold text-on-surface">Расширения</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">{{ installed_plugins|length }}</span>
+                        <span id="ext-arrow" class="material-symbols-outlined text-xs text-on-surface-variant transition-transform">expand_more</span>
+                    </div>
+                </button>
+                
+                <!-- Подменю установленных плагинов -->
+                <div id="extensions-submenu" class="mt-1 pl-6 pr-2 space-y-1">
+                    {% for p in installed_plugins %}
+                    <button onclick="switchTab('plugin-{{ p.id }}')" id="nav-plugin-{{ p.id }}" class="nav-btn w-full flex items-center px-4 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group text-left">
+                        <span class="material-symbols-outlined mr-3 text-base text-{{ p.color }}">{{ p.icon }}</span>
+                        <span class="text-xs font-medium truncate">{{ p.name }}</span>
+                    </button>
+                    {% endfor %}
+                    {% if not installed_plugins %}
+                    <div class="px-4 py-2 text-[11px] text-on-surface-variant italic">
+                        Нет установленных плагинов
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
             <button onclick="switchTab('security')" id="nav-security" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-error">lock_person</span>
                 <span class="text-sm font-medium">Безопасность & Доступ</span>
@@ -808,6 +832,140 @@
                 </div>
             </div>
 
+        
+            <!-- ================= DYNAMIC INSTALLED PLUGIN TABS ================= -->
+            {% for p in installed_plugins %}
+            <div id="tab-plugin-{{ p.id }}" class="tab-pane space-y-6">
+                <div class="bg-surface rounded-2xl p-8 border border-outline/30 shadow-sm">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-6 border-b border-surface-container">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 rounded-2xl bg-{{ p.color }}-container/20 text-{{ p.color }} flex items-center justify-center">
+                                <span class="material-symbols-outlined text-3xl">{{ p.icon }}</span>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h1 class="text-2xl font-bold text-on-surface">{{ p.name }}</h1>
+                                    <span class="text-xs px-2.5 py-0.5 rounded-full bg-success/10 text-success font-semibold flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[12px]">check_circle</span> Активен
+                                    </span>
+                                </div>
+                                <p class="text-xs text-on-surface-variant font-mono mt-0.5">ID: {{ p.id }} &bull; Версия: {{ p.version }} &bull; Автор: {{ p.author }}</p>
+                            </div>
+                        </div>
+                        <form action="/plugin/uninstall/{{ p.id }}" method="POST" onsubmit="return confirm('Удалить расширение {{ p.name }}?');">
+                            <button type="submit" class="px-4 py-2 rounded-xl text-error hover:bg-error/10 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-error/20">
+                                <span class="material-symbols-outlined text-base">delete</span>
+                                Удалить модуль
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- PLUGIN SETTINGS FORM CONTENT -->
+                    {% if p.id == 'amocrm_pro' %}
+                    <form action="/settings/amocrm" method="POST" class="space-y-4 max-w-xl">
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Субдомен amoCRM</label>
+                            <input type="text" name="subdomain" value="{{ integrations.get('amocrm', {}).get('subdomain', '') }}" placeholder="mycompany" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Долгосрочный токен (Bearer)</label>
+                            <input type="password" name="token" value="{{ integrations.get('amocrm', {}).get('token', '') }}" placeholder="eyJhbG..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                        </div>
+                        <div class="flex items-center gap-2 pt-1">
+                            <input type="checkbox" name="enabled" id="amo_tab_enabled" class="w-4 h-4 rounded text-secondary" {% if integrations.get('amocrm', {}).get('enabled') %}checked{% endif %}>
+                            <label for="amo_tab_enabled" class="text-xs text-on-surface font-medium cursor-pointer">Включить сквозную синхронизацию</label>
+                        </div>
+                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-secondary text-on-primary text-xs font-semibold hover:bg-secondary/90 transition-all shadow-sm">
+                            Сохранить настройки amoCRM
+                        </button>
+                    </form>
+                    {% elif p.id == 'telegram_alerts' %}
+                    <form action="/settings/telegram" method="POST" class="space-y-4 max-w-xl">
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Bot Token</label>
+                            <input type="password" name="token" value="{{ integrations.get('telegram', {}).get('token', '') }}" placeholder="123456:ABC-DEF..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Chat ID (через запятую)</label>
+                            <input type="text" name="chat_id" value="{{ integrations.get('telegram', {}).get('chat_id', '') }}" placeholder="12345678, -100987654" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                        </div>
+                        <div class="flex items-center gap-2 pt-1">
+                            <input type="checkbox" name="enabled" id="tg_tab_enabled" class="w-4 h-4 rounded text-warning" {% if integrations.get('telegram', {}).get('enabled') %}checked{% endif %}>
+                            <label for="tg_tab_enabled" class="text-xs text-on-surface font-medium cursor-pointer">Включить Telegram рассылку</label>
+                        </div>
+                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-warning text-on-primary text-xs font-semibold hover:bg-warning/90 transition-all shadow-sm">
+                            Сохранить Telegram
+                        </button>
+                    </form>
+                    {% elif p.id == 'ftp_storage' %}
+                    <form action="/settings/ftp" method="POST" class="space-y-4 max-w-xl">
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">FTP Сервер / Хост</label>
+                            <input type="text" name="host" value="{{ integrations.get('ftp', {}).get('host', '') }}" placeholder="ftp.myhost.com" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Логин</label>
+                                <input type="text" name="user" value="{{ integrations.get('ftp', {}).get('user', '') }}" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Пароль</label>
+                                <input type="password" name="password" value="{{ integrations.get('ftp', {}).get('password', '') }}" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 pt-1">
+                            <input type="checkbox" name="enabled" id="ftp_tab_enabled" class="w-4 h-4 rounded text-primary" {% if integrations.get('ftp', {}).get('enabled') %}checked{% endif %}>
+                            <label for="ftp_tab_enabled" class="text-xs text-on-surface font-medium cursor-pointer">Включить выгрузку на FTP</label>
+                        </div>
+                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition-all shadow-sm">
+                            Сохранить FTP
+                        </button>
+                    </form>
+                    {% elif p.id == 'gdrive_storage' %}
+                    <form action="/settings/gdrive" method="POST" class="space-y-4 max-w-xl">
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">OAuth Access Token Google Drive</label>
+                            <input type="password" name="token" value="{{ integrations.get('gdrive', {}).get('token', '') }}" placeholder="ya29.a0AfH6..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">ID папки на Диске (Folder ID)</label>
+                            <input type="text" name="folder_id" value="{{ integrations.get('gdrive', {}).get('folder_id', '') }}" placeholder="1A2B3C4D5E..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                        </div>
+                        <div class="flex items-center gap-2 pt-1">
+                            <input type="checkbox" name="enabled" id="gd_tab_enabled" class="w-4 h-4 rounded text-secondary" {% if integrations.get('gdrive', {}).get('enabled') %}checked{% endif %}>
+                            <label for="gd_tab_enabled" class="text-xs text-on-surface font-medium cursor-pointer">Включить Google Drive</label>
+                        </div>
+                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-secondary text-on-primary text-xs font-semibold hover:bg-secondary/90 transition-all shadow-sm">
+                            Сохранить Google Drive
+                        </button>
+                    </form>
+                    {% elif p.id == 'yandex_disk' %}
+                    <form action="/settings/yandex-disk" method="POST" class="space-y-4 max-w-xl">
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">OAuth Токен Яндекс.Диска</label>
+                            <input type="password" name="token" value="{{ integrations.get('yandex_disk', {}).get('token', '') }}" placeholder="y0_AgAAAA..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Путь к папке</label>
+                            <input type="text" name="path" value="{{ integrations.get('yandex_disk', {}).get('path', 'app:/records') }}" placeholder="app:/records" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                        </div>
+                        <div class="flex items-center gap-2 pt-1">
+                            <input type="checkbox" name="enabled" id="yd_tab_enabled" class="w-4 h-4 rounded text-warning" {% if integrations.get('yandex_disk', {}).get('enabled') %}checked{% endif %}>
+                            <label for="yd_tab_enabled" class="text-xs text-on-surface font-medium cursor-pointer">Включить Яндекс.Диск</label>
+                        </div>
+                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-warning text-on-primary text-xs font-semibold hover:bg-warning/90 transition-all shadow-sm">
+                            Сохранить Яндекс.Диск
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="p-6 rounded-2xl bg-surface-container-low text-xs text-on-surface-variant leading-relaxed">
+                        Модуль <b>{{ p.name }}</b> активен и работает в фоновом режиме Asterisk Core.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
         </main>
     </div>
 
@@ -905,6 +1063,19 @@
     </div>
 
     <script>
+        
+        function toggleExtensionsMenu() {
+            const sub = document.getElementById('extensions-submenu');
+            const arrow = document.getElementById('ext-arrow');
+            if (sub.classList.contains('hidden')) {
+                sub.classList.remove('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            } else {
+                sub.classList.add('hidden');
+                arrow.style.transform = 'rotate(-90deg)';
+            }
+        }
+
         function switchTab(tabId) {
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active-nav-item'));
@@ -969,6 +1140,30 @@
         </div>
     </div>
     {% endif %}
+
+
+    <!-- MODAL: INSTALL PLUGIN FROM ZIP -->
+    <div id="modal-install-zip" class="hidden fixed inset-0 bg-on-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-surface rounded-2xl max-w-md w-full p-6 border border-outline/30 shadow-xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-on-surface">Установка плагина из архива</h3>
+                <button onclick="document.getElementById('modal-install-zip').classList.add('hidden')" class="text-on-surface-variant hover:text-on-surface">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form action="/plugin/install-zip" method="POST" enctype="multipart/form-data" class="space-y-4">
+                <div class="p-4 rounded-xl bg-surface-container-low border border-dashed border-outline text-center space-y-2">
+                    <span class="material-symbols-outlined text-3xl text-primary">folder_zip</span>
+                    <div class="text-xs text-on-surface-variant">Выберите подписанный .zip пакет расширения</div>
+                    <input type="file" name="plugin_zip" accept=".zip" required class="text-xs text-on-surface-variant">
+                </div>
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="document.getElementById('modal-install-zip').classList.add('hidden')" class="px-4 py-2 rounded-xl text-sm font-medium text-on-surface-variant hover:bg-surface-container">Отмена</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:bg-primary/90 shadow-sm">Верифицировать & Установить</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
 </body>
 </html>

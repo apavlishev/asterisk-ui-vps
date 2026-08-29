@@ -1,3 +1,4 @@
+import plugin_manager
 
 import license_mgr
 import marketplace_data
@@ -4765,7 +4766,8 @@ def index():
         max_users=max_users,
         marketplace_plugins=plugins,
         current_version=get_current_version(),
-        get_system_network_info=get_system_network_info
+        get_system_network_info=get_system_network_info,
+        installed_plugins=plugin_manager.get_installed_plugins()
     )
 
 @app.route('/settings/ivr-builder', methods=['POST'])
@@ -5766,3 +5768,33 @@ if __name__ == '__main__':
     except Exception:
         pass
     app.run(host='0.0.0.0', port=8888)
+
+
+@app.route('/plugin/install-zip', methods=['POST'])
+def handle_install_plugin_zip():
+    if 'plugin_zip' not in request.files:
+        flash('Пожалуйста, выберите ZIP-архив плагина.')
+        return redirect(url_for('index'))
+    
+    file = request.files['plugin_zip']
+    if not file or not file.filename.endswith('.zip'):
+        flash('Файл должен иметь расширение .zip')
+        return redirect(url_for('index'))
+        
+    tmp_path = os.path.join('/tmp', secure_filename(file.filename))
+    file.save(tmp_path)
+    
+    success, msg = plugin_manager.install_plugin_from_zip(tmp_path)
+    try:
+        os.remove(tmp_path)
+    except Exception:
+        pass
+        
+    flash(msg)
+    return redirect(url_for('index'))
+
+@app.route('/plugin/uninstall/<plugin_id>', methods=['POST'])
+def handle_uninstall_plugin(plugin_id):
+    success, msg = plugin_manager.uninstall_plugin(plugin_id)
+    flash(msg)
+    return redirect(url_for('index'))
