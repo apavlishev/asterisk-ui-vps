@@ -1,4 +1,23 @@
 
+import license_mgr
+import marketplace_data
+from flask import render_template
+import secrets
+import time
+import os
+import subprocess
+import json
+import re
+import datetime
+import glob
+import csv
+import requests
+from flask import Flask, render_template_string, request, redirect, url_for, flash, jsonify, send_from_directory, abort
+from werkzeug.utils import secure_filename
+
+app = Flask(__name__)
+app.secret_key = 'asterisk-web-secret-key-2026'
+
 def is_local_ip(ip):
     if not ip:
         return True
@@ -86,24 +105,7 @@ def save_security_auth():
         
     return redirect(url_for('index'))
 
-import license_mgr
-import marketplace_data
-from flask import render_template
-import secrets
-import time
-import os
-import subprocess
-import json
-import re
-import datetime
-import glob
-import csv
-import requests
-from flask import Flask, render_template_string, request, redirect, url_for, flash, jsonify, send_from_directory, abort
-from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
-app.secret_key = 'asterisk-web-secret-key-2026'
 
 PJSIP_CONF = '/etc/asterisk/pjsip.conf'
 EXTENSIONS_CONF = '/etc/asterisk/extensions.conf'
