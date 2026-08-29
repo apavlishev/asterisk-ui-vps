@@ -701,7 +701,7 @@
                             
                             <!-- CANVAS BOTTOM HINT & LEGEND -->
                             <div class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-outline/30 shadow-lg text-xs font-mono text-on-surface flex items-center gap-4">
-                                <span class="text-primary font-bold">💡 Двойной клик на любой блок открывает окно настройки</span>
+                                <span class="text-primary font-bold">💡 Нажмите иконку ✏️ для редактирования или 🗑️ для удаления блока</span>
                                 <div class="h-4 w-[1px] bg-surface-container"></div>
                                 <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span>Trunk</span></div>
                                 <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span><span>IVR Меню</span></div>
@@ -1366,6 +1366,29 @@
 
                 // SELECT & DRAG / PAN MODE
                 if (hitNode) {
+                    // Check if clicked Edit Icon (Pencil)
+                    const editBtnX = hitNode.x + hitNode.w - (hitNode.id === 'main' || hitNode.id === 'inbound' ? 28 : 52);
+                    const editBtnY = hitNode.y + 10;
+                    if (worldX >= editBtnX && worldX <= editBtnX + 20 && worldY >= editBtnY && worldY <= editBtnY + 20) {
+                        openEditNodePopup(hitNode);
+                        return;
+                    }
+
+                    // Check if clicked Delete Icon (Trash)
+                    if (hitNode.id !== 'main' && hitNode.id !== 'inbound') {
+                        const delBtnX = hitNode.x + hitNode.w - 28;
+                        const delBtnY = hitNode.y + 10;
+                        if (worldX >= delBtnX && worldX <= delBtnX + 20 && worldY >= delBtnY && worldY <= delBtnY + 20) {
+                            if (confirm('Удалить блок "' + hitNode.title + '"?')) {
+                                ivrNodes = ivrNodes.filter(n => n.id !== hitNode.id);
+                                ivrLinks = ivrLinks.filter(l => l.from !== hitNode.id && l.to !== hitNode.id);
+                                selectedNode = ivrNodes[1];
+                                redrawCanvas();
+                            }
+                            return;
+                        }
+                    }
+
                     draggedNode = hitNode;
                     selectedNode = hitNode;
                     nodeDragStartOffset.x = worldX - hitNode.x;
@@ -1503,7 +1526,32 @@
                 ctx.font = 'bold 12px Inter, sans-serif';
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
-                ctx.fillText(node.title, node.x + 16, node.y + 14);
+                const maxTitleWidth = node.w - (node.id === 'main' || node.id === 'inbound' ? 50 : 75);
+                ctx.fillText(node.title, node.x + 16, node.y + 14, maxTitleWidth);
+
+                // ACTION BUTTON 1: EDIT ICON (PENCIL)
+                const editBtnX = node.x + node.w - (node.id === 'main' || node.id === 'inbound' ? 28 : 52);
+                const editBtnY = node.y + 10;
+                ctx.fillStyle = '#334155';
+                roundRect(ctx, editBtnX, editBtnY, 20, 20, 5, true, false);
+                ctx.fillStyle = '#38bdf8';
+                ctx.font = '12px Material Symbols Outlined, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('edit', editBtnX + 10, editBtnY + 10);
+
+                // ACTION BUTTON 2: DELETE ICON (TRASH) - for non-root nodes
+                if (node.id !== 'main' && node.id !== 'inbound') {
+                    const delBtnX = node.x + node.w - 28;
+                    const delBtnY = node.y + 10;
+                    ctx.fillStyle = '#334155';
+                    roundRect(ctx, delBtnX, delBtnY, 20, 20, 5, true, false);
+                    ctx.fillStyle = '#f43f5e';
+                    ctx.font = '12px Material Symbols Outlined, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('delete', delBtnX + 10, delBtnY + 10);
+                }
 
                 // Subtitle
                 ctx.fillStyle = '#94a3b8';
