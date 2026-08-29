@@ -1108,6 +1108,172 @@
     </div>
 
     <script>
+
+        // ================= POPUP NODE EDITOR INTEGRATION =================
+        function openEditNodePopup(node) {
+            if (!node) return;
+            selectedNode = node;
+            const modal = document.getElementById('modal-ivr-node');
+            if (!modal) return;
+
+            document.getElementById('popup-is-new').value = '0';
+            document.getElementById('popup-node-id').value = node.id;
+            document.getElementById('popup-node-title').value = node.title || '';
+            document.getElementById('popup-node-modal-title').textContent = 'Редактирование блока: ' + node.title;
+            document.getElementById('popup-node-modal-subtitle').textContent = 'Node ID: ' + node.id;
+
+            const typeSelect = document.getElementById('popup-node-type');
+            if (node.type === 'ivr') {
+                typeSelect.value = 'ivr';
+            } else if (node.action_type) {
+                typeSelect.value = node.action_type;
+            } else {
+                typeSelect.value = 'extension';
+            }
+
+            document.getElementById('popup-node-audio').value = node.audio || 'greeting_main.wav';
+            document.getElementById('popup-node-timeout').value = node.timeout || 7;
+            document.getElementById('popup-node-retries').value = node.retries || 3;
+            document.getElementById('popup-node-direct-dial').checked = Boolean(node.direct_dial !== false);
+
+            document.getElementById('popup-node-digit').value = node.digit || '1';
+            document.getElementById('popup-node-target').value = node.target || '101';
+
+            handlePopupTypeChange(typeSelect.value);
+            const delBtn = document.getElementById('popup-btn-delete');
+            if (delBtn) {
+                delBtn.style.display = (node.id === 'main' || node.id === 'inbound') ? 'none' : 'block';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function openAddNodePopup() {
+            const modal = document.getElementById('modal-ivr-node');
+            if (!modal) return;
+
+            const newId = 'node_' + Date.now();
+            document.getElementById('popup-is-new').value = '1';
+            document.getElementById('popup-node-id').value = newId;
+            document.getElementById('popup-node-title').value = 'Новая ветка сценария';
+            document.getElementById('popup-node-modal-title').textContent = 'Создание нового блока IVR';
+            document.getElementById('popup-node-modal-subtitle').textContent = 'Node ID: ' + newId;
+
+            document.getElementById('popup-node-type').value = 'extension';
+            document.getElementById('popup-node-digit').value = String(ivrNodes.filter(n => n.type === 'branch').length + 1);
+            document.getElementById('popup-node-target').value = '10' + String(ivrNodes.filter(n => n.type === 'branch').length + 1);
+
+            handlePopupTypeChange('extension');
+            const delBtn = document.getElementById('popup-btn-delete');
+            if (delBtn) delBtn.style.display = 'none';
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeIvrNodePopup() {
+            const modal = document.getElementById('modal-ivr-node');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function handlePopupTypeChange(val) {
+            const ivrFields = document.getElementById('popup-fields-ivr');
+            const branchFields = document.getElementById('popup-fields-branch');
+            const icon = document.getElementById('popup-node-icon');
+            const box = document.getElementById('popup-node-icon-box');
+
+            if (val === 'ivr') {
+                if (ivrFields) ivrFields.classList.remove('hidden');
+                if (branchFields) branchFields.classList.add('hidden');
+                if (icon) icon.textContent = 'account_tree';
+                if (box) box.className = 'w-11 h-11 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center';
+            } else {
+                if (ivrFields) ivrFields.classList.add('hidden');
+                if (branchFields) branchFields.classList.remove('hidden');
+                if (icon && box) {
+                    if (val === 'ring_group') {
+                        icon.textContent = 'groups';
+                        box.className = 'w-11 h-11 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center';
+                    } else if (val === 'voicemail') {
+                        icon.textContent = 'voicemail';
+                        box.className = 'w-11 h-11 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center';
+                    } else {
+                        icon.textContent = 'person';
+                        box.className = 'w-11 h-11 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center';
+                    }
+                }
+            }
+        }
+
+        function handleSaveNodePopup(e) {
+            e.preventDefault();
+            const isNew = document.getElementById('popup-is-new').value === '1';
+            const nodeId = document.getElementById('popup-node-id').value;
+            const title = (document.getElementById('popup-node-title').value || 'Блок').trim();
+            const nodeType = document.getElementById('popup-node-type').value;
+
+            if (isNew) {
+                const isIvr = (nodeType === 'ivr');
+                const digit = document.getElementById('popup-node-digit').value || '1';
+                const target = document.getElementById('popup-node-target').value || '101';
+
+                const newNode = {
+                    id: nodeId,
+                    type: isIvr ? 'ivr' : 'branch',
+                    action_type: isIvr ? null : nodeType,
+                    title: title,
+                    digit: digit,
+                    target: target,
+                    audio: document.getElementById('popup-node-audio').value,
+                    timeout: parseInt(document.getElementById('popup-node-timeout').value || 7),
+                    retries: parseInt(document.getElementById('popup-node-retries').value || 3),
+                    direct_dial: document.getElementById('popup-node-direct-dial').checked,
+                    x: 670,
+                    y: 100 + Math.random() * 350,
+                    w: 220,
+                    h: isIvr ? 120 : 75,
+                    color: isIvr ? '#3b82f6' : (nodeType === 'ring_group' ? '#f59e0b' : (nodeType === 'voicemail' ? '#f43f5e' : '#8b5cf6'))
+                };
+
+                ivrNodes.push(newNode);
+                ivrLinks.push({
+                    from: 'main',
+                    to: nodeId,
+                    label: (digit === 'i' ? 'Invalid [ i ]' : 'DTMF [ ' + digit + ' ]')
+                });
+                selectedNode = newNode;
+            } else {
+                if (selectedNode) {
+                    selectedNode.title = title;
+                    if (nodeType === 'ivr') {
+                        selectedNode.type = 'ivr';
+                        selectedNode.audio = document.getElementById('popup-node-audio').value;
+                        selectedNode.timeout = parseInt(document.getElementById('popup-node-timeout').value || 7);
+                        selectedNode.retries = parseInt(document.getElementById('popup-node-retries').value || 3);
+                        selectedNode.direct_dial = document.getElementById('popup-node-direct-dial').checked;
+                        selectedNode.color = '#3b82f6';
+                        selectedNode.h = 120;
+                    } else {
+                        selectedNode.type = 'branch';
+                        selectedNode.action_type = nodeType;
+                        selectedNode.digit = document.getElementById('popup-node-digit').value || '1';
+                        selectedNode.target = document.getElementById('popup-node-target').value || '101';
+                        selectedNode.color = (nodeType === 'ring_group' ? '#f59e0b' : (nodeType === 'voicemail' ? '#f43f5e' : '#8b5cf6'));
+                        selectedNode.h = 75;
+
+                        // Update link label
+                        const link = ivrLinks.find(l => l.to === selectedNode.id);
+                        if (link) {
+                            link.label = (selectedNode.digit === 'i' ? 'Invalid [ i ]' : 'DTMF [ ' + selectedNode.digit + ' ]');
+                        }
+                    }
+                }
+            }
+
+            closeIvrNodePopup();
+            redrawCanvas();
+        }
+
+
         
 
         // // ================= EXTENSIONS MENU ACCORDION PERSISTENCE // =================
