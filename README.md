@@ -1,6 +1,6 @@
-# 🚀 Asterisk PBX Web GUI & CRM Integration Suite
+# 🚀 Asterisk PBX Web GUI & CRM Integration Suite (VPS & Cloud Edition)
 
-**Asterisk PBX Web GUI** — комплексная программная АТС на базе Asterisk 20+ и Flask, разработанная специально для микрокомпьютеров (Raspberry Pi 3B/4/5, Orange Pi) и серверов Debian/Ubuntu. Решение объединяет управление SIP-абонентами, динамическую маршрутизацию, многоуровневый интерактивный IVR-конструктор, стереозапись разговоров и автоматическую сквозную интеграцию с **amoCRM (API v4)**, **Telegram** и внешними облачными хранилищами (**amoCRM Drive, Google Drive, FTP/HTTP Web-Storage**).
+**Asterisk PBX Web GUI** — модульная программная АТС на базе Asterisk 20+ и Flask, разработанная для микрокомпьютеров (Raspberry Pi 3B/4/5, Orange Pi) и облачных VPS-серверов (Debian/Ubuntu). Решение объединяет базовое ядро телефонии, систему криптографического лицензирования с привязкой к оборудованию, внутренний Маркетплейс плагинов и интеграции (amoCRM, Битрикс24, Telegram, AI Whisper).
 
 ---
 
@@ -72,11 +72,6 @@ sudo bash /opt/asterisk-gui/updater.sh
 
 ---
 
-## 📂 Структура проекта
+## 🗺 Дорожная карта (Project Vision & Marketplace Roadmap)
 
-* `app.py` — Flask Web GUI, REST API панели, генератор диалплана `extensions.conf` и PJSIP-конфигураций.
-* `crm-yandex-uploader.py` — автономный обработчик постобработки звонков: нормализация, выгрузка на amoCRM Drive / Google Drive / FTP, фиксация звонков в CRM и отправка Telegram-уведомлений с дедупликацией.
-* `tg-bot-daemon.py` — фоновый сервис мониторинга и сервисных оповещений.
-* `migrate.py` / `migrations/` — подсистема версионирования и миграции структуры данных конфигураций.
-* `version.json` — манифест текущей версии и список изменений.
-* `install.sh` / `updater.sh` — скрипты первоначальной установки и безопасного OTA-обновления.
+Подробное видение модульной платформы, системы аппаратного лицензирования и плана разработки: см. [ROADMAP.md](ROADMAP.md).
