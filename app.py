@@ -1,3 +1,6 @@
+import hashlib
+import io
+import ftplib
 import plugin_manager
 
 import license_mgr
