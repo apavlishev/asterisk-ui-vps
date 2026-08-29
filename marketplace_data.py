@@ -19,6 +19,22 @@ def load_marketplace_plugins(active_plugin_ids=None):
                     p_id = meta.get('id')
                     meta['installed'] = (p_id in active_plugin_ids)
                     meta['dir_name'] = entry
+                    
+                    # Ensure category is set for filtering
+                    if 'category' not in meta:
+                        if 'crm' in p_id or 'telegram' in p_id:
+                            meta['category'] = 'crm'
+                            meta['category_name'] = 'CRM & Бизнес'
+                        elif 'storage' in p_id or 'disk' in p_id or 'ftp' in p_id:
+                            meta['category'] = 'storage'
+                            meta['category_name'] = 'Облачные Диски & FTP'
+                        elif 'ai' in p_id or 'voice' in p_id or 'transcribe' in p_id:
+                            meta['category'] = 'ai'
+                            meta['category_name'] = 'AI & Аналитика'
+                        else:
+                            meta['category'] = 'core'
+                            meta['category_name'] = 'Ядро & Емкость'
+                            
                     plugins.append(meta)
                 except Exception as e:
                     print(f"Error loading plugin {entry}: {e}")
