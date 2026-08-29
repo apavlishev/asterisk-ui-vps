@@ -701,7 +701,7 @@
                             
                             <!-- CANVAS BOTTOM HINT & LEGEND -->
                             <div class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-outline/30 shadow-lg text-xs font-mono text-on-surface flex items-center gap-4">
-                                <span class="text-primary font-bold">💡 Нажмите иконку ✏️ для редактирования или 🗑️ для удаления блока</span>
+                                <span class="text-primary font-bold">💡 Потяните за кружок справа от блока, чтобы протянуть стрелку | Правый клик открывает меню</span>
                                 <div class="h-4 w-[1px] bg-surface-container"></div>
                                 <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span>Trunk</span></div>
                                 <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span><span>IVR Меню</span></div>
@@ -1108,6 +1108,65 @@
     </div>
 
     <script>
+
+        // ================= INTERACTIVE PORT DRAGGING & CONTEXT MENU ENGINE =================
+        let isConnectingFromPort = false;
+        let connectSourceNode = null;
+        let connectCurrentPos = { x: 0, y: 0 };
+        let selectedLinkIdx = -1;
+        let ctxTargetNode = null;
+        let ctxTargetLinkIdx = -1;
+        let ctxClickWorldPos = { x: 0, y: 0 };
+
+        // Hide context menu on click elsewhere
+        window.addEventListener('click', (e) => {
+            const ctxMenu = document.getElementById('canvas-context-menu');
+            if (ctxMenu && !ctxMenu.contains(e.target)) {
+                ctxMenu.classList.add('hidden');
+            }
+        });
+
+        function ctxHandleAction(action) {
+            const ctxMenu = document.getElementById('canvas-context-menu');
+            if (ctxMenu) ctxMenu.classList.add('hidden');
+
+            if (action === 'edit_node' && ctxTargetNode) {
+                openEditNodePopup(ctxTargetNode);
+            } else if (action === 'delete_node' && ctxTargetNode) {
+                if (ctxTargetNode.id === 'main' || ctxTargetNode.id === 'inbound') {
+                    alert('Нельзя удалить корневой узел системы.');
+                    return;
+                }
+                if (confirm('Удалить блок "' + ctxTargetNode.title + '"?')) {
+                    ivrNodes = ivrNodes.filter(n => n.id !== ctxTargetNode.id);
+                    ivrLinks = ivrLinks.filter(l => l.from !== ctxTargetNode.id && l.to !== ctxTargetNode.id);
+                    selectedNode = ivrNodes[1];
+                    redrawCanvas();
+                }
+            } else if (action === 'start_link' && ctxTargetNode) {
+                linkingSourceNode = ctxTargetNode;
+                setCanvasTool('link');
+            } else if (action === 'edit_link' && ctxTargetLinkIdx >= 0 && ivrLinks[ctxTargetLinkIdx]) {
+                const currentLabel = ivrLinks[ctxTargetLinkIdx].label.replace(/[^0-9*#it]/g, '');
+                const newDigit = prompt('Введите новую DTMF клавишу перехода (0–9, *, #, i, t):', currentLabel || '1');
+                if (newDigit !== null && newDigit.trim()) {
+                    ivrLinks[ctxTargetLinkIdx].label = (newDigit.trim() === 'i' ? 'Invalid [ i ]' : 'DTMF [ ' + newDigit.trim() + ' ]');
+                    redrawCanvas();
+                }
+            } else if (action === 'delete_link' && ctxTargetLinkIdx >= 0) {
+                if (confirm('Удалить эту стрелку перехода?')) {
+                    ivrLinks.splice(ctxTargetLinkIdx, 1);
+                    selectedLinkIdx = -1;
+                    redrawCanvas();
+                }
+            } else if (action === 'add_node') {
+                openAddNodePopup();
+            } else if (action === 'reset_view') {
+                resetCanvasView();
+            }
+        }
+
+
 
         // ================= POPUP NODE EDITOR INTEGRATION =================
         
@@ -1526,41 +1585,161 @@
             syncInspectorWithSelectedNode();
         }
 
-        function setupCanvasInteractions(canvas) {
-            canvas.onmousedown = (e) => {
+                function setupCanvasInteractions(canvas) {
+            // Prevent default browser context menu on canvas
+            canvas.oncontextmenu = (e) => {
+                e.preventDefault();
                 const rect = canvas.getBoundingClientRect();
                 const mouseClientX = e.clientX - rect.left;
                 const mouseClientY = e.clientY - rect.top;
-
-                // Transform client coordinates to world canvas coordinates
                 const worldX = (mouseClientX - canvasPanOffset.x) / canvasScale;
                 const worldY = (mouseClientY - canvasPanOffset.y) / canvasScale;
 
-                // Check node hit
-                let hitNode = null;
+                ctxClickWorldPos = { x: worldX, y: worldY };
+                ctxTargetNode = null;
+                ctxTargetLinkIdx = -1;
+
+                // Check if right clicked a node
                 for (let i = ivrNodes.length - 1; i >= 0; i--) {
                     const n = ivrNodes[i];
+                    if (worldX >= n.x && worldX <= n.x + n.w && worldY >= n.y && worldY <= n.y + n.h) {
+                        ctxTargetNode = n;
+                        break;
+                    }
+                }
+
+                // Check if right clicked a link badge
+                if (!ctxTargetNode) {
+                    for (let i = 0; i < ivrLinks.length; i++) {
+                        const link = ivrLinks[i];
+                        const src = ivrNodes.find(n => n.id === link.from);
+                        const dst = ivrNodes.find(n => n.id === link.to);
+                        if (src && dst) {
+                            const midX = (src.x + src.w + dst.x) / 2;
+                            const midY = (src.y + src.h / 2 + dst.y + dst.h / 2) / 2;
+                            if (worldX >= midX - 52 && worldX <= midX + 52 && worldY >= midY - 12 && worldY <= midY + 12) {
+                                ctxTargetLinkIdx = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Render context menu
+                const ctxMenu = document.getElementById('canvas-context-menu');
+                const nodeActions = document.getElementById('ctx-node-actions');
+                const linkActions = document.getElementById('ctx-link-actions');
+                const canvasActions = document.getElementById('ctx-canvas-actions');
+
+                if (ctxTargetNode) {
+                    nodeActions.classList.remove('hidden');
+                    linkActions.classList.add('hidden');
+                    canvasActions.classList.add('hidden');
+                    document.getElementById('ctx-target-title').textContent = 'Блок: ' + ctxTargetNode.title;
+                    const delNodeBtn = document.getElementById('ctx-btn-delete-node');
+                    if (delNodeBtn) delNodeBtn.style.display = (ctxTargetNode.id === 'main' || ctxTargetNode.id === 'inbound') ? 'none' : 'flex';
+                } else if (ctxTargetLinkIdx >= 0) {
+                    nodeActions.classList.add('hidden');
+                    linkActions.classList.remove('hidden');
+                    canvasActions.classList.add('hidden');
+                    document.getElementById('ctx-link-title').textContent = 'Стрелка: ' + ivrLinks[ctxTargetLinkIdx].label;
+                } else {
+                    nodeActions.classList.add('hidden');
+                    linkActions.classList.add('hidden');
+                    canvasActions.classList.remove('hidden');
+                }
+
+                ctxMenu.style.left = Math.min(window.innerWidth - 220, e.clientX) + 'px';
+                ctxMenu.style.top = Math.min(window.innerHeight - 200, e.clientY) + 'px';
+                ctxMenu.classList.remove('hidden');
+            };
+
+            canvas.onmousedown = (e) => {
+                if (e.button === 2) return; // Ignore right clicks in mousedown
+                const rect = canvas.getBoundingClientRect();
+                const mouseClientX = e.clientX - rect.left;
+                const mouseClientY = e.clientY - rect.top;
+                const worldX = (mouseClientX - canvasPanOffset.x) / canvasScale;
+                const worldY = (mouseClientY - canvasPanOffset.y) / canvasScale;
+
+                // 1. Check if clicked a link badge (delete cross or label edit)
+                for (let i = 0; i < ivrLinks.length; i++) {
+                    const link = ivrLinks[i];
+                    const src = ivrNodes.find(n => n.id === link.from);
+                    const dst = ivrNodes.find(n => n.id === link.to);
+                    if (src && dst) {
+                        const midX = (src.x + src.w + dst.x) / 2;
+                        const midY = (src.y + src.h / 2 + dst.y + dst.h / 2) / 2;
+                        
+                        // Check if clicked the '×' (Delete link)
+                        if (worldX >= midX + 28 && worldX <= midX + 52 && worldY >= midY - 12 && worldY <= midY + 12) {
+                            if (confirm('Удалить эту стрелку (' + link.label + ')?')) {
+                                ivrLinks.splice(i, 1);
+                                redrawCanvas();
+                            }
+                            return;
+                        }
+
+                        // Check if clicked the badge body (Edit DTMF digit)
+                        if (worldX >= midX - 52 && worldX <= midX + 28 && worldY >= midY - 12 && worldY <= midY + 12) {
+                            const curDigit = link.label.replace(/[^0-9*#it]/g, '');
+                            const newDigit = prompt('DTMF Клавиша для этого перехода (0–9, *, #, i, t):', curDigit || '1');
+                            if (newDigit !== null && newDigit.trim()) {
+                                link.label = (newDigit.trim() === 'i' ? 'Invalid [ i ]' : 'DTMF [ ' + newDigit.trim() + ' ]');
+                                redrawCanvas();
+                            }
+                            return;
+                        }
+                    }
+                }
+
+                // 2. Check if clicked a node or its port circle
+                let hitNode = null;
+                let hitPort = false;
+
+                for (let i = ivrNodes.length - 1; i >= 0; i--) {
+                    const n = ivrNodes[i];
+                    
+                    // Port circle hit check (radius 12)
+                    const portX = n.x + n.w;
+                    const portY = n.y + n.h / 2;
+                    const distToPort = Math.hypot(worldX - portX, worldY - portY);
+                    if (distToPort <= 14) {
+                        hitNode = n;
+                        hitPort = true;
+                        break;
+                    }
+
+                    // Node body hit check
                     if (worldX >= n.x && worldX <= n.x + n.w && worldY >= n.y && worldY <= n.y + n.h) {
                         hitNode = n;
                         break;
                     }
                 }
 
+                // 3. Port Drag-to-Connect Interaction
+                if (hitPort && hitNode) {
+                    isConnectingFromPort = true;
+                    connectSourceNode = hitNode;
+                    connectCurrentPos = { x: worldX, y: worldY };
+                    canvas.style.cursor = 'crosshair';
+                    redrawCanvas();
+                    return;
+                }
+
+                // 4. Manual Linking Tool Mode
                 if (activeCanvasTool === 'link') {
-                    // LINKING TOOL MODE
                     if (hitNode) {
                         if (!linkingSourceNode) {
                             linkingSourceNode = hitNode;
                         } else if (linkingSourceNode.id !== hitNode.id) {
-                            // Create new link
-                            const digit = prompt('Введите DTMF Клавишу или метку перехода (например 1, 2, i, t):', '1') || '1';
+                            const digit = prompt('Введите DTMF Клавишу (например 1, 2, i, t):', '1') || '1';
                             ivrLinks.push({
                                 from: linkingSourceNode.id,
                                 to: hitNode.id,
-                                label: 'DTMF [ ' + digit + ' ]'
+                                label: (digit === 'i' ? 'Invalid [ i ]' : 'DTMF [ ' + digit + ' ]')
                             });
                             linkingSourceNode = null;
-                            activeCanvasTool = 'select';
                             setCanvasTool('select');
                         }
                     } else {
@@ -1570,9 +1749,9 @@
                     return;
                 }
 
-                // SELECT & DRAG / PAN MODE
+                // 5. Select & Drag Node or Pan Canvas
                 if (hitNode) {
-                    // Check if clicked Edit Icon (Pencil)
+                    // Check Edit Icon
                     const editBtnX = hitNode.x + hitNode.w - (hitNode.id === 'main' || hitNode.id === 'inbound' ? 28 : 52);
                     const editBtnY = hitNode.y + 10;
                     if (worldX >= editBtnX && worldX <= editBtnX + 20 && worldY >= editBtnY && worldY <= editBtnY + 20) {
@@ -1580,7 +1759,7 @@
                         return;
                     }
 
-                    // Check if clicked Delete Icon (Trash)
+                    // Check Delete Icon
                     if (hitNode.id !== 'main' && hitNode.id !== 'inbound') {
                         const delBtnX = hitNode.x + hitNode.w - 28;
                         const delBtnY = hitNode.y + 10;
@@ -1599,10 +1778,8 @@
                     selectedNode = hitNode;
                     nodeDragStartOffset.x = worldX - hitNode.x;
                     nodeDragStartOffset.y = worldY - hitNode.y;
-                    syncInspectorWithSelectedNode();
                     canvas.style.cursor = 'grabbing';
                 } else {
-                    // Start canvas panning
                     isPanningCanvas = true;
                     panStart.x = mouseClientX - canvasPanOffset.x;
                     panStart.y = mouseClientY - canvasPanOffset.y;
@@ -1617,10 +1794,13 @@
                 const rect = canvas.getBoundingClientRect();
                 const mouseClientX = e.clientX - rect.left;
                 const mouseClientY = e.clientY - rect.top;
+                const worldX = (mouseClientX - canvasPanOffset.x) / canvasScale;
+                const worldY = (mouseClientY - canvasPanOffset.y) / canvasScale;
 
-                if (draggedNode) {
-                    const worldX = (mouseClientX - canvasPanOffset.x) / canvasScale;
-                    const worldY = (mouseClientY - canvasPanOffset.y) / canvasScale;
+                if (isConnectingFromPort) {
+                    connectCurrentPos = { x: worldX, y: worldY };
+                    redrawCanvas();
+                } else if (draggedNode) {
                     draggedNode.x = worldX - nodeDragStartOffset.x;
                     draggedNode.y = worldY - nodeDragStartOffset.y;
                     redrawCanvas();
@@ -1631,14 +1811,40 @@
                 }
             };
 
-            window.onmouseup = () => {
+            window.onmouseup = (e) => {
                 const canvas = document.getElementById('ivrCanvas');
+                if (!canvas) return;
+
+                if (isConnectingFromPort && connectSourceNode) {
+                    const rect = canvas.getBoundingClientRect();
+                    const mouseClientX = e.clientX - rect.left;
+                    const mouseClientY = e.clientY - rect.top;
+                    const worldX = (mouseClientX - canvasPanOffset.x) / canvasScale;
+                    const worldY = (mouseClientY - canvasPanOffset.y) / canvasScale;
+
+                    // Check if dropped on a target node
+                    for (let i = ivrNodes.length - 1; i >= 0; i--) {
+                        const targetNode = ivrNodes[i];
+                        if (targetNode.id !== connectSourceNode.id && worldX >= targetNode.x && worldX <= targetNode.x + targetNode.w && worldY >= targetNode.y && worldY <= targetNode.y + targetNode.h) {
+                            const digit = prompt('Введите DTMF Клавишу для связи [' + connectSourceNode.title + ' ➔ ' + targetNode.title + ']:', '1') || '1';
+                            ivrLinks.push({
+                                from: connectSourceNode.id,
+                                to: targetNode.id,
+                                label: (digit === 'i' ? 'Invalid [ i ]' : 'DTMF [ ' + digit + ' ]')
+                            });
+                            break;
+                        }
+                    }
+                    isConnectingFromPort = false;
+                    connectSourceNode = null;
+                    redrawCanvas();
+                }
+
                 draggedNode = null;
                 isPanningCanvas = false;
                 if (canvas) canvas.style.cursor = (activeCanvasTool === 'link' ? 'crosshair' : 'grab');
             };
 
-            // Mouse wheel zoom
             canvas.onwheel = (e) => {
                 e.preventDefault();
                 const zoomFactor = e.deltaY < 0 ? 0.08 : -0.08;
@@ -1672,6 +1878,30 @@
             }
 
             // 2. Draw Links (Bezier Curves with Badges)
+            
+            // Draw active connecting wire being dragged from a port
+            if (isConnectingFromPort && connectSourceNode) {
+                const startX = connectSourceNode.x + connectSourceNode.w;
+                const startY = connectSourceNode.y + connectSourceNode.h / 2;
+                const endX = connectCurrentPos.x;
+                const endY = connectCurrentPos.y;
+                const cpX = (startX + endX) / 2;
+
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.bezierCurveTo(cpX, startY, cpX, endY, endX, endY);
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([6, 4]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillStyle = '#38bdf8';
+                ctx.beginPath();
+                ctx.arc(endX, endY, 6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
             ivrLinks.forEach((link, idx) => {
                 const src = ivrNodes.find(n => n.id === link.from);
                 const dst = ivrNodes.find(n => n.id === link.to);
@@ -1695,19 +1925,31 @@
                     ctx.arc(endX - 4, endY, 4, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Link label
+                    // Link label badge with interactive delete button
                     if (link.label) {
                         const midX = (startX + endX) / 2;
                         const midY = (startY + endY) / 2;
+                        
+                        // Badge background
                         ctx.fillStyle = '#0f172a';
-                        ctx.fillRect(midX - 40, midY - 11, 80, 22);
-                        ctx.strokeStyle = '#334155';
-                        ctx.strokeRect(midX - 40, midY - 11, 80, 22);
+                        roundRect(ctx, midX - 52, midY - 12, 104, 24, 6, true, false);
+                        ctx.strokeStyle = (selectedLinkIdx === idx) ? '#38bdf8' : '#334155';
+                        ctx.lineWidth = 1.5;
+                        roundRect(ctx, midX - 52, midY - 12, 104, 24, 6, false, true);
+
+                        // Badge text
                         ctx.fillStyle = '#38bdf8';
                         ctx.font = 'bold 11px Inter, sans-serif';
+                        ctx.textAlign = 'left';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(link.label, midX - 44, midY);
+
+                        // Cross (x) delete button on badge
+                        ctx.fillStyle = '#f43f5e';
+                        ctx.font = 'bold 12px Inter, sans-serif';
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
-                        ctx.fillText(link.label, midX, midY);
+                        ctx.fillText('×', midX + 40, midY);
                     }
                 }
             });
@@ -2180,6 +2422,50 @@
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+
+
+    <!-- CUSTOM CANVAS CONTEXT MENU -->
+    <div id="canvas-context-menu" class="hidden fixed z-[200] bg-surface-container-highest/95 backdrop-blur-md rounded-2xl p-1.5 border border-outline/40 shadow-2xl min-w-[200px] text-xs font-sans animate-fadeIn">
+        <div id="ctx-node-actions" class="space-y-1">
+            <div class="px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-on-surface-variant/70 truncate" id="ctx-target-title">Узел IVR</div>
+            <button onclick="ctxHandleAction('edit_node')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-on-surface hover:bg-primary hover:text-on-primary transition-colors text-left">
+                <span class="material-symbols-outlined text-[16px] text-primary group-hover:text-on-primary">edit</span>
+                <span>Редактировать параметры</span>
+            </button>
+            <button onclick="ctxHandleAction('start_link')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-on-surface hover:bg-primary hover:text-on-primary transition-colors text-left">
+                <span class="material-symbols-outlined text-[16px] text-secondary">arrow_right_alt</span>
+                <span>Протянуть стрелку отсюда...</span>
+            </button>
+            <button id="ctx-btn-delete-node" onclick="ctxHandleAction('delete_node')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-error hover:bg-error/10 transition-colors text-left">
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+                <span>Удалить этот блок</span>
+            </button>
+        </div>
+
+        <div id="ctx-link-actions" class="hidden space-y-1">
+            <div class="px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-on-surface-variant/70" id="ctx-link-title">Связь (Стрелка)</div>
+            <button onclick="ctxHandleAction('edit_link')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-on-surface hover:bg-primary hover:text-on-primary transition-colors text-left">
+                <span class="material-symbols-outlined text-[16px] text-primary">edit</span>
+                <span>Изменить DTMF клавишу</span>
+            </button>
+            <button onclick="ctxHandleAction('delete_link')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-error hover:bg-error/10 transition-colors text-left">
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+                <span>Удалить эту стрелку</span>
+            </button>
+        </div>
+
+        <div id="ctx-canvas-actions" class="hidden space-y-1">
+            <div class="px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-on-surface-variant/70">Холст IVR</div>
+            <button onclick="ctxHandleAction('add_node')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-on-surface hover:bg-primary hover:text-on-primary transition-colors text-left">
+                <span class="material-symbols-outlined text-[16px] text-primary">add_circle</span>
+                <span>Создать новый блок здесь</span>
+            </button>
+            <button onclick="ctxHandleAction('reset_view')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-on-surface hover:bg-surface-container transition-colors text-left">
+                <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+                <span>Центрировать камеру</span>
+            </button>
         </div>
     </div>
 
