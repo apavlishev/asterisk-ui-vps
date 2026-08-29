@@ -1820,14 +1820,35 @@
             }, 1200);
         }
 
+
+        // ================= OFFICIAL GOOGLE DRIVE AUTH FLOW =================
+        const GOOGLE_CLIENT_ID = '432264536072-eapmmldb6dlhu61uvumctkrjhdifqs6b.apps.googleusercontent.com';
+
         function startOfficialGoogleAuth() {
-            // Official Google Drive Authorization
-            const token = prompt('🔑 Введите полученный OAuth Access Token для доступа к Google Drive:');
-            if (token && token.trim()) {
-                document.getElementById('gdrive_token_field').value = token.trim();
-                saveOAuthTokenToServer('gdrive', token.trim());
-            }
+            // Standard OAuth2 Implicit Grant / Token Flow for Google Drive API
+            const scope = encodeURIComponent('https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive');
+            const redirectUri = encodeURIComponent('https://developers.google.com/oauthplayground');
+            
+            // Build Google OAuth2 URL
+            const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${redirectUri}&scope=${scope}&include_granted_scopes=true&prompt=consent`;
+            
+            const width = 640;
+            const height = 720;
+            const left = (window.screen.width - width) / 2;
+            const top = (window.screen.height - height) / 2;
+            const authWin = window.open(googleAuthUrl, 'GoogleOAuth', `width=${width},height=${height},top=${top},left=${left},menubar=no,toolbar=no`);
+
+            setTimeout(() => {
+                const token = prompt('🔑 Подтвердите доступ в окне Google и вставьте полученный Access Token (ya29.a0...):');
+                if (token && token.trim()) {
+                    const cleanToken = token.trim();
+                    const tokenField = document.getElementById('gdrive_token_field');
+                    if (tokenField) tokenField.value = cleanToken;
+                    saveOAuthTokenToServer('gdrive', cleanToken);
+                }
+            }, 1200);
         }
+
 
 // // ================= UNIVERSAL OAUTH2 CLOUD RELAY & DEVICE FLOW =
         function startOAuthFlow(provider) {
