@@ -112,8 +112,7 @@ def get_system_modems_info():
                 imei_m = re.search(r'IMEI\s*:\s*([0-9]+)', det_out)
                 imsi_m = re.search(r'IMSI\s*:\s*([0-9]+)', det_out)
                 num_m = re.search(r'Number\s*:\s*([+0-9]+)', det_out)
-                prov_m = re.search(r'Provider Name\s*:\s*([^
-]+)', det_out)
+                prov_m = re.search(r'Provider Name\s*:\s*([^\r\n]+)', det_out)
                 
                 modems.append({
                     'id': d_id,
