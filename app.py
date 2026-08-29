@@ -5683,12 +5683,12 @@ def delete_ring_group(exten):
 
 @app.route('/settings/sip-trunks/add', methods=['POST'])
 def add_sip_trunk():
-    name = request.form.get('trunk_name', '').strip()
-    host = request.form.get('trunk_host', '').strip()
-    port = int(request.form.get('trunk_port', 5060))
-    user = request.form.get('trunk_user', '').strip()
-    pwd = request.form.get('trunk_pass', '').strip()
-    cid = request.form.get('trunk_callerid', '').strip()
+    name = (request.form.get('trunk_name') or request.form.get('name') or '').strip()
+    host = (request.form.get('trunk_host') or request.form.get('host') or '').strip()
+    port = int(request.form.get('trunk_port') or request.form.get('port') or 5060)
+    user = (request.form.get('trunk_user') or request.form.get('username') or request.form.get('user') or '').strip()
+    pwd = (request.form.get('trunk_pass') or request.form.get('password') or request.form.get('pwd') or '').strip()
+    cid = (request.form.get('trunk_callerid') or request.form.get('callerid') or '').strip()
 
     if not name or not host or not user:
         flash('Укажите название, хост и логин транка!')
