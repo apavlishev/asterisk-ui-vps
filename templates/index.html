@@ -280,7 +280,7 @@
               {% endif %}
             {% endwith %}
 
-            <!-- ================= TAB 1: DASHBOARD ================= -->
+            <!-- // ================= TAB 1: DASHBOARD // ================= -->
             <div id="tab-dashboard" class="tab-pane active space-y-8">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                     <div>
@@ -405,7 +405,7 @@
                 </div>
             </div>
 
-            <!-- ================= TAB 2: ACCOUNTS / USERS ================= -->
+            <!-- // ================= TAB 2: ACCOUNTS / USERS // ================= -->
             <div id="tab-accounts" class="tab-pane space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -474,7 +474,7 @@
                 </div>
             </div>
 
-            <!-- ================= TAB 3: MARKETPLACE ================= -->
+            <!-- // ================= TAB 3: MARKETPLACE // ================= -->
             <div id="tab-marketplace" class="tab-pane space-y-6">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                     <div>
@@ -531,7 +531,7 @@
                 </div>
             </div>
 
-            <!-- ================= TAB 4: LICENSING & OTA ================= -->
+            <!-- // ================= TAB 4: LICENSING & OTA // ================= -->
             <div id="tab-licensing" class="tab-pane space-y-6">
                 <div class="bg-surface rounded-2xl p-8 border border-outline/30 shadow-sm relative overflow-hidden">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -579,7 +579,7 @@
                 </div>
             </div>
 
-            <!-- ================= TAB 5: SIP TRUNKS ================= -->
+            <!-- // ================= TAB 5: SIP TRUNKS // ================= -->
             <div id="tab-trunks" class="tab-pane space-y-6">
                 <div class="flex justify-between items-center">
                     <div>
@@ -634,7 +634,7 @@
                 </div>
             </div>
 
-                                                <!-- ================= TAB 6: PROFESSIONAL ENTERPRISE IVR DESIGNER ================= -->
+                                                <!-- // ================= TAB 6: PROFESSIONAL ENTERPRISE IVR DESIGNER // ================= -->
             <div id="tab-ivr" class="tab-pane space-y-6">
                 <div class="bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm space-y-6">
                     
@@ -666,7 +666,7 @@
                         </div>
                     </div>
 
-                                        <!-- ================= VIEW 1: FULLSCREEN INTERACTIVE VISUAL CANVAS WITH MODAL POPUPS ================= -->
+                                        <!-- // ================= VIEW 1: FULLSCREEN INTERACTIVE VISUAL CANVAS WITH MODAL POPUPS // ================= -->
                     <div id="ivr-view-canvas" class="space-y-4">
                         <div class="flex flex-wrap items-center justify-between gap-2 px-1">
                             <div class="flex items-center gap-1 bg-surface-container-low p-1 rounded-xl border border-outline/40">
@@ -711,7 +711,7 @@
                         </div>
                     </div>
 
-                    <!-- ================= VIEW 2: GLOBAL SCHEDULE & WORKING HOURS ================= -->
+                    <!-- // ================= VIEW 2: GLOBAL SCHEDULE & WORKING HOURS // ================= -->
                     <div id="ivr-view-form" class="hidden space-y-6">
                         <form action="/settings/ivr-builder" method="POST" enctype="multipart/form-data" class="space-y-6 max-w-3xl">
                             <div class="p-6 rounded-2xl bg-surface-container-lowest border border-outline/30 space-y-4">
@@ -752,7 +752,7 @@
                 </div>
             </div>
 
-            <!-- ================= DYNAMIC INSTALLED PLUGIN TABS ================= -->
+            <!-- // ================= DYNAMIC INSTALLED PLUGIN TABS // ================= -->
             {% for p in installed_plugins %}
             <div id="tab-plugin-{{ p.id }}" class="tab-pane space-y-6">
                 <div class="bg-surface rounded-2xl p-8 border border-outline/30 shadow-sm">
@@ -936,7 +936,7 @@
             {% endfor %}
 
         
-            <!-- ================= TAB: CALL LOGS ================= -->
+            <!-- // ================= TAB: CALL LOGS // ================= -->
             <div id="tab-calls" class="tab-pane space-y-6">
                 <div class="bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm">
                     <div class="flex justify-between items-center mb-6">
@@ -963,7 +963,7 @@
             </div>
 
         
-            <!-- ================= TAB: SECURITY & ACCESS ================= -->
+            <!-- // ================= TAB: SECURITY & ACCESS // ================= -->
             <div id="tab-security" class="tab-pane space-y-6">
                 <div class="bg-surface rounded-2xl p-8 border border-outline/30 shadow-sm max-w-2xl">
                     <div class="flex items-center gap-4 mb-6 pb-4 border-b border-surface-container">
@@ -1110,7 +1110,7 @@
     <script>
         
 
-        // ================= EXTENSIONS MENU ACCORDION PERSISTENCE =================
+        // // ================= EXTENSIONS MENU ACCORDION PERSISTENCE // =================
         function toggleExtensionsMenu(forceState) {
             const sub = document.getElementById('extensions-submenu');
             const arrow = document.getElementById('ext-arrow');
@@ -1134,9 +1134,9 @@
         
         
         
-        // ================= UNIVERSAL OAUTH2 CLOUD RELAY & DEVICE FLOW =
+        // // ================= UNIVERSAL OAUTH2 CLOUD RELAY & DEVICE FLOW =
 
-        // ================= OFFICIAL BRANDED AUTH HANDLERS (YANDEX & GOOGLE) =================
+        // // ================= OFFICIAL BRANDED AUTH HANDLERS (YANDEX & GOOGLE) // =================
         function startOfficialYandexAuth() {
             // Official Yandex ID Authorization flow
             const yandexAuthUrl = 'https://oauth.yandex.ru/authorize?response_type=token&client_id=e578c7b8d0094c4892c20f1883398912&redirect_uri=https%3A%2F%2Foauth.yandex.ru%2Fverification_code';
@@ -1160,7 +1160,7 @@
             }
         }
 
-================
+// // ================= UNIVERSAL OAUTH2 CLOUD RELAY & DEVICE FLOW =
         function startOAuthFlow(provider) {
             const host = window.location.host;
             const protocol = window.location.protocol;
@@ -1207,7 +1207,7 @@
         }
 
 
-        // ================= ADVANCED PAN, ZOOM, DRAG & LINKING CANVAS ENGINE =================
+        // // ================= ADVANCED PAN, ZOOM, DRAG & LINKING CANVAS ENGINE // =================
         let ivrNodes = [
             { id: 'inbound', type: 'start', title: 'Входящий SIP Trunk', x: 60, y: 250, w: 200, h: 70, color: '#10b981' },
             { id: 'main', type: 'ivr', title: 'Главное Меню', audio: 'greeting_main.wav', timeout: 7, retries: 3, direct_dial: true, timeout_action: 'operator', x: 330, y: 200, w: 250, h: 140, color: '#3b82f6' },
@@ -1748,7 +1748,7 @@
         }
 
 
-        // ================= COLLAPSIBLE SIDEBAR LOGIC =================
+        // // ================= COLLAPSIBLE SIDEBAR LOGIC // =================
         function toggleSidebarCollapse() {
             const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
             const icon = document.getElementById('sidebar-toggle-icon');
