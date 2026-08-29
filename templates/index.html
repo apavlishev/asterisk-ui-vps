@@ -714,13 +714,17 @@
                                 <span>Применить IVR схему в Asterisk</span>
                             </button>
                             <div class="inline-flex p-1 rounded-2xl bg-surface-container-low border border-outline/40 shadow-inner">
-                                <button type="button" onclick="setIvrViewMode('canvas')" id="btn-ivr-mode-canvas" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-primary text-on-primary shadow-sm">
-                                    <span class="material-symbols-outlined text-base">account_tree</span>
+                                <button type="button" onclick="setIvrViewMode('canvas')" id="btn-ivr-mode-canvas" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all bg-primary text-on-primary shadow-sm">
+                                    <span class="material-symbols-outlined text-[16px]">account_tree</span>
                                     <span>Блок-схема (Canvas)</span>
                                 </button>
-                                <button type="button" onclick="setIvrViewMode('form')" id="btn-ivr-mode-form" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">
-                                    <span class="material-symbols-outlined text-base">tune</span>
-                                    <span>Глобальные настройки</span>
+                                <button type="button" onclick="setIvrViewMode('table')" id="btn-ivr-mode-table" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">
+                                    <span class="material-symbols-outlined text-[16px]">table_chart</span>
+                                    <span>Табличный вид</span>
+                                </button>
+                                <button type="button" onclick="setIvrViewMode('schedule')" id="btn-ivr-mode-schedule" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">
+                                    <span class="material-symbols-outlined text-[16px]">schedule</span>
+                                    <span>Расписание</span>
                                 </button>
                             </div>
                         </div>
@@ -771,8 +775,44 @@
                         </div>
                     </div>
 
-                    <!-- // ================= VIEW 2: GLOBAL SCHEDULE & WORKING HOURS // ================= -->
-                    <div id="ivr-view-form" class="hidden space-y-6">
+                                        <!-- ================= VIEW 2: TABLE VIEW (ТАБЛИЧНЫЙ ВИД МАРШРУТИЗАЦИИ) ================= -->
+                    <div id="ivr-view-table" class="hidden space-y-6">
+                        <div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline/30 shadow-sm space-y-4">
+                            <div class="flex justify-between items-center pb-3 border-b border-surface-container">
+                                <div>
+                                    <h3 class="text-base font-bold text-on-surface flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-primary">table_chart</span>
+                                        Таблица правил маршрутизации и DTMF веток
+                                    </h3>
+                                    <p class="text-xs text-on-surface-variant mt-0.5">Полный список правил перехода и целевых назначений голосового меню.</p>
+                                </div>
+                                <button type="button" onclick="openAddNodePopup()" class="px-4 py-2 rounded-xl bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 flex items-center gap-1.5 shadow-sm">
+                                    <span class="material-symbols-outlined text-[16px]">add_circle</span>
+                                    <span>Добавить ветку</span>
+                                </button>
+                            </div>
+
+                            <div class="overflow-x-auto rounded-xl border border-outline/30">
+                                <table class="w-full text-left border-collapse text-xs">
+                                    <thead>
+                                        <tr class="bg-surface-container-low border-b border-surface-container text-on-surface-variant font-semibold uppercase tracking-wider">
+                                            <th class="px-4 py-3">Клавиша DTMF</th>
+                                            <th class="px-4 py-3">Название ветки / Отдел</th>
+                                            <th class="px-4 py-3">Тип действия</th>
+                                            <th class="px-4 py-3">Целевой номер / Ресурс</th>
+                                            <th class="px-4 py-3 text-right">Действия</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-surface-container" id="ivr-table-tbody">
+                                        <!-- Rendered dynamically by syncIvrTableView() -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================= VIEW 3: SCHEDULE & WORKING HOURS ================= -->
+                    <div id="ivr-view-schedule" class="hidden space-y-6">
                         <form action="/settings/ivr-builder" method="POST" enctype="multipart/form-data" class="space-y-6 max-w-3xl">
                             <div class="p-6 rounded-2xl bg-surface-container-lowest border border-outline/30 space-y-4">
                                 <h3 class="font-bold text-base text-on-surface flex items-center gap-2">
@@ -809,8 +849,7 @@
                         </form>
                     </div>
 
-
-                    <!-- ================= ARCHITECTURAL DOCUMENTATION FOOTER: BLOCKS & INTERACTIONS ================= -->
+<!-- ================= ARCHITECTURAL DOCUMENTATION FOOTER: BLOCKS & INTERACTIONS ================= -->
                     <div class="mt-8 pt-8 border-t border-surface-container space-y-6">
                         <div>
                             <h3 class="text-base font-bold text-on-surface flex items-center gap-2">
@@ -1716,119 +1755,119 @@
 
 
         // // ================= ADVANCED PAN, ZOOM, DRAG & LINKING CANVAS ENGINE // =================
-        let ivrNodes = [
-            { id: 'inbound', type: 'start', title: 'Входящий SIP Trunk', x: 60, y: 250, w: 200, h: 70, color: '#10b981' },
-            { id: 'main', type: 'ivr', title: 'Главное Меню', audio: 'greeting_main.wav', timeout: 7, retries: 3, direct_dial: true, timeout_action: 'operator', x: 330, y: 200, w: 250, h: 140, color: '#3b82f6' },
-            { id: 'op_1', type: 'branch', action_type: 'extension', title: 'Отдел продаж (RU)', digit: '1', target: '101', x: 670, y: 50, w: 220, h: 80, color: '#8b5cf6' },
-            { id: 'op_2', type: 'branch', action_type: 'ring_group', title: 'Техническая поддержка', digit: '2', target: 'RingGroup:900', x: 670, y: 190, w: 220, h: 80, color: '#f59e0b' },
-            { id: 'op_3', type: 'branch', action_type: 'voicemail', title: 'Оставить голосовое сообщение', digit: '3', target: 'Voicemail:ALL', x: 670, y: 330, w: 220, h: 80, color: '#f43f5e' },
-            { id: 'op_i', type: 'branch', action_type: 'extension', title: 'Ошибочный ввод (Invalid)', digit: 'i', target: '101', x: 670, y: 470, w: 220, h: 80, color: '#64748b' }
-        ];
+        
+        // ================= IVR DATA INITIALIZATION FROM SERVER PERSISTENCE =================
+        const serverIvrTree = {{ ivr_tree|tojson|safe }};
+        
+        let ivrNodes = [];
+        let ivrLinks = [];
 
-        let ivrLinks = [
-            { from: 'inbound', to: 'main', label: 'SIP Call' },
-            { from: 'main', to: 'op_1', label: 'DTMF [ 1 ]' },
-            { from: 'main', to: 'op_2', label: 'DTMF [ 2 ]' },
-            { from: 'main', to: 'op_3', label: 'DTMF [ 3 ]' },
-            { from: 'main', to: 'op_i', label: 'Invalid [ i ]' }
-        ];
+        if (serverIvrTree && serverIvrTree.canvas_layout && serverIvrTree.canvas_layout.nodes && serverIvrTree.canvas_layout.nodes.length > 0) {
+            ivrNodes = serverIvrTree.canvas_layout.nodes;
+            ivrLinks = serverIvrTree.canvas_layout.links || [];
+        } else {
+            // Default initial graph
+            ivrNodes = [
+                { id: 'inbound', type: 'start', title: 'Входящий SIP Trunk', x: 60, y: 250, w: 200, h: 70, color: '#10b981' },
+                { id: 'main', type: 'ivr', title: (serverIvrTree && serverIvrTree.nodes && serverIvrTree.nodes[0] ? serverIvrTree.nodes[0].title : 'Главное Меню'), audio: (serverIvrTree && serverIvrTree.nodes && serverIvrTree.nodes[0] ? serverIvrTree.nodes[0].audio_file : 'greeting_main.wav'), timeout: (serverIvrTree && serverIvrTree.nodes && serverIvrTree.nodes[0] ? serverIvrTree.nodes[0].timeout_sec : 7), retries: 3, direct_dial: true, timeout_action: 'operator', x: 330, y: 200, w: 250, h: 140, color: '#3b82f6' },
+                { id: 'op_1', type: 'branch', action_type: 'extension', title: 'Отдел продаж (RU)', digit: '1', target: '101', x: 670, y: 50, w: 220, h: 80, color: '#8b5cf6' },
+                { id: 'op_2', type: 'branch', action_type: 'ring_group', title: 'Техническая поддержка', digit: '2', target: 'RingGroup:900', x: 670, y: 190, w: 220, h: 80, color: '#f59e0b' },
+                { id: 'op_3', type: 'branch', action_type: 'voicemail', title: 'Оставить голосовое сообщение', digit: '3', target: 'Voicemail:ALL', x: 670, y: 330, w: 220, h: 80, color: '#f43f5e' },
+                { id: 'op_i', type: 'branch', action_type: 'extension', title: 'Ошибочный ввод (Invalid)', digit: 'i', target: '101', x: 670, y: 470, w: 220, h: 80, color: '#64748b' }
+            ];
 
-        // Canvas Transformation State
-        let canvasScale = 1.0;
-        let canvasPanOffset = { x: 0, y: 0 };
-        let activeCanvasTool = 'select'; // 'select' or 'link'
-        let linkingSourceNode = null;
-
-        let selectedNode = ivrNodes[1];
-        let draggedNode = null;
-        let isPanningCanvas = false;
-        let panStart = { x: 0, y: 0 };
-        let nodeDragStartOffset = { x: 0, y: 0 };
-
-        function setCanvasTool(tool) {
-            activeCanvasTool = tool;
-            linkingSourceNode = null;
-            const btnSelect = document.getElementById('tool-btn-select');
-            const btnLink = document.getElementById('tool-btn-link');
-            const canvas = document.getElementById('ivrCanvas');
-
-            if (tool === 'select') {
-                btnSelect.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-on-primary flex items-center gap-1 shadow-sm transition-all";
-                btnLink.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-1 transition-all";
-                if (canvas) canvas.style.cursor = 'grab';
-            } else {
-                btnLink.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-on-primary flex items-center gap-1 shadow-sm transition-all";
-                btnSelect.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-1 transition-all";
-                if (canvas) canvas.style.cursor = 'crosshair';
-                alert('Режим связей: Кликните узел-источник (например, Главное меню), затем целевой узел для создания стрелки.');
-            }
-            redrawCanvas();
-        }
-
-        function zoomCanvas(delta) {
-            canvasScale = Math.max(0.4, Math.min(2.0, canvasScale + delta));
-            const lbl = document.getElementById('canvas-zoom-label');
-            if (lbl) lbl.textContent = Math.round(canvasScale * 100) + '%';
-            redrawCanvas();
-        }
-
-        function resetCanvasView() {
-            canvasScale = 1.0;
-            canvasPanOffset = { x: 0, y: 0 };
-            const lbl = document.getElementById('canvas-zoom-label');
-            if (lbl) lbl.textContent = '100%';
-            redrawCanvas();
+            ivrLinks = [
+                { from: 'inbound', to: 'main', label: 'SIP Call' },
+                { from: 'main', to: 'op_1', label: 'DTMF [ 1 ]' },
+                { from: 'main', to: 'op_2', label: 'DTMF [ 2 ]' },
+                { from: 'main', to: 'op_3', label: 'DTMF [ 3 ]' },
+                { from: 'main', to: 'op_i', label: 'Invalid [ i ]' }
+            ];
         }
 
         function setIvrViewMode(mode) {
             const canvasView = document.getElementById('ivr-view-canvas');
-            const formView = document.getElementById('ivr-view-form');
+            const tableView = document.getElementById('ivr-view-table');
+            const scheduleView = document.getElementById('ivr-view-schedule');
+
             const btnCanvas = document.getElementById('btn-ivr-mode-canvas');
-            const btnForm = document.getElementById('btn-ivr-mode-form');
+            const btnTable = document.getElementById('btn-ivr-mode-table');
+            const btnSchedule = document.getElementById('btn-ivr-mode-schedule');
+
+            // Reset classes
+            [btnCanvas, btnTable, btnSchedule].forEach(b => {
+                if (b) b.className = "flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all";
+            });
 
             if (mode === 'canvas') {
-                canvasView.classList.remove('hidden');
-                formView.classList.add('hidden');
-                btnCanvas.className = "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-primary text-on-primary shadow-sm";
-                btnForm.className = "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all";
+                if (canvasView) canvasView.classList.remove('hidden');
+                if (tableView) tableView.classList.add('hidden');
+                if (scheduleView) scheduleView.classList.add('hidden');
+                if (btnCanvas) btnCanvas.className = "flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all bg-primary text-on-primary shadow-sm";
                 setTimeout(initIvrCanvas, 50);
-            } else {
-                canvasView.classList.add('hidden');
-                formView.classList.remove('hidden');
-                btnForm.className = "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-primary text-on-primary shadow-sm";
-                btnCanvas.className = "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all";
+            } else if (mode === 'table') {
+                if (canvasView) canvasView.classList.add('hidden');
+                if (tableView) tableView.classList.remove('hidden');
+                if (scheduleView) scheduleView.classList.add('hidden');
+                if (btnTable) btnTable.className = "flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all bg-primary text-on-primary shadow-sm";
+                syncIvrTableView();
+            } else if (mode === 'schedule') {
+                if (canvasView) canvasView.classList.add('hidden');
+                if (tableView) tableView.classList.add('hidden');
+                if (scheduleView) scheduleView.classList.remove('hidden');
+                if (btnSchedule) btnSchedule.className = "flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all bg-primary text-on-primary shadow-sm";
             }
         }
 
-        function initIvrCanvas() {
-            const canvas = document.getElementById('ivrCanvas');
-            if (!canvas) return;
-            
-            const container = canvas.parentElement;
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = container.clientWidth * dpr;
-            canvas.height = container.clientHeight * dpr;
+        function syncIvrTableView() {
+            const tbody = document.getElementById('ivr-table-tbody');
+            if (!tbody) return;
 
-            setupCanvasInteractions(canvas);
-            canvas.ondblclick = (e) => {
-                const rect = canvas.getBoundingClientRect();
-                const mouseClientX = e.clientX - rect.left;
-                const mouseClientY = e.clientY - rect.top;
-                const worldX = (mouseClientX - canvasPanOffset.x) / canvasScale;
-                const worldY = (mouseClientY - canvasPanOffset.y) / canvasScale;
-                for (let i = ivrNodes.length - 1; i >= 0; i--) {
-                    const n = ivrNodes[i];
-                    if (worldX >= n.x && worldX <= n.x + n.w && worldY >= n.y && worldY <= n.y + n.h) {
-                        openEditNodePopup(n);
-                        break;
-                    }
-                }
-            };
-            redrawCanvas();
-            syncInspectorWithSelectedNode();
+            const branches = ivrNodes.filter(n => n.type === 'branch');
+            let rowsHtml = '';
+
+            branches.forEach((b, idx) => {
+                const actionLabels = {
+                    'extension': 'SIP Абонент',
+                    'ring_group': 'Группа вызова',
+                    'voicemail': 'Голосовая почта',
+                    'hangup': 'Завершение вызова'
+                };
+                const actionText = actionLabels[b.action_type || 'extension'] || 'SIP Абонент';
+
+                rowsHtml += `
+                    <tr class="hover:bg-surface-container-low/50 transition-colors">
+                        <td class="px-4 py-3 font-mono font-bold text-primary">
+                            <span class="px-2 py-0.5 rounded bg-primary/10 border border-primary/20">[ ${b.digit || '1'} ]</span>
+                        </td>
+                        <td class="px-4 py-3 font-semibold text-on-surface">${b.title}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface-container text-on-surface-variant uppercase">${actionText}</span>
+                        </td>
+                        <td class="px-4 py-3 font-mono text-on-surface-variant font-bold">${b.target || '101'}</td>
+                        <td class="px-4 py-3 text-right">
+                            <div class="flex items-center justify-end gap-1">
+                                <button type="button" onclick="openEditNodePopup(ivrNodes.find(n => n.id === '${b.id}'))" class="p-1.5 rounded-lg hover:bg-surface-container text-primary" title="Редактировать">
+                                    <span class="material-symbols-outlined text-[16px]">edit</span>
+                                </button>
+                                <button type="button" onclick="if(confirm('Удалить ветку ${b.title}?')){ ivrNodes = ivrNodes.filter(n => n.id !== '${b.id}'); ivrLinks = ivrLinks.filter(l => l.from !== '${b.id}' && l.to !== '${b.id}'); syncIvrTableView(); redrawCanvas(); }" class="p-1.5 rounded-lg hover:bg-error/10 text-error" title="Удалить">
+                                    <span class="material-symbols-outlined text-[16px]">delete</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            if (branches.length === 0) {
+                rowsHtml = '<tr><td colspan="5" class="px-4 py-6 text-center text-on-surface-variant italic">Нет настроенных веток. Нажмите «Добавить ветку» для создания правил DTMF.</td></tr>';
+            }
+
+            tbody.innerHTML = rowsHtml;
         }
 
-                function setupCanvasInteractions(canvas) {
+
+        function setupCanvasInteractions(canvas) {
             // Prevent default browser context menu on canvas
             canvas.oncontextmenu = (e) => {
                 e.preventDefault();
