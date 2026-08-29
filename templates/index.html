@@ -632,147 +632,48 @@
                         </div>
                     </div>
 
-                    <!-- ================= VIEW 1: INTERACTIVE VISUAL CANVAS WITH PRO INSPECTOR ================= -->
+                                        <!-- ================= VIEW 1: FULLSCREEN INTERACTIVE VISUAL CANVAS WITH MODAL POPUPS ================= -->
                     <div id="ivr-view-canvas" class="space-y-4">
-                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="flex flex-wrap items-center justify-between gap-2 px-1">
+                            <div class="flex items-center gap-1 bg-surface-container-low p-1 rounded-xl border border-outline/40">
+                                <button type="button" onclick="setCanvasTool('select')" id="tool-btn-select" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-on-primary flex items-center gap-1 shadow-sm transition-all" title="Двойной клик на блок открывает окно редактирования">
+                                    <span class="material-symbols-outlined text-[16px]">pan_tool</span>
+                                    <span>Двигать / Редактировать</span>
+                                </button>
+                                <button type="button" onclick="setCanvasTool('link')" id="tool-btn-link" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-1 transition-all" title="Соединить узлы стрелкой: Кликните начальный узел, затем целевой">
+                                    <span class="material-symbols-outlined text-[16px]">arrow_right_alt</span>
+                                    <span>Создать связь (Стрелку)</span>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-xl border border-outline/40 text-xs font-mono">
+                                    <button type="button" onclick="zoomCanvas(-0.1)" class="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container text-on-surface font-bold">&minus;</button>
+                                    <span id="canvas-zoom-label" class="px-1 text-on-surface-variant">100%</span>
+                                    <button type="button" onclick="zoomCanvas(0.1)" class="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container text-on-surface font-bold">&plus;</button>
+                                </div>
+                                <button type="button" onclick="resetCanvasView()" class="px-3 py-1.5 rounded-lg border border-outline text-xs text-on-surface hover:bg-surface-container transition-colors flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[16px]">restart_alt</span> Центрировать
+                                </button>
+                                <button type="button" onclick="openAddNodePopup()" class="px-4 py-1.5 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[16px]">add_circle</span> Создать блок
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- FULL-WIDTH CANVAS -->
+                        <div class="relative w-full h-[650px] bg-slate-900 rounded-2xl overflow-hidden border border-outline/30 shadow-inner">
+                            <canvas id="ivrCanvas" class="w-full h-full cursor-grab active:cursor-grabbing block"></canvas>
                             
-                            <!-- CANVAS WORKSPACE (8 COLS) -->
-                            <div class="lg:col-span-8 space-y-3">
-                                <div class="flex flex-wrap items-center justify-between gap-2 px-1">
-                                    <div class="flex items-center gap-1 bg-surface-container-low p-1 rounded-xl border border-outline/40">
-                                        <button type="button" onclick="setCanvasTool('select')" id="tool-btn-select" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-on-primary flex items-center gap-1 shadow-sm transition-all" title="Выбор и перемещение узлов">
-                                            <span class="material-symbols-outlined text-[16px]">pan_tool</span>
-                                            <span>Двигать / Выбор</span>
-                                        </button>
-                                        <button type="button" onclick="setCanvasTool('link')" id="tool-btn-link" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-1 transition-all" title="Соединить узлы стрелкой: Кликните начальный узел, затем целевой">
-                                            <span class="material-symbols-outlined text-[16px]">arrow_right_alt</span>
-                                            <span>Создать связь (Стрелку)</span>
-                                        </button>
-                                    </div>
-
-                                    <div class="flex items-center gap-2">
-                                        <div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-xl border border-outline/40 text-xs font-mono">
-                                            <button type="button" onclick="zoomCanvas(-0.1)" class="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container text-on-surface font-bold">&minus;</button>
-                                            <span id="canvas-zoom-label" class="px-1 text-on-surface-variant">100%</span>
-                                            <button type="button" onclick="zoomCanvas(0.1)" class="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container text-on-surface font-bold">&plus;</button>
-                                        </div>
-                                        <button type="button" onclick="resetCanvasView()" class="px-3 py-1.5 rounded-lg border border-outline text-xs text-on-surface hover:bg-surface-container transition-colors flex items-center gap-1">
-                                            <span class="material-symbols-outlined text-[16px]">restart_alt</span> Центрировать
-                                        </button>
-                                        <button type="button" onclick="addIvrNodeModal()" class="px-4 py-1.5 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-1">
-                                            <span class="material-symbols-outlined text-[16px]">add_circle</span> Добавить узел
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="relative w-full h-[680px] bg-slate-900 rounded-2xl overflow-hidden border border-outline/30 shadow-inner">
-                                    <canvas id="ivrCanvas" class="w-full h-full cursor-grab active:cursor-grabbing block"></canvas>
-                                    
-                                    <!-- CANVAS LEGEND & CONTROLS -->
-                                    <div class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-md px-4 py-2 rounded-xl border border-outline/30 shadow-lg text-[11px] font-mono text-on-surface flex items-center gap-4">
-                                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span>Trunk</span></div>
-                                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span><span>IVR Меню</span></div>
-                                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span><span>Оператор / SIP</span></div>
-                                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span><span>Ring Group</span></div>
-                                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span><span>Voicemail / Drop</span></div>
-                                    </div>
-                                </div>
+                            <!-- CANVAS BOTTOM HINT & LEGEND -->
+                            <div class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-outline/30 shadow-lg text-xs font-mono text-on-surface flex items-center gap-4">
+                                <span class="text-primary font-bold">💡 Двойной клик на любой блок открывает окно настройки</span>
+                                <div class="h-4 w-[1px] bg-surface-container"></div>
+                                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span>Trunk</span></div>
+                                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span><span>IVR Меню</span></div>
+                                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span><span>SIP Абонент</span></div>
+                                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span><span>Группа</span></div>
                             </div>
-
-                            <!-- PRO NODE INSPECTOR (4 COLS) -->
-                            <div class="lg:col-span-4 bg-surface-container-lowest p-6 rounded-2xl border border-outline/30 shadow-sm flex flex-col justify-between h-[720px]">
-                                <div class="space-y-4 overflow-y-auto pr-1">
-                                    <div class="flex items-center justify-between pb-3 border-b border-surface-container">
-                                        <div>
-                                            <h3 class="font-bold text-base text-on-surface flex items-center gap-2">
-                                                <span class="material-symbols-outlined text-primary">edit_note</span>
-                                                Инспектор узла
-                                            </h3>
-                                            <span id="inspector-type-badge" class="text-[10px] uppercase font-mono font-bold text-primary">IVR Root Menu</span>
-                                        </div>
-                                        <span id="inspector-node-id" class="text-xs px-2.5 py-0.5 rounded bg-surface-container font-mono text-on-surface-variant">main</span>
-                                    </div>
-
-                                    <!-- 1. General Node Info -->
-                                    <div class="space-y-3">
-                                        <div>
-                                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Название узла / меню</label>
-                                            <input type="text" id="inspector-title" class="w-full px-3.5 py-2 rounded-xl bg-surface-container-low border border-outline text-sm" oninput="updateActiveNodeProperty('title', this.value)">
-                                        </div>
-
-                                        <!-- IVR MENU SPECIFIC FIELDS -->
-                                        <div id="inspector-ivr-fields" class="space-y-3">
-                                            <div>
-                                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Аудиозапись приветствия (.wav)</label>
-                                                <input type="text" id="inspector-audio" class="w-full px-3.5 py-2 rounded-xl bg-surface-container-low border border-outline text-xs font-mono" oninput="updateActiveNodeProperty('audio', this.value)">
-                                            </div>
-                                            
-                                            <div class="grid grid-cols-2 gap-2">
-                                                <div>
-                                                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Таймаут ввода (сек)</label>
-                                                    <input type="number" id="inspector-timeout" min="1" max="60" class="w-full px-3.5 py-2 rounded-xl bg-surface-container-low border border-outline text-sm font-mono" oninput="updateActiveNodeProperty('timeout', this.value)">
-                                                </div>
-                                                <div>
-                                                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Кол-во попыток (Retries)</label>
-                                                    <input type="number" id="inspector-retries" min="1" max="5" value="3" class="w-full px-3.5 py-2 rounded-xl bg-surface-container-low border border-outline text-sm font-mono" oninput="updateActiveNodeProperty('retries', this.value)">
-                                                </div>
-                                            </div>
-
-                                            <div class="p-3 rounded-xl bg-surface-container-low border border-outline/20 space-y-2">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="text-xs font-semibold text-on-surface">Прямой донабор номера (Direct Dial)</span>
-                                                    <input type="checkbox" id="inspector-direct-dial" class="w-4 h-4 rounded text-primary" onchange="updateActiveNodeProperty('direct_dial', this.checked)">
-                                                </div>
-                                                <p class="text-[11px] text-on-surface-variant">Позволяет звонящему набрать внутренний номер сотрудника (101, 102 и т.д.) во время приветствия.</p>
-                                            </div>
-
-                                            <div>
-                                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Действие по таймауту (Timeout Action)</label>
-                                                <select id="inspector-timeout-action" class="w-full px-3.5 py-2 rounded-xl bg-surface-container-low border border-outline text-xs" onchange="updateActiveNodeProperty('timeout_action', this.value)">
-                                                    <option value="operator">Перевести на дежурного оператора</option>
-                                                    <option value="ring_all">Звонить всем абонентам (Ring ALL)</option>
-                                                    <option value="repeat">Повторить голосовое меню</option>
-                                                    <option value="voicemail">Голосовая почта (Voicemail)</option>
-                                                    <option value="hangup">Завершить звонок (Hangup)</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <!-- BRANCH SPECIFIC FIELDS -->
-                                        <div id="inspector-branch-fields" class="space-y-3">
-                                            <div>
-                                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">DTMF Клавиша (0–9, *, #, t, i)</label>
-                                                <input type="text" id="inspector-digit" maxlength="2" class="w-full px-3.5 py-2 rounded-xl bg-surface-container-low border border-outline text-sm font-mono" oninput="updateActiveNodeProperty('digit', this.value)">
-                                            </div>
-
-                                            <div>
-                                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Тип действия ветки (Action Type)</label>
-                                                <select id="inspector-action-type" class="w-full px-3.5 py-2 rounded-xl bg-surface-container-low border border-outline text-xs" onchange="updateActiveNodeActionType(this.value)">
-                                                    <option value="extension">SIP Абонент (Extension)</option>
-                                                    <option value="ring_group">Группа вызова (Ring Group)</option>
-                                                    <option value="submenu">Вложенное меню (Sub-IVR)</option>
-                                                    <option value="voicemail">Голосовая почта (Voicemail)</option>
-                                                    <option value="playback">Проиграть запись и завершить</option>
-                                                    <option value="hangup">Завершить вызов</option>
-                                                </select>
-                                            </div>
-
-                                            <div>
-                                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Назначение / Цель (Target)</label>
-                                                <input type="text" id="inspector-target" placeholder="101 или RingGroup:900" class="w-full px-3.5 py-2 rounded-xl bg-surface-container-low border border-outline text-sm font-mono" oninput="updateActiveNodeProperty('target', this.value)">
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-                                <div class="pt-4 border-t border-surface-container flex gap-2">
-                                    <button type="button" onclick="deleteActiveNode()" id="btn-delete-node" class="w-full py-2.5 rounded-xl border border-error/30 text-error hover:bg-error/10 text-xs font-semibold transition-colors flex items-center justify-center gap-1">
-                                        <span class="material-symbols-outlined text-[16px]">delete</span>
-                                        Удалить узел
-                                    </button>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
 
@@ -1159,6 +1060,20 @@
             canvas.height = container.clientHeight * dpr;
 
             setupCanvasInteractions(canvas);
+            canvas.ondblclick = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseClientX = e.clientX - rect.left;
+                const mouseClientY = e.clientY - rect.top;
+                const worldX = (mouseClientX - canvasPanOffset.x) / canvasScale;
+                const worldY = (mouseClientY - canvasPanOffset.y) / canvasScale;
+                for (let i = ivrNodes.length - 1; i >= 0; i--) {
+                    const n = ivrNodes[i];
+                    if (worldX >= n.x && worldX <= n.x + n.w && worldY >= n.y && worldY <= n.y + n.h) {
+                        openEditNodePopup(n);
+                        break;
+                    }
+                }
+            };
             redrawCanvas();
             syncInspectorWithSelectedNode();
         }
@@ -1675,6 +1590,98 @@
                 <div class="pt-2 flex justify-end gap-2">
                     <button type="button" onclick="document.getElementById('modal-install-zip').classList.add('hidden')" class="px-4 py-2 rounded-xl text-sm font-medium text-on-surface-variant hover:bg-surface-container">Отмена</button>
                     <button type="submit" class="px-5 py-2 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:bg-primary/90 shadow-sm">Верифицировать & Установить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- MODAL POPUP: EDIT / CREATE IVR NODE -->
+    <div id="modal-ivr-node" class="hidden fixed inset-0 bg-on-surface/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-surface rounded-3xl max-w-lg w-full p-7 border border-outline/30 shadow-2xl space-y-6 animate-fadeIn">
+            
+            <div class="flex justify-between items-center pb-4 border-b border-surface-container">
+                <div class="flex items-center gap-3">
+                    <div id="popup-node-icon-box" class="w-11 h-11 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-2xl" id="popup-node-icon">hub</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-on-surface" id="popup-node-modal-title">Настройка блока IVR</h3>
+                        <p class="text-xs text-on-surface-variant font-mono" id="popup-node-modal-subtitle">Node ID: main</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeIvrNodePopup()" class="p-1 rounded-full text-on-surface-variant hover:bg-surface-container">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <!-- POPUP FORM CONTENT -->
+            <form id="form-ivr-node-popup" onsubmit="handleSaveNodePopup(event)" class="space-y-4">
+                <input type="hidden" id="popup-node-id" value="">
+                <input type="hidden" id="popup-is-new" value="0">
+
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Название блока</label>
+                    <input type="text" id="popup-node-title" required placeholder="Например: Отдел продаж / Главное меню" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Тип блока (Type)</label>
+                    <select id="popup-node-type" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs" onchange="handlePopupTypeChange(this.value)">
+                        <option value="ivr">Голосовое меню с DTMF выбором (IVR Root)</option>
+                        <option value="extension">SIP Абонент (Extension)</option>
+                        <option value="ring_group">Группа вызова (Ring Group)</option>
+                        <option value="voicemail">Голосовая почта (Voicemail)</option>
+                        <option value="hangup">Завершение вызова (Hangup)</option>
+                    </select>
+                </div>
+
+                <!-- IVR SPECIFIC FIELDS -->
+                <div id="popup-fields-ivr" class="space-y-3 p-4 rounded-2xl bg-surface-container-low border border-outline/20">
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Аудиофайл приветствия</label>
+                        <input type="text" id="popup-node-audio" value="greeting_main.wav" class="w-full px-3.5 py-2 rounded-xl bg-surface border border-outline text-xs font-mono">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Таймаут (сек)</label>
+                            <input type="number" id="popup-node-timeout" value="7" min="1" max="60" class="w-full px-3.5 py-2 rounded-xl bg-surface border border-outline text-sm font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Попыток ввода</label>
+                            <input type="number" id="popup-node-retries" value="3" min="1" max="5" class="w-full px-3.5 py-2 rounded-xl bg-surface border border-outline text-sm font-mono">
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 pt-1">
+                        <input type="checkbox" id="popup-node-direct-dial" class="w-4 h-4 rounded text-primary" checked>
+                        <label for="popup-node-direct-dial" class="text-xs text-on-surface font-semibold cursor-pointer">Разрешить прямой донабор номера (Direct Dial)</label>
+                    </div>
+                </div>
+
+                <!-- BRANCH / DESTINATION SPECIFIC FIELDS -->
+                <div id="popup-fields-branch" class="space-y-3 p-4 rounded-2xl bg-surface-container-low border border-outline/20">
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">DTMF Клавиша перехода (0–9, *, #, i, t)</label>
+                        <input type="text" id="popup-node-digit" placeholder="1" maxlength="2" class="w-full px-3.5 py-2 rounded-xl bg-surface border border-outline text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Целевой номер / SIP Направление</label>
+                        <input type="text" id="popup-node-target" placeholder="101 или RingGroup:900" class="w-full px-3.5 py-2 rounded-xl bg-surface border border-outline text-sm font-mono">
+                    </div>
+                </div>
+
+                <div class="pt-3 flex justify-between items-center gap-3">
+                    <button type="button" onclick="handleDeleteFromPopup()" id="popup-btn-delete" class="px-4 py-2 rounded-xl border border-error/30 text-error hover:bg-error/10 text-xs font-semibold transition-colors">
+                        Удалить блок
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="closeIvrNodePopup()" class="px-4 py-2 rounded-xl text-xs font-medium text-on-surface-variant hover:bg-surface-container">
+                            Отмена
+                        </button>
+                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition-all shadow-md">
+                            Сохранить блок
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
