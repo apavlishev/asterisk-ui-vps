@@ -2233,6 +2233,42 @@
         }
 
 
+        
+        // ================= ROBUST IVR CANVAS INITIALIZER =================
+        function initIvrCanvas() {
+            const canvas = document.getElementById('ivrCanvas');
+            if (!canvas) return;
+            const container = canvas.parentElement;
+            if (!container) return;
+
+            const dpr = window.devicePixelRatio || 1;
+            const w = container.clientWidth || 1000;
+            const h = container.clientHeight || 650;
+
+            canvas.width = w * dpr;
+            canvas.height = h * dpr;
+
+            setupCanvasInteractions(canvas);
+
+            canvas.ondblclick = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseClientX = e.clientX - rect.left;
+                const mouseClientY = e.clientY - rect.top;
+                const worldX = (mouseClientX - canvasPanOffset.x) / canvasScale;
+                const worldY = (mouseClientY - canvasPanOffset.y) / canvasScale;
+                for (let i = ivrNodes.length - 1; i >= 0; i--) {
+                    const n = ivrNodes[i];
+                    if (worldX >= n.x && worldX <= n.x + n.w && worldY >= n.y && worldY <= n.y + n.h) {
+                        openEditNodePopup(n);
+                        break;
+                    }
+                }
+            };
+
+            redrawCanvas();
+            syncIvrTableView();
+        }
+
         function setupCanvasInteractions(canvas) {
             // Prevent default browser context menu on canvas
             canvas.oncontextmenu = (e) => {
