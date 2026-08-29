@@ -1121,10 +1121,25 @@
                             <input type="checkbox" name="enabled" id="ftp_tab_enabled" class="w-4 h-4 rounded text-primary" {% if integrations.get('ftp', {}).get('enabled') %}checked{% endif %}>
                             <label for="ftp_tab_enabled" class="text-xs text-on-surface font-medium cursor-pointer">Включить выгрузку на FTP</label>
                         </div>
-                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition-all shadow-sm">
-                            Сохранить FTP
-                        </button>
+                        <div class="flex items-center gap-3 pt-2">
+                            <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition-all shadow-sm">
+                                Сохранить FTP
+                            </button>
+                            <button type="button" onclick="runStorageIntegrityTest('ftp')" id="btn-test-ftp" class="px-4 py-2.5 rounded-xl bg-surface-container-high hover:bg-surface-container text-xs font-semibold text-on-surface border border-outline/30 flex items-center gap-1.5 transition-colors shadow-sm">
+                                <span class="material-symbols-outlined text-[16px] text-primary">verified_user</span>
+                                <span>Проверить целостность и хеш</span>
+                            </button>
+                        </div>
                     </form>
+
+                    <!-- STORAGE INTEGRITY TEST LOG CONSOLE -->
+                    <div id="storage-test-log-ftp" class="hidden space-y-2 p-4 rounded-2xl bg-surface-container-lowest border border-outline/30 shadow-inner">
+                        <div class="flex justify-between items-center text-xs font-bold text-on-surface">
+                            <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-primary">terminal</span> Протокол сквозного тестирования SHA-256</span>
+                            <span id="storage-test-status-ftp" class="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold">ВЫПОЛНЕНИЕ...</span>
+                        </div>
+                        <pre id="storage-test-pre-ftp" class="text-[11px] font-mono text-on-surface-variant p-3 bg-surface-container-low rounded-xl overflow-x-auto max-h-56 leading-relaxed whitespace-pre-wrap"></pre>
+                    </div>
                                                             {% elif p.id == 'gdrive_storage' %}
                     <div class="space-y-6 max-w-xl">
                         
@@ -1197,10 +1212,25 @@
                                 <input type="checkbox" name="enabled" id="gd_tab_enabled" class="w-4 h-4 rounded text-secondary" {% if integrations.get('gdrive', {}).get('enabled') %}checked{% endif %}>
                                 <label for="gd_tab_enabled" class="text-xs text-on-surface font-medium cursor-pointer">Включить автоматическую выгрузку на Google Drive</label>
                             </div>
-                            <button type="submit" class="px-6 py-2.5 rounded-xl bg-secondary text-on-primary text-xs font-semibold hover:bg-secondary/90 transition-all shadow-sm">
-                                Сохранить Google Drive
-                            </button>
+                            <div class="flex items-center gap-3 pt-2">
+                                <button type="submit" class="px-6 py-2.5 rounded-xl bg-secondary text-on-primary text-xs font-semibold hover:bg-secondary/90 transition-all shadow-sm">
+                                    Сохранить Google Drive
+                                </button>
+                                <button type="button" onclick="runStorageIntegrityTest('gdrive')" id="btn-test-gdrive" class="px-4 py-2.5 rounded-xl bg-surface-container-high hover:bg-surface-container text-xs font-semibold text-on-surface border border-outline/30 flex items-center gap-1.5 transition-colors shadow-sm">
+                                    <span class="material-symbols-outlined text-[16px] text-secondary">verified_user</span>
+                                    <span>Проверить целостность и хеш</span>
+                                </button>
+                            </div>
                         </form>
+
+                        <!-- STORAGE INTEGRITY TEST LOG CONSOLE -->
+                        <div id="storage-test-log-gdrive" class="hidden space-y-2 p-4 rounded-2xl bg-surface-container-lowest border border-outline/30 shadow-inner">
+                            <div class="flex justify-between items-center text-xs font-bold text-on-surface">
+                                <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-primary">terminal</span> Протокол сквозного тестирования SHA-256</span>
+                                <span id="storage-test-status-gdrive" class="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold">ВЫПОЛНЕНИЕ...</span>
+                            </div>
+                            <pre id="storage-test-pre-gdrive" class="text-[11px] font-mono text-on-surface-variant p-3 bg-surface-container-low rounded-xl overflow-x-auto max-h-56 leading-relaxed whitespace-pre-wrap"></pre>
+                        </div>
                     </div>
                     {% elif p.id == 'yandex_disk' %}
                     <div class="space-y-6 max-w-xl">
@@ -1265,10 +1295,25 @@
                                 <input type="checkbox" name="enabled" id="yd_tab_enabled" class="w-4 h-4 rounded text-warning" {% if integrations.get('yandex_disk', {}).get('enabled') %}checked{% endif %}>
                                 <label for="yd_tab_enabled" class="text-xs text-on-surface font-medium cursor-pointer">Включить автоматическую выгрузку на Яндекс.Диск</label>
                             </div>
-                            <button type="submit" class="px-6 py-2.5 rounded-xl bg-[#fc3f1d] text-white text-xs font-semibold hover:bg-[#e03718] transition-all shadow-sm">
-                                Сохранить настройки Яндекс.Диска
-                            </button>
+                            <div class="flex items-center gap-3 pt-2">
+                                <button type="submit" class="px-6 py-2.5 rounded-xl bg-[#fc3f1d] text-white text-xs font-semibold hover:bg-[#e03718] transition-all shadow-sm">
+                                    Сохранить настройки Яндекс.Диска
+                                </button>
+                                <button type="button" onclick="runStorageIntegrityTest('yandex_disk')" id="btn-test-yandex_disk" class="px-4 py-2.5 rounded-xl bg-surface-container-high hover:bg-surface-container text-xs font-semibold text-on-surface border border-outline/30 flex items-center gap-1.5 transition-colors shadow-sm">
+                                    <span class="material-symbols-outlined text-[16px] text-[#fc3f1d]">verified_user</span>
+                                    <span>Проверить целостность и хеш</span>
+                                </button>
+                            </div>
                         </form>
+
+                        <!-- STORAGE INTEGRITY TEST LOG CONSOLE -->
+                        <div id="storage-test-log-yandex_disk" class="hidden space-y-2 p-4 rounded-2xl bg-surface-container-lowest border border-outline/30 shadow-inner">
+                            <div class="flex justify-between items-center text-xs font-bold text-on-surface">
+                                <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-primary">terminal</span> Протокол сквозного тестирования SHA-256</span>
+                                <span id="storage-test-status-yandex_disk" class="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold">ВЫПОЛНЕНИЕ...</span>
+                            </div>
+                            <pre id="storage-test-pre-yandex_disk" class="text-[11px] font-mono text-on-surface-variant p-3 bg-surface-container-low rounded-xl overflow-x-auto max-h-56 leading-relaxed whitespace-pre-wrap"></pre>
+                        </div>
                     </div>
                     {% else %}
                     <div class="p-6 rounded-2xl bg-surface-container-low text-xs text-on-surface-variant leading-relaxed">
@@ -1977,6 +2022,54 @@
         
         // ================= OFFICIAL BRANDED AUTH HANDLERS (YANDEX ID & GOOGLE) =================
         const YANDEX_CLIENT_ID = '684950c1e0f54dcda75fa5af56eeb553';
+
+        
+        // ================= STORAGE INTEGRITY & END-TO-END HASH TESTER =================
+        async function runStorageIntegrityTest(provider) {
+            const btn = document.getElementById('btn-test-' + provider);
+            const box = document.getElementById('storage-test-log-' + provider);
+            const pre = document.getElementById('storage-test-pre-' + provider);
+            const statusBadge = document.getElementById('storage-test-status-' + provider);
+
+            if (!box || !pre) return;
+            box.classList.remove('hidden');
+            pre.textContent = '🚀 Инициализация тестовой сессии... Пожалуйста, подождите...';
+            if (statusBadge) {
+                statusBadge.className = 'text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-warning/10 text-warning';
+                statusBadge.textContent = 'ТЕСТИРОВАНИЕ...';
+            }
+            if (btn) btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/storage/test-integrity', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ provider: provider })
+                });
+                const data = await res.json();
+                pre.textContent = (data.logs || []).join('\n');
+
+                if (data.success) {
+                    if (statusBadge) {
+                        statusBadge.className = 'text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-success/10 text-success';
+                        statusBadge.textContent = '✅ ХЕШИ СОВПАДАЮТ (100% OK)';
+                    }
+                } else {
+                    if (statusBadge) {
+                        statusBadge.className = 'text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-error/10 text-error';
+                        statusBadge.textContent = '❌ ОШИБКА ТЕСТА';
+                    }
+                }
+            } catch (err) {
+                pre.textContent += '\n❌ Исключение сети: ' + err.message;
+                if (statusBadge) {
+                    statusBadge.className = 'text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-error/10 text-error';
+                    statusBadge.textContent = '❌ ОШИБКА';
+                }
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
 
         function startOfficialYandexAuth() {
             // Direct OAuth2 authorization redirect with Verification Code

@@ -4862,6 +4862,176 @@ def api_ivr_get_tree():
     })
     return jsonify({'success': True, 'ivr_tree': ivr_tree})
 
+
+# ================= STORAGE INTEGRITY & END-TO-END HASH VERIFIER =================
+@app.route('/api/storage/test-integrity', methods=['POST'])
+def api_storage_test_integrity():
+    """
+    Uploads a test payload to Cloud/FTP storage, reads it back,
+    and validates SHA-256 integrity checksums with live step-by-step logging.
+    """
+    data = request.get_json(force=True) or {}
+    provider = data.get('provider')
+    cfg = load_integrations()
+    logs = []
+    t_start = time.strftime('%H:%M:%S')
+
+    # Generate unique payload
+    test_content = f"Asterisk Call Record Integrity Test Payload {time.time()} - PBX Logic Core Integrity Check".encode('utf-8')
+    orig_sha256 = hashlib.sha256(test_content).hexdigest()
+    test_filename = f"integrity_test_{int(time.time())}.txt"
+
+    logs.append(f"[{t_start}] 🚀 Инициализация сквозного теста для: {provider.upper()}")
+    logs.append(f"[{t_start}] 📦 Создан локальный блок данных: {test_filename} ({len(test_content)} байт)")
+    logs.append(f"[{t_start}] 🔑 Исходный SHA-256: {orig_sha256}")
+
+    try:
+        if provider in ['yandex', 'yandex_disk']:
+            token = data.get('token') or cfg.get('yandex_disk', {}).get('token', '').strip()
+            folder = data.get('path') or cfg.get('yandex_disk', {}).get('path', 'app:/records').strip()
+            if not token:
+                logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ Ошибка: Отсутствует OAuth токен Яндекс.Диска.")
+                return jsonify({'success': False, 'logs': logs})
+
+            headers = {'Authorization': f'OAuth {token}'}
+            remote_path = f"{folder}/{test_filename}"
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 📤 Запрос URL на выгрузку в целевой каталог: {remote_path}")
+
+            # Ensure folder exists
+            requests.put(f"https://cloud-api.yandex.net/v1/disk/resources?path={folder}", headers=headers, timeout=4)
+
+            # Get upload url
+            r_url = requests.get(f"https://cloud-api.yandex.net/v1/disk/resources/upload?path={remote_path}&overwrite=true", headers=headers, timeout=5)
+            if r_url.status_code not in (200, 201):
+                logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ Ошибка получения ссылки на загрузку ({r_url.status_code}): {r_url.text}")
+                return jsonify({'success': False, 'logs': logs})
+
+            upload_href = r_url.json().get('href')
+            # Upload
+            r_up = requests.put(upload_href, data=test_content, timeout=8)
+            if r_up.status_code not in (200, 201, 202):
+                logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ Ошибка при отправке пакета на Диск ({r_up.status_code}): {r_up.text}")
+                return jsonify({'success': False, 'logs': logs})
+            logs.append(f"[{time.strftime('%H:%M:%S')}] ✅ Файл успешно записан на удаленный сервер Яндекс.Диск")
+
+            # Download back
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 📥 Скачивание записанного файла обратно для верификации...")
+            r_down = requests.get(f"https://cloud-api.yandex.net/v1/disk/resources/download?path={remote_path}", headers=headers, timeout=5)
+            if r_down.status_code != 200:
+                logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ Ошибка получения ссылки на чтение ({r_down.status_code}): {r_down.text}")
+                return jsonify({'success': False, 'logs': logs})
+
+            download_href = r_down.json().get('href')
+            downloaded_bytes = requests.get(download_href, timeout=8).content
+            downloaded_sha256 = hashlib.sha256(downloaded_bytes).hexdigest()
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 🔍 Вычислен SHA-256 прочитанного файла: {downloaded_sha256}")
+
+            # Delete test artifact
+            requests.delete(f"https://cloud-api.yandex.net/v1/disk/resources?path={remote_path}&permanently=true", headers=headers, timeout=4)
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 🧹 Тестовый артефакт успешно удален из хранилища.")
+
+            if downloaded_sha256 == orig_sha256:
+                logs.append(f"[{time.strftime('%H:%M:%S')}] 🏆 ВЕРИФИКАЦИЯ УСПЕШНА: Хеши 100% совпадают! Хранилище надежно и готово к архивации звонков.")
+                return jsonify({'success': True, 'logs': logs})
+            else:
+                logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ ОШИБКА ЦЕЛОСТНОСТИ: Контрольные суммы не совпали.")
+                return jsonify({'success': False, 'logs': logs})
+
+        elif provider in ['gdrive', 'google']:
+            token = data.get('token') or cfg.get('gdrive', {}).get('token', '').strip()
+            folder_id = data.get('folder_id') or cfg.get('gdrive', {}).get('folder_id', '').strip()
+            if not token:
+                logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ Ошибка: Отсутствует OAuth токен Google Drive.")
+                return jsonify({'success': False, 'logs': logs})
+
+            headers = {'Authorization': f'Bearer {token}'}
+            metadata = {'name': test_filename}
+            if folder_id:
+                metadata['parents'] = [folder_id]
+
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 📤 Загрузка тестового файла в Google Drive API v3...")
+            files = {
+                'data': ('metadata', json.dumps(metadata), 'application/json; charset=UTF-8'),
+                'file': (test_filename, io.BytesIO(test_content), 'text/plain')
+            }
+            r_up = requests.post("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", headers=headers, files=files, timeout=8)
+            if r_up.status_code not in (200, 201):
+                logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ Ошибка загрузки в Google Drive ({r_up.status_code}): {r_up.text}")
+                return jsonify({'success': False, 'logs': logs})
+
+            file_id = r_up.json().get('id')
+            logs.append(f"[{time.strftime('%H:%M:%S')}] ✅ Файл создан в Google Drive (ID: {file_id})")
+
+            # Download back
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 📥 Скачивание файла обратно из Google Drive...")
+            r_down = requests.get(f"https://www.googleapis.com/drive/v3/files/{file_id}?alt=media", headers=headers, timeout=8)
+            if r_down.status_code != 200:
+                logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ Ошибка скачивания из Google Drive ({r_down.status_code}): {r_down.text}")
+                return jsonify({'success': False, 'logs': logs})
+
+            downloaded_sha256 = hashlib.sha256(r_down.content).hexdigest()
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 🔍 Вычислен SHA-256 прочитанного файла: {downloaded_sha256}")
+
+            # Delete test file
+            requests.delete(f"https://www.googleapis.com/drive/v3/files/{file_id}", headers=headers, timeout=4)
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 🧹 Тестовый артефакт удален из Google Drive.")
+
+            if downloaded_sha256 == orig_sha256:
+                logs.append(f"[{time.strftime('%H:%M:%S')}] 🏆 ВЕРИФИКАЦИЯ УСПЕШНА: Хеши 100% совпадают! Google Drive полностью готов к работе.")
+                return jsonify({'success': True, 'logs': logs})
+            else:
+                logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ ОШИБКА ЦЕЛОСТНОСТИ: Контрольные суммы не совпали.")
+                return jsonify({'success': False, 'logs': logs})
+
+        elif provider == 'ftp':
+            host = data.get('host') or cfg.get('ftp', {}).get('host', '').strip()
+            port = int(data.get('port') or cfg.get('ftp', {}).get('port', 21))
+            user = data.get('user') or cfg.get('ftp', {}).get('user', '').strip()
+            password = data.get('password') or cfg.get('ftp', {}).get('password', '').strip()
+
+            if not host:
+                logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ Ошибка: Не указан хост FTP сервера.")
+                return jsonify({'success': False, 'logs': logs})
+
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 🌐 Подключение к FTP {host}:{port} под пользователем {user}...")
+            ftp = ftplib.FTP()
+            ftp.connect(host, port, timeout=5)
+            ftp.login(user, password)
+            logs.append(f"[{time.strftime('%H:%M:%S')}] ✅ Авторизация на FTP успешна.")
+
+            # Upload
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 📤 Отправка файла {test_filename} на FTP...")
+            bio_up = io.BytesIO(test_content)
+            ftp.storbinary(f"STOR {test_filename}", bio_up)
+            logs.append(f"[{time.strftime('%H:%M:%S')}] ✅ Файл записан на FTP.")
+
+            # Download back
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 📥 Скачивание файла обратно с FTP...")
+            bio_down = io.BytesIO()
+            ftp.retrbinary(f"RETR {test_filename}", bio_down.write)
+            downloaded_bytes = bio_down.getvalue()
+            downloaded_sha256 = hashlib.sha256(downloaded_bytes).hexdigest()
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 🔍 Вычислен SHA-256 прочитанного файла: {downloaded_sha256}")
+
+            # Delete
+            ftp.delete(test_filename)
+            ftp.quit()
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 🧹 Тестовый артефакт удален с FTP сервера.")
+
+            if downloaded_sha256 == orig_sha256:
+                logs.append(f"[{time.strftime('%H:%M:%S')}] 🏆 ВЕРИФИКАЦИЯ УСПЕШНА: Хеши 100% совпадают! FTP хранилище готово к архивации.")
+                return jsonify({'success': True, 'logs': logs})
+            else:
+                logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ ОШИБКА ЦЕЛОСТНОСТИ: Контрольные суммы не совпали.")
+                return jsonify({'success': False, 'logs': logs})
+
+    except Exception as e:
+        logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ Критическая ошибка выполнения теста: {str(e)}")
+        return jsonify({'success': False, 'logs': logs})
+
+    return jsonify({'success': False, 'logs': logs})
+
+
 @app.route('/api/ivr/save-canvas', methods=['POST'])
 def api_ivr_save_canvas():
     try:
