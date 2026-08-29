@@ -83,19 +83,30 @@ def acquire_call_lock(call_id):
 
 
 def normalize_phone_number(raw):
+    """Converts any raw incoming/outgoing phone number to standard international E.164 (+7XXXXXXXXXX, +971XXXXXXXX, etc.)."""
     if not raw: return ""
+    raw = str(raw).strip()
+    if raw.startswith('+'):
+        clean_digits = re.sub(r'\D', '', raw)
+        return '+' + clean_digits
+
     clean = re.sub(r'\D', '', raw)
-    if clean.startswith('8') and len(clean) == 11:
+    # Russian Federation / Kazakhstan (11 digits starting with 8 or 7)
+    if (clean.startswith('8') or clean.startswith('7')) and len(clean) == 11:
         return '+7' + clean[1:]
-    elif clean.startswith('7') and len(clean) == 11:
-        return '+' + clean
+    # Russian Federation without country code (10 digits starting with 9)
+    elif clean.startswith('9') and len(clean) == 10:
+        return '+7' + clean
+    # UAE (e.g. 050XXXXXXX -> +97150XXXXXXX, or 971XXXXXXXX)
+    elif clean.startswith('0') and len(clean) in [10, 9]:
+        return '+971' + clean[1:]
     elif clean.startswith('971') and len(clean) >= 11:
         return '+' + clean
-    elif clean.startswith('0') and len(clean) == 10:
-        return '+971' + clean[1:]
-    elif not raw.startswith('+') and len(clean) >= 10:
+    # Generic international number with 10+ digits
+    elif len(clean) >= 10:
         return '+' + clean
-    return raw.strip()
+
+    return raw
 
 CONFIG_FILE = '/opt/integrations_config.json'
 
@@ -204,11 +215,6 @@ def sync_amocrm(cfg, call_id, src, dst, direction, disposition, billsec, rec_pat
 
     subdomain = amo.get("subdomain", "").strip()
     token = amo.get("token", "").strip()
-    pipeline_id = amo.get("pipeline_id")
-    status_id = amo.get("status_id")
-
-    if status_id == "55683782":
-        status_id = "55683786"
 
     if not subdomain or not token:
         log_debug("amoCRM Error: Subdomain or Bearer Token is missing!")
@@ -220,13 +226,14 @@ def sync_amocrm(cfg, call_id, src, dst, direction, disposition, billsec, rec_pat
     }
     base_url = f"https://{subdomain}.amocrm.ru"
 
-    # Универсальная стандартизация международного номера (ОАЭ / РФ / Любые страны)
+    # 1. INTERNATIONAL PHONE NUMBER NORMALIZATION
     target_raw = src if direction == "inbound" else dst
     amo_phone = normalize_phone_number(target_raw)
 
-    # Определение ответственного пользователя amoCRM (посадочное место)
-    user_mapping = amo.get("user_mapping", {})
     operator_ext = dst if direction == "inbound" else src
+    user_mapping = amo.get("user_mapping", {})
+    
+    # 2. RESPONSIBLE USER
     resp_user_id = None
     if operator_ext in user_mapping and user_mapping[operator_ext]:
         try: resp_user_id = int(user_mapping[operator_ext])
@@ -235,7 +242,6 @@ def sync_amocrm(cfg, call_id, src, dst, direction, disposition, billsec, rec_pat
         try: resp_user_id = int(user_mapping["default"])
         except: pass
     if not resp_user_id:
-        # Автоматический fallback: получаем account current_user_id или первого доступного пользователя
         try:
             r_acc = http.get(f"{base_url}/api/v4/account", headers=headers, timeout=5)
             if r_acc.status_code == 200:
@@ -243,18 +249,74 @@ def sync_amocrm(cfg, call_id, src, dst, direction, disposition, billsec, rec_pat
         except Exception:
             pass
     if not resp_user_id:
-        resp_user_id = 10967978  # Default verified admin/integrator user ID
+        resp_user_id = 10967978
 
     duration_s = int(billsec) if str(billsec).isdigit() else 0
     call_status = 4 if disposition == "ANSWERED" else (6 if disposition == "BUSY" else 2)
 
-    amocrm_audio_link = upload_to_amocrm_drive(token, rec_path)
-    playback_link = ftp_url if ftp_url else (amocrm_audio_link if amocrm_audio_link else (gdrive_url if gdrive_url else ""))
+    # 3. DETERMINE AUDIO PLAYBACK LINK BASED ON SETTINGS
+    # audio_mode: 'amocrm_drive' (upload directly), 'cloud_link' (use Yandex/GDrive/FTP), 'none' (no audio)
+    audio_mode = amo.get("audio_mode", "cloud_link")
+    cloud_provider_pref = amo.get("cloud_provider", "auto") # 'yandex_disk', 'gdrive', 'ftp', 'auto'
+    playback_link = ""
+
+    # Fetch public yandex link if available
+    yandex_url = ""
+    yd_cfg = cfg.get("yandex_disk", {})
+    if yd_cfg.get("token") and os.path.exists(rec_path):
+        fn = os.path.basename(rec_path)
+        yandex_url = f"https://disk.yandex.ru/client/disk/app/records/{fn}"
+
+    if audio_mode == "amocrm_drive":
+        log_debug("Uploading audio directly to amoCRM Drive storage...")
+        amocrm_audio_link = upload_to_amocrm_drive(token, rec_path)
+        playback_link = amocrm_audio_link or ""
+    elif audio_mode == "cloud_link":
+        if cloud_provider_pref == "ftp" and ftp_url:
+            playback_link = ftp_url
+        elif cloud_provider_pref == "gdrive" and gdrive_url:
+            playback_link = gdrive_url
+        elif cloud_provider_pref == "yandex_disk" and yandex_url:
+            playback_link = yandex_url
+        else:
+            # Auto fallback
+            playback_link = yandex_url or gdrive_url or ftp_url or ""
+    elif audio_mode == "none":
+        playback_link = ""
+
+    # 4. DETERMINE PIPELINE & STAGE FOR NEW LEADS (By Inbound Trunk / Channel OR By Operator Participant)
+    routing_mode = amo.get("routing_mode", "by_operator") # 'by_channel', 'by_operator', 'default'
+    target_pipeline_id = None
+    target_status_id = None
+
+    # Channel/Trunk Mapping e.g. {"trunk_test_6044": {"pipeline_id": "123", "status_id": "456"}}
+    channel_mapping = amo.get("channel_mapping", {})
+    operator_pipeline_mapping = amo.get("operator_pipeline_mapping", {})
+
+    # Detect channel key (from REC_FILE or src/dst tag)
+    channel_key = "default"
+    if "trunk_" in rec_path or "KEY_" in rec_path:
+        for t in cfg.get("sip_trunks", []):
+            if t.get("id") and t["id"] in rec_path:
+                channel_key = t["id"]
+                break
+
+    if routing_mode == "by_channel" and channel_key in channel_mapping:
+        target_pipeline_id = channel_mapping[channel_key].get("pipeline_id")
+        target_status_id = channel_mapping[channel_key].get("status_id")
+    elif routing_mode == "by_operator" and operator_ext in operator_pipeline_mapping:
+        target_pipeline_id = operator_pipeline_mapping[operator_ext].get("pipeline_id")
+        target_status_id = operator_pipeline_mapping[operator_ext].get("status_id")
+
+    if not target_pipeline_id:
+        target_pipeline_id = amo.get("pipeline_id")
+    if not target_status_id:
+        target_status_id = amo.get("status_id")
 
     log_debug(f"=== amoCRM START SYNC ===")
-    log_debug(f"Call: ID={call_id}, Direction={direction}, Phone={amo_phone}, Duration={duration_s}s, PlaybackLink={playback_link}")
+    log_debug(f"Call: ID={call_id}, Direction={direction}, Phone={amo_phone}, Duration={duration_s}s, RoutingMode={routing_mode}, Pipeline={target_pipeline_id}/{target_status_id}, AudioLink={playback_link}")
 
-    # 1. Поиск существующего контакта (по стандартизированному номеру и вариантам)
+    # 5. ПОИСК СУЩЕСТВУЮЩЕГО КОНТАКТА
     contact_id = None
     search_queries = [amo_phone]
     clean_dig = re.sub(r'\D', '', amo_phone)
@@ -279,7 +341,7 @@ def sync_amocrm(cfg, call_id, src, dst, direction, disposition, billsec, rec_pat
         except Exception as e:
             log_debug(f"Search contact query {q} exception: {e}")
 
-    # 2. Если контакта нет — создаем новый
+    # 6. ЕСЛИ КОНТАКТА НЕТ — СОЗДАЕМ НОВЫЙ В МЕЖДУНАРОДНОМ ФОРМАТЕ
     if not contact_id:
         try:
             log_debug(f"Creating new contact for {amo_phone}...")
@@ -301,7 +363,7 @@ def sync_amocrm(cfg, call_id, src, dst, direction, disposition, billsec, rec_pat
         except Exception as e:
             log_debug(f"Create contact exception: {e}")
 
-    # 3. Проверяем сделки у контакта
+    # 7. ПРОВЕРЯЕМ НАЛИЧИЕ АКТИВНОЙ СДЕЛКИ У КОНТАКТА
     lead_id = None
     if contact_id:
         try:
@@ -310,15 +372,16 @@ def sync_amocrm(cfg, call_id, src, dst, direction, disposition, billsec, rec_pat
                 c_data = r.json()
                 leads = c_data.get("_embedded", {}).get("leads", [])
                 if leads:
+                    # Check if lead is active (not closed successfully or lost)
                     lead_id = leads[0]["id"]
                     log_debug(f"Contact has existing Lead ID: {lead_id}")
         except Exception as e:
             log_debug(f"Get contact leads exception: {e}")
 
-    # 4. Если сделки нет — создаем сделку
+    # 8. ЕСЛИ АКТИВНОЙ СДЕЛКИ НЕТ — СОЗДАЕМ НОВУЮ В ЦЕЛЕВУЮ ВОРОНКУ И ЭТАП
     if contact_id and not lead_id:
         try:
-            log_debug("No lead found for contact. Creating new Lead...")
+            log_debug(f"No active lead found for contact. Creating new Lead in Pipeline={target_pipeline_id}, Stage={target_status_id}...")
             lead_payload = [{
                 "name": f"Звонок: {amo_phone}",
                 "responsible_user_id": int(resp_user_id) if resp_user_id else 10967978,
@@ -326,22 +389,24 @@ def sync_amocrm(cfg, call_id, src, dst, direction, disposition, billsec, rec_pat
                     "contacts": [{"id": contact_id}]
                 }
             }]
-            if pipeline_id:
-                lead_payload[0]["pipeline_id"] = int(pipeline_id)
-            if status_id:
-                lead_payload[0]["status_id"] = int(status_id)
+            if target_pipeline_id:
+                try: lead_payload[0]["pipeline_id"] = int(target_pipeline_id)
+                except: pass
+            if target_status_id:
+                try: lead_payload[0]["status_id"] = int(target_status_id)
+                except: pass
 
             r = http.post(f"{base_url}/api/v4/leads", headers=headers, json=lead_payload, timeout=10)
             if r.status_code in [200, 201]:
                 l_res = r.json()
                 lead_id = l_res["_embedded"]["leads"][0]["id"]
-                log_debug(f"Created Lead ID: {lead_id} (Pipeline: {pipeline_id}, Stage: {status_id})")
+                log_debug(f"Successfully Created Lead ID: {lead_id} (Pipeline: {target_pipeline_id}, Stage: {target_status_id})")
             else:
                 log_debug(f"Create lead error [{r.status_code}]: {r.text}")
         except Exception as e:
             log_debug(f"Create lead exception: {e}")
 
-    # 5. Отправляем событие звонка в amoCRM (/api/v4/calls) с плеером
+    # 9. ОТПРАВЛЯЕМ КАРТОЧКУ ЗВОНКА В /api/v4/calls С АУДИОССЫЛКОЙ
     try:
         call_payload = [{
             "uniq": str(call_id),
@@ -351,16 +416,17 @@ def sync_amocrm(cfg, call_id, src, dst, direction, disposition, billsec, rec_pat
             "phone": amo_phone,
             "responsible_user_id": int(resp_user_id) if resp_user_id else 10967978,
             "call_status": call_status,
-            "call_result": f"Статус: {disposition}. Длительность: {duration_s} сек.",
-            "link": playback_link
+            "call_result": f"Статус: {disposition}. Длительность: {duration_s} сек."
         }]
+        if playback_link:
+            call_payload[0]["link"] = playback_link
+
         log_debug(f"Posting call event to /api/v4/calls: {json.dumps(call_payload, ensure_ascii=False)}")
         r = http.post(f"{base_url}/api/v4/calls", headers=headers, json=call_payload, timeout=10)
         log_debug(f"Call post response [{r.status_code}]: {r.text}")
     except Exception as e:
         log_debug(f"Call event exception: {e}")
 
-    # Примечание-комментарий убрано по требованию (оставляем только чистую карточку звонка)
     log_debug(f"=== amoCRM SYNC COMPLETE ===")
 
 

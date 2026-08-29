@@ -1276,24 +1276,117 @@
 
                         <div class="{{ 'opacity-40 pointer-events-none select-none filter blur-[1px]' if p.id in integrations.get('plugins_disabled', []) else '' }} space-y-6">
 
-                    <!-- PLUGIN SETTINGS FORM CONTENT -->
+                    <!-- PLUGIN SETTINGS FORM CONTENT: ADVANCED ENTERPRISE AMOCRM INTEGRATION -->
                     {% if p.id == 'amocrm_pro' %}
-                    <form action="/settings/amocrm" method="POST" class="space-y-4 max-w-xl">
-                        <div>
-                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Субдомен amoCRM</label>
-                            <input type="text" name="subdomain" value="{{ integrations.get('amocrm', {}).get('subdomain', '') }}" placeholder="mycompany" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                    <form action="/settings/amocrm" method="POST" class="space-y-6 max-w-3xl">
+                        
+                        <!-- 1. ACCOUNT AUTHENTICATION -->
+                        <div class="p-6 rounded-2xl bg-surface-container-low border border-outline/30 space-y-4">
+                            <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-[18px]">key</span>
+                                1. Подключение к аккаунту amoCRM
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Субдомен аккаунта amoCRM</label>
+                                    <div class="flex items-center">
+                                        <input type="text" name="subdomain" value="{{ integrations.get('amocrm', {}).get('subdomain', '') }}" placeholder="mycompany" class="w-full px-4 py-2.5 rounded-l-xl bg-surface border border-outline text-sm">
+                                        <span class="px-3.5 py-2.5 bg-surface-container border border-l-0 border-outline text-xs text-on-surface-variant rounded-r-xl font-mono">.amocrm.ru</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Долгосрочный токен (Bearer Token)</label>
+                                    <input type="password" name="token" value="{{ integrations.get('amocrm', {}).get('token', '') }}" placeholder="eyJhbGciOi..." class="w-full px-4 py-2.5 rounded-xl bg-surface border border-outline text-sm font-mono">
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Долгосрочный токен (Bearer)</label>
-                            <input type="password" name="token" value="{{ integrations.get('amocrm', {}).get('token', '') }}" placeholder="eyJhbG..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+
+                        <!-- 2. ROUTING PIPELINE & STAGE SELECTION FOR NEW LEADS -->
+                        <div class="p-6 rounded-2xl bg-surface-container-low border border-outline/30 space-y-5">
+                            <div>
+                                <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-secondary text-[18px]">account_tree</span>
+                                    2. Маршрутизация сделок при отсутствии активной сделки
+                                </h3>
+                                <p class="text-xs text-on-surface-variant mt-0.5">Если у звонящего нет активной сделки, система создаст новую сделку по выбранному правилу.</p>
+                            </div>
+
+                            <!-- ROUTING MODE SELECTOR -->
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">Правило определения целевой воронки:</label>
+                                <select name="routing_mode" id="amo-routing-mode" onchange="toggleAmoRoutingView(this.value)" class="w-full px-4 py-2.5 rounded-xl bg-surface border border-outline text-xs font-bold text-on-surface cursor-pointer">
+                                    <option value="by_channel" {% if integrations.get('amocrm', {}).get('routing_mode') == 'by_channel' %}selected{% endif %}>📞 По входящему каналу / SIP-транку (Разные воронки для разных номеров)</option>
+                                    <option value="by_operator" {% if integrations.get('amocrm', {}).get('routing_mode') == 'by_operator' %}selected{% endif %}>👤 По принявшему оператору / участнику разговора (Воронка отдела сотрудника)</option>
+                                    <option value="default" {% if integrations.get('amocrm', {}).get('routing_mode') == 'default' %}selected{% endif %}>🌐 Единая общая воронка и этап для всех звонков</option>
+                                </select>
+                            </div>
+
+                            <!-- DEFAULT PIPELINE & STAGE (FALLBACK) -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                                <div>
+                                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Основная Воронка (Pipeline ID)</label>
+                                    <input type="text" name="pipeline_id" value="{{ integrations.get('amocrm', {}).get('pipeline_id', '') }}" placeholder="например, 7481920" class="w-full px-4 py-2.5 rounded-xl bg-surface border border-outline text-sm font-mono">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Основной Этап воронки (Status ID)</label>
+                                    <input type="text" name="status_id" value="{{ integrations.get('amocrm', {}).get('status_id', '') }}" placeholder="например, 55683786 (Неразобранное / Первичный контакт)" class="w-full px-4 py-2.5 rounded-xl bg-surface border border-outline text-sm font-mono">
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2 pt-1">
-                            <input type="checkbox" name="enabled" id="amo_tab_enabled" class="w-4 h-4 rounded text-secondary" {% if integrations.get('amocrm', {}).get('enabled') %}checked{% endif %}>
-                            <label for="amo_tab_enabled" class="text-xs text-on-surface font-medium cursor-pointer">Включить сквозную синхронизацию</label>
+
+                        <!-- 3. AUDIO RECORDINGS DISPATCH & CLOUD SOURCE -->
+                        <div class="p-6 rounded-2xl bg-surface-container-low border border-outline/30 space-y-4">
+                            <div>
+                                <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-amber-500 text-[18px]">audiotrack</span>
+                                    3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка
+                                </h3>
+                                <p class="text-xs text-on-surface-variant mt-0.5">Настройте, куда отправлять аудиофайл или из какого хранилища брать прямую ссылку.</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Режим выгрузки аудио в amoCRM:</label>
+                                    <select name="audio_mode" class="w-full px-4 py-2.5 rounded-xl bg-surface border border-outline text-xs font-semibold text-on-surface">
+                                        <option value="cloud_link" {% if integrations.get('amocrm', {}).get('audio_mode', 'cloud_link') == 'cloud_link' %}selected{% endif %}>🔗 Брать ссылку из облака / FTP (Рекомендуется, экономит диск amoCRM)</option>
+                                        <option value="amocrm_drive" {% if integrations.get('amocrm', {}).get('audio_mode') == 'amocrm_drive' %}selected{% endif %}>📤 Выгружать сам файл в amoCRM Drive</option>
+                                        <option value="none" {% if integrations.get('amocrm', {}).get('audio_mode') == 'none' %}selected{% endif %}>🚫 Не прикреплять аудиозапись к звонку</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Источник ссылки на аудио:</label>
+                                    <select name="cloud_provider" class="w-full px-4 py-2.5 rounded-xl bg-surface border border-outline text-xs font-semibold text-on-surface">
+                                        <option value="auto" {% if integrations.get('amocrm', {}).get('cloud_provider', 'auto') == 'auto' %}selected{% endif %}>⚡ Автовыбор (Первое доступное хранилище)</option>
+                                        <option value="yandex_disk" {% if integrations.get('amocrm', {}).get('cloud_provider') == 'yandex_disk' %}selected{% endif %}>🟡 Яндекс.Диск</option>
+                                        <option value="gdrive" {% if integrations.get('amocrm', {}).get('cloud_provider') == 'gdrive' %}selected{% endif %}>🔵 Google Drive</option>
+                                        <option value="ftp" {% if integrations.get('amocrm', {}).get('cloud_provider') == 'ftp' %}selected{% endif %}>🖧 Корпоративный FTP Сервер</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-secondary text-on-primary text-xs font-semibold hover:bg-secondary/90 transition-all shadow-sm">
-                            Сохранить настройки amoCRM
-                        </button>
+
+                        <!-- 4. E.164 STANDARDIZATION & INTERNAL CALLS TOGGLES -->
+                        <div class="space-y-3 pt-2">
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" checked disabled class="w-4 h-4 rounded text-success">
+                                <label class="text-xs text-on-surface font-semibold">Автоматическое приведение номеров к международному формату E.164 (+7..., +971..., +1...)</label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" name="enabled" id="amo_tab_enabled" class="w-4 h-4 rounded text-secondary" {% if integrations.get('amocrm', {}).get('enabled') %}checked{% endif %}>
+                                <label for="amo_tab_enabled" class="text-xs text-on-surface font-semibold cursor-pointer">Активировать сквозную интеграцию amoCRM</label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" name="send_internal" id="amo_send_internal" class="w-4 h-4 rounded text-secondary" {% if integrations.get('amocrm', {}).get('send_internal') %}checked{% endif %}>
+                                <label for="amo_send_internal" class="text-xs text-on-surface-variant font-medium cursor-pointer">Передавать внутренние звонки между сотрудниками</label>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 flex items-center gap-3">
+                            <button type="submit" class="px-6 py-2.5 rounded-xl bg-secondary text-on-primary text-xs font-semibold hover:bg-secondary/90 transition-all shadow-sm">
+                                Сохранить все параметры amoCRM
+                            </button>
+                        </div>
                     </form>
                     {% elif p.id == 'telegram_alerts' %}
                     <form action="/settings/telegram" method="POST" class="space-y-4 max-w-xl">

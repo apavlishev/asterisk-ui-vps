@@ -5400,6 +5400,39 @@ def api_amocrm_users():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e), 'users': []})
 
+@app.route('/settings/amocrm', methods=['POST'])
+def save_amocrm():
+    cfg = load_integrations()
+    subdomain = request.form.get('subdomain', '').strip()
+    token = request.form.get('token', '').strip()
+    enabled = True if request.form.get('enabled') else False
+    send_internal = True if request.form.get('send_internal') else False
+    
+    routing_mode = request.form.get('routing_mode', 'by_operator')
+    pipeline_id = request.form.get('pipeline_id', '').strip()
+    status_id = request.form.get('status_id', '').strip()
+    
+    audio_mode = request.form.get('audio_mode', 'cloud_link')
+    cloud_provider = request.form.get('cloud_provider', 'auto')
+    
+    if 'amocrm' not in cfg:
+        cfg['amocrm'] = {}
+        
+    cfg['amocrm']['subdomain'] = subdomain
+    cfg['amocrm']['token'] = token
+    cfg['amocrm']['enabled'] = enabled
+    cfg['amocrm']['send_internal'] = send_internal
+    cfg['amocrm']['routing_mode'] = routing_mode
+    cfg['amocrm']['pipeline_id'] = pipeline_id
+    cfg['amocrm']['status_id'] = status_id
+    cfg['amocrm']['audio_mode'] = audio_mode
+    cfg['amocrm']['cloud_provider'] = cloud_provider
+    
+    save_integrations(cfg)
+    flash('Все параметры интеграции amoCRM успешно сохранены!')
+    return redirect(url_for('index'))
+
+
 @app.route('/settings/amocrm-seats', methods=['POST'])
 def save_amocrm_seats():
     cfg = load_integrations()
