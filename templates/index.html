@@ -238,6 +238,12 @@
                     <span class="text-xs font-semibold sidebar-text">SIP Транки</span>
                 </button>
 
+                <button onclick="switchTab('modems')" id="nav-modems" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="GSM Модемы">
+                    <span class="material-symbols-outlined mr-3.5 text-amber-500 text-[22px]">sim_card</span>
+                    <span class="text-xs font-semibold sidebar-text">GSM Модемы</span>
+                    <span class="ml-auto text-[11px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 font-mono sidebar-badge">{{ modems_list|length }}</span>
+                </button>
+
                 <button onclick="switchTab('ivr')" id="nav-ivr" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="IVR Конструктор">
                     <span class="material-symbols-outlined mr-3.5 text-secondary text-[22px]">account_tree</span>
                     <span class="text-xs font-semibold sidebar-text">IVR Конструктор</span>
@@ -730,6 +736,88 @@
                 </div>
             </div>
 
+                        <!-- // ================= TAB: GSM MODEMS POOL // ================= -->
+            <div id="tab-modems" class="tab-pane space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-on-surface flex items-center gap-2.5">
+                            <span>GSM Модемы и Сим-карты</span>
+                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20 font-bold">Hardware Pool</span>
+                        </h1>
+                        <p class="text-on-surface-variant text-sm mt-0.5">Управление подключенными USB-модемами, мониторинг операторов связи, уровня сигнала CSQ и статусов регистрации.</p>
+                    </div>
+                    <button onclick="location.reload()" class="px-4 py-2 rounded-xl bg-surface hover:bg-surface-container-high text-xs font-semibold text-on-surface flex items-center gap-1.5 transition-colors border border-outline/40 shadow-sm">
+                        <span class="material-symbols-outlined text-[16px]">refresh</span>
+                        <span>Пересканировать шину USB</span>
+                    </button>
+                </div>
+
+                <!-- MODEMS CARDS GRID -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for m in modems_list %}
+                    <div class="bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm space-y-5 hover:border-amber-500/40 transition-all">
+                        <!-- HEADER ROW -->
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold text-xl shadow-inner">
+                                    <span class="material-symbols-outlined text-2xl">cell_tower</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-base text-on-surface">{{ m.id|upper }}</h3>
+                                    <p class="text-xs text-on-surface-variant font-mono">{{ m.model }}</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase {{ 'bg-success/10 text-success border border-success/20' if m.online else 'bg-error/10 text-error border border-error/20' }}">
+                                {{ '🟢 В сети' if m.online else '🔴 Отключен' }}
+                            </span>
+                        </div>
+
+                        <!-- SIGNAL METRIC BAR -->
+                        <div class="space-y-1.5 bg-surface-container-low p-3.5 rounded-xl border border-outline/20">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-on-surface-variant font-semibold flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[15px] text-amber-500">signal_cellular_alt</span>
+                                    Уровень сигнала:
+                                </span>
+                                <span class="font-mono font-bold text-on-surface">{{ m.signal_percent }}% (CSQ {{ m.signal_csq }}/31)</span>
+                            </div>
+                            <div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+                                <div class="h-full rounded-full transition-all duration-300 {{ 'bg-success' if m.signal_percent > 50 else ('bg-amber-500' if m.signal_percent > 25 else 'bg-error') }}" style="width: {{ m.signal_percent }}%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- DETAILS LIST -->
+                        <div class="space-y-2 text-xs divide-y divide-surface-container-low pt-1">
+                            <div class="flex justify-between items-center pt-1.5">
+                                <span class="text-on-surface-variant">Оператор связи:</span>
+                                <span class="font-bold text-on-surface">{{ m.operator }}</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-1.5">
+                                <span class="text-on-surface-variant">Номер телефона:</span>
+                                <span class="font-mono font-bold text-primary">{{ m.number }}</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-1.5">
+                                <span class="text-on-surface-variant">Режим сети:</span>
+                                <span class="font-semibold text-on-surface">{{ m.mode }}</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-1.5">
+                                <span class="text-on-surface-variant">Порт устройства:</span>
+                                <span class="font-mono text-on-surface-variant text-[11px]">{{ m.port }}</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-1.5">
+                                <span class="text-on-surface-variant">IMEI:</span>
+                                <span class="font-mono text-on-surface-variant text-[11px]">{{ m.imei }}</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-1.5">
+                                <span class="text-on-surface-variant">Состояние канала:</span>
+                                <span class="font-semibold text-success">{{ m.state }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
             <!-- // ================= TAB 5: SIP TRUNKS // ================= -->
             <div id="tab-trunks" class="tab-pane space-y-6">
                 <div class="flex justify-between items-center">
@@ -824,43 +912,49 @@
             <div id="tab-ivr" class="tab-pane space-y-6">
                 <div class="bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm space-y-6">
                     
-                    <!-- HEADER & ACTIONS WITH TRUNK ROUTE SELECTOR -->
-                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pb-5 border-b border-surface-container">
-                        <div class="space-y-2">
-                            <div class="flex items-center gap-2.5">
-                                <h1 class="text-2xl font-bold text-on-surface">Интерактивный IVR Конструктор</h1>
-                                <span class="text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">PRO Multi-Trunk</span>
+                    <!-- HEADER & ACTIONS WITH BEAUTIFUL TRUNK ROUTE SELECTOR -->
+                    <div class="space-y-4 pb-4 border-b border-surface-container">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <div class="flex items-center gap-2.5">
+                                    <h1 class="text-2xl font-bold text-on-surface">Интерактивный IVR Конструктор</h1>
+                                    <span class="text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 whitespace-nowrap">PRO Multi-Trunk</span>
+                                </div>
+                                <p class="text-on-surface-variant text-sm mt-0.5">Визуальное проектирование голосовых сценариев, прямого донабора (Direct Dial), очередей и расписаний.</p>
                             </div>
                             
-                            <!-- TRUNK / LINE SELECTOR -->
-                            <div class="flex items-center gap-2 pt-1">
-                                <label class="text-xs font-semibold text-on-surface-variant shrink-0">Входящий маршрут / Линия:</label>
-                                <select id="ivr-trunk-selector" onchange="switchIvrTrunkRoute(this.value)" class="px-3.5 py-1.5 rounded-xl bg-surface-container border border-outline text-xs font-bold text-primary cursor-pointer shadow-sm">
-                                    <option value="default">🌐 Общий сценарий (По умолчанию)</option>
-                                    <option value="gsm_pool">📱 GSM Модемы (Пул сим-карт)</option>
-                                    {% for t in sip_trunks %}
-                                    <option value="{{ t.id }}">📞 SIP Транк: {{ t.name }} ({{ t.host }})</option>
-                                    {% endfor %}
-                                </select>
-                                <span id="trunk-route-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-primary/10 text-primary font-bold">default</span>
+                            <div class="flex items-center gap-3 shrink-0">
+                                <button type="button" onclick="saveIvrCanvasToServer()" id="btn-save-canvas" class="px-5 py-2.5 rounded-xl bg-success text-on-primary text-xs font-semibold hover:bg-success/90 transition-all shadow-sm">
+                                    <span>Применить IVR схему в Asterisk</span>
+                                </button>
+                                <div class="inline-flex p-1 rounded-2xl bg-surface-container-low border border-outline/40 shadow-inner">
+                                    <button type="button" onclick="setIvrViewMode('canvas')" id="btn-ivr-mode-canvas" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-primary text-on-primary shadow-sm">
+                                        <span>Блок-схема (Canvas)</span>
+                                    </button>
+                                    <button type="button" onclick="setIvrViewMode('table')" id="btn-ivr-mode-table" class="px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">
+                                        <span>Табличный вид</span>
+                                    </button>
+                                    <button type="button" onclick="setIvrViewMode('schedule')" id="btn-ivr-mode-schedule" class="px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">
+                                        <span>Расписание</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="flex items-center gap-3">
-                            <button type="button" onclick="saveIvrCanvasToServer()" id="btn-save-canvas" class="px-5 py-2.5 rounded-xl bg-success text-on-primary text-xs font-semibold hover:bg-success/90 transition-all shadow-sm">
-                                <span>Применить IVR схему в Asterisk</span>
-                            </button>
-                            <div class="inline-flex p-1 rounded-2xl bg-surface-container-low border border-outline/40 shadow-inner">
-                                <button type="button" onclick="setIvrViewMode('canvas')" id="btn-ivr-mode-canvas" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-primary text-on-primary shadow-sm">
-                                    <span>Блок-схема (Canvas)</span>
-                                </button>
-                                <button type="button" onclick="setIvrViewMode('table')" id="btn-ivr-mode-table" class="px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">
-                                    <span>Табличный вид</span>
-                                </button>
-                                <button type="button" onclick="setIvrViewMode('schedule')" id="btn-ivr-mode-schedule" class="px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">
-                                    <span>Расписание</span>
-                                </button>
-                            </div>
+
+                        <!-- LINE / TRUNK SWITCHER SUB-BAR -->
+                        <div class="flex items-center gap-3 p-3 rounded-2xl bg-surface-container-low border border-outline/30">
+                            <span class="text-xs font-semibold text-on-surface flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px] text-primary">route</span>
+                                Настройка голосового сценария для линии:
+                            </span>
+                            <select id="ivr-trunk-selector" onchange="switchIvrTrunkRoute(this.value)" class="px-3.5 py-1.5 rounded-xl bg-surface border border-outline text-xs font-bold text-primary cursor-pointer shadow-sm min-w-[260px]">
+                                <option value="default">🌐 Общий сценарий (По умолчанию)</option>
+                                <option value="gsm_pool">📱 GSM Модемы (Пул сим-карт)</option>
+                                {% for t in sip_trunks %}
+                                <option value="{{ t.id }}">📞 SIP Транк: {{ t.name }} ({{ t.host }})</option>
+                                {% endfor %}
+                            </select>
+                            <span id="trunk-route-badge" class="text-[10px] font-mono px-2.5 py-1 rounded-lg bg-surface border border-outline/30 text-on-surface-variant font-bold">default</span>
                         </div>
                     </div>
 
