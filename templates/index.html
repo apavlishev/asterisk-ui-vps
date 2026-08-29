@@ -1754,13 +1754,31 @@
         }
 
 
-        // // ================= ADVANCED PAN, ZOOM, DRAG & LINKING CANVAS ENGINE // =================
         
-        // ================= IVR DATA INITIALIZATION FROM SERVER PERSISTENCE =================
-        const serverIvrTree = {{ ivr_tree|tojson|safe }};
+        // ================= ADVANCED PAN, ZOOM, DRAG & LINKING CANVAS ENGINE =================
+        // Canvas Transformation & Tool State (GLOBAL SCOPE)
+        let canvasScale = 1.0;
+        let canvasPanOffset = { x: 0, y: 0 };
+        let activeCanvasTool = 'select'; // 'select' or 'link'
+        let linkingSourceNode = null;
+        let selectedNode = null;
+        let draggedNode = null;
+        let isPanningCanvas = false;
+        let panStart = { x: 0, y: 0 };
+        let nodeDragStartOffset = { x: 0, y: 0 };
 
-        // Auto convert standard backend tree to canvas nodes if layout was empty
-        if (serverIvrTree && serverIvrTree.nodes && serverIvrTree.nodes.length > 0 && (!serverIvrTree.canvas_layout || !serverIvrTree.canvas_layout.nodes || serverIvrTree.canvas_layout.nodes.length === 0)) {
+        // IVR Nodes & Links state initialized from server
+        const serverIvrTree = {{ ivr_tree|tojson|safe }};
+        let ivrNodes = [];
+        let ivrLinks = [];
+
+        if (serverIvrTree && serverIvrTree.canvas_layout && serverIvrTree.canvas_layout.nodes && serverIvrTree.canvas_layout.nodes.length > 0) {
+            ivrNodes = serverIvrTree.canvas_layout.nodes;
+            ivrLinks = serverIvrTree.canvas_layout.links || [];
+            if (serverIvrTree.canvas_layout.pan) canvasPanOffset = serverIvrTree.canvas_layout.pan;
+            if (serverIvrTree.canvas_layout.zoom) canvasScale = serverIvrTree.canvas_layout.zoom;
+        } else if (serverIvrTree && serverIvrTree.nodes && serverIvrTree.nodes.length > 0) {
+            // Auto-convert standard backend tree to visual canvas nodes
             const rootNode = serverIvrTree.nodes[0];
             ivrNodes = [
                 { id: 'inbound', type: 'start', title: 'Входящий SIP Trunk', x: 60, y: 250, w: 200, h: 70, color: '#10b981' },
@@ -1771,7 +1789,7 @@
             ];
 
             (rootNode.branches || []).forEach((b, idx) => {
-                const bId = 'op_' + idx;
+                const bId = 'op_' + (idx + 1);
                 const bY = 50 + idx * 120;
                 let col = '#8b5cf6';
                 if (b.action === 'ring_group') col = '#f59e0b';
@@ -1781,7 +1799,7 @@
                     id: bId,
                     type: 'branch',
                     action_type: b.action || 'extension',
-                    title: b.title || ('Ветка ' + b.digit),
+                    title: b.title || ('Ветка ' + (b.digit || (idx + 1))),
                     digit: b.digit || String(idx + 1),
                     target: b.target || '101',
                     x: 670,
@@ -1797,20 +1815,11 @@
                     label: (b.digit === 'i' ? 'Invalid [ i ]' : 'DTMF [ ' + (b.digit || String(idx + 1)) + ' ]')
                 });
             });
-        }
-
-        
-        let ivrNodes = [];
-        let ivrLinks = [];
-
-        if (serverIvrTree && serverIvrTree.canvas_layout && serverIvrTree.canvas_layout.nodes && serverIvrTree.canvas_layout.nodes.length > 0) {
-            ivrNodes = serverIvrTree.canvas_layout.nodes;
-            ivrLinks = serverIvrTree.canvas_layout.links || [];
         } else {
-            // Default initial graph
+            // Default initial starter graph
             ivrNodes = [
                 { id: 'inbound', type: 'start', title: 'Входящий SIP Trunk', x: 60, y: 250, w: 200, h: 70, color: '#10b981' },
-                { id: 'main', type: 'ivr', title: (serverIvrTree && serverIvrTree.nodes && serverIvrTree.nodes[0] ? serverIvrTree.nodes[0].title : 'Главное Меню'), audio: (serverIvrTree && serverIvrTree.nodes && serverIvrTree.nodes[0] ? serverIvrTree.nodes[0].audio_file : 'greeting_main.wav'), timeout: (serverIvrTree && serverIvrTree.nodes && serverIvrTree.nodes[0] ? serverIvrTree.nodes[0].timeout_sec : 7), retries: 3, direct_dial: true, timeout_action: 'operator', x: 330, y: 200, w: 250, h: 140, color: '#3b82f6' },
+                { id: 'main', type: 'ivr', title: 'Главное Меню', audio: 'greeting_main.wav', timeout: 7, retries: 3, direct_dial: true, timeout_action: 'operator', x: 330, y: 200, w: 250, h: 140, color: '#3b82f6' },
                 { id: 'op_1', type: 'branch', action_type: 'extension', title: 'Отдел продаж (RU)', digit: '1', target: '101', x: 670, y: 50, w: 220, h: 80, color: '#8b5cf6' },
                 { id: 'op_2', type: 'branch', action_type: 'ring_group', title: 'Техническая поддержка', digit: '2', target: 'RingGroup:900', x: 670, y: 190, w: 220, h: 80, color: '#f59e0b' },
                 { id: 'op_3', type: 'branch', action_type: 'voicemail', title: 'Оставить голосовое сообщение', digit: '3', target: 'Voicemail:ALL', x: 670, y: 330, w: 220, h: 80, color: '#f43f5e' },
@@ -1825,6 +1834,9 @@
                 { from: 'main', to: 'op_i', label: 'Invalid [ i ]' }
             ];
         }
+
+        selectedNode = ivrNodes.find(n => n.type === 'ivr') || ivrNodes[1] || ivrNodes[0];
+
 
         function setIvrViewMode(mode) {
             const canvasView = document.getElementById('ivr-view-canvas');
