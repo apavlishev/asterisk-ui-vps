@@ -762,18 +762,33 @@
 
                         <!-- // ================= TAB: GSM MODEMS POOL (TABLE LIST VIEW) // ================= -->
             <div id="tab-modems" class="tab-pane space-y-6">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 class="text-2xl font-bold text-on-surface flex items-center gap-2.5">
-                            <span>GSM Модемы и Сим-карты</span>
+                        <div class="flex items-center gap-2.5">
+                            <h1 class="text-2xl font-bold text-on-surface">GSM Модемы и Сим-карты</h1>
                             <span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20 font-bold">Hardware Pool</span>
-                        </h1>
-                        <p class="text-on-surface-variant text-sm mt-0.5">Список подключенных USB-модемов, операторы связи, уровни сигнала CSQ и системные порты.</p>
+                        </div>
+                        <p class="text-on-surface-variant text-sm mt-0.5">Физические USB-модемы, операторы сотовой связи, уровни сигнала CSQ и системные порты.</p>
                     </div>
-                    <button onclick="location.reload()" class="px-4 py-2 rounded-xl bg-surface hover:bg-surface-container-high text-xs font-semibold text-on-surface flex items-center gap-1.5 transition-colors border border-outline/40 shadow-sm">
-                        <span class="material-symbols-outlined text-[16px]">refresh</span>
-                        <span>Пересканировать шину USB</span>
-                    </button>
+                    
+                    <div class="flex items-center gap-3">
+                        <!-- TEST MODE CHECKBOX TOGGLE -->
+                        <form action="/settings/modems/toggle-test" method="POST" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface border border-outline/40 shadow-sm">
+                            <input type="checkbox" name="enabled" id="modems_test_mode_toggle" onchange="this.form.submit()" class="w-4 h-4 rounded text-amber-500 cursor-pointer" {% if integrations.get('modems_test_mode') %}checked{% endif %}>
+                            <label for="modems_test_mode_toggle" class="text-xs text-on-surface font-semibold cursor-pointer select-none flex items-center gap-1">
+                                <span>Тестовые модемы (Эмуляция)</span>
+                                {% if integrations.get('modems_test_mode') %}
+                                <span class="w-2 h-2 rounded-full bg-amber-500 inline-block animate-pulse"></span>
+                                {% endif %}
+                            </label>
+                        </form>
+
+                        <!-- RESCAN HARDWARE BUTTON -->
+                        <button onclick="location.reload()" class="px-4 py-2 rounded-xl bg-surface hover:bg-surface-container-high text-xs font-semibold text-on-surface flex items-center gap-1.5 transition-colors border border-outline/40 shadow-sm">
+                            <span class="material-symbols-outlined text-[16px]">refresh</span>
+                            <span>Пересканировать USB</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- MODEMS STRUCTURED TABLE LIST -->
@@ -846,8 +861,14 @@
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="6" class="px-6 py-8 text-center text-on-surface-variant text-sm">
-                                    USB-модемы не обнаружены. Подключите GSM-модем и нажмите «Пересканировать шину USB».
+                                <td colspan="6" class="px-6 py-12 text-center text-on-surface-variant">
+                                    <div class="w-12 h-12 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center mx-auto mb-3">
+                                        <span class="material-symbols-outlined text-2xl">usb_off</span>
+                                    </div>
+                                    <div class="text-sm font-bold text-on-surface mb-1">Физические USB-модемы не обнаружены на сервере</div>
+                                    <p class="text-xs text-on-surface-variant max-w-md mx-auto mb-4">
+                                        В облачной среде VPS физические USB-порты отсутствуют. Для проверки маршрутизации и IVR включите галочку <b>«Тестовые модемы (Эмуляция)»</b> вверху.
+                                    </p>
                                 </td>
                             </tr>
                             {% endfor %}
