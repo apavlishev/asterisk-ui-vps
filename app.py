@@ -4913,7 +4913,8 @@ def index():
     amocrm_user_mapping = integrations.get('amocrm', {}).get('user_mapping', {})
     license_info = license_mgr.load_license()
     max_users = license_mgr.get_max_allowed_users()
-    plugins = marketplace_data.load_marketplace_plugins(license_info.get('active_plugins', []))
+    disabled_plugins = integrations.get('plugins_disabled', [])
+    plugins = marketplace_data.load_marketplace_plugins(license_info.get('active_plugins', []), disabled_plugins)
     client_ip = get_client_ip()
     is_client_local = is_local_ip(client_ip)
     auth_cfg = integrations.get('security_auth', {})
@@ -6036,6 +6037,34 @@ def save_ai_whisper():
     
     save_integrations(cfg)
     flash('Настройки Neural Speech AI & Whisper успешно сохранены!')
+    return redirect(url_for('index'))
+
+
+
+@app.route('/plugins/toggle/<plugin_id>', methods=['POST'])
+def toggle_plugin_status(plugin_id):
+    cfg = load_integrations()
+    if 'plugins_disabled' not in cfg:
+        cfg['plugins_disabled'] = []
+        
+    if plugin_id in cfg['plugins_disabled']:
+        cfg['plugins_disabled'].remove(plugin_id)
+        flash_msg = f'Модуль «{plugin_id}» успешно ВКЛЮЧЕН в работу!'
+    else:
+        cfg['plugins_disabled'].append(plugin_id)
+        flash_msg = f'Модуль «{plugin_id}» временно ОТКЛЮЧЕН (код и настройки сохранены)!'
+        
+    save_integrations(cfg)
+    flash(flash_msg)
+    return redirect(request.referrer or url_for('index'))
+
+@app.route('/plugins/delete/<plugin_id>', methods=['POST'])
+def delete_plugin(plugin_id):
+    success, msg = plugin_manager.uninstall_plugin(plugin_id)
+    if success:
+        flash(f'Модуль «{plugin_id}» успешно полностью удален из системы!')
+    else:
+        flash(f'Ошибка удаления модуля: {msg}')
     return redirect(url_for('index'))
 
 
