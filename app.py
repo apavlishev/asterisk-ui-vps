@@ -5962,6 +5962,25 @@ def api_ivr_upload_audio():
     })
 
 
+
+@app.route('/api/ivr/play-audio/<path:filename>')
+def api_ivr_play_audio(filename):
+    """Streams audio file for Web GUI audio player."""
+    safe_fn = secure_filename(filename)
+    search_dirs = [
+        "/var/lib/asterisk/sounds/ru",
+        "/var/lib/asterisk/sounds/custom",
+        "/var/lib/asterisk/sounds",
+        "/var/spool/asterisk/monitor",
+        "/tmp"
+    ]
+    for d in search_dirs:
+        full_p = os.path.join(d, safe_fn)
+        if os.path.exists(full_p):
+            return send_from_directory(d, safe_fn, mimetype="audio/wav" if safe_fn.endswith('.wav') else "audio/mpeg")
+    return jsonify({'success': False, 'error': 'Audio file not found'}), 404
+
+
 if __name__ == '__main__':
     try:
         threading.Thread(target=network_guardian_startup_check, daemon=True).start()

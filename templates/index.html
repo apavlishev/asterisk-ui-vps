@@ -1491,6 +1491,111 @@
             }
         }
 
+        
+        // ================= MODERN SLEEK AUDIO PLAYER ENGINE =================
+        let ivrAudioElement = null;
+        let isIvrAudioPlaying = false;
+
+        function getAudioPlayer() {
+            if (!ivrAudioElement) {
+                ivrAudioElement = document.getElementById('ivr-node-native-audio');
+                if (ivrAudioElement) {
+                    ivrAudioElement.ontimeupdate = () => {
+                        if (!ivrAudioElement.duration) return;
+                        const pct = (ivrAudioElement.currentTime / ivrAudioElement.duration) * 100;
+                        const bar = document.getElementById('audio-progress-bar');
+                        const timeLbl = document.getElementById('audio-player-time');
+                        if (bar) bar.style.width = pct + '%';
+                        if (timeLbl) {
+                            timeLbl.textContent = formatAudioTime(ivrAudioElement.currentTime) + ' / ' + formatAudioTime(ivrAudioElement.duration);
+                        }
+                    };
+                    ivrAudioElement.onended = () => {
+                        stopIvrAudioPlayback();
+                    };
+                    ivrAudioElement.onerror = () => {
+                        const timeLbl = document.getElementById('audio-player-time');
+                        if (timeLbl) timeLbl.textContent = 'Файл не найден';
+                        stopIvrAudioPlayback();
+                    };
+                }
+            }
+            return ivrAudioElement;
+        }
+
+        function formatAudioTime(sec) {
+            if (isNaN(sec) || sec === Infinity) return '0:00';
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return m + ':' + (s < 10 ? '0' : '') + s;
+        }
+
+        function updateAudioPlayerSrc() {
+            const input = document.getElementById('popup-node-audio');
+            const trackName = document.getElementById('audio-player-track-name');
+            const audio = getAudioPlayer();
+            const timeLbl = document.getElementById('audio-player-time');
+
+            if (!input || !audio) return;
+            const fn = (input.value || '').trim();
+            if (trackName) trackName.textContent = fn || 'Нет файла';
+
+            if (fn) {
+                audio.src = '/api/ivr/play-audio/' + encodeURIComponent(fn);
+                if (timeLbl) timeLbl.textContent = '0:00 / 0:00';
+            } else {
+                audio.src = '';
+                if (timeLbl) timeLbl.textContent = '—';
+            }
+            stopIvrAudioPlayback();
+        }
+
+        function toggleIvrAudioPlayback() {
+            const audio = getAudioPlayer();
+            if (!audio) return;
+            const icon = document.getElementById('icon-audio-play-pause');
+
+            if (!audio.src || audio.src.endsWith('/play-audio/')) {
+                updateAudioPlayerSrc();
+            }
+
+            if (audio.paused) {
+                audio.play().then(() => {
+                    isIvrAudioPlaying = true;
+                    if (icon) icon.textContent = 'pause';
+                }).catch(err => {
+                    alert('Не удалось воспроизвести файл: ' + err.message);
+                    stopIvrAudioPlayback();
+                });
+            } else {
+                audio.pause();
+                isIvrAudioPlaying = false;
+                if (icon) icon.textContent = 'play_arrow';
+            }
+        }
+
+        function stopIvrAudioPlayback() {
+            const audio = getAudioPlayer();
+            const icon = document.getElementById('icon-audio-play-pause');
+            const bar = document.getElementById('audio-progress-bar');
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            isIvrAudioPlaying = false;
+            if (icon) icon.textContent = 'play_arrow';
+            if (bar) bar.style.width = '0%';
+        }
+
+        function seekIvrAudio(e) {
+            const audio = getAudioPlayer();
+            if (!audio || !audio.duration) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const pct = Math.max(0, Math.min(1, clickX / rect.width));
+            audio.currentTime = pct * audio.duration;
+        }
+
         function openEditNodePopup(node) {
             if (!node) return;
             selectedNode = node;
@@ -1513,6 +1618,7 @@
             }
 
             document.getElementById('popup-node-audio').value = node.audio || 'greeting_main.wav';
+            updateAudioPlayerSrc();
             document.getElementById('popup-node-timeout').value = node.timeout || 7;
             document.getElementById('popup-node-retries').value = node.retries || 3;
             document.getElementById('popup-node-direct-dial').checked = Boolean(node.direct_dial !== false);
@@ -1552,6 +1658,7 @@
         }
 
         function closeIvrNodePopup() {
+            stopIvrAudioPlayback();
             const modal = document.getElementById('modal-ivr-node');
             if (modal) modal.classList.add('hidden');
         }
@@ -2777,16 +2884,40 @@
                             <span id="upload-audio-status" class="text-[11px] font-mono text-primary hidden">Загрузка...</span>
                         </div>
                         
-                        <!-- AUDIO UPLOAD DROPZONE / BROWSER -->
+                        <!-- AUDIO FILE INPUT & UPLOAD -->
                         <div class="flex items-center gap-2">
-                            <input type="text" id="popup-node-audio" value="greeting_main.wav" placeholder="greeting_main.wav" class="flex-1 px-3.5 py-2 rounded-xl bg-surface border border-outline text-xs font-mono">
-                            <label class="px-3.5 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container text-xs font-semibold text-on-surface cursor-pointer border border-outline/30 flex items-center gap-1.5 transition-colors shrink-0">
+                            <input type="text" id="popup-node-audio" value="greeting_main.wav" placeholder="greeting_main.wav" class="flex-1 px-3.5 py-2 rounded-xl bg-surface border border-outline text-xs font-mono" oninput="updateAudioPlayerSrc()">
+                            <label class="px-3.5 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container text-xs font-semibold text-on-surface cursor-pointer border border-outline/30 flex items-center gap-1.5 transition-colors shrink-0 shadow-sm">
                                 <span class="material-symbols-outlined text-[16px] text-primary">upload_file</span>
                                 <span>Загрузить</span>
                                 <input type="file" id="popup-audio-file-input" accept=".wav,.mp3,.gsm" class="hidden" onchange="handleDirectAudioUpload(this)">
                             </label>
                         </div>
-                        <p class="text-[10px] text-on-surface-variant">Файл автоматически сконвертируется и сохранится в звуковую директорию Asterisk.</p>
+
+                        <!-- SLEEK MODERN AUDIO PLAYER WIDGET -->
+                        <div id="ivr-audio-player-container" class="p-3 rounded-2xl bg-surface-container-lowest border border-outline/30 flex items-center gap-3 shadow-inner">
+                            <button type="button" id="btn-audio-play-pause" onclick="toggleIvrAudioPlayback()" class="w-9 h-9 rounded-xl bg-primary text-on-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-md shrink-0">
+                                <span class="material-symbols-outlined text-[20px]" id="icon-audio-play-pause">play_arrow</span>
+                            </button>
+                            
+                            <div class="flex-1 space-y-1">
+                                <div class="flex justify-between items-center text-[10px] font-mono text-on-surface-variant">
+                                    <span id="audio-player-track-name" class="truncate max-w-[170px] font-bold text-on-surface">greeting_main.wav</span>
+                                    <span id="audio-player-time">0:00 / 0:00</span>
+                                </div>
+                                <div class="relative w-full h-1.5 bg-surface-container rounded-full overflow-hidden cursor-pointer" onclick="seekIvrAudio(event)" id="audio-progress-bar-bg">
+                                    <div id="audio-progress-bar" class="h-full bg-primary rounded-full transition-all duration-100" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="stopIvrAudioPlayback()" class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Сбросить">
+                                <span class="material-symbols-outlined text-[16px]">stop</span>
+                            </button>
+                            
+                            <audio id="ivr-node-native-audio" class="hidden" preload="none"></audio>
+                        </div>
+
+                        <p class="text-[10px] text-on-surface-variant">Файл автоматически конвертируется и сохраняется в звуковую директорию Asterisk.</p>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
