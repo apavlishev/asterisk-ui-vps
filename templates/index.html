@@ -1110,6 +1110,46 @@
     <script>
 
         // ================= POPUP NODE EDITOR INTEGRATION =================
+        
+        // ================= ASYNC AUDIO FILE UPLOADER FOR IVR =================
+        async function handleDirectAudioUpload(inputEl) {
+            if (!inputEl.files || inputEl.files.length === 0) return;
+            const file = inputEl.files[0];
+            const statusEl = document.getElementById('upload-audio-status');
+            const audioInput = document.getElementById('popup-node-audio');
+
+            const formData = new FormData();
+            formData.append('audio_file', file);
+
+            if (statusEl) {
+                statusEl.textContent = '⏳ Загрузка ' + file.name + '...';
+                statusEl.classList.remove('hidden', 'text-error', 'text-success');
+                statusEl.classList.add('text-primary');
+            }
+
+            try {
+                const res = await fetch('/api/ivr/upload-audio', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    audioInput.value = data.filename;
+                    if (statusEl) {
+                        statusEl.textContent = '✅ Файл загружен!';
+                        statusEl.classList.remove('text-primary');
+                        statusEl.classList.add('text-success');
+                    }
+                } else {
+                    alert('❌ Ошибка загрузки: ' + data.error);
+                    if (statusEl) statusEl.classList.add('hidden');
+                }
+            } catch (err) {
+                alert('❌ Ошибка сети: ' + err.message);
+                if (statusEl) statusEl.classList.add('hidden');
+            }
+        }
+
         function openEditNodePopup(node) {
             if (!node) return;
             selectedNode = node;
@@ -2081,9 +2121,22 @@
 
                 <!-- IVR SPECIFIC FIELDS -->
                 <div id="popup-fields-ivr" class="space-y-3 p-4 rounded-2xl bg-surface-container-low border border-outline/20">
-                    <div>
-                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Аудиофайл приветствия</label>
-                        <input type="text" id="popup-node-audio" value="greeting_main.wav" class="w-full px-3.5 py-2 rounded-xl bg-surface border border-outline text-xs font-mono">
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label class="block text-xs font-semibold text-on-surface-variant">Аудиофайл приветствия (.wav / .mp3)</label>
+                            <span id="upload-audio-status" class="text-[11px] font-mono text-primary hidden">Загрузка...</span>
+                        </div>
+                        
+                        <!-- AUDIO UPLOAD DROPZONE / BROWSER -->
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="popup-node-audio" value="greeting_main.wav" placeholder="greeting_main.wav" class="flex-1 px-3.5 py-2 rounded-xl bg-surface border border-outline text-xs font-mono">
+                            <label class="px-3.5 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container text-xs font-semibold text-on-surface cursor-pointer border border-outline/30 flex items-center gap-1.5 transition-colors shrink-0">
+                                <span class="material-symbols-outlined text-[16px] text-primary">upload_file</span>
+                                <span>Загрузить</span>
+                                <input type="file" id="popup-audio-file-input" accept=".wav,.mp3,.gsm" class="hidden" onchange="handleDirectAudioUpload(this)">
+                            </label>
+                        </div>
+                        <p class="text-[10px] text-on-surface-variant">Файл автоматически сконвертируется и сохранится в звуковую директорию Asterisk.</p>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>

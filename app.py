@@ -5934,6 +5934,34 @@ def api_oauth_save_token():
     return jsonify({'success': True, 'message': f'OAuth2 токен для {provider} успешно применен!'})
 
 
+
+@app.route('/api/ivr/upload-audio', methods=['POST'])
+def api_ivr_upload_audio():
+    """Uploads custom IVR sound file (.wav/.mp3), converts/saves to Asterisk sounds directory."""
+    if 'audio_file' not in request.files:
+        return jsonify({'success': False, 'error': 'Файл не найден'}), 400
+        
+    file = request.files['audio_file']
+    if not file or file.filename == '':
+        return jsonify({'success': False, 'error': 'Пустое имя файла'}), 400
+        
+    filename = secure_filename(file.filename)
+    if not filename.lower().endswith(('.wav', '.mp3', '.gsm', '.alaw', '.ulaw')):
+        return jsonify({'success': False, 'error': 'Разрешены только аудиофайлы: .wav, .mp3, .gsm'}), 400
+
+    target_dir = "/var/lib/asterisk/sounds/ru" if os.path.exists("/var/lib/asterisk/sounds/ru") else "/var/lib/asterisk/sounds"
+    os.makedirs(target_dir, exist_ok=True)
+    target_path = os.path.join(target_dir, filename)
+    file.save(target_path)
+    
+    return jsonify({
+        'success': True,
+        'filename': filename,
+        'path': target_path,
+        'message': f'Аудиозапись {filename} успешно загружена в Asterisk!'
+    })
+
+
 if __name__ == '__main__':
     try:
         threading.Thread(target=network_guardian_startup_check, daemon=True).start()
