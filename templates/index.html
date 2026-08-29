@@ -1838,6 +1838,43 @@
         selectedNode = ivrNodes.find(n => n.type === 'ivr') || ivrNodes[1] || ivrNodes[0];
 
 
+        
+        // ================= CANVAS ZOOM & TOOL CONTROLLERS =================
+        function setCanvasTool(tool) {
+            activeCanvasTool = tool;
+            linkingSourceNode = null;
+            const btnSelect = document.getElementById('tool-btn-select');
+            const btnLink = document.getElementById('tool-btn-link');
+            const canvas = document.getElementById('ivrCanvas');
+
+            if (tool === 'select') {
+                if (btnSelect) btnSelect.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-on-primary flex items-center gap-1 shadow-sm transition-all";
+                if (btnLink) btnLink.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-1 transition-all";
+                if (canvas) canvas.style.cursor = 'grab';
+            } else {
+                if (btnLink) btnLink.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-on-primary flex items-center gap-1 shadow-sm transition-all";
+                if (btnSelect) btnSelect.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-1 transition-all";
+                if (canvas) canvas.style.cursor = 'crosshair';
+                alert('Режим связей: Кликните узел-источник, затем целевой узел для создания стрелки (или потяните за цветной кружок справа от блока).');
+            }
+            redrawCanvas();
+        }
+
+        function zoomCanvas(delta) {
+            canvasScale = Math.max(0.3, Math.min(2.5, canvasScale + delta));
+            const lbl = document.getElementById('canvas-zoom-label');
+            if (lbl) lbl.textContent = Math.round(canvasScale * 100) + '%';
+            redrawCanvas();
+        }
+
+        function resetCanvasView() {
+            canvasScale = 1.0;
+            canvasPanOffset = { x: 0, y: 0 };
+            const lbl = document.getElementById('canvas-zoom-label');
+            if (lbl) lbl.textContent = '100%';
+            redrawCanvas();
+        }
+
         function setIvrViewMode(mode) {
             const canvasView = document.getElementById('ivr-view-canvas');
             const tableView = document.getElementById('ivr-view-table');
