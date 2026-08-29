@@ -56,6 +56,12 @@
             border-color: transparent transparent #005bbf transparent !important;
             border-width: 0 4px 5px 4px !important;
         }
+        .select2-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            display: block !important;
+            font-family: 'Inter', sans-serif !important;
+        }
         .select2-dropdown {
             background-color: #ffffff !important;
             border: 1px solid #dadce0 !important;
@@ -64,6 +70,7 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.06) !important;
             z-index: 999999 !important;
             padding: 6px !important;
+            box-sizing: border-box !important;
         }
         .select2-search--dropdown {
             padding: 4px 4px 6px 4px !important;
@@ -4162,7 +4169,7 @@
                 sel.innerHTML = optionsHtml;
 
                 // Init Select2 on pipeline
-                $(sel).select2({ width: '100%', dropdownAutoWidth: true });
+                $(sel).select2({ width: '100%', dropdownAutoWidth: false });
 
                 // Trigger change to populate corresponding status dropdown
                 const key = sel.id.replace('sel_pipe_', '');
@@ -4189,7 +4196,7 @@
             }
 
             statusSel.innerHTML = statusesHtml;
-            $(statusSel).select2({ width: '100%', dropdownAutoWidth: true });
+            $(statusSel).select2({ width: '100%', dropdownAutoWidth: false });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
