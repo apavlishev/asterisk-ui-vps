@@ -4290,6 +4290,18 @@ def generate_dialplan_from_tree():
     default_ivr_tree = cfg.get('ivr_tree', {})
     sip_trunks = cfg.get('sip_trunks', [])
 
+    debug_enabled = default_ivr_tree.get('debug_enabled', True)
+    debug_exten = default_ivr_tree.get('debug_exten', '888').strip()
+    if debug_enabled and debug_exten:
+        debug_dialplan_entry = f"""
+; --- DEBUG IVR ТЕСТОВЫЙ ВЫЗОВ (Наберите {debug_exten} с любого SIP софтфона) ---
+exten => {debug_exten},1,NoOp(Debug вызов IVR от ${{CALLERID(num)}} на {debug_exten})
+ same => n,Goto(dongle-incoming,s,1)
+"""
+    else:
+        debug_dialplan_entry = ""
+
+
     all_ivr_contexts = []
 
     # Helper to compile an IVR tree into Asterisk dialplan contexts
