@@ -4854,26 +4854,20 @@ def index():
 
 @app.route('/api/ivr/get-tree', methods=['GET'])
 def api_ivr_get_tree():
+    trunk_key = request.args.get('trunk_key', 'default').strip()
     cfg = load_integrations()
-    ivr_tree = cfg.get('ivr_tree', {
-        'enabled': True,
-        'debug_enabled': True,
-        'debug_exten': '888',
-        'nodes': [{
-            'id': 'main',
-            'title': 'Главное меню (greeting.wav)',
-            'audio_file': 'greeting_main.wav',
-            'timeout_sec': 7,
-            'timeout_action': 'operator',
-            'timeout_target': 'ALL',
-            'branches': [
-                {'digit': '1', 'title': 'Отдел продаж (RU)', 'action': 'operator', 'target': '101'},
-                {'digit': '2', 'title': 'Support (EN)', 'action': 'operator', 'target': '102'},
-                {'digit': '3', 'title': 'VIP Desk', 'action': 'operator', 'target': '103'}
-            ]
-        }]
-    })
-    return jsonify({'success': True, 'ivr_tree': ivr_tree})
+    ivr_trees = cfg.get('ivr_trees', {})
+    
+    # Return specific tree or default tree
+    tree = ivr_trees.get(trunk_key)
+    if not tree:
+        if trunk_key == 'default':
+            tree = cfg.get('ivr_tree', {})
+        else:
+            # Fallback to default
+            tree = cfg.get('ivr_tree', {})
+
+    return jsonify({'success': True, 'trunk_key': trunk_key, 'tree': tree, 'ivr_tree': tree})
 
 
 # ================= STORAGE INTEGRITY & END-TO-END HASH VERIFIER =================
