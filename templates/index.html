@@ -52,55 +52,75 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
         .active-nav-item { background-color: #d8e2ff !important; color: #001a41 !important; font-weight: 600 !important; }
         .active-nav-item .material-symbols-outlined { color: #005bbf !important; }
+    
+        /* COLLAPSIBLE SIDEBAR STYLES */
+        body.sidebar-collapsed aside { width: 4.5rem !important; }
+        body.sidebar-collapsed #main-wrapper { padding-left: 4.5rem !important; }
+        body.sidebar-collapsed header { left: 4.5rem !important; }
+        body.sidebar-collapsed .sidebar-text,
+        body.sidebar-collapsed #extensions-submenu,
+        body.sidebar-collapsed #ext-arrow,
+        body.sidebar-collapsed .sidebar-badge,
+        body.sidebar-collapsed .sidebar-user-info { display: none !important; }
+        body.sidebar-collapsed .nav-btn { justify-content: center !important; padding-left: 0 !important; padding-right: 0 !important; }
+        body.sidebar-collapsed .nav-btn .material-symbols-outlined { margin-right: 0 !important; font-size: 24px !important; }
+        body.sidebar-collapsed #btn-extensions-parent { justify-content: center !important; padding-left: 0 !important; padding-right: 0 !important; }
+        body.sidebar-collapsed #btn-extensions-parent .material-symbols-outlined { margin-right: 0 !important; font-size: 24px !important; }
+
     </style>
 </head>
 <body class="bg-background text-on-surface flex min-h-screen">
 
     <!-- SIDEBAR -->
     <aside class="fixed left-0 top-0 h-full w-72 bg-surface border-r border-surface-container flex flex-col z-50 transition-all duration-300">
-        <div class="h-16 px-6 flex items-center gap-3 border-b border-surface-container">
-            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                <span class="material-symbols-outlined text-2xl font-bold">hub</span>
+        <div class="h-16 px-4 flex items-center justify-between border-b border-surface-container">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <div class="w-10 h-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-2xl font-bold">hub</span>
+                </div>
+                <div class="sidebar-text truncate">
+                    <span class="font-bold text-base tracking-tight text-on-surface block leading-tight">Logic Core</span>
+                    <span class="text-[11px] text-on-surface-variant font-mono">Asterisk PBX Pro</span>
+                </div>
             </div>
-            <div>
-                <span class="font-bold text-lg tracking-tight text-on-surface block leading-tight">Logic Core</span>
-                <span class="text-xs text-on-surface-variant font-mono">Asterisk PBX Pro</span>
-            </div>
+            <button onclick="toggleSidebarCollapse()" class="p-1.5 rounded-xl hover:bg-surface-container text-on-surface-variant transition-colors" title="Свернуть/Развернуть меню">
+                <span class="material-symbols-outlined text-[20px]" id="sidebar-toggle-icon">menu_open</span>
+            </button>
         </div>
 
         <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
             <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group active-nav-item">
                 <span class="material-symbols-outlined mr-4 text-primary">dashboard</span>
-                <span class="text-sm font-medium">Дашборд</span>
+                <span class="text-sm font-medium sidebar-text">Дашборд</span>
             </button>
             <button onclick="switchTab('accounts')" id="nav-accounts" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-secondary">group</span>
-                <span class="text-sm font-medium">SIP Абоненты</span>
-                <span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-surface-container-high font-mono">{{ accounts|length }}/{{ max_users }}</span>
+                <span class="text-sm font-medium sidebar-text">SIP Абоненты</span>
+                <span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-surface-container-high font-mono sidebar-badge">{{ accounts|length }}/{{ max_users }}</span>
             </button>
             <button onclick="switchTab('marketplace')" id="nav-marketplace" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-warning">shopping_bag</span>
-                <span class="text-sm font-medium">Маркетплейс</span>
-                <span class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-warning/10 text-warning font-bold uppercase">Store</span>
+                <span class="text-sm font-medium sidebar-text">Маркетплейс</span>
+                <span class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-warning/10 text-warning font-bold uppercase sidebar-badge">Store</span>
             </button>
             <button onclick="switchTab('licensing')" id="nav-licensing" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-success">verified_user</span>
-                <span class="text-sm font-medium">Лицензия & OTA</span>
+                <span class="text-sm font-medium sidebar-text">Лицензия & OTA</span>
             </button>
             <button onclick="switchTab('trunks')" id="nav-trunks" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-primary">settings_ethernet</span>
-                <span class="text-sm font-medium">SIP Транки</span>
+                <span class="text-sm font-medium sidebar-text">SIP Транки</span>
             </button>
             <button onclick="switchTab('ivr')" id="nav-ivr" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-secondary">account_tree</span>
-                <span class="text-sm font-medium">IVR Конструктор</span>
+                <span class="text-sm font-medium sidebar-text">IVR Конструктор</span>
             </button>
             <!-- РАСКРЫВАЮЩИЙСЯ БЛОК: РАСШИРЕНИЯ И ПЛАГИНЫ -->
             <div class="pt-2">
                 <button type="button" onclick="toggleExtensionsMenu()" id="btn-extensions-parent" class="w-full flex items-center justify-between px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                     <div class="flex items-center">
                         <span class="material-symbols-outlined mr-4 text-primary">extension</span>
-                        <span class="text-sm font-semibold text-on-surface">Расширения</span>
+                        <span class="text-sm font-semibold text-on-surface sidebar-text">Расширения</span>
                     </div>
                     <div class="flex items-center gap-1">
                         <span class="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">{{ installed_plugins|length }}</span>
@@ -125,14 +145,14 @@
             </div>
             <button onclick="switchTab('security')" id="nav-security" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-error">lock_person</span>
-                <span class="text-sm font-medium">Безопасность & Доступ</span>
+                <span class="text-sm font-medium sidebar-text">Безопасность & Доступ</span>
                 {% if not auth_enabled %}
                 <span class="ml-auto w-2 h-2 rounded-full bg-error animate-pulse" title="Парольная защита отключена"></span>
                 {% endif %}
             </button>
             <button onclick="switchTab('calls')" id="nav-calls" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-primary">history</span>
-                <span class="text-sm font-medium">Журнал вызовов</span>
+                <span class="text-sm font-medium sidebar-text">Журнал вызовов</span>
             </button>
         </nav>
 
@@ -150,7 +170,7 @@
     </aside>
 
     <!-- MAIN WRAPPER -->
-    <div class="pl-72 w-full flex flex-col min-h-screen">
+    <div id="main-wrapper" class="pl-72 w-full flex flex-col min-h-screen transition-all duration-300">
         
         <!-- HEADER -->
         <header class="fixed top-0 left-72 right-0 h-16 bg-surface/90 backdrop-blur-md z-40 flex items-center justify-between px-8 border-b border-surface-container">
@@ -1283,6 +1303,28 @@
                 btn.disabled = false;
             }
         }
+
+        
+        // ================= COLLAPSIBLE SIDEBAR LOGIC =================
+        function toggleSidebarCollapse() {
+            const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+            const icon = document.getElementById('sidebar-toggle-icon');
+            if (icon) {
+                icon.textContent = isCollapsed ? 'menu' : 'menu_open';
+            }
+            localStorage.setItem('sidebar_collapsed_pref', isCollapsed ? '1' : '0');
+            // If canvas is open, redraw on sidebar toggle
+            setTimeout(() => { if (typeof initIvrCanvas === 'function') initIvrCanvas(); }, 350);
+        }
+
+        // Restore sidebar state
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('sidebar_collapsed_pref') === '1') {
+                document.body.classList.add('sidebar-collapsed');
+                const icon = document.getElementById('sidebar-toggle-icon');
+                if (icon) icon.textContent = 'menu';
+            }
+        });
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
