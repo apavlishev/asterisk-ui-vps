@@ -53,7 +53,17 @@
         .active-nav-item { background-color: #d8e2ff !important; color: #001a41 !important; font-weight: 600 !important; }
         .active-nav-item .material-symbols-outlined { color: #005bbf !important; }
     
-        /* COLLAPSIBLE SIDEBAR STYLES */
+        
+        /* SQUARE / MODERN RECTANGULAR NAV BUTTONS */
+        .nav-btn {
+            border-radius: 0.75rem !important; /* rounded-xl */
+            margin-bottom: 0.25rem;
+        }
+        #btn-extensions-parent {
+            border-radius: 0.75rem !important;
+        }
+
+        /* COLLAPSIBLE SIDEBAR STYLES (COMPACT ICON RAIL) */
         body.sidebar-collapsed aside { width: 4.5rem !important; }
         body.sidebar-collapsed #main-wrapper { padding-left: 4.5rem !important; }
         body.sidebar-collapsed header { left: 4.5rem !important; }
@@ -62,10 +72,23 @@
         body.sidebar-collapsed #ext-arrow,
         body.sidebar-collapsed .sidebar-badge,
         body.sidebar-collapsed .sidebar-user-info { display: none !important; }
-        body.sidebar-collapsed .nav-btn { justify-content: center !important; padding-left: 0 !important; padding-right: 0 !important; }
-        body.sidebar-collapsed .nav-btn .material-symbols-outlined { margin-right: 0 !important; font-size: 24px !important; }
-        body.sidebar-collapsed #btn-extensions-parent { justify-content: center !important; padding-left: 0 !important; padding-right: 0 !important; }
-        body.sidebar-collapsed #btn-extensions-parent .material-symbols-outlined { margin-right: 0 !important; font-size: 24px !important; }
+        
+        body.sidebar-collapsed .nav-btn,
+        body.sidebar-collapsed #btn-extensions-parent {
+            width: 3.25rem !important;
+            height: 3.25rem !important;
+            margin: 0 auto 0.35rem auto !important;
+            padding: 0 !important;
+            border-radius: 0.75rem !important; /* Square with soft rounded corners */
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        body.sidebar-collapsed .nav-btn .material-symbols-outlined,
+        body.sidebar-collapsed #btn-extensions-parent .material-symbols-outlined {
+            margin-right: 0 !important;
+            font-size: 24px !important;
+        }
 
     </style>
 </head>
@@ -89,35 +112,35 @@
         </div>
 
         <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group active-nav-item">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group active-nav-item">
                 <span class="material-symbols-outlined mr-4 text-primary">dashboard</span>
                 <span class="text-sm font-medium sidebar-text">Дашборд</span>
             </button>
-            <button onclick="switchTab('accounts')" id="nav-accounts" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
+            <button onclick="switchTab('accounts')" id="nav-accounts" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-secondary">group</span>
                 <span class="text-sm font-medium sidebar-text">SIP Абоненты</span>
                 <span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-surface-container-high font-mono sidebar-badge">{{ accounts|length }}/{{ max_users }}</span>
             </button>
-            <button onclick="switchTab('marketplace')" id="nav-marketplace" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
+            <button onclick="switchTab('marketplace')" id="nav-marketplace" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-warning">shopping_bag</span>
                 <span class="text-sm font-medium sidebar-text">Маркетплейс</span>
                 <span class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-warning/10 text-warning font-bold uppercase sidebar-badge">Store</span>
             </button>
-            <button onclick="switchTab('licensing')" id="nav-licensing" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
+            <button onclick="switchTab('licensing')" id="nav-licensing" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-success">verified_user</span>
                 <span class="text-sm font-medium sidebar-text">Лицензия & OTA</span>
             </button>
-            <button onclick="switchTab('trunks')" id="nav-trunks" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
+            <button onclick="switchTab('trunks')" id="nav-trunks" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-primary">settings_ethernet</span>
                 <span class="text-sm font-medium sidebar-text">SIP Транки</span>
             </button>
-            <button onclick="switchTab('ivr')" id="nav-ivr" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
+            <button onclick="switchTab('ivr')" id="nav-ivr" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-secondary">account_tree</span>
                 <span class="text-sm font-medium sidebar-text">IVR Конструктор</span>
             </button>
             <!-- РАСКРЫВАЮЩИЙСЯ БЛОК: РАСШИРЕНИЯ И ПЛАГИНЫ -->
             <div class="pt-2">
-                <button type="button" onclick="toggleExtensionsMenu()" id="btn-extensions-parent" class="w-full flex items-center justify-between px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
+                <button type="button" onclick="toggleExtensionsMenu()" id="btn-extensions-parent" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                     <div class="flex items-center">
                         <span class="material-symbols-outlined mr-4 text-primary">extension</span>
                         <span class="text-sm font-semibold text-on-surface sidebar-text">Расширения</span>
@@ -143,14 +166,14 @@
                     {% endif %}
                 </div>
             </div>
-            <button onclick="switchTab('security')" id="nav-security" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
+            <button onclick="switchTab('security')" id="nav-security" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-error">lock_person</span>
                 <span class="text-sm font-medium sidebar-text">Безопасность & Доступ</span>
                 {% if not auth_enabled %}
                 <span class="ml-auto w-2 h-2 rounded-full bg-error animate-pulse" title="Парольная защита отключена"></span>
                 {% endif %}
             </button>
-            <button onclick="switchTab('calls')" id="nav-calls" class="nav-btn w-full flex items-center px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
+            <button onclick="switchTab('calls')" id="nav-calls" class="nav-btn w-full flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group">
                 <span class="material-symbols-outlined mr-4 text-primary">history</span>
                 <span class="text-sm font-medium sidebar-text">Журнал вызовов</span>
             </button>
