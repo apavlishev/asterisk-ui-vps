@@ -1553,18 +1553,20 @@
                     ctx.fillText('delete', delBtnX + 10, delBtnY + 10);
                 }
 
-                // Subtitle
+                // Subtitle (Carefully aligned inside card bounds)
                 ctx.fillStyle = '#94a3b8';
                 ctx.font = '11px JetBrains Mono, monospace';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
                 if (node.type === 'ivr') {
-                    ctx.fillText('Таймаут: ' + (node.timeout || 7) + 's (x' + (node.retries || 3) + ')', node.x + 16, node.y + 40);
-                    ctx.fillText('Донабор: ' + (node.direct_dial ? 'ВКЛ' : 'ВЫКЛ'), node.x + 16, node.y + 60);
-                    ctx.fillText('Аудио: ' + (node.audio || 'greeting.wav'), node.x + 16, node.y + 80);
+                    ctx.fillText('Таймаут: ' + (node.timeout || 7) + 's (x' + (node.retries || 3) + ')', node.x + 16, node.y + 38);
+                    ctx.fillText('Донабор: ' + (node.direct_dial ? 'ВКЛ' : 'ВЫКЛ'), node.x + 16, node.y + 58);
+                    ctx.fillText('Аудио: ' + (node.audio || 'greeting.wav'), node.x + 16, node.y + 78, node.w - 30);
                 } else if (node.type === 'branch') {
-                    ctx.fillText('Клавиша: [' + (node.digit || '1') + ']', node.x + 16, node.y + 38);
-                    ctx.fillText('Цель: ' + (node.target || '101'), node.x + 16, node.y + 56);
+                    ctx.fillText('Клавиша: [' + (node.digit || '1') + ']', node.x + 16, node.y + 36);
+                    ctx.fillText('Цель: ' + (node.target || '101'), node.x + 16, node.y + 54, node.w - 30);
                 } else {
-                    ctx.fillText('Режим: Прямой транк', node.x + 16, node.y + 40);
+                    ctx.fillText('Режим: Прямой транк', node.x + 16, node.y + 38);
                 }
 
                 // Port circle
@@ -1593,34 +1595,7 @@
             if (stroke) ctx.stroke();
         }
 
-        function syncInspectorWithSelectedNode() {
-            if (!selectedNode) return;
-            document.getElementById('inspector-node-id').textContent = selectedNode.id;
-            document.getElementById('inspector-title').value = selectedNode.title || '';
-            document.getElementById('inspector-type-badge').textContent = (selectedNode.type === 'ivr' ? 'Корневое IVR Меню' : (selectedNode.type === 'start' ? 'Входящий Транк' : 'DTMF Ветка сценария'));
-
-            const ivrFields = document.getElementById('inspector-ivr-fields');
-            const branchFields = document.getElementById('inspector-branch-fields');
-
-            if (selectedNode.type === 'ivr') {
-                ivrFields.classList.remove('hidden');
-                branchFields.classList.add('hidden');
-                document.getElementById('inspector-timeout').value = selectedNode.timeout || 7;
-                document.getElementById('inspector-retries').value = selectedNode.retries || 3;
-                document.getElementById('inspector-audio').value = selectedNode.audio || 'greeting_main.wav';
-                document.getElementById('inspector-direct-dial').checked = Boolean(selectedNode.direct_dial);
-                document.getElementById('inspector-timeout-action').value = selectedNode.timeout_action || 'operator';
-            } else if (selectedNode.type === 'branch') {
-                ivrFields.classList.add('hidden');
-                branchFields.classList.remove('hidden');
-                document.getElementById('inspector-digit').value = selectedNode.digit || '1';
-                document.getElementById('inspector-target').value = selectedNode.target || '101';
-                document.getElementById('inspector-action-type').value = selectedNode.action_type || 'extension';
-            } else {
-                ivrFields.classList.add('hidden');
-                branchFields.classList.add('hidden');
-            }
-        }
+        function syncInspectorWithSelectedNode() { return; }
 
         function updateActiveNodeProperty(key, val) {
             if (!selectedNode) return;
