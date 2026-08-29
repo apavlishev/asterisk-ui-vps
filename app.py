@@ -24,23 +24,40 @@ def get_yandex_disk_account_info(token):
     if not token:
         return {'valid': False}
     try:
-        r = requests.get('https://cloud-api.yandex.net/v1/disk', headers={'Authorization': f'OAuth {token}'}, timeout=3)
-        if r.status_code == 200:
-            data = r.json()
+        headers = {'Authorization': f'OAuth {token}'}
+        # 1. Try fetching login info
+        r_user = requests.get('https://login.yandex.ru/info', headers=headers, timeout=3)
+        user_data = r_user.json() if r_user.status_code == 200 else {}
+        login = user_data.get('login') or user_data.get('default_email') or user_data.get('id') or 'Пользователь Яндекс'
+
+        # 2. Try fetching Disk quota
+        r_disk = requests.get('https://cloud-api.yandex.net/v1/disk', headers=headers, timeout=3)
+        if r_disk.status_code == 200:
+            data = r_disk.json()
             user = data.get('user', {})
             total_gb = round(data.get('total_space', 0) / (1024**3), 1)
             used_gb = round(data.get('used_space', 0) / (1024**3), 1)
             return {
                 'valid': True,
-                'display_name': user.get('display_name') or user.get('login') or 'Яндекс Пользователь',
-                'login': user.get('login', ''),
-                'uid': user.get('uid', ''),
+                'has_disk_scope': True,
+                'display_name': user.get('display_name') or login,
+                'login': login,
                 'total_gb': total_gb,
                 'used_gb': used_gb,
-                'free_gb': round(total_gb - used_gb, 1)
+                'free_gb': round(total_gb - used_gb, 1),
+                'status_msg': f'Свободно: {round(total_gb - used_gb, 1)} ГБ из {total_gb} ГБ'
             }
-    except Exception:
-        pass
+        elif r_user.status_code == 200:
+            # Token is valid, but Disk scope needs checkbox in Yandex OAuth App
+            return {
+                'valid': True,
+                'has_disk_scope': False,
+                'display_name': login,
+                'login': login,
+                'status_msg': '⚠️ Требуется включить права Яндекс.Диска в приложении OAuth'
+            }
+    except Exception as e:
+        print(f"Error checking Yandex token: {e}")
     return {'valid': False}
 
 def get_google_drive_account_info(token):

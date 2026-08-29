@@ -1128,12 +1128,18 @@
                                 <div>
                                     <div class="flex items-center gap-2">
                                         <h4 class="text-sm font-bold text-on-surface">{{ yandex_account.display_name }}</h4>
+                                        {% if yandex_account.has_disk_scope %}
                                         <span class="text-[10px] px-2 py-0.5 rounded-full bg-success/10 text-success font-bold flex items-center gap-1">
-                                            <span class="material-symbols-outlined text-[12px]">verified</span> Подключен
+                                            <span class="material-symbols-outlined text-[12px]">verified</span> Диск активен
                                         </span>
+                                        {% else %}
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-warning/10 text-warning font-bold flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-[12px]">warning</span> Авторизован
+                                        </span>
+                                        {% endif %}
                                     </div>
-                                    <p class="text-xs text-on-surface-variant font-mono mt-0.5">{{ yandex_account.login }}</p>
-                                    <p class="text-[11px] text-on-surface-variant mt-1">Доступно на Диске: <b class="text-on-surface">{{ yandex_account.free_gb }} ГБ</b> (Всего: {{ yandex_account.total_gb }} ГБ)</p>
+                                    <p class="text-xs text-on-surface-variant font-mono mt-0.5">Логин: {{ yandex_account.login }}</p>
+                                    <p class="text-[11px] {{ 'text-on-surface-variant' if yandex_account.has_disk_scope else 'text-warning' }} mt-1">{{ yandex_account.status_msg }}</p>
                                 </div>
                             </div>
 
