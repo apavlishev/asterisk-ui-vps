@@ -4129,7 +4129,7 @@ def generate_pjsip_conf():
         out.append("")
         out.append(f"[{t_id}]")
         out.append("type=endpoint")
-        out.append("context=from-internal")
+        out.append(f"context=trunk-in-{t_id}")
         out.append("disallow=all")
         out.append("allow=alaw")
         out.append("allow=ulaw")
@@ -4285,208 +4285,172 @@ def generate_dialplan_from_tree():
     accounts = load_sip_accounts()
     all_extens = [a['exten'] for a in accounts]
     outbound_dialplan_block = build_outbound_dialplan_lines(cfg)
-    
-    inbound_target = cfg.get('routing', {}).get('inbound_target', 'ALL')
-    direct_dial_str = get_dial_target(inbound_target, all_extens)
-    direct_label = inbound_target if inbound_target else 'ALL'
 
-    ivr_tree = cfg.get('ivr_tree', {})
-    ivr_enabled = ivr_tree.get('enabled', True)
-    debug_enabled = ivr_tree.get('debug_enabled', True)
-    debug_exten = ivr_tree.get('debug_exten', '888').strip()
-    nodes = ivr_tree.get('nodes', [])
+    ivr_trees = cfg.get('ivr_trees', {})
+    default_ivr_tree = cfg.get('ivr_tree', {})
+    sip_trunks = cfg.get('sip_trunks', [])
 
-    if debug_enabled and debug_exten:
-        debug_dialplan_entry = f"""
-; --- DEBUG IVR ТЕСТОВЫЙ ВЫЗОВ (Наберите {debug_exten} с любого SIP софтфона) ---
-exten => {debug_exten},1,NoOp(Debug вызов IVR от ${{CALLERID(num)}} на {debug_exten})
- same => n,Goto(ivr-main,s,1)
+    all_ivr_contexts = []
+
+    # Helper to compile an IVR tree into Asterisk dialplan contexts
+    def compile_tree_to_contexts(tree, prefix, trunk_title):
+        if not tree or not tree.get('nodes'):
+            return f"""
+[{prefix}]
+exten => _.,1,NoOp(Входящий вызов {trunk_title} -> Прямой вызов всех)
+ same => n,Set(REC_FILE=${{STRFTIME(${{EPOCH}},,%Y%m%d-%H%M%S)}}_${{CALLERID(num)}}_INBOUND.wav)
+ same => n,Set(__CALL_ID=${{UNIQUEID}})
+ same => n,Set(__CALL_SRC=${{CALLERID(num)}})
+ same => n,Set(__CALL_DST=ALL)
+ same => n,Set(__CALL_DIRECTION=inbound)
+ same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})
+ same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)
+ same => n,Dial({get_dial_target('ALL', all_extens)},60,U(sub-record-start))
+ same => n,Hangup()
 """
-    else:
-        debug_dialplan_entry = ""
+        nodes = tree.get('nodes', [])
+        root_node = nodes[0]
+        work_hours = tree.get('work_hours', {})
+        wh_enabled = work_hours.get('enabled', False)
+        wh_start = work_hours.get('start', '09:00')
+        wh_end = work_hours.get('end', '18:00')
+        wh_days = work_hours.get('days', 'mon-fri')
+        wh_audio = work_hours.get('audio_file', '')
 
+        entry_ctx_name = prefix
+        main_ctx_name = f"{prefix}-main"
 
-    work_hours = ivr_tree.get('work_hours', {})
-    wh_enabled = work_hours.get('enabled', False)
-    wh_start = work_hours.get('start', '09:00')
-    wh_end = work_hours.get('end', '18:00')
-    wh_days = work_hours.get('days', 'mon-fri')
-    wh_audio = work_hours.get('audio_file', '')
-    
-    if wh_enabled and ivr_enabled and nodes:
-        time_str = f"{wh_start}-{wh_end},{wh_days},*,*"
-        offhours_goto = f" same => n,GotoIfTime({time_str}?ivr-main,s,1)\n same => n,Goto(ivr-offhours,s,1)"
-        sound_base = wh_audio.replace('.wav', '') if wh_audio else 'beep'
-        offhours_ctx = f"""
-[ivr-offhours]
-exten => s,1,NoOp(Вызов в нерабочее время)
+        if wh_enabled:
+            time_str = f"{wh_start}-{wh_end},{wh_days},*,*"
+            offhours_goto = f" same => n,GotoIfTime({time_str}?{main_ctx_name},s,1)\n same => n,Goto({prefix}-offhours,s,1)"
+            sound_base = wh_audio.replace('.wav', '').replace('.mp3', '') if wh_audio else 'beep'
+            offhours_ctx = f"""
+[{prefix}-offhours]
+exten => s,1,NoOp({trunk_title}: Вызов в нерабочее время)
  same => n,Answer()
  same => n,Wait(0.5)
  same => n,Playback(custom/{sound_base})
  same => n,Hangup()
 """
-    else:
-        offhours_goto = " same => n,Goto(ivr-main,s,1)"
-        offhours_ctx = ""
-        
-    if not ivr_enabled or not nodes:
+        else:
+            offhours_goto = f" same => n,Goto({main_ctx_name},s,1)"
+            offhours_ctx = ""
 
-        ivr_sections = f"""[sub-record-start]
-exten => s,1,NoOp(Старт записи разговора при снятии трубки: ${{REC_PATH}})
- same => n,MixMonitor(${{REC_PATH}})
- same => n,Return()
+        entry_section = f"""
+[{entry_ctx_name}]
+exten => _X.,1,NoOp(Входящий вызов {trunk_title} от ${{CALLERID(num)}})
+{offhours_goto}
 
-[dongle-incoming]
-exten => _X.,1,NoOp(Входящий GSM вызов от ${{CALLERID(num)}} -> {direct_label})
- same => n,Set(REC_FILE=${{STRFTIME(${{EPOCH}},,%Y%m%d-%H%M%S)}}_${{CALLERID(num)}}_{direct_label}.wav)
- same => n,Set(__CALL_ID=${{UNIQUEID}})
- same => n,Set(__CALL_SRC=${{CALLERID(num)}})
- same => n,Set(__CALL_DST={direct_label})
- same => n,Set(__CALL_DIRECTION=inbound)
- same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})
- same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)
- same => n,Dial({direct_dial_str},60,U(sub-record-start))
- same => n,Hangup()
+exten => _+.,1,NoOp(Входящий вызов {trunk_title} (+) от ${{CALLERID(num)}})
+{offhours_goto}
 
-exten => _+.,1,NoOp(Входящий GSM вызов (+) от ${{CALLERID(num)}} -> {direct_label})
- same => n,Set(REC_FILE=${{STRFTIME(${{EPOCH}},,%Y%m%d-%H%M%S)}}_${{CALLERID(num)}}_{direct_label}.wav)
- same => n,Set(__CALL_ID=${{UNIQUEID}})
- same => n,Set(__CALL_SRC=${{CALLERID(num)}})
- same => n,Set(__CALL_DST={direct_label})
- same => n,Set(__CALL_DIRECTION=inbound)
- same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})
- same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)
- same => n,Dial({direct_dial_str},60,U(sub-record-start))
- same => n,Hangup()
+exten => s,1,NoOp(Входящий вызов {trunk_title} (s-exten))
+{offhours_goto}
 
-exten => +79000000000,1,NoOp(Входящий GSM вызов +79000000000 -> {direct_label})
- same => n,Set(REC_FILE=${{STRFTIME(${{EPOCH}},,%Y%m%d-%H%M%S)}}_${{CALLERID(num)}}_{direct_label}.wav)
- same => n,Set(__CALL_ID=${{UNIQUEID}})
- same => n,Set(__CALL_SRC=${{CALLERID(num)}})
- same => n,Set(__CALL_DST={direct_label})
- same => n,Set(__CALL_DIRECTION=inbound)
- same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})
- same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)
- same => n,Dial({direct_dial_str},60,U(sub-record-start))
- same => n,Hangup()
+exten => _.,1,NoOp(Входящий вызов {trunk_title} (catch-all) от ${{CALLERID(num)}})
+{offhours_goto}
 
-exten => s,1,NoOp(Входящий GSM вызов s-exten -> {direct_label})
- same => n,Set(REC_FILE=${{STRFTIME(${{EPOCH}},,%Y%m%d-%H%M%S)}}_${{CALLERID(num)}}_{direct_label}.wav)
- same => n,Set(__CALL_ID=${{UNIQUEID}})
- same => n,Set(__CALL_SRC=${{CALLERID(num)}})
- same => n,Set(__CALL_DST={direct_label})
- same => n,Set(__CALL_DIRECTION=inbound)
- same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})
- same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)
- same => n,Dial({direct_dial_str},60,U(sub-record-start))
- same => n,Hangup()
-
-exten => _.,1,NoOp(Входящий GSM вызов catch-all от ${{CALLERID(num)}} -> {direct_label})
- same => n,Set(REC_FILE=${{STRFTIME(${{EPOCH}},,%Y%m%d-%H%M%S)}}_${{CALLERID(num)}}_{direct_label}.wav)
- same => n,Set(__CALL_ID=${{UNIQUEID}})
- same => n,Set(__CALL_SRC=${{CALLERID(num)}})
- same => n,Set(__CALL_DST={direct_label})
- same => n,Set(__CALL_DIRECTION=inbound)
- same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})
- same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)
- same => n,Dial({direct_dial_str},60,U(sub-record-start))
- same => n,Hangup()
-
+{offhours_ctx}
 """
-    else:
+
         node_contexts = []
         for n in nodes:
             n_id = n['id']
-            ctx_name = f'ivr-{n_id}'
+            ctx_name = f"{prefix}-{n_id}" if n_id != 'main' else main_ctx_name
             audio_fn = n.get('audio_file', '')
             t_sec = n.get('timeout_sec', 7)
             t_action = n.get('timeout_action', 'operator')
             t_target = n.get('timeout_target', 'ALL')
 
-            sound_path = os.path.join(SOUNDS_DIR, audio_fn) if audio_fn else ''
-            sound_base = audio_fn.replace('.wav', '') if audio_fn else ''
-            if audio_fn and os.path.exists(sound_path):
-                play_line = f'same => n,Background(custom/{sound_base})'
-            else:
-                play_line = 'same => n,Playback(beep)'
+            sound_base = audio_fn.replace('.wav', '').replace('.mp3', '') if audio_fn else ''
+            play_line = f'same => n,Background(custom/{sound_base})' if sound_base else 'same => n,Playback(beep)'
 
-            if t_action == 'operator':
-                t_dial = get_dial_target(t_target, all_extens)
-                timeout_lines = f"""exten => t,1,NoOp(IVR {n_id}: Таймаут -> Оператор {t_target})
+            t_dial = get_dial_target(t_target, all_extens)
+            timeout_lines = f"""exten => t,1,NoOp({trunk_title} IVR {n_id}: Таймаут -> {t_target})
  same => n,Set(REC_FILE=${{STRFTIME(${{EPOCH}},,%Y%m%d-%H%M%S)}}_${{CALL_SRC}}_{n_id}_TO_{t_target}.wav)
  same => n,Set(__CALL_DST={n_id}_TO_{t_target})
  same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})
  same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)
  same => n,Answer()
- same => n,MixMonitor(${{REC_PATH}})
- same => n,Dial({t_dial},60)
+ same => n,Dial({t_dial},60,U(sub-record-start))
  same => n,Hangup()"""
-            else:
-                target_ctx = f'ivr-{t_target}'
-                timeout_lines = f"""exten => t,1,NoOp(IVR {n_id}: Таймаут -> Переход в меню {t_target})
- same => n,Goto({target_ctx},s,1)"""
 
-            branches_lines = []
+            branch_lines = []
             for b in n.get('branches', []):
                 digit = b.get('digit', '1')
-                b_title = b.get('title', 'Пункт')
-                b_action = b.get('action', 'operator')
-                b_target = b.get('target', 'ALL')
+                action = b.get('action', 'extension')
+                target = b.get('target', '101')
+                b_title = b.get('title', 'Отдел')
 
-                if b_action == 'operator':
-                    b_dial = get_dial_target(b_target, all_extens)
-                    branches_lines.append(f"""exten => {digit},1,NoOp(IVR {n_id}: Клавиша {digit} ({b_title}) -> Оператор {b_target})
- same => n,Set(REC_FILE=${{STRFTIME(${{EPOCH}},,%Y%m%d-%H%M%S)}}_${{CALL_SRC}}_{n_id}_{digit}_{b_target}.wav)
- same => n,Set(__CALL_DST={n_id}_{digit}_{b_target})
+                if action == 'hangup' or target == 'Hangup':
+                    act_line = f""" same => n,Playback(beep)
+ same => n,Hangup()"""
+                elif action == 'voicemail' or target.startswith('Voicemail'):
+                    act_line = f""" same => n,Answer()
+ same => n,VoiceMail(101@default,u)
+ same => n,Hangup()"""
+                else:
+                    b_dial = get_dial_target(target, all_extens)
+                    act_line = f""" same => n,Dial({b_dial},60,U(sub-record-start))
+ same => n,Hangup()"""
+
+                branch_lines.append(f"""exten => {digit},1,NoOp({trunk_title} IVR {n_id}: Нажата клавиша [{digit}] -> {b_title} ({target}))
+ same => n,Set(REC_FILE=${{STRFTIME(${{EPOCH}},,%Y%m%d-%H%M%S)}}_${{CALL_SRC}}_{n_id}_KEY_{digit}.wav)
+ same => n,Set(__CALL_DST={n_id}_KEY_{digit}_{target})
  same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})
  same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)
  same => n,Answer()
- same => n,MixMonitor(${{REC_PATH}})
- same => n,Dial({b_dial},60)
- same => n,Hangup()""")
-                else:
-                    target_ctx = f'ivr-{b_target}'
-                    branches_lines.append(f"""exten => {digit},1,NoOp(IVR {n_id}: Клавиша {digit} ({b_title}) -> Переход в меню {b_target})
- same => n,Goto({target_ctx},s,1)""")
+{act_line}""")
 
-            branches_block = '\n'.join(branches_lines)
-
-            ctx_body = f"""[{ctx_name}]
-exten => s,1,NoOp(IVR Уровень: {n_id})
+            # Direct dial if enabled
+            direct_dial_lines = ""
+            if n.get('direct_dial', True):
+                direct_dial_lines = f"""
+exten => _[1-9]XX,1,NoOp({trunk_title} IVR {n_id}: Прямой донабор номера ${{EXTEN}})
+ same => n,Set(REC_FILE=${{STRFTIME(${{EPOCH}},,%Y%m%d-%H%M%S)}}_${{CALL_SRC}}_{n_id}_EXT_${{EXTEN}}.wav)
+ same => n,Set(__CALL_DST={n_id}_EXT_${{EXTEN}})
+ same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})
+ same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)
  same => n,Answer()
- same => n,Set(__CALL_ID=${{UNIQUEID}})
- same => n,Set(__CALL_SRC=${{CALLERID(num)}})
- same => n,Set(__CALL_DIRECTION=inbound)
+ same => n,Dial(PJSIP/${{EXTEN}},60,U(sub-record-start))
+ same => n,Hangup()
+"""
+
+            node_contexts.append(f"""
+[{ctx_name}]
+exten => s,1,NoOp(Старт IVR узла {n_id} ({trunk_title}))
+ same => n,Answer()
  same => n,Wait(0.5)
- {play_line}
+ same => n,Set(CALL_SRC=${{CALLERID(num)}})
+ same => n,Set(__CALL_DIRECTION=inbound)
+ same => n,{play_line}
  same => n,WaitExten({t_sec})
 
-{branches_block}
+{chr(10).join(branch_lines)}
+
 {timeout_lines}
-exten => i,1,Goto({ctx_name},t,1)
 
-"""
-            node_contexts.append(ctx_body)
+exten => i,1,NoOp({trunk_title} IVR {n_id}: Неверный ввод клавиши)
+ same => n,Playback(invalid)
+ same => n,Goto(s,4)
 
-        dongle_entry = f"""[dongle-incoming]
-exten => _X.,1,NoOp(Входящий GSM вызов от ${{CALLERID(num)}} -> IVR)
-{offhours_goto}
+{direct_dial_lines}
+""")
 
-exten => _+.,1,NoOp(Входящий GSM вызов (+) от ${{CALLERID(num)}} -> IVR)
-{offhours_goto}
+        return entry_section + "\n\n" + "\n\n".join(node_contexts)
 
-exten => +79000000000,1,NoOp(Входящий GSM вызов +79000000000 -> IVR)
-{offhours_goto}
+    # 1. Compile GSM Dongles incoming (dongle-incoming)
+    gsm_tree = ivr_trees.get('gsm_pool') or ivr_trees.get('default') or default_ivr_tree
+    all_ivr_contexts.append(compile_tree_to_contexts(gsm_tree, 'dongle-incoming', 'GSM Dongle Gateway'))
 
-exten => s,1,NoOp(Входящий GSM вызов s-exten -> IVR)
-{offhours_goto}
+    # 2. Compile each SIP Trunk incoming route (trunk-in-<trunk_id>)
+    for t in sip_trunks:
+        t_id = t['id']
+        t_name = t.get('name', t_id)
+        trunk_tree = ivr_trees.get(t_id) or ivr_trees.get('default') or default_ivr_tree
+        all_ivr_contexts.append(compile_tree_to_contexts(trunk_tree, f"trunk-in-{t_id}", f"SIP Trunk {t_name}"))
 
-exten => _.,1,NoOp(Входящий GSM вызов (catch-all) от ${{CALLERID(num)}} -> IVR)
-{offhours_goto}
-
-{offhours_ctx}
-"""
-        ivr_sections = dongle_entry + '\n\n' + '\n\n'.join(node_contexts)
+    ivr_sections = "\n\n".join(all_ivr_contexts)
 
     dialplan = f"""[general]
 static=yes
