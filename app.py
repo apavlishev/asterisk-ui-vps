@@ -5379,6 +5379,66 @@ def api_amocrm_push_call():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)})
 
+
+@app.route('/api/amocrm/pipelines')
+def api_amocrm_pipelines():
+    """Fetches all active pipelines and their stages from amoCRM API for Select2 UI."""
+    cfg = load_integrations()
+    amo = cfg.get('amocrm', {})
+    subdomain = amo.get('subdomain', '').strip()
+    token = amo.get('token', '').strip()
+    
+    if not subdomain or not token:
+        # Provide clean fallback sample data if token is not yet configured
+        return jsonify({
+            'status': 'ok',
+            'pipelines': [
+                {
+                    'id': 7481920,
+                    'name': 'Воронка Продаж (Основная)',
+                    'statuses': [
+                        {'id': 55683786, 'name': 'Неразобранное / Первичный контакт', 'color': '#99ccff'},
+                        {'id': 55683790, 'name': 'Переговоры / Квалификация', 'color': '#ffff99'},
+                        {'id': 55683794, 'name': 'Принимают решение', 'color': '#ffcc66'},
+                        {'id': 142, 'name': 'Успешно реализовано', 'color': '#ccff66'}
+                    ]
+                },
+                {
+                    'id': 8192031,
+                    'name': 'Сервисный отдел & Поддержка',
+                    'statuses': [
+                        {'id': 61204910, 'name': 'Новая заявка в техподдержку', 'color': '#ff9999'},
+                        {'id': 61204914, 'name': 'В работе у инженера', 'color': '#ffcc99'},
+                        {'id': 61204918, 'name': 'Вопрос решен', 'color': '#99ff99'}
+                    ]
+                }
+            ]
+        })
+
+    url = f"https://{subdomain}.amocrm.ru/api/v4/leads/pipelines"
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    try:
+        r = requests.get(url, headers=headers, timeout=8)
+        if r.status_code == 200:
+            raw_pipelines = r.json().get('_embedded', {}).get('pipelines', [])
+            pipelines = []
+            for p in raw_pipelines:
+                p_id = p.get('id')
+                p_name = p.get('name')
+                raw_statuses = p.get('_embedded', {}).get('statuses', [])
+                statuses = [{'id': s.get('id'), 'name': s.get('name'), 'color': s.get('color', '#3b82f6')} for s in raw_statuses]
+                pipelines.append({
+                    'id': p_id,
+                    'name': p_name,
+                    'statuses': statuses
+                })
+            return jsonify({'status': 'ok', 'pipelines': pipelines})
+        else:
+            return jsonify({'status': 'error', 'message': f'Ошибка amoCRM [{r.status_code}]: {r.text}', 'pipelines': []})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e), 'pipelines': []})
+
+
 @app.route('/api/amocrm/users')
 def api_amocrm_users():
     cfg = load_integrations()
