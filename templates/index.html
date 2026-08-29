@@ -4107,10 +4107,6 @@
     </div>
 
 <script>
-        // ================= AMOCRM PIPELINES & STATUSES SELECT2 ENGINE =================
-        let loadedAmoPipelines = [];
-
-        async 
         // ================= DYNAMIC AMOCRM ROUTING SECTIONS TOGGLER =================
         function toggleAmoRoutingView(mode) {
             const secChannels = document.getElementById('amo-section-channels');
@@ -4134,7 +4130,9 @@
             }
         }
 
-        function loadAmoPipelinesAndPopulate() {
+        let loadedAmoPipelines = [];
+
+        async function loadAmoPipelinesAndPopulate() {
             try {
                 const res = await fetch('/api/amocrm/pipelines');
                 const data = await res.json();
