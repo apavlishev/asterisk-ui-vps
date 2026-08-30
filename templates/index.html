@@ -4647,6 +4647,7 @@
         let isLogStreamActive = true;
         let activeLogType = 'all';
         let activeLogLevel = 'all';
+        let renderRequested = false;
 
         function initLogsStream() {
             if (logStreamSource) {
@@ -4662,11 +4663,11 @@
                         const data = JSON.parse(e.data);
                         if (data.type === 'init' && Array.isArray(data.logs)) {
                             logEvents = data.logs;
-                            renderLogsTerminal();
+                            requestRenderTerminal();
                         } else if (data.type === 'batch' && Array.isArray(data.logs)) {
                             data.logs.forEach(l => logEvents.push(l));
-                            if (logEvents.length > 500) logEvents = logEvents.slice(-500);
-                            renderLogsTerminal();
+                            if (logEvents.length > 200) logEvents = logEvents.slice(-200);
+                            requestRenderTerminal();
                         }
                     } catch (err) {}
                 };
@@ -4682,11 +4683,11 @@
         async function fetchHistoricalLogs() {
             try {
                 const search = document.getElementById('log-search-input')?.value || '';
-                const res = await fetch(`/api/logs/query?level=${activeLogLevel}&type=${activeLogType}&search=${encodeURIComponent(search)}&limit=150`);
+                const res = await fetch(`/api/logs/query?level=${activeLogLevel}&type=${activeLogType}&search=${encodeURIComponent(search)}&limit=80`);
                 const data = await res.json();
                 if (data.status === 'ok' && Array.isArray(data.logs)) {
                     logEvents = data.logs;
-                    renderLogsTerminal();
+                    requestRenderTerminal();
                 }
             } catch (err) {
                 console.error("Error fetching historical logs:", err);
@@ -4710,7 +4711,7 @@
 
         function clearLiveLogsTerminal() {
             logEvents = [];
-            renderLogsTerminal();
+            requestRenderTerminal();
         }
 
         function setLogTypeFilter(type, btn) {
@@ -4719,7 +4720,7 @@
                 b.className = 'log-type-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-container text-on-surface hover:bg-surface-container-high transition-all flex items-center gap-1';
             });
             btn.className = 'log-type-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-on-primary transition-all flex items-center gap-1 shadow-sm';
-            applyLogsFiltering();
+            requestRenderTerminal();
         }
 
         function setLogLevelFilter(level, btn) {
@@ -4728,11 +4729,20 @@
                 b.classList.remove('ring-2', 'ring-primary', 'shadow-sm', 'font-black');
             });
             btn.classList.add('ring-2', 'ring-primary', 'shadow-sm', 'font-black');
-            applyLogsFiltering();
+            requestRenderTerminal();
         }
 
         function applyLogsFiltering() {
-            renderLogsTerminal();
+            requestRenderTerminal();
+        }
+
+        function requestRenderTerminal() {
+            if (renderRequested) return;
+            renderRequested = true;
+            requestAnimationFrame(() => {
+                renderLogsTerminal();
+                renderRequested = false;
+            });
         }
 
         function renderLogsTerminal() {
@@ -4758,7 +4768,6 @@
 
             let html = '';
             filtered.forEach(l => {
-                // Level color badges
                 let lvlColor = 'text-blue-400 bg-blue-950/60 border-blue-800';
                 let lvlText = 'INFO';
                 if (l.level === 'error') {
@@ -4772,7 +4781,6 @@
                     lvlText = 'DEBUG';
                 }
 
-                // Type badge
                 let typeColor = 'text-slate-300';
                 let typeIcon = 'terminal';
                 if (l.type === 'modems') { typeColor = 'text-amber-400'; typeIcon = 'cell_tower'; }
@@ -4795,7 +4803,6 @@
 
             viewport.innerHTML = html;
 
-            // Auto-scroll
             if (document.getElementById('chk-autoscroll')?.checked) {
                 viewport.scrollTop = viewport.scrollHeight;
             }
