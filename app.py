@@ -5385,6 +5385,71 @@ def api_amocrm_push_call():
         return jsonify({'status': 'error', 'message': str(e)})
 
 
+
+# ================= MODULAR PLUGINS TEST & DIAGNOSTICS ENDPOINTS =================
+@app.route('/api/plugins/test/yandex', methods=['POST'])
+def api_test_yandex_disk():
+    cfg = load_integrations()
+    token = request.json.get('token') if request.is_json else request.form.get('token')
+    if not token:
+        token = cfg.get('yandex_disk', {}).get('token', '')
+    
+    from plugins.plugin_yandex_disk.uploader import test_yandex_disk_connection
+    success, msg, logs = test_yandex_disk_connection(token)
+    return jsonify({'status': 'ok' if success else 'error', 'message': msg, 'logs': logs})
+
+@app.route('/api/plugins/test/gdrive', methods=['POST'])
+def api_test_gdrive():
+    cfg = load_integrations()
+    token = request.json.get('token') if request.is_json else request.form.get('token')
+    folder_id = request.json.get('folder_id') if request.is_json else request.form.get('folder_id')
+    if not token:
+        token = cfg.get('gdrive', {}).get('token', '')
+    if folder_id is None:
+        folder_id = cfg.get('gdrive', {}).get('folder_id', '')
+
+    from plugins.plugin_gdrive.uploader import test_gdrive_connection
+    success, msg, logs = test_gdrive_connection(token, folder_id)
+    return jsonify({'status': 'ok' if success else 'error', 'message': msg, 'logs': logs})
+
+@app.route('/api/plugins/test/ftp', methods=['POST'])
+def api_test_ftp():
+    cfg = load_integrations()
+    ftp_cfg = cfg.get('ftp_storage', {})
+    host = request.form.get('host') or ftp_cfg.get('host', '')
+    port = request.form.get('port') or ftp_cfg.get('port', 21)
+    user = request.form.get('user') or ftp_cfg.get('user', '')
+    password = request.form.get('password') or ftp_cfg.get('password', '')
+    remote_dir = request.form.get('remote_dir') or ftp_cfg.get('remote_dir', '/records')
+    public_url = request.form.get('public_base_url') or ftp_cfg.get('public_base_url', '')
+
+    from plugins.plugin_ftp_storage.uploader import test_ftp_connection
+    success, msg, logs = test_ftp_connection(host, port, user, password, remote_dir, public_url)
+    return jsonify({'status': 'ok' if success else 'error', 'message': msg, 'logs': logs})
+
+@app.route('/api/plugins/test/amocrm', methods=['POST'])
+def api_test_amocrm():
+    cfg = load_integrations()
+    amo = cfg.get('amocrm', {})
+    subdomain = request.form.get('subdomain') or amo.get('subdomain', '')
+    token = request.form.get('token') or amo.get('token', '')
+
+    from plugins.plugin_amocrm.sync_engine import test_amocrm_connection
+    success, msg, logs = test_amocrm_connection(subdomain, token)
+    return jsonify({'status': 'ok' if success else 'error', 'message': msg, 'logs': logs})
+
+@app.route('/api/plugins/test/telegram', methods=['POST'])
+def api_test_telegram():
+    cfg = load_integrations()
+    tg = cfg.get('telegram', {})
+    bot_token = request.form.get('token') or tg.get('token', '')
+    chat_id = request.form.get('chat_id') or tg.get('chat_id', '')
+
+    from plugins.plugin_telegram.notifier import test_telegram_connection
+    success, msg, logs = test_telegram_connection(bot_token, chat_id)
+    return jsonify({'status': 'ok' if success else 'error', 'message': msg, 'logs': logs})
+
+
 @app.route('/api/amocrm/pipelines')
 def api_amocrm_pipelines():
     """Fetches all active pipelines and their stages from amoCRM API for Select2 UI."""

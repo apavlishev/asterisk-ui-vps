@@ -5,6 +5,33 @@ import time
 import glob
 import re
 import requests
+
+# Add plugins path to sys.path
+PLUGINS_PATH = os.path.join(os.path.dirname(__file__), 'plugins')
+if PLUGINS_PATH not in sys.path:
+    sys.path.insert(0, PLUGINS_PATH)
+
+try:
+    from plugin_yandex_disk.uploader import upload_call_record_to_yandex
+except Exception:
+    upload_call_record_to_yandex = None
+
+try:
+    from plugin_gdrive.uploader import upload_call_record_to_gdrive
+except Exception:
+    upload_call_record_to_gdrive = None
+
+try:
+    from plugin_ftp_storage.uploader import upload_call_record_to_ftp
+except Exception:
+    upload_call_record_to_ftp = None
+
+try:
+    from plugin_amocrm.sync_engine import upload_audio_to_amocrm_drive, normalize_e164_phone
+except Exception:
+    upload_audio_to_amocrm_drive = None
+    normalize_e164_phone = None
+
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 import datetime
