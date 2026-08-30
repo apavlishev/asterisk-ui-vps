@@ -2363,23 +2363,98 @@
                     </div>
 
                     {% elif p.id == 'telegram_alerts' %}
-                    <form action="/settings/telegram" method="POST" class="space-y-4 max-w-xl">
-                        <div>
-                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Bot Token</label>
-                            <input type="password" name="token" value="{{ integrations.get('telegram', {}).get('token', '') }}" placeholder="123456:ABC-DEF..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                    <div class="space-y-6 max-w-2xl">
+                        <!-- BANNER & CAPABILITIES -->
+                        <div class="p-6 rounded-2xl bg-surface border border-sky-500/40 shadow-sm flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-500 flex items-center justify-center font-bold text-2xl shrink-0">
+                                <span class="material-symbols-outlined text-3xl">send</span>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <h4 class="text-base font-bold text-on-surface">Telegram Smart Alerts & SOCKS5 Proxy Hub</h4>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-success/10 text-success font-bold">Active Shield</span>
+                                </div>
+                                <p class="text-xs text-on-surface-variant leading-relaxed">
+                                    Моментальное оповещение руководства и дежурных операторов о событиях телефонии, пропущенных лидах, взломах и системных инцидентах прямо в Telegram-чаты.
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Chat ID (через запятую)</label>
-                            <input type="text" name="chat_id" value="{{ integrations.get('telegram', {}).get('chat_id', '') }}" placeholder="12345678, -100987654" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+
+                        <!-- DETAILED FEATURE CARDS (WHAT IT CAN DO) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1">
+                                <div class="font-bold text-on-surface flex items-center gap-1.5 text-sky-500">
+                                    <span class="material-symbols-outlined text-[16px]">call_missed</span>
+                                    <span>Уведомления о пропущенных звонках</span>
+                                </div>
+                                <p class="text-on-surface-variant leading-relaxed text-[11px]">
+                                    Мгновенная карточка в чат с номером клиента, временем звонка и линией/модемом, на которую звонили, чтобы не терять горячие лиды.
+                                </p>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1">
+                                <div class="font-bold text-on-surface flex items-center gap-1.5 text-error">
+                                    <span class="material-symbols-outlined text-[16px]">shield</span>
+                                    <span>Алерты Антифрода и Банов (Fail2ban)</span>
+                                </div>
+                                <p class="text-on-surface-variant leading-relaxed text-[11px]">
+                                    Оповещение с IP-адресом атакующего бота при попытках сетевого брутфорса и автоматической блокировке в iptables.
+                                </p>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1">
+                                <div class="font-bold text-on-surface flex items-center gap-1.5 text-amber-500">
+                                    <span class="material-symbols-outlined text-[16px]">signal_cellular_alt</span>
+                                    <span>Контроль GSM-модемов и баланса</span>
+                                </div>
+                                <p class="text-on-surface-variant leading-relaxed text-[11px]">
+                                    Сигнал тревоги при падении уровня сети (CSQ < 10) или отключении физического USB-донгла от сервера.
+                                </p>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1">
+                                <div class="font-bold text-on-surface flex items-center gap-1.5 text-emerald-500">
+                                    <span class="material-symbols-outlined text-[16px]">vpn_lock</span>
+                                    <span>Встроенный Proxy / Обход блокировок</span>
+                                </div>
+                                <p class="text-on-surface-variant leading-relaxed text-[11px]">
+                                    Прямая доставка сообщений через защищенные HTTPS / MTProto каналы без риска замедления API Telegram.
+                                </p>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2 pt-1">
-                            <input type="checkbox" name="enabled" id="tg_tab_enabled" class="w-4 h-4 rounded text-warning" {% if integrations.get('telegram', {}).get('enabled') %}checked{% endif %}>
-                            <label for="tg_tab_enabled" class="text-xs text-on-surface font-medium cursor-pointer">Включить Telegram рассылку</label>
+
+                        <!-- QUICK SETUP GUIDE -->
+                        <div class="p-4 rounded-xl bg-sky-500/10 border border-sky-500/20 text-xs space-y-2">
+                            <div class="font-bold text-sky-500 flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">menu_book</span>
+                                <span>Как настроить бота и получить Chat ID:</span>
+                            </div>
+                            <ol class="list-decimal list-inside space-y-1 text-on-surface-variant leading-relaxed">
+                                <li>Откройте бота <b>@BotFather</b> в Telegram и отправьте команду <code>/newbot</code>, чтобы получить <b>Bot Token</b>.</li>
+                                <li>Создайте группу для алертов (или напишите боту в ЛС) и добавьте бота в чат.</li>
+                                <li>Чтобы узнать ID группы/пользователя, перешлите любое сообщение в бота <b>@userinfobot</b> или <b>@getmyid_bot</b> (ID групп начинаются с минуса, например: <code>-100123456789</code>).</li>
+                            </ol>
                         </div>
-                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-warning text-on-primary text-xs font-semibold hover:bg-warning/90 transition-all shadow-sm">
-                            Сохранить Telegram
-                        </button>
-                    </form>
+
+                        <!-- SETTINGS FORM -->
+                        <form action="/settings/telegram" method="POST" class="bg-surface p-6 rounded-2xl border border-outline/30 shadow-sm space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Bot Token (@BotFather)</label>
+                                <input type="password" name="token" value="{{ integrations.get('telegram', {}).get('token', '') }}" placeholder="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Chat ID получателей (через запятую для нескольких чатов)</label>
+                                <input type="text" name="chat_id" value="{{ integrations.get('telegram', {}).get('chat_id', '') }}" placeholder="-1001234567890, 987654321" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs font-mono">
+                            </div>
+                            <div class="flex items-center gap-2 pt-1 border-t border-surface-container">
+                                <input type="checkbox" name="enabled" id="tg_tab_enabled" class="w-4 h-4 rounded text-sky-500" {% if integrations.get('telegram', {}).get('enabled') %}checked{% endif %}>
+                                <label for="tg_tab_enabled" class="text-xs text-on-surface font-bold cursor-pointer">Включить автоматическую рассылку Telegram алертов</label>
+                            </div>
+                            <button type="submit" class="px-6 py-2.5 rounded-xl bg-sky-500 text-white text-xs font-semibold hover:bg-sky-600 transition-all shadow-sm">
+                                Сохранить настройки Telegram
+                            </button>
+                        </form>
+                    </div>
                     {% elif p.id == 'ftp_storage' %}
                     <form action="/settings/ftp" method="POST" class="space-y-4 max-w-xl">
                         <div>
