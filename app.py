@@ -5815,23 +5815,13 @@ def api_logs_query():
 
     all_logs = []
     
-    # Read Asterisk messages log
-    if os.path.exists('/var/log/asterisk/messages'):
-        try:
-            res = subprocess.run(['tail', '-n', str(limit * 2), '/var/log/asterisk/messages'], capture_output=True, text=True, errors='ignore')
-            for line in res.stdout.splitlines():
-                parsed = parse_log_line(line, 'system')
-                if parsed: all_logs.append(parsed)
-        except Exception:
-            pass
-
-    # Read Module & amoCRM logs
-    for log_f in ['/opt/amocrm_debug.log', '/opt/crm-yandex-uploader.log']:
+    # Read from full and messages logs
+    for log_f, def_t in [('/var/log/asterisk/full', 'trunks'), ('/var/log/asterisk/messages', 'trunks'), ('/opt/amocrm_debug.log', 'amocrm'), ('/opt/crm-yandex-uploader.log', 'plugins'), ('/var/log/fail2ban.log', 'plugins')]:
         if os.path.exists(log_f):
             try:
-                res = subprocess.run(['tail', '-n', '100', log_f], capture_output=True, text=True, errors='ignore')
+                res = subprocess.run(['tail', '-n', str(limit), log_f], capture_output=True, text=True, errors='ignore')
                 for line in res.stdout.splitlines():
-                    parsed = parse_log_line(line, 'amocrm')
+                    parsed = parse_log_line(line, def_t)
                     if parsed: all_logs.append(parsed)
             except Exception:
                 pass
