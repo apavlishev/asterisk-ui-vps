@@ -89,6 +89,32 @@ def get_google_drive_account_info(token):
 
 
 
+
+def get_amocrm_account_info():
+    cfg = load_integrations()
+    amo = cfg.get('amocrm', {})
+    subdomain = amo.get('subdomain', '').strip()
+    token = amo.get('token', '').strip()
+    if not subdomain or not token:
+        return {'valid': False}
+    try:
+        headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+        r = requests.get(f"https://{subdomain}.amocrm.ru/api/v4/account", headers=headers, timeout=4)
+        if r.status_code == 200:
+            data = r.json()
+            return {
+                'valid': True,
+                'id': data.get('id'),
+                'name': data.get('name', subdomain),
+                'subdomain': data.get('subdomain', subdomain),
+                'country': data.get('country', 'RU'),
+                'currency': data.get('currency_symbol', '₽')
+            }
+    except Exception:
+        pass
+    return {'valid': False}
+
+
 def get_system_modems_info(force_test=None):
     """Scans for real physical USB/GSM dongles. If test mode is checked, supplies virtual test modems."""
     cfg = load_integrations()
@@ -4951,7 +4977,8 @@ def index():
         current_version=get_current_version(),
         get_system_network_info=get_system_network_info,
         installed_plugins=plugin_manager.get_installed_plugins(),
-        modems_list=get_system_modems_info()
+        modems_list=get_system_modems_info(),
+        amocrm_account=get_amocrm_account_info()
     )
 
 
