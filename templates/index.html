@@ -237,6 +237,12 @@
                     <span class="material-symbols-outlined mr-3.5 text-primary text-[22px]">history</span>
                     <span class="text-xs font-semibold sidebar-text">Журнал вызовов</span>
                 </button>
+
+                <button onclick="switchTab('logs')" id="nav-logs" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="Логи в реальном времени">
+                    <span class="material-symbols-outlined mr-3.5 text-secondary text-[22px]">terminal</span>
+                    <span class="text-xs font-semibold sidebar-text">Логирование Live</span>
+                    <span class="ml-auto w-2 h-2 rounded-full bg-emerald-500 animate-pulse sidebar-badge" title="Live stream active"></span>
+                </button>
             </div>
 
             <!-- GROUP 2: ТЕЛЕФОНИЯ & МАРШРУТИЗАЦИЯ -->
@@ -519,6 +525,117 @@
             </div>
 
             <!-- // ================= TAB 2: ACCOUNTS / USERS // ================= -->
+            
+            <!-- // ================= TAB: LIVE LOGS & EVENT STREAM // ================= -->
+            <div id="tab-logs" class="tab-pane space-y-6">
+                <!-- HEADER & STATUS -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <div class="flex items-center gap-2.5">
+                            <h1 class="text-2xl font-bold text-on-surface">Логи в реальном времени</h1>
+                            <span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 font-bold border border-emerald-500/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Live Stream</span>
+                            </span>
+                        </div>
+                        <p class="text-on-surface-variant text-sm mt-0.5">Потоковая телеметрия ядра Asterisk, GSM-модемов, SIP-транков, аудиозаписи и модулей расширений.</p>
+                    </div>
+
+                    <!-- STREAM CONTROLS -->
+                    <div class="flex items-center gap-2">
+                        <button type="button" id="btn-toggle-log-stream" onclick="toggleLogStreaming()" class="px-4 py-2 rounded-xl bg-surface hover:bg-surface-container-high border border-outline/40 text-xs font-semibold text-on-surface flex items-center gap-1.5 transition-all shadow-sm">
+                            <span class="material-symbols-outlined text-[16px] text-amber-500" id="icon-stream-toggle">pause</span>
+                            <span id="text-stream-toggle">Пауза потока</span>
+                        </button>
+                        <button type="button" onclick="clearLiveLogsTerminal()" class="px-4 py-2 rounded-xl bg-surface hover:bg-surface-container-high border border-outline/40 text-xs font-semibold text-on-surface flex items-center gap-1.5 transition-all shadow-sm">
+                            <span class="material-symbols-outlined text-[16px] text-on-surface-variant">delete_sweep</span>
+                            <span>Очистить экран</span>
+                        </button>
+                        <button type="button" onclick="fetchHistoricalLogs()" class="px-4 py-2 rounded-xl bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 flex items-center gap-1.5 transition-all shadow-sm">
+                            <span class="material-symbols-outlined text-[16px]">refresh</span>
+                            <span>Обновить</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FILTERS & CATEGORIES TOOLBAR -->
+                <div class="p-4 rounded-2xl bg-surface border border-outline/30 shadow-sm space-y-3">
+                    
+                    <!-- ROW 1: TYPE / CATEGORY TABS -->
+                    <div class="flex flex-wrap items-center gap-2 border-b border-surface-container pb-3">
+                        <span class="text-xs font-bold text-on-surface-variant mr-1 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[16px]">filter_alt</span>
+                            Источник:
+                        </span>
+                        <button type="button" onclick="setLogTypeFilter('all', this)" class="log-type-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-on-primary transition-all">Все источники</button>
+                        <button type="button" onclick="setLogTypeFilter('modems', this)" class="log-type-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-container text-on-surface hover:bg-surface-container-high transition-all flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px] text-amber-500">cell_tower</span>
+                            <span>GSM Модемы</span>
+                        </button>
+                        <button type="button" onclick="setLogTypeFilter('trunks', this)" class="log-type-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-container text-on-surface hover:bg-surface-container-high transition-all flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px] text-blue-500">settings_ethernet</span>
+                            <span>SIP Транки & Вызовы</span>
+                        </button>
+                        <button type="button" onclick="setLogTypeFilter('recording', this)" class="log-type-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-container text-on-surface hover:bg-surface-container-high transition-all flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px] text-purple-500">mic</span>
+                            <span>Запись разговоров</span>
+                        </button>
+                        <button type="button" onclick="setLogTypeFilter('amocrm', this)" class="log-type-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-container text-on-surface hover:bg-surface-container-high transition-all flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px] text-cyan-500">sync_alt</span>
+                            <span>amoCRM & Сделки</span>
+                        </button>
+                        <button type="button" onclick="setLogTypeFilter('plugins', this)" class="log-type-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-container text-on-surface hover:bg-surface-container-high transition-all flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px] text-emerald-500">extension</span>
+                            <span>Модули (Диски & Чанки)</span>
+                        </button>
+                    </div>
+
+                    <!-- ROW 2: SEVERITY LEVEL & SEARCH INPUT -->
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-1">
+                        <!-- SEVERITY PILLS -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-on-surface-variant mr-1">Важность:</span>
+                            <button type="button" onclick="setLogLevelFilter('all', this)" class="log-lvl-btn px-2.5 py-1 rounded-md text-[11px] font-bold bg-surface-container-highest text-on-surface transition-all">ALL</button>
+                            <button type="button" onclick="setLogLevelFilter('info', this)" class="log-lvl-btn px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-all">INFO</button>
+                            <button type="button" onclick="setLogLevelFilter('warning', this)" class="log-lvl-btn px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 transition-all">WARNING</button>
+                            <button type="button" onclick="setLogLevelFilter('error', this)" class="log-lvl-btn px-2.5 py-1 rounded-md text-[11px] font-bold bg-error/10 text-error hover:bg-error/20 transition-all">ERROR</button>
+                            <button type="button" onclick="setLogLevelFilter('debug', this)" class="log-lvl-btn px-2.5 py-1 rounded-md text-[11px] font-bold bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all">DEBUG</button>
+                        </div>
+
+                        <!-- LIVE SEARCH -->
+                        <div class="w-full sm:w-72 relative">
+                            <span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-base">search</span>
+                            <input type="text" id="log-search-input" oninput="applyLogsFiltering()" placeholder="Поиск по тексту лога..." class="w-full pl-9 pr-3 py-1.5 rounded-xl bg-surface-container-low border border-outline/40 text-xs font-mono">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LIVE TERMINAL CONSOLE -->
+                <div class="rounded-2xl bg-[#0f172a] border border-slate-800 shadow-2xl overflow-hidden font-mono text-xs">
+                    <!-- TERMINAL BAR -->
+                    <div class="px-4 py-2.5 bg-[#1e293b] border-b border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                            <span class="text-[11px] text-slate-400 font-bold ml-2">asterisk-core-telemetry@vps:/var/log/messages</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-[11px] text-slate-400">
+                            <span id="log-counter-badge" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-bold">0 строк</span>
+                            <label class="flex items-center gap-1 cursor-pointer select-none text-[11px] hover:text-white">
+                                <input type="checkbox" id="chk-autoscroll" checked class="rounded border-slate-700 bg-slate-900 text-primary">
+                                <span>Автоскролл</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- TERMINAL OUTPUT STREAM CONTAINER -->
+                    <div id="logs-terminal-viewport" class="p-4 space-y-1.5 h-[560px] overflow-y-auto font-mono text-[12px] leading-relaxed select-text">
+                        <div class="text-slate-500 italic py-2 text-center">Инициализация потока телеметрии Asterisk Live Logs...</div>
+                    </div>
+                </div>
+            </div>
+
             <div id="tab-accounts" class="tab-pane space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -4222,9 +4339,175 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadAmoPipelinesAndPopulate();
+            initLogsStream();
             const curMode = document.getElementById('amo-routing-mode');
             if (curMode) toggleAmoRoutingView(curMode.value);
         });
+</script>
+<script>
+        // ================= REAL-TIME LOGS STREAM & FILTERING ENGINE =================
+        let logEvents = [];
+        let logStreamSource = null;
+        let isLogStreamActive = true;
+        let activeLogType = 'all';
+        let activeLogLevel = 'all';
+
+        function initLogsStream() {
+            if (logStreamSource) {
+                logStreamSource.close();
+            }
+
+            try {
+                logStreamSource = new EventSource('/api/logs/stream');
+                
+                logStreamSource.onmessage = function(e) {
+                    if (!isLogStreamActive) return;
+                    try {
+                        const data = JSON.parse(e.data);
+                        if (data.type === 'init' && Array.isArray(data.logs)) {
+                            logEvents = data.logs;
+                            renderLogsTerminal();
+                        } else if (data.type === 'batch' && Array.isArray(data.logs)) {
+                            data.logs.forEach(l => logEvents.push(l));
+                            if (logEvents.length > 500) logEvents = logEvents.slice(-500);
+                            renderLogsTerminal();
+                        }
+                    } catch (err) {}
+                };
+
+                logStreamSource.onerror = function() {
+                    console.log("Log stream reconnecting...");
+                };
+            } catch (err) {
+                console.error("SSE Logs init error:", err);
+            }
+        }
+
+        async function fetchHistoricalLogs() {
+            try {
+                const search = document.getElementById('log-search-input')?.value || '';
+                const res = await fetch(`/api/logs/query?level=${activeLogLevel}&type=${activeLogType}&search=${encodeURIComponent(search)}&limit=150`);
+                const data = await res.json();
+                if (data.status === 'ok' && Array.isArray(data.logs)) {
+                    logEvents = data.logs;
+                    renderLogsTerminal();
+                }
+            } catch (err) {
+                console.error("Error fetching historical logs:", err);
+            }
+        }
+
+        function toggleLogStreaming() {
+            isLogStreamActive = !isLogStreamActive;
+            const btnText = document.getElementById('text-stream-toggle');
+            const btnIcon = document.getElementById('icon-stream-toggle');
+            if (isLogStreamActive) {
+                btnText.textContent = 'Пауза потока';
+                btnIcon.textContent = 'pause';
+                btnIcon.className = 'material-symbols-outlined text-[16px] text-amber-500';
+            } else {
+                btnText.textContent = 'Возобновить поток';
+                btnIcon.textContent = 'play_arrow';
+                btnIcon.className = 'material-symbols-outlined text-[16px] text-emerald-500';
+            }
+        }
+
+        function clearLiveLogsTerminal() {
+            logEvents = [];
+            renderLogsTerminal();
+        }
+
+        function setLogTypeFilter(type, btn) {
+            activeLogType = type;
+            document.querySelectorAll('.log-type-btn').forEach(b => {
+                b.className = 'log-type-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-container text-on-surface hover:bg-surface-container-high transition-all flex items-center gap-1';
+            });
+            btn.className = 'log-type-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-on-primary transition-all flex items-center gap-1 shadow-sm';
+            applyLogsFiltering();
+        }
+
+        function setLogLevelFilter(level, btn) {
+            activeLogLevel = level;
+            document.querySelectorAll('.log-lvl-btn').forEach(b => {
+                b.classList.remove('ring-2', 'ring-primary', 'shadow-sm', 'font-black');
+            });
+            btn.classList.add('ring-2', 'ring-primary', 'shadow-sm', 'font-black');
+            applyLogsFiltering();
+        }
+
+        function applyLogsFiltering() {
+            renderLogsTerminal();
+        }
+
+        function renderLogsTerminal() {
+            const viewport = document.getElementById('logs-terminal-viewport');
+            const counter = document.getElementById('log-counter-badge');
+            if (!viewport) return;
+
+            const search = (document.getElementById('log-search-input')?.value || '').toLowerCase();
+
+            const filtered = logEvents.filter(l => {
+                if (activeLogLevel !== 'all' && l.level !== activeLogLevel) return false;
+                if (activeLogType !== 'all' && l.type !== activeLogType) return false;
+                if (search && !l.message.toLowerCase().includes(search)) return false;
+                return true;
+            });
+
+            if (counter) counter.textContent = `${filtered.length} строк`;
+
+            if (filtered.length === 0) {
+                viewport.innerHTML = '<div class="text-slate-500 italic py-8 text-center">Нет записей лога по заданным фильтрам.</div>';
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(l => {
+                // Level color badges
+                let lvlColor = 'text-blue-400 bg-blue-950/60 border-blue-800';
+                let lvlText = 'INFO';
+                if (l.level === 'error') {
+                    lvlColor = 'text-rose-400 bg-rose-950/60 border-rose-800 font-bold';
+                    lvlText = 'ERROR';
+                } else if (l.level === 'warning') {
+                    lvlColor = 'text-amber-400 bg-amber-950/60 border-amber-800 font-bold';
+                    lvlText = 'WARN';
+                } else if (l.level === 'debug') {
+                    lvlColor = 'text-slate-400 bg-slate-900 border-slate-700';
+                    lvlText = 'DEBUG';
+                }
+
+                // Type badge
+                let typeColor = 'text-slate-300';
+                let typeIcon = 'terminal';
+                if (l.type === 'modems') { typeColor = 'text-amber-400'; typeIcon = 'cell_tower'; }
+                else if (l.type === 'trunks') { typeColor = 'text-sky-400'; typeIcon = 'settings_ethernet'; }
+                else if (l.type === 'recording') { typeColor = 'text-purple-400'; typeIcon = 'mic'; }
+                else if (l.type === 'amocrm') { typeColor = 'text-cyan-400'; typeIcon = 'sync_alt'; }
+                else if (l.type === 'plugins') { typeColor = 'text-emerald-400'; typeIcon = 'extension'; }
+
+                html += `
+                <div class="hover:bg-slate-900/80 px-2 py-1 rounded transition-colors flex items-start gap-2.5 font-mono text-[11.5px] border-b border-slate-900/40">
+                    <span class="text-slate-500 shrink-0 select-none">${l.timestamp}</span>
+                    <span class="px-1.5 py-0.2 rounded border text-[10px] ${lvlColor} shrink-0 uppercase">${lvlText}</span>
+                    <span class="px-1.5 py-0.2 rounded bg-slate-800/80 text-[10px] ${typeColor} shrink-0 uppercase font-bold flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-[11px]">${typeIcon}</span>
+                        <span>${l.type}</span>
+                    </span>
+                    <span class="text-slate-200 break-all leading-snug flex-1">${escapeHtml(l.message)}</span>
+                </div>`;
+            });
+
+            viewport.innerHTML = html;
+
+            // Auto-scroll
+            if (document.getElementById('chk-autoscroll')?.checked) {
+                viewport.scrollTop = viewport.scrollHeight;
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
 </script>
 </body>
 </html>

@@ -5387,6 +5387,159 @@ def api_amocrm_push_call():
 
 
 # ================= MODULAR PLUGINS TEST & DIAGNOSTICS ENDPOINTS =================
+
+# ================= REAL-TIME SYSTEM & TELEPHONY LOGS STREAM ENGINE =================
+LOG_FILES_MAP = {
+    'system': '/var/log/asterisk/messages',
+    'amocrm': '/opt/amocrm_debug.log',
+    'uploader': '/opt/crm-yandex-uploader.log',
+    'modems': '/var/log/asterisk/messages',
+    'recording': '/var/log/asterisk/messages'
+}
+
+def parse_log_line(raw_line, default_type='system'):
+    raw_line = raw_line.strip()
+    if not raw_line: return None
+
+    # Detect level
+    level = 'info'
+    upper = raw_line.upper()
+    if 'ERROR' in upper or 'FAIL' in upper or 'EXCEPTION' in upper or 'CRITICAL' in upper:
+        level = 'error'
+    elif 'WARN' in upper or 'NOTICE' in upper or 'WARNING' in upper:
+        level = 'warning'
+    elif 'DEBUG' in upper or 'TRACE' in upper:
+        level = 'debug'
+    else:
+        level = 'info'
+
+    # Detect category / type
+    log_type = default_type
+    if 'DONGLE' in upper or 'MODEM' in upper or 'TTY' in upper or 'CSQ' in upper or 'SMS' in upper or 'SIM' in upper:
+        log_type = 'modems'
+    elif 'TRUNK' in upper or 'PJSIP' in upper or 'SIP' in upper or 'CHAN' in upper or 'INVITE' in upper or 'REGISTER' in upper:
+        log_type = 'trunks'
+    elif 'MIXMONITOR' in upper or 'RECORD' in upper or 'AUDIO' in upper or 'WAV' in upper or 'MP3' in upper or 'PLAYBACK' in upper:
+        log_type = 'recording'
+    elif 'AMOCRM' in upper or 'LEAD' in upper or 'CONTACT' in upper or 'BEARER' in upper or 'PIPELINE' in upper:
+        log_type = 'amocrm'
+    elif 'YANDEX' in upper or 'GDRIVE' in upper or 'FTP' in upper or 'TELEGRAM' in upper or 'PLUGIN' in upper or 'WEBHOOK' in upper:
+        log_type = 'plugins'
+
+    # Parse Timestamp if present
+    ts = datetime.datetime.now().strftime("%H:%M:%S")
+    ts_match = re.search(r'\[([0-9]{4}-[0-9]{2}-[0-9]{2}\s+[0-9]{2}:[0-9]{2}:[0-9]{2})\]', raw_line)
+    if not ts_match:
+        ts_match = re.search(r'\[([A-Za-z]{3}\s+[0-9]{1,2}\s+[0-9]{2}:[0-9]{2}:[0-9]{2})\]', raw_line)
+    if ts_match:
+        ts = ts_match.group(1)
+
+    return {
+        'timestamp': ts,
+        'level': level,
+        'type': log_type,
+        'message': raw_line
+    }
+
+@app.route('/api/logs/stream')
+def api_logs_stream():
+    """Server-Sent Events (SSE) stream for real-time live logs."""
+    def event_stream():
+        # Get initial last 40 lines
+        lines_buffer = []
+        
+        # 1. Read last lines from Asterisk messages
+        try:
+            res = subprocess.run(['tail', '-n', '50', '/var/log/asterisk/messages'], capture_output=True, text=True, errors='ignore')
+            if res.stdout:
+                for line in res.stdout.splitlines():
+                    parsed = parse_log_line(line, 'trunks')
+                    if parsed: lines_buffer.append(parsed)
+        except Exception:
+            pass
+
+        # 2. Read last lines from amoCRM / Uploader debug logs
+        for log_f in ['/opt/amocrm_debug.log', '/opt/crm-yandex-uploader.log']:
+            if os.path.exists(log_f):
+                try:
+                    res = subprocess.run(['tail', '-n', '20', log_f], capture_output=True, text=True, errors='ignore')
+                    if res.stdout:
+                        for line in res.stdout.splitlines():
+                            parsed = parse_log_line(line, 'amocrm')
+                            if parsed: lines_buffer.append(parsed)
+                except Exception:
+                    pass
+
+        # Send initial batch
+        yield f"data: {json.dumps({'type': 'init', 'logs': lines_buffer[-80:]})}\n\n"
+
+        # Continuous live tail
+        while True:
+            time.sleep(2)
+            # Fetch recent Asterisk activity via Asterisk CLI or fresh log lines
+            live_logs = []
+            try:
+                # Poll last 5 lines
+                res = subprocess.run(['tail', '-n', '5', '/var/log/asterisk/messages'], capture_output=True, text=True, errors='ignore')
+                if res.stdout:
+                    for line in res.stdout.splitlines():
+                        parsed = parse_log_line(line, 'system')
+                        if parsed: live_logs.append(parsed)
+            except Exception:
+                pass
+
+            if live_logs:
+                yield f"data: {json.dumps({'type': 'batch', 'logs': live_logs})}\n\n"
+            else:
+                yield f": ping\n\n"
+
+    return Response(event_stream(), mimetype="text/event-stream")
+
+@app.route('/api/logs/query', methods=['GET'])
+def api_logs_query():
+    """Returns filtered historical logs by level and category."""
+    level = request.args.get('level', 'all')
+    log_type = request.args.get('type', 'all')
+    search = request.args.get('search', '').lower()
+    limit = int(request.args.get('limit', 150))
+
+    all_logs = []
+    
+    # Read Asterisk messages log
+    if os.path.exists('/var/log/asterisk/messages'):
+        try:
+            res = subprocess.run(['tail', '-n', str(limit * 2), '/var/log/asterisk/messages'], capture_output=True, text=True, errors='ignore')
+            for line in res.stdout.splitlines():
+                parsed = parse_log_line(line, 'system')
+                if parsed: all_logs.append(parsed)
+        except Exception:
+            pass
+
+    # Read Module & amoCRM logs
+    for log_f in ['/opt/amocrm_debug.log', '/opt/crm-yandex-uploader.log']:
+        if os.path.exists(log_f):
+            try:
+                res = subprocess.run(['tail', '-n', '100', log_f], capture_output=True, text=True, errors='ignore')
+                for line in res.stdout.splitlines():
+                    parsed = parse_log_line(line, 'amocrm')
+                    if parsed: all_logs.append(parsed)
+            except Exception:
+                pass
+
+    # Filter
+    filtered = []
+    for l in all_logs:
+        if level != 'all' and l['level'] != level:
+            continue
+        if log_type != 'all' and l['type'] != log_type:
+            continue
+        if search and search not in l['message'].lower():
+            continue
+        filtered.append(l)
+
+    return jsonify({'status': 'ok', 'logs': filtered[-limit:]})
+
+
 @app.route('/api/plugins/test/yandex', methods=['POST'])
 def api_test_yandex_disk():
     cfg = load_integrations()
