@@ -5312,7 +5312,7 @@ def index():
     license_info = license_mgr.load_license()
     max_users = license_mgr.get_max_allowed_users()
     disabled_plugins = integrations.get('plugins_disabled', [])
-    plugins = marketplace_data.load_marketplace_plugins(license_info.get('active_plugins', []), disabled_plugins)
+    plugins = marketplace_data.load_marketplace_plugins(license_info.get('active_plugins', []), disabled_plugins, lang_code=get_current_language())
     client_ip = get_client_ip()
     is_client_local = is_local_ip(client_ip)
     auth_cfg = integrations.get('security_auth', {})
