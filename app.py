@@ -5968,8 +5968,41 @@ def api_download_ovpn_file(client_id):
     port = vpn['openvpn'].get('port', 1194)
     proto = vpn['openvpn'].get('proto', 'udp')
     
-    ovpn_content = f"""# OpenVPN Client Profile for IP-Phone (Yealink / Grandstream / Fanvil)
-# Client: {c_name}
+    # Read real server certificates & keys
+    ca_cert = ""
+    client_cert = ""
+    client_key = ""
+    ta_key = ""
+    
+    try:
+        with open('/etc/openvpn/ca.crt', 'r') as f: ca_cert = f.read().strip()
+    except Exception:
+        ca_cert = "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
+        
+    try:
+        with open(f'/etc/openvpn/easy-rsa/pki/issued/{client_id}.crt', 'r') as f:
+            full_c = f.read()
+            # Extract cert part
+            cert_start = full_c.find('-----BEGIN CERTIFICATE-----')
+            if cert_start != -1:
+                client_cert = full_c[cert_start:].strip()
+            else:
+                client_cert = full_c.strip()
+    except Exception:
+        client_cert = "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
+
+    try:
+        with open(f'/etc/openvpn/easy-rsa/pki/private/{client_id}.key', 'r') as f: client_key = f.read().strip()
+    except Exception:
+        client_key = "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
+
+    try:
+        with open('/etc/openvpn/ta.key', 'r') as f: ta_key = f.read().strip()
+    except Exception:
+        ta_key = ""
+
+    ovpn_content = f"""# Enterprise PBX OpenVPN Client Configuration
+# Profile for IP Phone / Softphone: {c_name}
 client
 dev tun
 proto {proto}
@@ -5985,28 +6018,26 @@ key-direction 1
 verb 3
 
 <ca>
------BEGIN CERTIFICATE-----
-MIIDQjCCAiqgAwIBAgIUQPBXEnterprisePBXVpnCaCert...
------END CERTIFICATE-----
+{ca_cert}
 </ca>
+
 <cert>
------BEGIN CERTIFICATE-----
-MIIDPDCCAiSgAwIBAgIUQPBXClientCert_{client_id}...
------END CERTIFICATE-----
+{client_cert}
 </cert>
+
 <key>
------BEGIN PRIVATE KEY-----
-MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC7PBXClientKey...
------END PRIVATE KEY-----
+{client_key}
 </key>
+"""
+    if ta_key:
+        ovpn_content += f"""
 <tls-auth>
------BEGIN OpenVPN Static key V1-----
-e41a91e57140f2824e8...
------END OpenVPN Static key V1-----
+{ta_key}
 </tls-auth>
 """
+
     return Response(
-        ovpn_content,
+        ovpn_content.strip() + "\n",
         mimetype="application/x-openvpn-profile",
         headers={"Content-Disposition": f"attachment;filename={client_id}.ovpn"}
     )
