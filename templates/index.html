@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="{{ current_lang }}" dir="{{ available_languages[current_lang].dir if current_lang in available_languages else "ltr" }}">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -226,55 +226,55 @@
             
             <!-- GROUP 1: МОНИТОРИНГ & АНАЛИТИКА -->
             <div class="space-y-1">
-                <div class="px-3 pb-1 text-[10px] uppercase font-bold tracking-wider text-on-surface-variant/70 sidebar-text">Мониторинг</div>
+                <div class="px-3 pb-1 text-[10px] uppercase font-bold tracking-wider text-on-surface-variant/70 sidebar-text">{{ t.nav_monitoring or "МОНИТОРИНГ" }}</div>
                 
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group active-nav-item" title="Дашборд">
                     <span class="material-symbols-outlined mr-3.5 text-primary text-[22px]">dashboard</span>
-                    <span class="text-xs font-semibold sidebar-text">Дашборд</span>
+                    <span class="text-xs font-semibold sidebar-text">{{ t.nav_dashboard or "Дашборд" }}</span>
                 </button>
 
                 <button onclick="switchTab('calls')" id="nav-calls" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="Журнал вызовов">
                     <span class="material-symbols-outlined mr-3.5 text-primary text-[22px]">history</span>
-                    <span class="text-xs font-semibold sidebar-text">Журнал вызовов</span>
+                    <span class="text-xs font-semibold sidebar-text">{{ t.nav_calls or "Журнал вызовов" }}</span>
                 </button>
 
                 <button onclick="switchTab('logs')" id="nav-logs" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="Логи в реальном времени">
                     <span class="material-symbols-outlined mr-3.5 text-secondary text-[22px]">terminal</span>
-                    <span class="text-xs font-semibold sidebar-text">Логирование Live</span>
+                    <span class="text-xs font-semibold sidebar-text">{{ t.nav_logs or "Логирование Live" }}</span>
                     <span class="ml-auto w-2 h-2 rounded-full bg-emerald-500 animate-pulse sidebar-badge" title="Live stream active"></span>
                 </button>
             </div>
 
             <!-- GROUP 2: ТЕЛЕФОНИЯ & МАРШРУТИЗАЦИЯ -->
             <div class="space-y-1">
-                <div class="px-3 pb-1 text-[10px] uppercase font-bold tracking-wider text-on-surface-variant/70 sidebar-text">Телефония</div>
+                <div class="px-3 pb-1 text-[10px] uppercase font-bold tracking-wider text-on-surface-variant/70 sidebar-text">{{ t.nav_telephony or "ТЕЛЕФОНИЯ" }}</div>
                 
                 <button onclick="switchTab('accounts')" id="nav-accounts" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="SIP Абоненты">
                     <span class="material-symbols-outlined mr-3.5 text-secondary text-[22px]">group</span>
-                    <span class="text-xs font-semibold sidebar-text">SIP Абоненты</span>
+                    <span class="text-xs font-semibold sidebar-text">{{ t.nav_subscribers or "SIP Абоненты" }}</span>
                     <span class="ml-auto text-[11px] px-2 py-0.5 rounded-full bg-surface-container-high font-mono sidebar-badge">{{ accounts|length }}/{{ max_users }}</span>
                 </button>
 
                 <button onclick="switchTab('trunks')" id="nav-trunks" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="SIP Транки">
                     <span class="material-symbols-outlined mr-3.5 text-primary text-[22px]">settings_ethernet</span>
-                    <span class="text-xs font-semibold sidebar-text">SIP Транки</span>
+                    <span class="text-xs font-semibold sidebar-text">{{ t.nav_trunks or "SIP Транки" }}</span>
                 </button>
 
                 <button onclick="switchTab('modems')" id="nav-modems" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="GSM Модемы">
                     <span class="material-symbols-outlined mr-3.5 text-amber-500 text-[22px]">sim_card</span>
-                    <span class="text-xs font-semibold sidebar-text">GSM Модемы</span>
+                    <span class="text-xs font-semibold sidebar-text">{{ t.nav_modems or "GSM Модемы" }}</span>
                     <span class="ml-auto text-[11px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 font-mono sidebar-badge">{{ modems_list|length }}</span>
                 </button>
 
                 <button onclick="switchTab('ivr')" id="nav-ivr" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="IVR Конструктор">
                     <span class="material-symbols-outlined mr-3.5 text-secondary text-[22px]">account_tree</span>
-                    <span class="text-xs font-semibold sidebar-text">IVR Конструктор</span>
+                    <span class="text-xs font-semibold sidebar-text">{{ t.nav_ivr or "IVR Конструктор" }}</span>
                 </button>
             </div>
 
             <!-- GROUP 3: ЭКОСИСТЕМА & ПЛАГИНЫ -->
             <div class="space-y-1">
-                <div class="px-3 pb-1 text-[10px] uppercase font-bold tracking-wider text-on-surface-variant/70 sidebar-text">Экосистема</div>
+                <div class="px-3 pb-1 text-[10px] uppercase font-bold tracking-wider text-on-surface-variant/70 sidebar-text">{{ t.nav_ecosystem or "ЭКОСИСТЕМА" }}</div>
 
                 <!-- РАСКРЫВАЮЩИЙСЯ БЛОК: РАСШИРЕНИЯ -->
                 <div>
@@ -307,7 +307,7 @@
 
                 <button onclick="switchTab('marketplace')" id="nav-marketplace" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="Маркетплейс">
                     <span class="material-symbols-outlined mr-3.5 text-warning text-[22px]">shopping_bag</span>
-                    <span class="text-xs font-semibold sidebar-text">Маркетплейс</span>
+                    <span class="text-xs font-semibold sidebar-text">{{ t.nav_marketplace or "Маркетплейс" }}</span>
                     <span class="ml-auto text-[9px] px-1.5 py-0.5 rounded-full bg-warning/10 text-warning font-bold uppercase sidebar-badge">Store</span>
                 </button>
             </div>
@@ -318,7 +318,7 @@
 
                 <button onclick="switchTab('security')" id="nav-security" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="Безопасность & Доступ">
                     <span class="material-symbols-outlined mr-3.5 text-error text-[22px]">lock_person</span>
-                    <span class="text-xs font-semibold sidebar-text">Безопасность & Доступ</span>
+                    <span class="text-xs font-semibold sidebar-text">{{ t.nav_security or "Безопасность & Доступ" }}</span>
                     {% if not auth_enabled %}
                     <span class="ml-auto w-2 h-2 rounded-full bg-error animate-pulse sidebar-badge" title="Парольная защита отключена"></span>
                     {% endif %}
@@ -353,7 +353,7 @@
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-success/10 text-success text-xs font-semibold">
                     <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
-                    <span>Asterisk Core: ONLINE</span>
+                    <span>{{ t.core_online or "Asterisk Core: ONLINE" }}</span>
                 </div>
                 <div class="text-xs text-on-surface-variant hidden md:block">
                     Лицензия: <span class="font-semibold text-on-surface">{{ license.tier }}</span>
@@ -361,6 +361,32 @@
             </div>
             
             <div class="flex items-center gap-3">
+                <!-- LANGUAGE SWITCHER (TOP 10 WORLD LANGUAGES) -->
+                <div class="relative">
+                    <button type="button" id="lang-dropdown-btn" onclick="toggleLangDropdown()" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface border border-outline/30 hover:bg-surface-container-high transition-all text-xs font-semibold text-on-surface shadow-sm">
+                        <span class="text-base">{{ available_languages[current_lang].flag if current_lang in available_languages else '🌐' }}</span>
+                        <span class="hidden sm:inline">{{ available_languages[current_lang].name if current_lang in available_languages else 'Language' }}</span>
+                        <span class="material-symbols-outlined text-[16px] text-on-surface-variant">expand_more</span>
+                    </button>
+
+                    <div id="lang-dropdown-menu" class="hidden absolute right-0 mt-2 w-52 bg-surface rounded-2xl border border-outline/30 shadow-xl py-2 z-50 animate-fadeIn">
+                        <div class="px-3.5 py-1.5 text-[10px] uppercase font-bold text-on-surface-variant/70 tracking-wider border-b border-surface-container mb-1">
+                            Язык интерфейса / Language
+                        </div>
+                        {% for code, lang_meta in available_languages.items() %}
+                        <a href="/set-language/{{ code }}" class="flex items-center justify-between px-3.5 py-2 text-xs hover:bg-surface-container transition-colors {{ 'font-bold text-primary bg-primary/5' if current_lang == code else 'text-on-surface' }}">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-base">{{ lang_meta.flag }}</span>
+                                <span>{{ lang_meta.name }}</span>
+                            </div>
+                            {% if current_lang == code %}
+                            <span class="material-symbols-outlined text-[16px] text-primary">check</span>
+                            {% endif %}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
                 <button onclick="location.reload()" title="Обновить страницу" class="p-2 rounded-full hover:bg-surface-container text-on-surface-variant transition-colors">
                     <span class="material-symbols-outlined text-[20px]">refresh</span>
                 </button>
@@ -5168,6 +5194,20 @@
 
 
         // // ================= COLLAPSIBLE SIDEBAR LOGIC // =================
+        
+        function toggleLangDropdown() {
+            const menu = document.getElementById('lang-dropdown-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', function(event) {
+            const btn = document.getElementById('lang-dropdown-btn');
+            const menu = document.getElementById('lang-dropdown-menu');
+            if (btn && menu && !btn.contains(event.target) && !menu.contains(event.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+
         function toggleSidebarCollapse() {
             const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
             const icon = document.getElementById('sidebar-toggle-icon');

@@ -1,0 +1,52 @@
+{
+  "ru": {
+    "name": "Русский",
+    "flag": "🇷🇺",
+    "dir": "ltr"
+  },
+  "en": {
+    "name": "English",
+    "flag": "🇺🇸",
+    "dir": "ltr"
+  },
+  "zh": {
+    "name": "中文 (Chinese)",
+    "flag": "🇨🇳",
+    "dir": "ltr"
+  },
+  "es": {
+    "name": "Español (Spanish)",
+    "flag": "🇪🇸",
+    "dir": "ltr"
+  },
+  "ar": {
+    "name": "العربية (Arabic)",
+    "flag": "🇦🇪",
+    "dir": "rtl"
+  },
+  "hi": {
+    "name": "हिन्दी (Hindi)",
+    "flag": "🇮🇳",
+    "dir": "ltr"
+  },
+  "pt": {
+    "name": "Português (Portuguese)",
+    "flag": "🇧🇷",
+    "dir": "ltr"
+  },
+  "fr": {
+    "name": "Français (French)",
+    "flag": "🇫🇷",
+    "dir": "ltr"
+  },
+  "de": {
+    "name": "Deutsch (German)",
+    "flag": "🇩🇪",
+    "dir": "ltr"
+  },
+  "ja": {
+    "name": "日本語 (Japanese)",
+    "flag": "🇯🇵",
+    "dir": "ltr"
+  }
+}

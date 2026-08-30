@@ -4332,6 +4332,63 @@ def save_integrations(data):
 
 
 
+
+# ================= MULTILINGUAL (I18N) ENGINE (TOP 10 WORLD LANGUAGES) =================
+LOCALES_DIR = os.path.join(os.path.dirname(__file__), 'locales')
+
+def get_available_languages():
+    lang_file = os.path.join(LOCALES_DIR, 'languages.json')
+    if os.path.exists(lang_file):
+        try:
+            with open(lang_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {
+        "ru": {"name": "Русский", "flag": "🇷🇺", "dir": "ltr"},
+        "en": {"name": "English", "flag": "🇺🇸", "dir": "ltr"}
+    }
+
+def get_locale_translations(lang_code='ru'):
+    fp = os.path.join(LOCALES_DIR, f"{lang_code}.json")
+    if not os.path.exists(fp):
+        fp = os.path.join(LOCALES_DIR, "en.json")
+    if os.path.exists(fp):
+        try:
+            with open(fp, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+def get_current_language():
+    cfg = load_integrations()
+    # Check cookie first, then saved integrations, then browser header
+    cookie_lang = request.cookies.get('app_lang')
+    if cookie_lang and cookie_lang in get_available_languages():
+        return cookie_lang
+    if 'system_lang' in cfg and cfg['system_lang'] in get_available_languages():
+        return cfg['system_lang']
+    return 'ru'
+
+@app.route('/set-language/<lang_code>', methods=['GET', 'POST'])
+def set_language(lang_code):
+    langs = get_available_languages()
+    if lang_code not in langs:
+        lang_code = 'en'
+    cfg = load_integrations()
+    cfg['system_lang'] = lang_code
+    save_integrations(cfg)
+    
+    resp = redirect(request.referrer or url_for('index'))
+    resp.set_cookie('app_lang', lang_code, max_age=60*60*24*365) # 1 year
+    return resp
+
+@app.route('/api/locales/<lang_code>', methods=['GET'])
+def api_get_locale(lang_code):
+    return jsonify(get_locale_translations(lang_code))
+
+
 def get_available_sip_contexts():
     """Extracts all valid dialplan contexts from extensions.conf and pjsip.conf."""
     contexts = set(['from-internal', 'default'])
@@ -5271,6 +5328,9 @@ def index():
         show_security_prompt=show_security_prompt,
         accounts=accounts,
         available_contexts=get_available_sip_contexts(),
+        current_lang=get_current_language(),
+        available_languages=get_available_languages(),
+        t=get_locale_translations(get_current_language()),
         integrations=integrations,
         ring_groups=ring_groups,
         sip_trunks=sip_trunks,
