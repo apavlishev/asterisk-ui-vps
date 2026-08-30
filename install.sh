@@ -2,7 +2,7 @@
 # Инициализация и автоматическая установка Asterisk PBX GUI & Integrations
 set -e
 
-echo "=== Начало установки Asterisk PBX GUI ==="
+echo "=== Начало установки Asterisk PBX GUI & Core Security ==="
 
 # Проверка на root
 if [ "$EUID" -ne 0 ]; then
@@ -10,17 +10,17 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-echo "1. Обновление системы и установка зависимостей..."
+echo "1. Обновление системы и установка системных пакетов..."
 apt-get update
-apt-get install -y python3 python3-pip python3-venv ffmpeg curl wget git sudo lsof || true
-apt-get install -y asterisk || true
+apt-get install -y python3 python3-pip python3-venv ffmpeg sox curl wget git sudo lsof fail2ban iptables net-tools || true
+apt-get install -y asterisk asterisk-modules asterisk-pjsip || true
 
 # Настройка безопасных директорий Git
 git config --global --add safe.directory /opt/asterisk-gui || true
 git config --global --add safe.directory /opt/asterisk-gui-repo || true
 
 echo "2. Установка Python зависимостей..."
-pip3 install flask requests paramiko werkzeug --break-system-packages 2>/dev/null || pip3 install flask requests paramiko werkzeug || true
+pip3 install flask requests paramiko werkzeug google-api-python-client google-auth-httplib2 google-auth-oauthlib pydrive --break-system-packages 2>/dev/null || pip3 install flask requests paramiko werkzeug google-api-python-client google-auth-httplib2 google-auth-oauthlib pydrive || true
 
 echo "3. Создание структуры директорий и прав..."
 # 3.1 DNS Fallback для Telegram прокси
@@ -29,6 +29,7 @@ if ! grep -q "telegram.dentaldate.ae" /etc/hosts; then
 fi
 
 mkdir -p /opt/asterisk-gui
+mkdir -p /opt/plugins
 mkdir -p /var/log/asterisk/cdr-csv
 mkdir -p /var/spool/asterisk/monitor
 mkdir -p /var/lib/asterisk/sounds/custom
@@ -45,6 +46,44 @@ asterisk ALL=(ALL) NOPASSWD: ALL
 user ALL=(ALL) NOPASSWD: ALL
 SUDORULES
 chmod 0440 /etc/sudoers.d/asterisk-gui
+
+# Настройка Fail2ban для защиты Asterisk
+echo "3.1 Настройка Fail2ban & Антифрод-фильтра..."
+mkdir -p /etc/fail2ban/filter.d
+cat << 'EOF_FILTER' > /etc/fail2ban/filter.d/asterisk-antifraud.conf
+[Definition]
+failregex = Request '(?:REGISTER|INVITE|SUBSCRIBE|OPTIONS)' from .* failed for '<HOST>:\d+'
+            failed for '<HOST>:\d+' - (?:No matching endpoint found|Failed to authenticate|Username/auth name mismatch|Device does not match ACL)
+            Call from '.*' \(<HOST>:\d+\) to extension '.*' rejected
+            <HOST> failed to authenticate
+            Host <HOST> failed to authenticate
+            No registration for peer '.*' \(from <HOST>\)
+
+ignoreregex =
+EOF_FILTER
+
+cat << 'EOF_JAIL' > /etc/fail2ban/jail.local
+[DEFAULT]
+ignoreip = 127.0.0.1/8 ::1 91.226.93.233
+bantime  = 86400
+findtime = 300
+maxretry = 3
+backend  = systemd
+
+[asterisk-antifraud]
+enabled  = true
+backend  = systemd
+journalmatch = _SYSTEMD_UNIT=asterisk.service
+port     = 5060,5061,5160,10000:20000
+protocol = all
+filter   = asterisk-antifraud
+maxretry = 3
+findtime = 300
+bantime  = 86400
+action   = iptables-allports[name=ASTERISK-ANTIFRAUD, protocol=all]
+EOF_JAIL
+
+systemctl restart fail2ban 2>/dev/null || true
 
 # Клонирование / копирование исходного кода
 echo "4. Развертывание исходного кода..."
@@ -66,8 +105,8 @@ if [ ! -f /opt/integrations_config.json ]; then
     chown asterisk:asterisk /opt/integrations_config.json
 fi
 
-# 5.1 Стандартный PJSIP шаблон (для любых SIP софтфонов MicroSIP/Zoiper и межатс-подключений)
-echo "5.1 Настройка PJSIP (универсальный SIP-клиент/софтфон стандарт)..."
+# 5.1 Стандартный PJSIP шаблон
+echo "5.1 Настройка PJSIP..."
 if [ ! -f /etc/asterisk/pjsip.conf ] || ! grep -q "auth_type=userpass" /etc/asterisk/pjsip.conf; then
 cat << 'PJSIPCONF' > /etc/asterisk/pjsip.conf
 [transport-udp]
@@ -159,16 +198,8 @@ chown asterisk:asterisk /etc/asterisk/pjsip.conf
 chmod 644 /etc/asterisk/pjsip.conf
 fi
 
-# 5.2 Настройка dongle.conf
-echo "5.2 Настройка GSM Dongle модема..."
-if [ -f /etc/asterisk/dongle.conf ]; then
-    sed -i 's/exten=+79000000000/exten=s/g' /etc/asterisk/dongle.conf
-    sed -i 's/rxgain=4/rxgain=0/g' /etc/asterisk/dongle.conf
-    sed -i 's/txgain=4/txgain=0/g' /etc/asterisk/dongle.conf
-fi
-
 # Udev правила для горячего подключения модемов (Hot-plug)
-echo "5.3 Настройка Udev правил для модемов..."
+echo "5.2 Настройка Udev правил для модемов..."
 cat << 'UDEVRULES' > /etc/udev/rules.d/99-huawei-dongle.rules
 KERNEL=="ttyUSB*", MODE="0666", GROUP="dialout"
 SUBSYSTEM=="tty", ATTRS{idVendor}=="12d1", RUN+="/bin/bash /opt/asterisk-gui/dongle_hotplug.sh"
@@ -178,14 +209,14 @@ UDEVRULES
 udevadm control --reload-rules 2>/dev/null || true
 udevadm trigger 2>/dev/null || true
 
-# 5.4 Автоматическая генерация эталонного диалплана с записью входящих вызовов
-echo "5.4 Генерация эталонного диалплана..."
+# 5.3 Автоматическая генерация эталонного диалплана
+echo "5.3 Генерация эталонного диалплана..."
 python3 -c "import sys; sys.path.insert(0, '/opt/asterisk-gui'); import app; app.generate_dialplan_from_tree(); app.generate_pjsip_conf()" 2>/dev/null || true
 
 echo "6. Настройка Systemd сервисов..."
 cat << 'SERVICE' > /etc/systemd/system/asterisk-gui.service
 [Unit]
-Description=Asterisk Web GUI
+Description=Asterisk PBX Web GUI (Logic Core)
 After=network.target asterisk.service
 
 [Service]
@@ -224,4 +255,4 @@ systemctl restart asterisk-gui.service
 systemctl restart asterisk.service 2>/dev/null || true
 
 echo "=== Установка успешно завершена! ==="
-echo "Панель управления доступна по адресу: http://<ip-адрес-малины>:8080"
+echo "Панель управления доступна по адресу: http://<IP_СЕРВЕРА>:8888"
