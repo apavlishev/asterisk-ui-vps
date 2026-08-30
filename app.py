@@ -5551,31 +5551,54 @@ def save_telegram():
     return redirect(url_for('index'))
 
 @app.route('/sip/save', methods=['POST'])
-
 def sip_save():
+    old_exten = request.form.get('old_exten', '').strip()
     exten = request.form.get('exten', '').strip()
+    name = request.form.get('name', '').strip()
     password = request.form.get('password', '').strip()
-    if not exten or not password:
-        flash('Номер и пароль обязательны!')
+    context = request.form.get('context', 'from-internal').strip() or 'from-internal'
+    
+    if not exten:
+        flash('Номер абонента обязателен!')
         return redirect(url_for('index'))
+        
     accounts = load_sip_accounts()
-    updated = False
-    for a in accounts:
-        if a['exten'] == exten:
-            a['password'] = password
-            updated = True
-            break
-    if not updated:
+    target_acc = None
+    
+    if old_exten:
+        for a in accounts:
+            if a['exten'] == old_exten:
+                target_acc = a
+                break
+    else:
+        for a in accounts:
+            if a['exten'] == exten:
+                target_acc = a
+                break
+
+    if target_acc:
+        target_acc['exten'] = exten
+        if name: target_acc['name'] = name
+        if password: target_acc['password'] = password
+        target_acc['context'] = context
+        flash(f'Данные абонента {exten} («{target_acc.get("name", exten)}») успешно обновлены!')
+    else:
+        if not password:
+            password = f"Pass{exten}!"
         max_users = license_mgr.get_max_allowed_users()
         if len(accounts) >= max_users:
             flash(f'Достигнут лимит пользователей ({max_users}). Для добавления новых абонентов активируйте пакет Multi-SIP в Маркетплейсе.')
             return redirect(url_for('index'))
-        accounts.append({'exten': exten, 'password': password, 'context': 'from-internal'})
-    
-    out = ["[transport-udp]", "type=transport", "protocol=udp", "bind=0.0.0.0:5060", ""]
+        if not name: name = f"Оператор {exten}"
+        accounts.append({'exten': exten, 'name': name, 'password': password, 'context': context})
+        flash(f'Новый абонент {exten} («{name}») успешно создан!')
+
+    # Write clean PJSIP configuration
+    out = ["[transport-udp]", "type=transport", "protocol=udp", "bind=0.0.0.0:5060", "local_net=192.168.0.0/16", ""]
     for acc in accounts:
         ext = acc['exten']
         pwd = acc['password']
+        disp_name = acc.get('name', f'User {ext}')
         ctx = acc.get('context', 'from-internal')
         out.append(f"[{ext}]")
         out.append("type=auth")
@@ -5585,24 +5608,31 @@ def sip_save():
         out.append("")
         out.append(f"[{ext}]")
         out.append("type=aor")
-        out.append("max_contacts=2")
+        out.append("max_contacts=5")
         out.append("remove_existing=yes")
         out.append("")
         out.append(f"[{ext}]")
         out.append("type=endpoint")
         out.append(f"context={ctx}")
+        out.append(f'callerid="{disp_name}" <{ext}>')
         out.append("disallow=all")
-        out.append("allow=ulaw")
         out.append("allow=alaw")
+        out.append("allow=ulaw")
         out.append("allow=g722")
+        out.append("allow=slin16")
+        out.append("direct_media=no")
+        out.append("rtp_symmetric=yes")
+        out.append("force_rport=yes")
+        out.append("rewrite_contact=yes")
         out.append(f"auth={ext}")
         out.append(f"aors={ext}")
         out.append("")
+
     with open(PJSIP_CONF, 'w', encoding='utf-8') as f:
         f.write("\n".join(out))
 
+    subprocess.run(['asterisk', '-rx', 'pjsip reload'], capture_output=True)
     generate_dialplan_from_tree()
-    flash(f'SIP Аккаунт {exten} успешно сохранен!')
     return redirect(url_for('index'))
 
 @app.route('/sip/delete', methods=['POST'])

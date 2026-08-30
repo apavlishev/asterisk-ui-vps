@@ -678,8 +678,8 @@
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
                                 <tr class="bg-surface-container-low border-b border-surface-container text-on-surface-variant font-semibold text-xs uppercase tracking-wider">
-                                    <th class="px-6 py-4">Номер / SIP URI</th>
-                                    <th class="px-6 py-4">Пароль</th>
+                                    <th class="px-6 py-4">Сотрудник / Номер</th>
+                                    <th class="px-6 py-4">Пароль (Secret)</th>
                                     <th class="px-6 py-4">Контекст</th>
                                     <th class="px-6 py-4">Сетевой статус</th>
                                     <th class="px-6 py-4 text-right">Действия</th>
@@ -688,11 +688,16 @@
                             <tbody class="divide-y divide-surface-container">
                                 {% for acc in accounts %}
                                 <tr class="hover:bg-surface-container-low/40 transition-colors">
-                                    <td class="px-6 py-4 font-mono font-bold text-on-surface flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
-                                            {{ acc.exten }}
+                                    <td class="px-6 py-4 font-bold text-on-surface">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs font-mono">
+                                                {{ acc.exten }}
+                                            </div>
+                                            <div>
+                                                <div class="text-xs font-bold text-on-surface">{{ acc.name }}</div>
+                                                <div class="text-[11px] font-mono text-on-surface-variant font-normal">sip:{{ acc.exten }}@{{ host }}</div>
+                                            </div>
                                         </div>
-                                        <span>sip:{{ acc.exten }}@{{ host }}</span>
                                     </td>
                                     <td class="px-6 py-4 font-mono text-on-surface-variant">{{ acc.password }}</td>
                                     <td class="px-6 py-4 text-xs font-mono text-on-surface-variant">{{ acc.context }}</td>
@@ -707,7 +712,10 @@
                                         </span>
                                         {% endif %}
                                     </td>
-                                    <td class="px-6 py-4 text-right">
+                                    <td class="px-6 py-4 text-right space-x-1">
+                                        <button type="button" onclick="openEditUserModal('{{ acc.exten }}', '{{ acc.name }}', '{{ acc.password }}', '{{ acc.context }}')" class="p-2 rounded-lg text-primary hover:bg-primary/10 transition-colors" title="Редактировать данные абонента">
+                                            <span class="material-symbols-outlined text-[18px]">edit</span>
+                                        </button>
                                         <form action="/sip/delete" method="POST" onsubmit="return confirm('Удалить SIP абонента {{ acc.exten }}?');" class="inline">
                                             <input type="hidden" name="exten" value="{{ acc.exten }}">
                                             <button type="submit" class="p-2 rounded-lg text-error hover:bg-error/10 transition-colors" title="Удалить">
@@ -2583,6 +2591,59 @@
     
 
 
+        <!-- MODAL: EDIT SIP USER -->
+    <div id="modal-edit-user" class="hidden fixed inset-0 bg-on-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-surface rounded-2xl max-w-md w-full p-6 border border-outline/30 shadow-xl space-y-4">
+            <div class="flex justify-between items-center pb-2 border-b border-surface-container">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-xl">manage_accounts</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-on-surface">Редактирование абонента</h3>
+                        <p class="text-xs text-on-surface-variant" id="edit-user-subtitle">Изменение номера, имени и пароля</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeEditUserModal()" class="text-on-surface-variant hover:text-on-surface p-1">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <form action="/sip/save" method="POST" class="space-y-4">
+                <input type="hidden" id="edit-user-old-exten" name="old_exten" value="">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Имя сотрудника / Отдел (CallerID Name)</label>
+                    <input type="text" id="edit-user-name" name="name" placeholder="Иван Иванов (Отдел продаж)" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm text-on-surface">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Внутренний номер</label>
+                        <input type="text" id="edit-user-exten" name="exten" placeholder="101" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono text-on-surface">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Контекст вызовов</label>
+                        <input type="text" id="edit-user-context" name="context" value="from-internal" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono text-on-surface">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Пароль (Secret SIP)</label>
+                    <input type="text" id="edit-user-password" name="password" placeholder="Pass12345!" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono text-on-surface">
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2 border-t border-surface-container">
+                    <button type="button" onclick="closeEditUserModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:bg-surface-container transition-colors">Отмена</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition-all shadow-sm flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">save</span>
+                        <span>Сохранить изменения</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL: ADD SIP USER -->
     <div id="modal-add-user" class="hidden fixed inset-0 bg-on-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-surface rounded-2xl max-w-md w-full p-6 border border-outline/30 shadow-xl">
@@ -2594,12 +2655,18 @@
             </div>
             <form action="/sip/save" method="POST" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Внутренний номер (Extension)</label>
-                    <input type="text" name="exten" placeholder="101" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Имя сотрудника / Отдел (CallerID)</label>
+                    <input type="text" name="name" placeholder="Иван Иванов (Отдел продаж)" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Пароль (Secret)</label>
-                    <input type="text" name="password" placeholder="Pass12345!" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Внутренний номер</label>
+                        <input type="text" name="exten" placeholder="101" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Пароль (Secret)</label>
+                        <input type="text" name="password" placeholder="Pass12345!" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                    </div>
                 </div>
                 <div class="pt-2 flex justify-end gap-2">
                     <button type="button" onclick="document.getElementById('modal-add-user').classList.add('hidden')" class="px-4 py-2 rounded-xl text-sm font-medium text-on-surface-variant hover:bg-surface-container">Отмена</button>
@@ -4457,6 +4524,21 @@
             navigator.clipboard.writeText(link).then(() => {
                 alert('VLESS Reality ссылка скопирована в буфер обмена!');
             });
+        }
+
+        
+        function openEditUserModal(exten, name, password, context) {
+            document.getElementById('edit-user-old-exten').value = exten;
+            document.getElementById('edit-user-exten').value = exten;
+            document.getElementById('edit-user-name').value = name || ('Оператор ' + exten);
+            document.getElementById('edit-user-password').value = password || '';
+            document.getElementById('edit-user-context').value = context || 'from-internal';
+            document.getElementById('edit-user-subtitle').textContent = 'Редактирование параметров для № ' + exten;
+            document.getElementById('modal-edit-user').classList.remove('hidden');
+        }
+
+        function closeEditUserModal() {
+            document.getElementById('modal-edit-user').classList.add('hidden');
         }
 
         function switchTab(tabId) {
