@@ -182,25 +182,25 @@
     "zh": "电话控制中枢"
   },
   "Мониторинг соединений, емкости и параметров маршрутизации в реальном времени.": {
-    "ru": "Мониторинг соединений, емкости и параметров маршрутизации в реальном времени.",
     "en": "Real-time monitoring of connections, capacity, and routing parameters.",
-    "es": "Monitoreo en tiempo real de conexiones, capacidad y enrutamiento.",
-    "ar": "مراقبة الاتصالات والسعة والتوجيه في الوقت الفعلي.",
-    "zh": "实时监控呼叫连接、系统容量与路由参数。"
+    "es": "Monitoreo en tiempo real de conexiones, capacidad y parámetros de enrutamiento.",
+    "ar": "مراقبة الاتصالات والسعة ومعلمات التوجيه في الوقت الفعلي.",
+    "zh": "实时监控呼叫连接、系统容量与路由参数。",
+    "ru": "Мониторинг соединений, емкости и параметров маршрутизации в реальном времени."
   },
   "Маркетплейс модулей": {
-    "ru": "Маркетплейс модулей",
     "en": "Module Marketplace",
     "es": "Mercado de Módulos",
     "ar": "متجر الإضافات",
-    "zh": "模块市场"
+    "zh": "模块应用市场",
+    "ru": "Маркетплейс модулей"
   },
   "SIP Емкость": {
-    "ru": "SIP Емкость",
     "en": "SIP Capacity",
     "es": "Capacidad SIP",
     "ar": "سعة SIP",
-    "zh": "SIP 容量"
+    "zh": "SIP 容量",
+    "ru": "SIP Емкость"
   },
   "польз.": {
     "ru": "польз.",
@@ -238,25 +238,25 @@
     "zh": "GSM 调制解调器与 SIM 卡池"
   },
   "Физические USB-модемы, операторы сотовой связи, уровни сигнала CSQ и системные порты.": {
-    "ru": "Физические USB-модемы, операторы сотовой связи, уровни сигнала CSQ и системные порты.",
     "en": "Physical USB modems, mobile operators, CSQ signal levels, and system serial ports.",
     "es": "Módems USB físicos, operadores móviles, niveles de señal CSQ y puertos serie.",
     "ar": "أجهزة مودم USB الفعلية، مشغلو شبكات الهاتف المحمول، مستويات إشارة CSQ ومنافذ النظام.",
-    "zh": "物理 USB 调制解调器、移动运营商、CSQ 信号强度及系统串口。"
+    "zh": "物理 USB 调制解调器、移动运营商、CSQ 信号强度及系统串口。",
+    "ru": "Физические USB-модемы, операторы сотовой связи, уровни сигнала CSQ и системные порты."
   },
   "Тестовые модемы (Эмуляция)": {
-    "ru": "Тестовые модемы (Эмуляция)",
     "en": "Test Modems (Emulation)",
     "es": "Módems de Prueba (Emulación)",
     "ar": "مودم الاختبار (محاكاة)",
-    "zh": "测试调制解调器 (模拟)"
+    "zh": "测试调制解调器 (模拟)",
+    "ru": "Тестовые модемы (Эмуляция)"
   },
   "Пересканировать USB": {
-    "ru": "Пересканировать USB",
     "en": "Rescan USB Hardware",
     "es": "Reescanear USB",
     "ar": "إعادة فحص USB",
-    "zh": "重新扫描 USB 硬件"
+    "zh": "重新扫描 USB 硬件",
+    "ru": "Пересканировать USB"
   },
   "Модем / Устройство": {
     "ru": "Модем / Устройство",
@@ -294,25 +294,25 @@
     "zh": "通道状态"
   },
   "Free (Тестовый режим)": {
-    "ru": "Free (Тестовый режим)",
     "en": "Free (Test Mode)",
     "es": "Libre (Modo Prueba)",
     "ar": "متاح (وضع الاختبار)",
-    "zh": "空闲 (测试模式)"
+    "zh": "空闲 (测试模式)",
+    "ru": "Free (Тестовый режим)"
   },
   "Руководство по USB GSM-модемам, chan_dongle и голосовым чипсетам": {
-    "ru": "Руководство по USB GSM-модемам, chan_dongle и голосовым чипсетам",
     "en": "Guide to USB GSM Modems, chan_dongle, and Voice Chipsets",
     "es": "Guía de Módems GSM USB, chan_dongle y Conjuntos de Chips de Voz",
     "ar": "دليل أجهزة مودم GSM USB وchan_dongle وشرائح الصوت",
-    "zh": "USB GSM 调制解调器、chan_dongle 及语音芯片组指南"
+    "zh": "USB GSM 调制解调器、chan_dongle 及语音芯片组指南",
+    "ru": "Руководство по USB GSM-модемам, chan_dongle и голосовым чипсетам"
   },
   "Требования к физическим модемам для Asterisk, поддержка передачи голоса (Voice Enabled), драйверы и питание": {
-    "ru": "Требования к физическим модемам для Asterisk, поддержка передачи голоса (Voice Enabled), драйверы и питание",
     "en": "Hardware requirements for Asterisk, Voice-enabled firmware, Linux drivers, and power supply standards.",
     "es": "Requisitos de hardware para Asterisk, firmware de voz, controladores y alimentación.",
     "ar": "متطلبات الأجهزة لـ Asterisk، البرامج الثابتة التي تدعم الصوت، برامج التشغيل وتوزيع الطاقة.",
-    "zh": "Asterisk 物理硬件要求、语音固件 (Voice Enabled)、驱动及供电规范。"
+    "zh": "Asterisk 物理硬件要求、语音固件 (Voice Enabled)、驱动及供电规范。",
+    "ru": "Требования к физическим модемам для Asterisk, поддержка передачи голоса (Voice Enabled), драйверы и питание"
   },
   "SIP-Транки и Провайдеры": {
     "ru": "SIP-Транки и Провайдеры",
@@ -474,5 +474,222 @@
     "es": "Deshabilitar",
     "ar": "تعطيل",
     "zh": "禁用"
+  },
+  "SIP ЕМКОСТЬ": {
+    "en": "SIP CAPACITY",
+    "es": "CAPACIDAD SIP",
+    "ar": "سعة SIP",
+    "zh": "SIP 容量",
+    "ru": "SIP ЕМКОСТЬ"
+  },
+  "СОСТОЯНИЕ АТС": {
+    "en": "PBX HEALTH",
+    "es": "ESTADO PBX",
+    "ar": "حالة المقسم",
+    "zh": "PBX 运行状态",
+    "ru": "СОСТОЯНИЕ АТС"
+  },
+  "Состояние АТС": {
+    "en": "PBX Health",
+    "es": "Estado PBX",
+    "ar": "حالة المقسم",
+    "zh": "PBX 运行状态",
+    "ru": "Состояние АТС"
+  },
+  "ЛИЦЕНЗИЯ & ПЛАН": {
+    "en": "LICENSE & PLAN",
+    "es": "LICENCIA Y PLAN",
+    "ar": "الترخيص والخطة",
+    "zh": "授权与套餐",
+    "ru": "ЛИЦЕНЗИЯ & ПЛАН"
+  },
+  "Лицензия & План": {
+    "en": "License & Plan",
+    "es": "Licencia y Plan",
+    "ar": "الترخيص والخطة",
+    "zh": "授权与套餐",
+    "ru": "Лицензия & План"
+  },
+  "Все службы функционируют штатно": {
+    "en": "All services operating normally",
+    "es": "Todos los servicios funcionan normalmente",
+    "ar": "جميع الخدمات تعمل بشكل طبيعي",
+    "zh": "所有系统服务正常运行",
+    "ru": "Все службы функционируют штатно"
+  },
+  "Онлайн сейчас:": {
+    "en": "Online now:",
+    "es": "En línea ahora:",
+    "ar": "متصل الآن:",
+    "zh": "当前在线:",
+    "ru": "Онлайн сейчас:"
+  },
+  "SIP Транков:": {
+    "en": "SIP Trunks:",
+    "es": "Troncales SIP:",
+    "ar": "خطوط SIP:",
+    "zh": "SIP 中继:",
+    "ru": "SIP Транков:"
+  },
+  "Активных плагинов:": {
+    "en": "Active plugins:",
+    "es": "Plugins activos:",
+    "ar": "الإضافات النشطة:",
+    "zh": "活跃插件:",
+    "ru": "Активных плагинов:"
+  },
+  "Управление →": {
+    "en": "Manage →",
+    "es": "Administrar →",
+    "ar": "إدارة ←",
+    "zh": "管理 →",
+    "ru": "Управление →"
+  },
+  "Транки →": {
+    "en": "Trunks →",
+    "es": "Troncales →",
+    "ar": "الخطوط ←",
+    "zh": "中继 →",
+    "ru": "Транки →"
+  },
+  "Подробнее →": {
+    "en": "Details →",
+    "es": "Detalles →",
+    "ar": "تفاصيل ←",
+    "zh": "详情 →",
+    "ru": "Подробнее →"
+  },
+  "Оперативная сводка системы": {
+    "en": "System Operational Summary",
+    "es": "Resumen Operativo del Sistema",
+    "ar": "الملخص التشغيلي للنظام",
+    "zh": "系统运行摘要",
+    "ru": "Оперативная сводка системы"
+  },
+  "ВХОДЯЩАЯ ЛИНИЯ": {
+    "en": "INBOUND ROUTE",
+    "es": "RUTA ENTRANTE",
+    "ar": "خط الدخول",
+    "zh": "呼入线路",
+    "ru": "ВХОДЯЩАЯ ЛИНИЯ"
+  },
+  "Основное направление": {
+    "en": "Default destination",
+    "es": "Destino principal",
+    "ar": "الوجهة الرئيسية",
+    "zh": "默认主叫目的地",
+    "ru": "Основное направление"
+  },
+  "IVR МЕНЮ": {
+    "en": "IVR MENU",
+    "es": "MENÚ IVR",
+    "ar": "قائمة IVR",
+    "zh": "IVR 菜单",
+    "ru": "IVR МЕНЮ"
+  },
+  "Включено": {
+    "en": "Enabled",
+    "es": "Habilitado",
+    "ar": "مفعل",
+    "zh": "已启用",
+    "ru": "Включено"
+  },
+  "узлов дерева": {
+    "en": "tree nodes",
+    "es": "nodos del árbol",
+    "ar": "عقد الشجرة",
+    "zh": "树节点",
+    "ru": "узлов дерева"
+  },
+  "AMOCRM СИНХРОНИЗАЦИЯ": {
+    "en": "AMOCRM SYNC",
+    "es": "SINCRONIZACIÓN AMOCRM",
+    "ar": "مزامنة AMOCRM",
+    "zh": "AMOCRM 同步",
+    "ru": "AMOCRM СИНХРОНИЗАЦИЯ"
+  },
+  "Включена": {
+    "en": "Active",
+    "es": "Activa",
+    "ar": "نشط",
+    "zh": "已激活",
+    "ru": "Включена"
+  },
+  "Быстрые действия": {
+    "en": "Quick Actions",
+    "es": "Acciones Rápidas",
+    "ar": "إجراءات سريعة",
+    "zh": "快捷操作",
+    "ru": "Быстрые действия"
+  },
+  "Создать SIP абонента": {
+    "en": "Create SIP Subscriber",
+    "es": "Crear Suscriptor SIP",
+    "ar": "إنشاء مشترك SIP",
+    "zh": "创建 SIP 分机",
+    "ru": "Создать SIP абонента"
+  },
+  "Настроить IVR схему": {
+    "en": "Configure IVR Tree",
+    "es": "Configurar Árbol IVR",
+    "ar": "تكوين شجرة IVR",
+    "zh": "配置 IVR 语音导航",
+    "ru": "Настроить IVR схему"
+  },
+  "Установить плагин": {
+    "en": "Install Plugin",
+    "es": "Instalar Plugin",
+    "ar": "تثبيت إضافة",
+    "zh": "安装新插件",
+    "ru": "Установить плагин"
+  },
+  "1. Поддержка передачи голоса (Voice-прошивка)": {
+    "en": "1. Voice Calls Support (Voice-Enabled Firmware)",
+    "es": "1. Soporte de Llamadas de Voz (Firmware Habilitado)",
+    "ar": "1. دعم المكالمات الصوتية (برامج ثابتة تدعم الصوت)",
+    "zh": "1. 语音传输支持 (Voice-Enabled 固件)",
+    "ru": "1. Поддержка передачи голоса (Voice-прошивка)"
+  },
+  "2. Питание USB-хаба (Active USB 2.0 Hub)": {
+    "en": "2. Powered USB Hub (Active USB 2.0 Hub)",
+    "es": "2. Concentrador USB con Alimentación (Hub USB 2.0 Activo)",
+    "ar": "2. موزع USB نشط مزود بالطاقة (Active USB 2.0 Hub)",
+    "zh": "2. 独立供电 USB 集线器 (Active USB 2.0 Hub)",
+    "ru": "2. Питание USB-хаба (Active USB 2.0 Hub)"
+  },
+  "Проверенные модели 3G / 4G модемов и модулей для Asterisk": {
+    "en": "Verified 3G / 4G Modems and Voice Cellular Modules for Asterisk",
+    "es": "Modelos probados de módems 3G / 4G y módulos celulares para Asterisk",
+    "ar": "طرازات أجهزة المودم 3G / 4G المعتمدة ووحدات الصوت لـ Asterisk",
+    "zh": "经过验证的 Asterisk 3G / 4G 语音调制解调器及工业模组",
+    "ru": "Проверенные модели 3G / 4G модемов и модулей для Asterisk"
+  },
+  "100% Эталон (Voice активен)": {
+    "en": "100% Benchmark (Voice Active)",
+    "es": "100% Referencia (Voz Activa)",
+    "ar": "100% معيار (الصوت نشط)",
+    "zh": "100% 推荐 (语音已激活)",
+    "ru": "100% Эталон (Voice активен)"
+  },
+  "Отлично (В Stick-режиме)": {
+    "en": "Excellent (In Stick Mode)",
+    "es": "Excelente (En Modo Stick)",
+    "ar": "ممتاز (في وضع العصا)",
+    "zh": "极佳 (在 Stick 模式下)",
+    "ru": "Отлично (В Stick-режиме)"
+  },
+  "Современный Enterprise 4G": {
+    "en": "Modern Enterprise 4G",
+    "es": "Enterprise 4G Moderno",
+    "ar": "مؤسسي 4G حديث",
+    "zh": "现代企业级 4G",
+    "ru": "Современный Enterprise 4G"
+  },
+  "Промышленный стандарт 4G": {
+    "en": "Industrial Standard 4G",
+    "es": "Estándar Industrial 4G",
+    "ar": "معيار صناعي 4G",
+    "zh": "工业级标准 4G",
+    "ru": "Промышленный стандарт 4G"
   }
 }
