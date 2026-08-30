@@ -5389,14 +5389,6 @@ def api_amocrm_push_call():
 # ================= MODULAR PLUGINS TEST & DIAGNOSTICS ENDPOINTS =================
 
 # ================= REAL-TIME SYSTEM & TELEPHONY LOGS STREAM ENGINE =================
-LOG_FILES_MAP = {
-    'system': '/var/log/asterisk/messages',
-    'amocrm': '/opt/amocrm_debug.log',
-    'uploader': '/opt/crm-yandex-uploader.log',
-    'modems': '/var/log/asterisk/messages',
-    'recording': '/var/log/asterisk/messages'
-}
-
 def parse_log_line(raw_line, default_type='system'):
     raw_line = raw_line.strip()
     if not raw_line: return None
@@ -5417,7 +5409,7 @@ def parse_log_line(raw_line, default_type='system'):
     log_type = default_type
     if 'DONGLE' in upper or 'MODEM' in upper or 'TTY' in upper or 'CSQ' in upper or 'SMS' in upper or 'SIM' in upper:
         log_type = 'modems'
-    elif 'TRUNK' in upper or 'PJSIP' in upper or 'SIP' in upper or 'CHAN' in upper or 'INVITE' in upper or 'REGISTER' in upper:
+    elif 'TRUNK' in upper or 'PJSIP' in upper or 'SIP' in upper or 'CHAN' in upper or 'INVITE' in upper or 'REGISTER' in upper or 'DIAL' in upper:
         log_type = 'trunks'
     elif 'MIXMONITOR' in upper or 'RECORD' in upper or 'AUDIO' in upper or 'WAV' in upper or 'MP3' in upper or 'PLAYBACK' in upper:
         log_type = 'recording'
@@ -5426,7 +5418,7 @@ def parse_log_line(raw_line, default_type='system'):
     elif 'YANDEX' in upper or 'GDRIVE' in upper or 'FTP' in upper or 'TELEGRAM' in upper or 'PLUGIN' in upper or 'WEBHOOK' in upper:
         log_type = 'plugins'
 
-    # Parse Timestamp if present
+    # Parse Timestamp
     ts = datetime.datetime.now().strftime("%H:%M:%S")
     ts_match = re.search(r'\[([0-9]{4}-[0-9]{2}-[0-9]{2}\s+[0-9]{2}:[0-9]{2}:[0-9]{2})\]', raw_line)
     if not ts_match:
@@ -5443,55 +5435,52 @@ def parse_log_line(raw_line, default_type='system'):
 
 @app.route('/api/logs/stream')
 def api_logs_stream():
-    """Server-Sent Events (SSE) stream for real-time live logs."""
+    """Continuous EventSource stream yielding live Asterisk & PBX events."""
     def event_stream():
-        # Get initial last 40 lines
+        # Send initial batch of 60 lines
         lines_buffer = []
-        
-        # 1. Read last lines from Asterisk messages
-        try:
-            res = subprocess.run(['tail', '-n', '50', '/var/log/asterisk/messages'], capture_output=True, text=True, errors='ignore')
-            if res.stdout:
-                for line in res.stdout.splitlines():
-                    parsed = parse_log_line(line, 'trunks')
-                    if parsed: lines_buffer.append(parsed)
-        except Exception:
-            pass
-
-        # 2. Read last lines from amoCRM / Uploader debug logs
-        for log_f in ['/opt/amocrm_debug.log', '/opt/crm-yandex-uploader.log']:
+        for log_f, def_t in [('/var/log/asterisk/messages', 'trunks'), ('/opt/amocrm_debug.log', 'amocrm'), ('/opt/crm-yandex-uploader.log', 'plugins')]:
             if os.path.exists(log_f):
                 try:
-                    res = subprocess.run(['tail', '-n', '20', log_f], capture_output=True, text=True, errors='ignore')
-                    if res.stdout:
-                        for line in res.stdout.splitlines():
-                            parsed = parse_log_line(line, 'amocrm')
-                            if parsed: lines_buffer.append(parsed)
+                    res = subprocess.run(['tail', '-n', '30', log_f], capture_output=True, text=True, errors='ignore')
+                    for line in res.stdout.splitlines():
+                        p = parse_log_line(line, def_t)
+                        if p: lines_buffer.append(p)
                 except Exception:
                     pass
 
-        # Send initial batch
+        if not lines_buffer:
+            lines_buffer.append({
+                'timestamp': datetime.datetime.now().strftime("%H:%M:%S"),
+                'level': 'info',
+                'type': 'system',
+                'message': 'Asterisk Logic Core Logger initialized. Listening for active channels and live calls...'
+            })
+
         yield f"data: {json.dumps({'type': 'init', 'logs': lines_buffer[-80:]})}\n\n"
 
-        # Continuous live tail
-        while True:
-            time.sleep(2)
-            # Fetch recent Asterisk activity via Asterisk CLI or fresh log lines
-            live_logs = []
-            try:
-                # Poll last 5 lines
-                res = subprocess.run(['tail', '-n', '5', '/var/log/asterisk/messages'], capture_output=True, text=True, errors='ignore')
-                if res.stdout:
-                    for line in res.stdout.splitlines():
-                        parsed = parse_log_line(line, 'system')
-                        if parsed: live_logs.append(parsed)
-            except Exception:
-                pass
+        # Continuous streaming via tail -F
+        p_tail = subprocess.Popen(
+            ['tail', '-n', '0', '-F', '/var/log/asterisk/messages', '/opt/amocrm_debug.log', '/opt/crm-yandex-uploader.log'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+            bufsize=1
+        )
 
-            if live_logs:
-                yield f"data: {json.dumps({'type': 'batch', 'logs': live_logs})}\n\n"
-            else:
-                yield f": ping\n\n"
+        try:
+            while True:
+                line = p_tail.stdout.readline()
+                if line:
+                    p = parse_log_line(line, 'system')
+                    if p:
+                        yield f"data: {json.dumps({'type': 'batch', 'logs': [p]})}\n\n"
+                else:
+                    time.sleep(0.5)
+        except GeneratorExit:
+            p_tail.terminate()
+        except Exception:
+            p_tail.terminate()
 
     return Response(event_stream(), mimetype="text/event-stream")
 
