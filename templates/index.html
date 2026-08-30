@@ -2624,7 +2624,11 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-on-surface-variant mb-1">Контекст вызовов</label>
-                        <input type="text" id="edit-user-context" name="context" value="from-internal" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono text-on-surface">
+                        <select name="context" id="edit-user-context" class="select2-context-dropdown w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs font-mono text-on-surface">
+                            {% for ctx in available_contexts %}
+                            <option value="{{ ctx }}">{{ ctx }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
 
@@ -2667,6 +2671,16 @@
                         <label class="block text-xs font-semibold text-on-surface-variant mb-1">Пароль (Secret)</label>
                         <input type="text" name="password" placeholder="Pass12345!" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
                     </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Контекст вызовов (Диалплан)</label>
+                    <select name="context" id="add_user_context_select" class="select2-context-dropdown w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs font-mono">
+                        {% for ctx in available_contexts %}
+                        <option value="{{ ctx }}" {% if ctx == 'from-internal' %}selected{% endif %}>{{ ctx }}{{ ' (По умолчанию)' if ctx == 'from-internal' else '' }}</option>
+                        {% endfor %}
+                    </select>
+                    <span class="text-[11px] text-on-surface-variant mt-1 block">Выберите существующий контекст или введите новый прямо в поле.</span>
                 </div>
                 <div class="pt-2 flex justify-end gap-2">
                     <button type="button" onclick="document.getElementById('modal-add-user').classList.add('hidden')" class="px-4 py-2 rounded-xl text-sm font-medium text-on-surface-variant hover:bg-surface-container">Отмена</button>
@@ -4527,7 +4541,8 @@
         }
 
         
-        function openEditUserModal(exten, name, password, context) {
+        // SELECT2 CONTEXT HANDLER
+
             document.getElementById('edit-user-old-exten').value = exten;
             document.getElementById('edit-user-exten').value = exten;
             document.getElementById('edit-user-name').value = name || ('Оператор ' + exten);
@@ -4536,6 +4551,36 @@
             document.getElementById('edit-user-subtitle').textContent = 'Редактирование параметров для № ' + exten;
             document.getElementById('modal-edit-user').classList.remove('hidden');
         }
+
+        
+        function openEditUserModal(exten, name, password, context) {
+            document.getElementById('edit-user-old-exten').value = exten;
+            document.getElementById('edit-user-exten').value = exten;
+            document.getElementById('edit-user-name').value = name || ('Оператор ' + exten);
+            document.getElementById('edit-user-password').value = password || '';
+            
+            const ctxSelect = $('#edit-user-context');
+            if (ctxSelect.find("option[value='" + context + "']").length) {
+                ctxSelect.val(context).trigger('change');
+            } else {
+                const newOption = new Option(context, context, true, true);
+                ctxSelect.append(newOption).trigger('change');
+            }
+
+            document.getElementById('edit-user-subtitle').textContent = 'Редактирование параметров для № ' + exten;
+            document.getElementById('modal-edit-user').classList.remove('hidden');
+        }
+
+        $(document).ready(function() {
+            if (typeof $.fn.select2 !== 'undefined') {
+                $('.select2-context-dropdown').select2({
+                    tags: true,
+                    width: '100%',
+                    placeholder: 'Выберите или введите контекст...',
+                    dropdownParent: $('body')
+                });
+            }
+        });
 
         function closeEditUserModal() {
             document.getElementById('modal-edit-user').classList.add('hidden');

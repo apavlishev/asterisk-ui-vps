@@ -4331,6 +4331,39 @@ def save_integrations(data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+
+def get_available_sip_contexts():
+    """Extracts all valid dialplan contexts from extensions.conf and pjsip.conf."""
+    contexts = set(['from-internal', 'default'])
+    
+    # 1. Parse extensions.conf
+    if os.path.exists(EXTENSIONS_CONF):
+        try:
+            with open(EXTENSIONS_CONF, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith('[') and line.endswith(']'):
+                        ctx = line[1:-1].strip()
+                        if ctx not in ['general', 'globals'] and not ctx.startswith('sub-'):
+                            contexts.add(ctx)
+        except Exception:
+            pass
+
+    # 2. Parse existing PJSIP endpoints contexts
+    if os.path.exists(PJSIP_CONF):
+        try:
+            with open(PJSIP_CONF, 'r', encoding='utf-8') as f:
+                for line in f:
+                    if line.strip().startswith('context='):
+                        ctx = line.strip().split('=', 1)[1].strip()
+                        if ctx:
+                            contexts.add(ctx)
+        except Exception:
+            pass
+
+    return sorted(list(contexts))
+
+
 def load_sip_accounts():
     accounts = []
     if not os.path.exists(PJSIP_CONF):
@@ -5237,6 +5270,7 @@ def index():
         auth_username=auth_cfg.get('username', 'admin'),
         show_security_prompt=show_security_prompt,
         accounts=accounts,
+        available_contexts=get_available_sip_contexts(),
         integrations=integrations,
         ring_groups=ring_groups,
         sip_trunks=sip_trunks,
