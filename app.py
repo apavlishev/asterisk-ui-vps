@@ -5707,6 +5707,114 @@ def sip_delete():
     flash(f'SIP Аккаунт {exten} удален!')
     return redirect(url_for('index'))
 
+
+# ================= SIP TRUNKS MANAGEMENT (ADD / EDIT / TOGGLE / DELETE) =================
+@app.route('/settings/sip-trunks/add', methods=['POST'])
+@app.route('/settings/sip-trunks/save', methods=['POST'])
+def api_save_sip_trunk():
+    cfg = load_integrations()
+    trunks = cfg.get('sip_trunks', [])
+    
+    trunk_id = request.form.get('trunk_id', '').strip()
+    name = request.form.get('trunk_name', '').strip()
+    host = request.form.get('trunk_host', '').strip()
+    port = int(request.form.get('trunk_port', 5060) or 5060)
+    username = request.form.get('trunk_user', '').strip()
+    password = request.form.get('trunk_pass', '').strip()
+    callerid = request.form.get('trunk_cid', '').strip()
+    transport = request.form.get('trunk_transport', 'udp').strip()
+    context = request.form.get('trunk_context', '').strip()
+    
+    if not name or not host or not username:
+        flash('Название, хост и логин транка обязательны!')
+        return redirect(url_for('index'))
+        
+    target_trunk = None
+    if trunk_id:
+        for t in trunks:
+            if t['id'] == trunk_id:
+                target_trunk = t
+                break
+                
+    if target_trunk:
+        target_trunk['name'] = name
+        target_trunk['host'] = host
+        target_trunk['port'] = port
+        target_trunk['username'] = username
+        if password:
+            target_trunk['password'] = password
+        target_trunk['callerid'] = callerid
+        target_trunk['transport'] = transport
+        if context:
+            target_trunk['context'] = context
+        flash(f'SIP-Транк «{name}» успешно обновлен!')
+    else:
+        # Generate clean trunk ID
+        new_id = "trunk_" + re.sub(r'[^a-zA-Z0-9_]', '', name.lower())[:15] + "_" + str(int(time.time()))[-4:]
+        new_trunk = {
+            'id': new_id,
+            'name': name,
+            'host': host,
+            'port': port,
+            'username': username,
+            'password': password,
+            'callerid': callerid,
+            'transport': transport,
+            'context': context or f"trunk-in-{new_id}",
+            'enabled': True
+        }
+        trunks.append(new_trunk)
+        flash(f'SIP-Транк «{name}» успешно подключен!')
+
+    cfg['sip_trunks'] = trunks
+    save_integrations(cfg)
+    
+    # Re-generate PJSIP & Dialplan
+    try:
+        generate_pjsip_conf()
+        generate_dialplan_from_tree()
+        subprocess.run(['asterisk', '-rx', 'pjsip reload'], capture_output=True)
+        subprocess.run(['asterisk', '-rx', 'dialplan reload'], capture_output=True)
+    except Exception as e:
+        print("Error reloading Asterisk after trunk save:", e)
+        
+    return redirect(url_for('index'))
+
+@app.route('/settings/sip-trunks/toggle/<trunk_id>', methods=['POST'])
+def api_toggle_sip_trunk(trunk_id):
+    cfg = load_integrations()
+    trunks = cfg.get('sip_trunks', [])
+    for t in trunks:
+        if t['id'] == trunk_id:
+            t['enabled'] = not t.get('enabled', True)
+            flash(f"SIP-Транк «{t['name']}» {'активирован' if t['enabled'] else 'отключен'}.")
+            break
+    cfg['sip_trunks'] = trunks
+    save_integrations(cfg)
+    try:
+        generate_pjsip_conf()
+        generate_dialplan_from_tree()
+        subprocess.run(['asterisk', '-rx', 'pjsip reload'], capture_output=True)
+    except Exception:
+        pass
+    return redirect(url_for('index'))
+
+@app.route('/settings/sip-trunks/delete/<trunk_id>', methods=['POST'])
+def api_delete_sip_trunk(trunk_id):
+    cfg = load_integrations()
+    trunks = cfg.get('sip_trunks', [])
+    cfg['sip_trunks'] = [t for t in trunks if t['id'] != trunk_id]
+    save_integrations(cfg)
+    try:
+        generate_pjsip_conf()
+        generate_dialplan_from_tree()
+        subprocess.run(['asterisk', '-rx', 'pjsip reload'], capture_output=True)
+    except Exception:
+        pass
+    flash(f"SIP-Транк успешно удален!")
+    return redirect(url_for('index'))
+
+
 @app.route('/action/restart-dongle', methods=['POST'])
 def restart_dongle():
     try:

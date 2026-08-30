@@ -1181,6 +1181,62 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- DOCUMENTATION & KNOWLEDGE BASE: SIP TRUNKS & CARRIERS -->
+                <div class="bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm space-y-5">
+                    <div class="flex items-center gap-3 pb-3 border-b border-surface-container">
+                        <div class="w-10 h-10 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center font-bold">
+                            <span class="material-symbols-outlined text-2xl">help</span>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-on-surface">Руководство по настройке SIP-транков и внешних провайдеров</h3>
+                            <p class="text-xs text-on-surface-variant">Разбор всех технических параметров подключения операторов связи (Zadarma, Mango, Мегафон, Билайн, du, Etisalat, Twilio)</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
+                            <div class="flex items-center gap-2 font-bold text-on-surface">
+                                <span class="material-symbols-outlined text-primary text-[18px]">dns</span>
+                                <span>Хост / Домен провайдера (SIP Registrar) и Порт</span>
+                            </div>
+                            <p class="text-on-surface-variant leading-relaxed">
+                                Адрес сервера оператора (например: <code>sip.zadarma.com</code>, <code>multifon.megafon.ru</code>, <code>vpbx.mangosip.ru</code>).<br>
+                                <b>Порт:</b> по умолчанию <code>5060</code> (UDP/TCP) или <code>5061</code> (TLS). Сервер непрерывно опрашивает хост механизмом OPTIONS Keep-Alive.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
+                            <div class="flex items-center gap-2 font-bold text-on-surface">
+                                <span class="material-symbols-outlined text-amber-500 text-[18px]">badge</span>
+                                <span>Логин (Auth User) и Пароль (Secret)</span>
+                            </div>
+                            <p class="text-on-surface-variant leading-relaxed">
+                                Учетные данные SIP-линии из личного кабинета провайдера. При включенной опции <i>«Используется»</i> Asterisk отправляет дайджест-регистрацию (SIP REGISTER) каждые 60 секунд.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
+                            <div class="flex items-center gap-2 font-bold text-on-surface">
+                                <span class="material-symbols-outlined text-secondary text-[18px]">call</span>
+                                <span>АОН / CallerID (Outbound Caller ID)</span>
+                            </div>
+                            <p class="text-on-surface-variant leading-relaxed">
+                                Городской или мобильный номер в международном формате (например, <code>+74951234567</code> или <code>+97142000000</code>), который будет высвечиваться у клиентов при исходящих звонках менеджеров.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
+                            <div class="flex items-center gap-2 font-bold text-on-surface">
+                                <span class="material-symbols-outlined text-success text-[18px]">alt_route</span>
+                                <span>Входящий контекст (Inbound Context)</span>
+                            </div>
+                            <p class="text-on-surface-variant leading-relaxed">
+                                Автоматически генерируемый маршрут (например: <code>trunk-in-trunk_megafon</code>). Вызовы с этого транка попадают в назначенный IVR-сценарий или распределяются на сотрудников по расписанию.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- // ================= TAB 5: SIP TRUNKS // ================= -->
@@ -1253,7 +1309,10 @@
                                     {% endif %}
                                 </td>
 
-                                <td class="px-6 py-4 text-right">
+                                <td class="px-6 py-4 text-right space-x-1">
+                                    <button type="button" onclick="openEditTrunkModal('{{ t.id }}', '{{ t.name }}', '{{ t.host }}', '{{ t.port or 5060 }}', '{{ t.username }}', '{{ t.password }}', '{{ t.callerid or '' }}', '{{ t.transport or 'udp' }}', '{{ t.context or '' }}')" class="p-2 rounded-lg text-primary hover:bg-primary/10 transition-colors" title="Редактировать параметры транка">
+                                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                                    </button>
                                     <form action="/settings/sip-trunks/delete/{{ t.id }}" method="POST" onsubmit="return confirm('Удалить транк {{ t.name }}?');" class="inline">
                                         <button type="submit" class="p-2 rounded-lg text-error hover:bg-error/10 transition-colors" title="Удалить транк">
                                             <span class="material-symbols-outlined text-[18px]">delete</span>
@@ -1270,6 +1329,62 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                </div>
+
+                <!-- DOCUMENTATION & KNOWLEDGE BASE: SIP TRUNKS & CARRIERS -->
+                <div class="bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm space-y-5">
+                    <div class="flex items-center gap-3 pb-3 border-b border-surface-container">
+                        <div class="w-10 h-10 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center font-bold">
+                            <span class="material-symbols-outlined text-2xl">help</span>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-on-surface">Руководство по настройке SIP-транков и внешних провайдеров</h3>
+                            <p class="text-xs text-on-surface-variant">Разбор всех технических параметров подключения операторов связи (Zadarma, Mango, Мегафон, Билайн, du, Etisalat, Twilio)</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
+                            <div class="flex items-center gap-2 font-bold text-on-surface">
+                                <span class="material-symbols-outlined text-primary text-[18px]">dns</span>
+                                <span>Хост / Домен провайдера (SIP Registrar) и Порт</span>
+                            </div>
+                            <p class="text-on-surface-variant leading-relaxed">
+                                Адрес сервера оператора (например: <code>sip.zadarma.com</code>, <code>multifon.megafon.ru</code>, <code>vpbx.mangosip.ru</code>).<br>
+                                <b>Порт:</b> по умолчанию <code>5060</code> (UDP/TCP) или <code>5061</code> (TLS). Сервер непрерывно опрашивает хост механизмом OPTIONS Keep-Alive.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
+                            <div class="flex items-center gap-2 font-bold text-on-surface">
+                                <span class="material-symbols-outlined text-amber-500 text-[18px]">badge</span>
+                                <span>Логин (Auth User) и Пароль (Secret)</span>
+                            </div>
+                            <p class="text-on-surface-variant leading-relaxed">
+                                Учетные данные SIP-линии из личного кабинета провайдера. При включенной опции <i>«Используется»</i> Asterisk отправляет дайджест-регистрацию (SIP REGISTER) каждые 60 секунд.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
+                            <div class="flex items-center gap-2 font-bold text-on-surface">
+                                <span class="material-symbols-outlined text-secondary text-[18px]">call</span>
+                                <span>АОН / CallerID (Outbound Caller ID)</span>
+                            </div>
+                            <p class="text-on-surface-variant leading-relaxed">
+                                Городской или мобильный номер в международном формате (например, <code>+74951234567</code> или <code>+97142000000</code>), который будет высвечиваться у клиентов при исходящих звонках менеджеров.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
+                            <div class="flex items-center gap-2 font-bold text-on-surface">
+                                <span class="material-symbols-outlined text-success text-[18px]">alt_route</span>
+                                <span>Входящий контекст (Inbound Context)</span>
+                            </div>
+                            <p class="text-on-surface-variant leading-relaxed">
+                                Автоматически генерируемый маршрут (например: <code>trunk-in-trunk_megafon</code>). Вызовы с этого транка попадают в назначенный IVR-сценарий или распределяются на сотрудников по расписанию.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -2770,6 +2885,80 @@
                 <div class="pt-2 flex justify-end gap-2">
                     <button type="button" onclick="document.getElementById('modal-add-user').classList.add('hidden')" class="px-4 py-2 rounded-xl text-sm font-medium text-on-surface-variant hover:bg-surface-container">Отмена</button>
                     <button type="submit" class="px-5 py-2 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:bg-primary/90">Создать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+        <!-- MODAL: EDIT SIP TRUNK -->
+    <div id="modal-edit-trunk" class="hidden fixed inset-0 bg-on-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-surface rounded-2xl max-w-md w-full p-6 border border-outline/30 shadow-xl space-y-4">
+            <div class="flex justify-between items-center pb-2 border-b border-surface-container">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-xl">settings_ethernet</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-on-surface">Редактирование SIP-Транка</h3>
+                        <p class="text-xs text-on-surface-variant" id="edit-trunk-subtitle">Изменение параметров провайдера связи</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeEditTrunkModal()" class="text-on-surface-variant hover:text-on-surface p-1">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <form action="/settings/sip-trunks/save" method="POST" class="space-y-4">
+                <input type="hidden" id="edit-trunk-id" name="trunk_id" value="">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Название транка</label>
+                    <input type="text" id="edit-trunk-name" name="trunk_name" placeholder="Zadarma / Megafon / Mango" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm text-on-surface">
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="col-span-2">
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Хост / Домен сервера</label>
+                        <input type="text" id="edit-trunk-host" name="trunk_host" placeholder="sip.provider.com" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono text-on-surface">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Порт</label>
+                        <input type="number" id="edit-trunk-port" name="trunk_port" value="5060" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono text-on-surface">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Логин / SIP ID</label>
+                        <input type="text" id="edit-trunk-user" name="trunk_user" placeholder="123456" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono text-on-surface">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Пароль (Secret)</label>
+                        <input type="password" id="edit-trunk-pass" name="trunk_pass" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono text-on-surface">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">АОН / CallerID</label>
+                        <input type="text" id="edit-trunk-cid" name="trunk_cid" placeholder="+74951234567" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono text-on-surface">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Транспорт</label>
+                        <select id="edit-trunk-transport" name="trunk_transport" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs font-semibold text-on-surface">
+                            <option value="udp">UDP (Стандарт)</option>
+                            <option value="tcp">TCP</option>
+                            <option value="tls">TLS (Зашифрованный)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2 border-t border-surface-container">
+                    <button type="button" onclick="closeEditTrunkModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:bg-surface-container transition-colors">Отмена</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition-all shadow-sm flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">save</span>
+                        <span>Сохранить параметры транка</span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -4657,6 +4846,24 @@
                 });
             }
         });
+
+        
+        function openEditTrunkModal(id, name, host, port, user, pass, cid, transport, context) {
+            document.getElementById('edit-trunk-id').value = id;
+            document.getElementById('edit-trunk-name').value = name || '';
+            document.getElementById('edit-trunk-host').value = host || '';
+            document.getElementById('edit-trunk-port').value = port || '5060';
+            document.getElementById('edit-trunk-user').value = user || '';
+            document.getElementById('edit-trunk-pass').value = pass || '';
+            document.getElementById('edit-trunk-cid').value = cid || '';
+            document.getElementById('edit-trunk-transport').value = transport || 'udp';
+            document.getElementById('edit-trunk-subtitle').textContent = 'Параметры подключения линии «' + name + '»';
+            document.getElementById('modal-edit-trunk').classList.remove('hidden');
+        }
+
+        function closeEditTrunkModal() {
+            document.getElementById('modal-edit-trunk').classList.add('hidden');
+        }
 
         function closeEditUserModal() {
             document.getElementById('modal-edit-user').classList.add('hidden');
