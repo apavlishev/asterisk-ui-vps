@@ -1,0 +1,4 @@
+{
+  "name": "Google Drive Cloud Vault",
+  "desc": "Архивация звонков в Google Drive с иерархией по папкам Год/Месяц и OAuth2 авторизацией."
+}

@@ -1,0 +1,4 @@
+{
+  "name": "Google Drive 企业云归档",
+  "desc": "自动将录音归档至 Google Drive，支持年月多级目录及官方 OAuth2 认证。"
+}

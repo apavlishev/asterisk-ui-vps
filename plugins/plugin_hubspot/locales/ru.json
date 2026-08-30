@@ -1,0 +1,4 @@
+{
+  "name": "HubSpot Enterprise CRM Sync",
+  "desc": "Логирование звонков через Call Objects API v3, встроенный плеер записи и автосвязка с Contacts/Deals."
+}

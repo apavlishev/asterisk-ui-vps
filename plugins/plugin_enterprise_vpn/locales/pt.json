@@ -1,0 +1,4 @@
+{
+  "name": "Enterprise PBX VPN Server",
+  "desc": "Secure on-premise VPN server (OpenVPN + VLESS) for encrypted remote softphone connections."
+}

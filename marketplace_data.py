@@ -3,8 +3,8 @@ import json
 
 PLUGINS_DIR = os.path.join(os.path.dirname(__file__), 'plugins')
 
-def load_marketplace_plugins(active_plugin_ids=None, disabled_plugin_ids=None):
-    """Dynamically reads all plugin manifests from /plugins folder and calculates active/disabled state."""
+def load_marketplace_plugins(active_plugin_ids=None, disabled_plugin_ids=None, lang_code='ru'):
+    """Dynamically reads all plugin manifests and applies per-plugin localized translations from /locales."""
     if active_plugin_ids is None:
         active_plugin_ids = []
     if disabled_plugin_ids is None:
@@ -13,7 +13,8 @@ def load_marketplace_plugins(active_plugin_ids=None, disabled_plugin_ids=None):
     plugins = []
     if os.path.exists(PLUGINS_DIR):
         for entry in os.listdir(PLUGINS_DIR):
-            manifest_path = os.path.join(PLUGINS_DIR, entry, 'manifest.json')
+            plugin_path = os.path.join(PLUGINS_DIR, entry)
+            manifest_path = os.path.join(plugin_path, 'manifest.json')
             if os.path.exists(manifest_path):
                 try:
                     with open(manifest_path, 'r', encoding='utf-8') as f:
@@ -23,6 +24,19 @@ def load_marketplace_plugins(active_plugin_ids=None, disabled_plugin_ids=None):
                     meta['enabled'] = (p_id not in disabled_plugin_ids)
                     meta['dir_name'] = entry
                     
+                    # 🌐 Check for Plugin-Specific Locale
+                    loc_file = os.path.join(plugin_path, 'locales', f'{lang_code}.json')
+                    if not os.path.exists(loc_file):
+                        loc_file = os.path.join(plugin_path, 'locales', 'en.json')
+                    if os.path.exists(loc_file):
+                        try:
+                            with open(loc_file, 'r', encoding='utf-8') as lf:
+                                loc_data = json.load(lf)
+                                if 'name' in loc_data: meta['name'] = loc_data['name']
+                                if 'desc' in loc_data: meta['description'] = loc_data['desc']
+                        except Exception:
+                            pass
+
                     # Ensure category is set for filtering
                     if 'category' not in meta:
                         if 'crm' in p_id or 'telegram' in p_id:

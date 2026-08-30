@@ -1,0 +1,4 @@
+{
+  "name": "Enterprise PBX VPN Server",
+  "desc": "Защищенный VPN сервер (OpenVPN + VLESS) для безопасного подключения удаленных сотрудников."
+}
