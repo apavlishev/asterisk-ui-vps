@@ -5727,6 +5727,50 @@ def restart_dongle():
 
 
 
+
+@app.route('/api/amocrm/pipelines', methods=['GET'])
+def api_amocrm_pipelines():
+    """Fetches pipelines and statuses from amoCRM API or returns saved/cached ones."""
+    cfg = load_integrations()
+    amo = cfg.get('amocrm', {})
+    subdomain = amo.get('subdomain', '').strip()
+    token = amo.get('token', '').strip()
+    
+    if not subdomain or not token:
+        return jsonify({'status': 'error', 'message': 'amoCRM не настроен или отсутствует токен', 'pipelines': []})
+        
+    url = f"https://{subdomain}.amocrm.ru/api/v4/leads/pipelines"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+    try:
+        resp = requests.get(url, headers=headers, timeout=5)
+        if resp.status_code == 200:
+            data = resp.json()
+            raw_pipelines = data.get('_embedded', {}).get('pipelines', [])
+            pipelines = []
+            for p in raw_pipelines:
+                p_obj = {
+                    'id': p.get('id'),
+                    'name': p.get('name'),
+                    'statuses': []
+                }
+                raw_statuses = p.get('_embedded', {}).get('statuses', [])
+                for s in raw_statuses:
+                    p_obj['statuses'].append({
+                        'id': s.get('id'),
+                        'name': s.get('name'),
+                        'color': s.get('color', '#4c8bf7')
+                    })
+                pipelines.append(p_obj)
+            return jsonify({'status': 'ok', 'pipelines': pipelines})
+        else:
+            return jsonify({'status': 'error', 'message': f'amoCRM API HTTP {resp.status_code}', 'pipelines': []})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e), 'pipelines': []})
+
+
 @app.route('/api/amocrm/push-call', methods=['POST'])
 def api_amocrm_push_call():
     data = request.get_json() or {}

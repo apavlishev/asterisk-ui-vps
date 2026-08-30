@@ -4543,15 +4543,6 @@
         
         // SELECT2 CONTEXT HANDLER
 
-            document.getElementById('edit-user-old-exten').value = exten;
-            document.getElementById('edit-user-exten').value = exten;
-            document.getElementById('edit-user-name').value = name || ('Оператор ' + exten);
-            document.getElementById('edit-user-password').value = password || '';
-            document.getElementById('edit-user-context').value = context || 'from-internal';
-            document.getElementById('edit-user-subtitle').textContent = 'Редактирование параметров для № ' + exten;
-            document.getElementById('modal-edit-user').classList.remove('hidden');
-        }
-
         
         function openEditUserModal(exten, name, password, context) {
             document.getElementById('edit-user-old-exten').value = exten;
