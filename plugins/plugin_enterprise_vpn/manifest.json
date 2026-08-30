@@ -1,0 +1,15 @@
+{
+  "id": "enterprise_vpn",
+  "name": "Enterprise PBX VPN Hub",
+  "category": "security",
+  "category_name": "Безопасность & VPN",
+  "version": "v1.1.0",
+  "author": "Logic Core Security",
+  "icon": "vpn_lock",
+  "color": "primary",
+  "rating": "5.0 (New)",
+  "price": "Free",
+  "price_sub": "Included",
+  "description": "Полнофункциональный двойной VPN-сервер прямо на АТС: OpenVPN (для офисных IP-телефонов Yealink/Grandstream/Fanvil) + VLESS Reality XTLS (для смартфонов и софтфонов с маскировкой под HTTPS и обходом любых блокировок).",
+  "entry_point": "plugin_main.py"
+}

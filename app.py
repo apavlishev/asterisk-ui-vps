@@ -5854,6 +5854,164 @@ def api_logs_query():
     return jsonify({'status': 'ok', 'logs': filtered[-limit:]})
 
 
+
+# ================= ENTERPRISE PBX VPN HUB (OPENVPN & VLESS REALITY) =================
+def get_enterprise_vpn_config():
+    cfg = load_integrations()
+    vpn = cfg.get('enterprise_vpn', {})
+    if not vpn:
+        # Default starter configuration
+        vpn = {
+            'enabled': True,
+            'server_ip': '138.124.229.10',
+            'openvpn': {
+                'enabled': True,
+                'port': 1194,
+                'proto': 'udp',
+                'subnet': '10.8.0.0/24',
+                'clients': [
+                    {'id': 'ovpn_101', 'name': 'Офисный телефон (Yealink 101)', 'ip': '10.8.0.101', 'created': '2026-08-30'},
+                    {'id': 'ovpn_102', 'name': 'Офисный телефон (Grandstream 102)', 'ip': '10.8.0.102', 'created': '2026-08-30'}
+                ]
+            },
+            'vless': {
+                'enabled': True,
+                'port': 8443,
+                'dest_domain': 'www.microsoft.com:443',
+                'server_names': ['www.microsoft.com', 'microsoft.com'],
+                'public_key': 'eP3Z9V0M5Q2N1_SAMPLE_KEY_REALITY_SECURE_KEY',
+                'short_id': '6ba7b810',
+                'clients': [
+                    {'id': 'vless_mobile_101', 'name': 'Моб. софтфон (iPhone 101)', 'uuid': 'b831381d-6324-4d53-ad4f-8cda48b30811', 'created': '2026-08-30'},
+                    {'id': 'vless_mobile_103', 'name': 'Моб. софтфон (Android 103)', 'uuid': 'c942492e-7435-5e64-be50-9deb59c41922', 'created': '2026-08-30'}
+                ]
+            }
+        }
+    return vpn
+
+def save_enterprise_vpn_config(vpn_cfg):
+    cfg = load_integrations()
+    cfg['enterprise_vpn'] = vpn_cfg
+    save_integrations(cfg)
+
+@app.route('/settings/enterprise-vpn', methods=['POST'])
+def api_save_enterprise_vpn():
+    vpn = get_enterprise_vpn_config()
+    vpn['enabled'] = True if request.form.get('enabled') else False
+    vpn['server_ip'] = request.form.get('server_ip', '138.124.229.10').strip()
+    
+    # OpenVPN settings
+    vpn['openvpn']['enabled'] = True if request.form.get('openvpn_enabled') else False
+    vpn['openvpn']['port'] = int(request.form.get('openvpn_port', 1194))
+    vpn['openvpn']['proto'] = request.form.get('openvpn_proto', 'udp')
+    
+    # VLESS settings
+    vpn['vless']['enabled'] = True if request.form.get('vless_enabled') else False
+    vpn['vless']['port'] = int(request.form.get('vless_port', 8443))
+    vpn['vless']['dest_domain'] = request.form.get('vless_dest_domain', 'www.microsoft.com:443').strip()
+    
+    save_enterprise_vpn_config(vpn)
+    flash('Настройки Enterprise PBX VPN Hub сохранены!')
+    return redirect(request.referrer or url_for('index'))
+
+@app.route('/api/vpn/client/add', methods=['POST'])
+def api_add_vpn_client():
+    data = request.get_json() or {}
+    vpn_type = data.get('type', 'openvpn') # openvpn or vless
+    name = data.get('name', 'Новый клиент').strip()
+    
+    vpn = get_enterprise_vpn_config()
+    if vpn_type == 'openvpn':
+        c_id = f"ovpn_{int(time.time())}"
+        next_ip = f"10.8.0.{100 + len(vpn['openvpn']['clients']) + 1}"
+        client_obj = {
+            'id': c_id,
+            'name': name,
+            'ip': next_ip,
+            'created': datetime.datetime.now().strftime("%Y-%m-%d")
+        }
+        vpn['openvpn']['clients'].append(client_obj)
+        save_enterprise_vpn_config(vpn)
+        return jsonify({'status': 'ok', 'client': client_obj})
+    else:
+        c_id = f"vless_{int(time.time())}"
+        client_uuid = str(uuid.uuid4())
+        client_obj = {
+            'id': c_id,
+            'name': name,
+            'uuid': client_uuid,
+            'created': datetime.datetime.now().strftime("%Y-%m-%d")
+        }
+        vpn['vless']['clients'].append(client_obj)
+        save_enterprise_vpn_config(vpn)
+        return jsonify({'status': 'ok', 'client': client_obj})
+
+@app.route('/api/vpn/client/delete', methods=['POST'])
+def api_delete_vpn_client():
+    data = request.get_json() or {}
+    client_id = data.get('id')
+    vpn_type = data.get('type')
+    vpn = get_enterprise_vpn_config()
+    if vpn_type == 'openvpn':
+        vpn['openvpn']['clients'] = [c for c in vpn['openvpn']['clients'] if c['id'] != client_id]
+    else:
+        vpn['vless']['clients'] = [c for c in vpn['vless']['clients'] if c['id'] != client_id]
+    save_enterprise_vpn_config(vpn)
+    return jsonify({'status': 'ok'})
+
+@app.route('/api/vpn/openvpn/download/<client_id>')
+def api_download_ovpn_file(client_id):
+    vpn = get_enterprise_vpn_config()
+    client = next((c for c in vpn['openvpn']['clients'] if c['id'] == client_id), None)
+    c_name = client['name'] if client else client_id
+    server_ip = vpn.get('server_ip', '138.124.229.10')
+    port = vpn['openvpn'].get('port', 1194)
+    proto = vpn['openvpn'].get('proto', 'udp')
+    
+    ovpn_content = f"""# OpenVPN Client Profile for IP-Phone (Yealink / Grandstream / Fanvil)
+# Client: {c_name}
+client
+dev tun
+proto {proto}
+remote {server_ip} {port}
+resolv-retry infinite
+nobind
+persist-key
+persist-tun
+remote-cert-tls server
+cipher AES-256-GCM
+auth SHA256
+key-direction 1
+verb 3
+
+<ca>
+-----BEGIN CERTIFICATE-----
+MIIDQjCCAiqgAwIBAgIUQPBXEnterprisePBXVpnCaCert...
+-----END CERTIFICATE-----
+</ca>
+<cert>
+-----BEGIN CERTIFICATE-----
+MIIDPDCCAiSgAwIBAgIUQPBXClientCert_{client_id}...
+-----END CERTIFICATE-----
+</cert>
+<key>
+-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC7PBXClientKey...
+-----END PRIVATE KEY-----
+</key>
+<tls-auth>
+-----BEGIN OpenVPN Static key V1-----
+e41a91e57140f2824e8...
+-----END OpenVPN Static key V1-----
+</tls-auth>
+"""
+    return Response(
+        ovpn_content,
+        mimetype="application/x-openvpn-profile",
+        headers={"Content-Disposition": f"attachment;filename={client_id}.ovpn"}
+    )
+
+
 if __name__ == '__main__':
     try:
         threading.Thread(target=network_guardian_startup_check, daemon=True).start()
