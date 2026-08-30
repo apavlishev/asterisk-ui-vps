@@ -1,422 +1,478 @@
 {
+  "Asterisk Core: ONLINE": {
+    "ru": "Asterisk Core: ONLINE",
+    "en": "Asterisk Core: ONLINE",
+    "es": "Núcleo Asterisk: EN LÍNEA",
+    "ar": "نواة أستريسك: متصل",
+    "zh": "Asterisk 核心: 运行中"
+  },
+  "Asterisk Core: OFFLINE": {
+    "ru": "Asterisk Core: OFFLINE",
+    "en": "Asterisk Core: OFFLINE",
+    "es": "Núcleo Asterisk: FUERA DE LÍNEA",
+    "ar": "نواة أستريسك: غير متصل",
+    "zh": "Asterisk 核心: 已停止"
+  },
+  "Лицензия:": {
+    "ru": "Лицензия:",
+    "en": "License:",
+    "es": "Licencia:",
+    "ar": "الترخيص:",
+    "zh": "许可证:"
+  },
+  "Client IP": {
+    "ru": "Client IP",
+    "en": "Client IP",
+    "es": "IP del Cliente",
+    "ar": "عنوان IP العميل",
+    "zh": "客户端 IP"
+  },
+  "Выйти из системы": {
+    "ru": "Выйти из системы",
+    "en": "Logout",
+    "es": "Cerrar sesión",
+    "ar": "تسجيل الخروج",
+    "zh": "退出系统"
+  },
+  "Root Administrator": {
+    "ru": "Главный Администратор",
+    "en": "Root Administrator",
+    "es": "Administrador Principal",
+    "ar": "المسؤول الرئيسي",
+    "zh": "超级管理员"
+  },
   "МОНИТОРИНГ": {
-    "en": "MONITORING",
     "ru": "МОНИТОРИНГ",
+    "en": "MONITORING",
     "es": "MONITOREO",
     "ar": "المراقبة",
     "zh": "监控管理"
   },
   "Дашборд": {
-    "en": "Dashboard",
     "ru": "Дашборд",
+    "en": "Dashboard",
     "es": "Panel de Control",
     "ar": "لوحة القيادة",
     "zh": "仪表板"
   },
   "Журнал вызовов": {
-    "en": "Call History",
     "ru": "Журнал вызовов",
+    "en": "Call History",
     "es": "Historial de Llamadas",
     "ar": "سجل المكالمات",
     "zh": "通话记录"
   },
   "Логирование Live": {
-    "en": "Live Streaming",
     "ru": "Логирование Live",
+    "en": "Live Streaming",
     "es": "Registros en Vivo",
     "ar": "السجلات المباشرة",
     "zh": "实时日志"
   },
   "ТЕЛЕФОНИЯ": {
-    "en": "TELEPHONY",
     "ru": "ТЕЛЕФОНИЯ",
+    "en": "TELEPHONY",
     "es": "TELEFONÍA",
     "ar": "الهاتفية",
     "zh": "电话系统"
   },
   "Телефония": {
-    "en": "Telephony",
     "ru": "Телефония",
+    "en": "Telephony",
     "es": "Telefonía",
     "ar": "الهاتفية",
     "zh": "电话系统"
   },
   "SIP Абоненты": {
-    "en": "SIP Extensions",
     "ru": "SIP Абоненты",
+    "en": "SIP Extensions",
     "es": "Extensiones SIP",
     "ar": "مشتركو SIP",
     "zh": "SIP 分机用户"
   },
   "SIP Транки": {
-    "en": "SIP Trunks",
     "ru": "SIP Транки",
+    "en": "SIP Trunks",
     "es": "Troncales SIP",
     "ar": "خطوط SIP",
     "zh": "SIP 中继线路"
   },
   "GSM Модемы": {
-    "en": "GSM Modems",
     "ru": "GSM Модемы",
+    "en": "GSM Modems",
     "es": "Módems GSM",
     "ar": "مودم GSM",
     "zh": "GSM 调制解调器"
   },
   "IVR Конструктор": {
-    "en": "IVR Designer",
     "ru": "IVR Конструктор",
+    "en": "IVR Designer",
     "es": "Diseñador IVR",
     "ar": "مصمم الرد الصوتي",
     "zh": "IVR 语音导航"
   },
   "ЭКОСИСТЕМА": {
-    "en": "ECOSYSTEM",
     "ru": "ЭКОСИСТЕМА",
+    "en": "ECOSYSTEM",
     "es": "ECOSISTEMA",
     "ar": "النظام البيئي",
     "zh": "应用生态"
   },
   "Экосистема": {
-    "en": "Ecosystem",
     "ru": "Экосистема",
+    "en": "Ecosystem",
     "es": "Ecosistema",
     "ar": "النظام البيئي",
     "zh": "应用生态"
   },
   "Маркетплейс": {
-    "en": "Marketplace",
     "ru": "Маркетплейс",
+    "en": "Marketplace",
     "es": "Mercado",
     "ar": "متجر الإضافات",
     "zh": "插件市场"
   },
   "Расширения": {
-    "en": "Extensions",
     "ru": "Расширения",
+    "en": "Extensions",
     "es": "Extensiones",
     "ar": "الإضافات",
     "zh": "已安装扩展"
   },
   "НАСТРОЙКИ": {
-    "en": "SETTINGS",
     "ru": "НАСТРОЙКИ",
+    "en": "SETTINGS",
     "es": "CONFIGURACIÓN",
     "ar": "الإعدادات",
     "zh": "系统设置"
   },
   "Настройки": {
-    "en": "Settings",
     "ru": "Настройки",
+    "en": "Settings",
     "es": "Configuración",
     "ar": "الإعدادات",
     "zh": "系统设置"
   },
   "Система & Сеть": {
-    "en": "System & Network",
     "ru": "Система & Сеть",
+    "en": "System & Network",
     "es": "Sistema y Red",
     "ar": "النظام والشبكة",
     "zh": "网络与系统"
   },
   "Безопасность & Доступ": {
-    "en": "Security & Access",
     "ru": "Безопасность & Доступ",
+    "en": "Security & Access",
     "es": "Seguridad y Acceso",
     "ar": "الأمان والوصول",
     "zh": "安全与访问"
   },
   "API Документация & Хуки": {
-    "en": "API Docs & Webhooks",
     "ru": "API Документация & Хуки",
+    "en": "API Docs & Webhooks",
     "es": "Documentación API",
     "ar": "دليل API والخطافات",
     "zh": "API 文档与回调"
   },
-  "Лицензия:": {
-    "en": "License:",
-    "ru": "Лицензия:",
-    "es": "Licencia:",
-    "ar": "الترخيص:",
-    "zh": "许可证:"
+  "Telephony Control Center": {
+    "ru": "Центр управления телефонией",
+    "en": "Telephony Control Center",
+    "es": "Centro de Control de Telefonía",
+    "ar": "مركز التحكم في الهاتف",
+    "zh": "电话控制中枢"
   },
-  "Обновить страницу": {
-    "en": "Refresh Page",
-    "ru": "Обновить страницу",
-    "es": "Actualizar Página",
-    "ar": "تحديث الصفحة",
-    "zh": "刷新页面"
+  "Мониторинг соединений, емкости и параметров маршрутизации в реальном времени.": {
+    "ru": "Мониторинг соединений, емкости и параметров маршрутизации в реальном времени.",
+    "en": "Real-time monitoring of connections, capacity, and routing parameters.",
+    "es": "Monitoreo en tiempo real de conexiones, capacidad y enrutamiento.",
+    "ar": "مراقبة الاتصالات والسعة والتوجيه في الوقت الفعلي.",
+    "zh": "实时监控呼叫连接、系统容量与路由参数。"
   },
-  "Выйти из системы": {
-    "en": "Logout",
-    "ru": "Выйти из системы",
-    "es": "Cerrar sesión",
-    "ar": "تسجيل الخروج",
-    "zh": "退出系统"
+  "Маркетплейс модулей": {
+    "ru": "Маркетплейс модулей",
+    "en": "Module Marketplace",
+    "es": "Mercado de Módulos",
+    "ar": "متجر الإضافات",
+    "zh": "模块市场"
+  },
+  "SIP Емкость": {
+    "ru": "SIP Емкость",
+    "en": "SIP Capacity",
+    "es": "Capacidad SIP",
+    "ar": "سعة SIP",
+    "zh": "SIP 容量"
+  },
+  "польз.": {
+    "ru": "польз.",
+    "en": "users",
+    "es": "usuarios",
+    "ar": "مستخدمين",
+    "zh": "用户"
+  },
+  "Активные Вызовы": {
+    "ru": "Активные Вызовы",
+    "en": "Active Calls",
+    "es": "Llamadas Activas",
+    "ar": "المكالمات النشطة",
+    "zh": "实时通话"
+  },
+  "В реальном времени": {
+    "ru": "В реальном времени",
+    "en": "Real-time",
+    "es": "En tiempo real",
+    "ar": "في الوقت الفعلي",
+    "zh": "实时"
+  },
+  "Вызовов за сегодня": {
+    "ru": "Вызовов за сегодня",
+    "en": "Calls Today",
+    "es": "Llamadas Hoy",
+    "ar": "مكالمات اليوم",
+    "zh": "今日通话量"
   },
   "GSM Модемы и Сим-карты": {
-    "en": "GSM Modems & SIM Pool",
     "ru": "GSM Модемы и Сим-карты",
+    "en": "GSM Modems & SIM Pool",
     "es": "Módems GSM y Tarjetas SIM",
     "ar": "مودم GSM وشرائح SIM",
     "zh": "GSM 调制解调器与 SIM 卡池"
   },
   "Физические USB-модемы, операторы сотовой связи, уровни сигнала CSQ и системные порты.": {
-    "en": "Physical USB modems, mobile operators, CSQ signal levels, and system serial ports.",
     "ru": "Физические USB-модемы, операторы сотовой связи, уровни сигнала CSQ и системные порты.",
+    "en": "Physical USB modems, mobile operators, CSQ signal levels, and system serial ports.",
     "es": "Módems USB físicos, operadores móviles, niveles de señal CSQ y puertos serie.",
     "ar": "أجهزة مودم USB الفعلية، مشغلو شبكات الهاتف المحمول، مستويات إشارة CSQ ومنافذ النظام.",
     "zh": "物理 USB 调制解调器、移动运营商、CSQ 信号强度及系统串口。"
   },
   "Тестовые модемы (Эмуляция)": {
-    "en": "Test Modems (Emulation)",
     "ru": "Тестовые модемы (Эмуляция)",
+    "en": "Test Modems (Emulation)",
     "es": "Módems de Prueba (Emulación)",
     "ar": "مودم الاختبار (محاكاة)",
     "zh": "测试调制解调器 (模拟)"
   },
   "Пересканировать USB": {
-    "en": "Rescan USB Hardware",
     "ru": "Пересканировать USB",
+    "en": "Rescan USB Hardware",
     "es": "Reescanear USB",
     "ar": "إعادة فحص USB",
     "zh": "重新扫描 USB 硬件"
   },
-  "МОДЕМ / УСТРОЙСТВО": {
-    "en": "MODEM / DEVICE",
-    "ru": "МОДЕМ / УСТРОЙСТВО",
-    "es": "MÓDEM / DISPOSITIVO",
-    "ar": "المودم / الجهاز",
-    "zh": "调制解调器 / 设备"
-  },
   "Модем / Устройство": {
-    "en": "Modem / Device",
     "ru": "Модем / Устройство",
+    "en": "Modem / Device",
     "es": "Módem / Dispositivo",
     "ar": "المودم / الجهاز",
     "zh": "调制解调器 / 设备"
   },
-  "ОПЕРАТОР & НОМЕР": {
-    "en": "OPERATOR & NUMBER",
-    "ru": "ОПЕРАТОР & НОМЕР",
-    "es": "OPERADOR Y NÚMERO",
-    "ar": "المشغل والرقم",
-    "zh": "运营商与号码"
-  },
   "Оператор & Номер": {
-    "en": "Operator & Number",
     "ru": "Оператор & Номер",
+    "en": "Operator & Number",
     "es": "Operador & Número",
     "ar": "المشغل والرقم",
     "zh": "运营商与号码"
   },
-  "УРОВЕНЬ СИГНАЛА": {
-    "en": "SIGNAL LEVEL",
-    "ru": "УРОВЕНЬ СИГНАЛА",
-    "es": "NIVEL DE SEÑAL",
-    "ar": "مستوى الإشارة",
-    "zh": "信号强度"
-  },
   "Уровень сигнала": {
-    "en": "Signal Level",
     "ru": "Уровень сигнала",
+    "en": "Signal Level",
     "es": "Nivel de Señal",
     "ar": "مستوى الإشارة",
     "zh": "信号强度"
   },
-  "РЕЖИМ & ПОРТ": {
-    "en": "MODE & PORT",
-    "ru": "РЕЖИМ & ПОРТ",
-    "es": "MODO Y PUERTO",
-    "ar": "الوضع والمنفذ",
-    "zh": "工作模式与端口"
-  },
   "Режим & Порт": {
-    "en": "Mode & Port",
     "ru": "Режим & Порт",
+    "en": "Mode & Port",
     "es": "Modo y Puerto",
     "ar": "الوضع والمنفذ",
     "zh": "工作模式与端口"
   },
-  "СТАТУС КАНАЛА": {
-    "en": "CHANNEL STATUS",
-    "ru": "СТАТУС КАНАЛА",
-    "es": "ESTADO DEL CANAL",
-    "ar": "حالة القناة",
-    "zh": "通道状态"
-  },
   "Статус канала": {
-    "en": "Channel Status",
     "ru": "Статус канала",
+    "en": "Channel Status",
     "es": "Estado del Canal",
     "ar": "حالة القناة",
     "zh": "通道状态"
   },
+  "Free (Тестовый режим)": {
+    "ru": "Free (Тестовый режим)",
+    "en": "Free (Test Mode)",
+    "es": "Libre (Modo Prueba)",
+    "ar": "متاح (وضع الاختبار)",
+    "zh": "空闲 (测试模式)"
+  },
   "Руководство по USB GSM-модемам, chan_dongle и голосовым чипсетам": {
-    "en": "Guide to USB GSM Modems, chan_dongle, and Voice Chipsets",
     "ru": "Руководство по USB GSM-модемам, chan_dongle и голосовым чипсетам",
+    "en": "Guide to USB GSM Modems, chan_dongle, and Voice Chipsets",
     "es": "Guía de Módems GSM USB, chan_dongle y Conjuntos de Chips de Voz",
     "ar": "دليل أجهزة مودم GSM USB وchan_dongle وشرائح الصوت",
     "zh": "USB GSM 调制解调器、chan_dongle 及语音芯片组指南"
   },
   "Требования к физическим модемам для Asterisk, поддержка передачи голоса (Voice Enabled), драйверы и питание": {
-    "en": "Hardware requirements for Asterisk, Voice-enabled firmware, Linux drivers, and power supply standards.",
     "ru": "Требования к физическим модемам для Asterisk, поддержка передачи голоса (Voice Enabled), драйверы и питание",
+    "en": "Hardware requirements for Asterisk, Voice-enabled firmware, Linux drivers, and power supply standards.",
     "es": "Requisitos de hardware para Asterisk, firmware de voz, controladores y alimentación.",
     "ar": "متطلبات الأجهزة لـ Asterisk، البرامج الثابتة التي تدعم الصوت، برامج التشغيل وتوزيع الطاقة.",
     "zh": "Asterisk 物理硬件要求、语音固件 (Voice Enabled)、驱动及供电规范。"
   },
-  "1. Поддержка передачи голоса (Voice-прошивка)": {
-    "en": "1. Voice Calls Support (Voice-Enabled Firmware)",
-    "ru": "1. Поддержка передачи голоса (Voice-прошивка)",
-    "es": "1. Soporte de Llamadas de Voz (Firmware Habilitado)",
-    "ar": "1. دعم المكالمات الصوتية (برامج ثابتة تدعم الصوت)",
-    "zh": "1. 语音传输支持 (Voice-Enabled 固件)"
-  },
-  "2. Питание USB-хаба (Active USB 2.0 Hub)": {
-    "en": "2. Powered USB Hub (Active USB 2.0 Hub)",
-    "ru": "2. Питание USB-хаба (Active USB 2.0 Hub)",
-    "es": "2. Concentrador USB con Alimentación (Hub USB 2.0 Activo)",
-    "ar": "2. موزع USB نشط مزود بالطاقة (Active USB 2.0 Hub)",
-    "zh": "2. 独立供电 USB 集线器 (Active USB 2.0 Hub)"
-  },
-  "Проверенные модели 3G / 4G модемов и модулей для Asterisk": {
-    "en": "Verified 3G / 4G Modems and Voice Cellular Modules for Asterisk",
-    "ru": "Проверенные модели 3G / 4G модемов и модулей для Asterisk",
-    "es": "Modelos probados de módems 3G / 4G y módulos celulares para Asterisk",
-    "ar": "طرازات أجهزة المودم 3G / 4G المعتمدة ووحدات الصوت لـ Asterisk",
-    "zh": "经过验证的 Asterisk 3G / 4G 语音调制解调器及工业模组"
-  },
-  "Модель / Чипсет": {
-    "en": "Model / Chipset",
-    "ru": "Модель / Чипсет",
-    "es": "Modelo / Chipset",
-    "ar": "الطراز / الشرائح",
-    "zh": "型号 / 芯片组"
-  },
-  "Стандарты связи": {
-    "en": "Cellular Standards",
-    "ru": "Стандарты связи",
-    "es": "Estándares Celulares",
-    "ar": "معايير الاتصال",
-    "zh": "网络频段与标准"
-  },
-  "Драйвер в PBX": {
-    "en": "PBX Driver / Channel",
-    "ru": "Драйвер в PBX",
-    "es": "Controlador PBX",
-    "ar": "برنامج التشغيل",
-    "zh": "PBX 驱动程序"
-  },
-  "Статус поддержки": {
-    "en": "Support Status",
-    "ru": "Статус поддержки",
-    "es": "Estado de Soporte",
-    "ar": "حالة الدعم",
-    "zh": "兼容评级"
-  },
   "SIP-Транки и Провайдеры": {
-    "en": "SIP Trunks & VoIP Carriers",
     "ru": "SIP-Транки и Провайдеры",
+    "en": "SIP Trunks & VoIP Carriers",
     "es": "Troncales SIP y Operadoras VoIP",
     "ar": "خطوط SIP ومزودو الخدمة",
     "zh": "SIP 中继与 VoIP 运营商"
   },
   "Внешние телефонные линии и подключение к операторам связи.": {
-    "en": "External telephone lines and connections to telecom providers.",
     "ru": "Внешние телефонные линии и подключение к операторам связи.",
+    "en": "External telephone lines and connections to telecom providers.",
     "es": "Líneas telefónicas externas y conexión a operadores de telecomunicaciones.",
     "ar": "خطوط الهاتف الخارجية والاتصال بمزودي خدمات الاتصالات.",
     "zh": "外部电话中继线路与电信运营商接入。"
   },
   "Подключить транк": {
-    "en": "Add SIP Trunk",
     "ru": "Подключить транк",
+    "en": "Add SIP Trunk",
     "es": "Conectar Troncal",
     "ar": "إضافة خط SIP",
     "zh": "添加 SIP 中继"
   },
   "Название транка": {
-    "en": "Trunk Name",
     "ru": "Название транка",
+    "en": "Trunk Name",
     "es": "Nombre del Troncal",
     "ar": "اسم الخط",
     "zh": "中继名称"
   },
   "Хост / Провайдер": {
-    "en": "Host / Provider",
     "ru": "Хост / Провайдер",
+    "en": "Host / Provider",
     "es": "Host / Proveedor",
     "ar": "المضيف / المزود",
     "zh": "主机 / 运营商"
   },
   "Логин / АОН": {
-    "en": "Auth User / CallerID",
     "ru": "Логин / АОН",
+    "en": "Auth User / CallerID",
     "es": "Usuario / CallerID",
     "ar": "المستخدم / رقم المتصل",
     "zh": "认证用户 / 主叫号码"
   },
+  "Руководство по настройке SIP-транков и внешних провайдеров": {
+    "ru": "Руководство по настройке SIP-транков и внешних провайдеров",
+    "en": "Configuration Guide for SIP Trunks and External Carriers",
+    "es": "Guía de configuración para troncales SIP y operadores externos",
+    "ar": "دليل إعداد خطوط SIP ومزودي الخدمة الخارجيين",
+    "zh": "SIP 中继与外部运营商配置指南"
+  },
   "SIP Абоненты и Сотрудники": {
-    "en": "SIP Extensions & Agents",
     "ru": "SIP Абоненты и Сотрудники",
+    "en": "SIP Extensions & Agents",
     "es": "Extensiones SIP y Agentes",
     "ar": "مشتركو SIP والموظفون",
     "zh": "SIP 分机与坐席管理"
   },
   "Управление внутренними номерами, софтфонами, паролями и диалпланом.": {
-    "en": "Management of internal extension numbers, softphones, security secrets, and dialplans.",
     "ru": "Управление внутренними номерами, софтфонами, паролями и диалпланом.",
+    "en": "Management of internal extension numbers, softphones, security secrets, and dialplans.",
     "es": "Gestión de números internos, softphones, contraseñas y plan de marcación.",
     "ar": "إدارة الأرقام الداخلية والهواتف البرمجية وكلمات المرور وخطة الاتصال.",
     "zh": "管理内部短号、软电话终端、访问密码及拨号规则。"
   },
   "Добавить абонента": {
-    "en": "Add Subscriber",
     "ru": "Добавить абонента",
+    "en": "Add Subscriber",
     "es": "Agregar Extensión",
     "ar": "إضافة مشترك",
     "zh": "新建分机用户"
   },
   "Номер": {
-    "en": "Extension",
     "ru": "Номер",
+    "en": "Extension",
     "es": "Número",
     "ar": "الرقم",
     "zh": "分机短号"
   },
   "Имя / CallerID": {
-    "en": "Name / CallerID",
     "ru": "Имя / CallerID",
+    "en": "Name / CallerID",
     "es": "Nombre / CallerID",
     "ar": "الاسم / المتصل",
     "zh": "用户姓名 / CallerID"
   },
   "Пароль PJSIP": {
-    "en": "PJSIP Secret",
     "ru": "Пароль PJSIP",
+    "en": "PJSIP Secret",
     "es": "Contraseña PJSIP",
     "ar": "كلمة مرور PJSIP",
     "zh": "PJSIP 密码"
   },
   "Контекст": {
-    "en": "Context",
     "ru": "Контекст",
+    "en": "Context",
     "es": "Contexto",
     "ar": "السياق",
     "zh": "拨号上下文"
   },
   "Статус": {
-    "en": "Status",
     "ru": "Статус",
+    "en": "Status",
     "es": "Estado",
     "ar": "الحالة",
     "zh": "在线状态"
   },
   "Действия": {
-    "en": "Actions",
     "ru": "Действия",
+    "en": "Actions",
     "es": "Acciones",
     "ar": "الإجراءات",
     "zh": "操作"
+  },
+  "Сохранить": {
+    "ru": "Сохранить",
+    "en": "Save",
+    "es": "Guardar",
+    "ar": "حفظ",
+    "zh": "保存"
+  },
+  "Отмена": {
+    "ru": "Отмена",
+    "en": "Cancel",
+    "es": "Cancelar",
+    "ar": "إلغاء",
+    "zh": "取消"
+  },
+  "Удалить": {
+    "ru": "Удалить",
+    "en": "Delete",
+    "es": "Eliminar",
+    "ar": "حذف",
+    "zh": "删除"
+  },
+  "Редактировать": {
+    "ru": "Редактировать",
+    "en": "Edit",
+    "es": "Editar",
+    "ar": "تعديل",
+    "zh": "编辑"
+  },
+  "Скачать": {
+    "ru": "Скачать",
+    "en": "Download",
+    "es": "Descargar",
+    "ar": "تحميل",
+    "zh": "下载"
+  },
+  "Включить": {
+    "ru": "Включить",
+    "en": "Enable",
+    "es": "Habilitar",
+    "ar": "تفعيل",
+    "zh": "启用"
+  },
+  "Отключить": {
+    "ru": "Отключить",
+    "en": "Disable",
+    "es": "Deshabilitar",
+    "ar": "تعطيل",
+    "zh": "禁用"
   }
 }
