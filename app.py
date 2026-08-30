@@ -5257,6 +5257,7 @@ def index():
         modems_list=get_system_modems_info(),
         amocrm_account=get_amocrm_account_info(),
         antifraud=get_antifraud_status(),
+        log_quota=get_log_quota_status(),
         sip_groups=get_sip_groups()
     )
 
@@ -6041,6 +6042,104 @@ verb 3
         mimetype="application/x-openvpn-profile",
         headers={"Content-Disposition": f"attachment;filename={client_id}.ovpn"}
     )
+
+
+
+# ================= LOG ROTATION & DISK QUOTA MANAGEMENT =================
+def get_log_quota_status():
+    cfg = load_integrations()
+    log_cfg = cfg.get('log_quota', {
+        'max_size_mb': 50,
+        'rotate_count': 3,
+        'auto_compress': True,
+        'retention_days': 7
+    })
+    
+    # Calculate real disk usage of logs
+    total_bytes = 0
+    files_info = []
+    log_dir = '/var/log/asterisk'
+    if os.path.exists(log_dir):
+        for root, _, files in os.walk(log_dir):
+            for file in files:
+                fp = os.path.join(root, file)
+                try:
+                    sz = os.path.getsize(fp)
+                    total_bytes += sz
+                    files_info.append({'name': file, 'size_mb': round(sz / (1024 * 1024), 2)})
+                except Exception:
+                    pass
+                    
+    return {
+        'config': log_cfg,
+        'total_mb': round(total_bytes / (1024 * 1024), 2),
+        'files': sorted(files_info, key=lambda x: x['size_mb'], reverse=True)[:5]
+    }
+
+def apply_system_logrotate(max_size_mb=50, rotate_count=3, compress=True):
+    """Updates /etc/logrotate.d/asterisk and /etc/cron.hourly/asterisk-log-guard."""
+    compress_opt = "compress\n        delaycompress" if compress else ""
+    logrotate_content = f"""/var/log/asterisk/messages /var/log/asterisk/full /var/log/asterisk/debug /var/log/asterisk/*_log {{
+        size {max_size_mb}M
+        rotate {rotate_count}
+        missingok
+        notifempty
+        {compress_opt}
+        sharedscripts
+        postrotate
+                /usr/sbin/asterisk -rx "logger rotate" > /dev/null 2>&1 || true
+                /usr/sbin/asterisk -rx "logger reload" > /dev/null 2>&1 || true
+        endscript
+}}
+"""
+    try:
+        with open('/etc/logrotate.d/asterisk', 'w') as f:
+            f.write(logrotate_content)
+    except Exception:
+        pass
+
+    # Setup automatic hourly cron safeguard to never allow logs to exceed max_size_mb
+    cron_script = f"""#!/bin/bash
+# Asterisk Log Guard Auto-Rotator
+logrotate /etc/logrotate.d/asterisk 2>/dev/null || true
+find /var/log/asterisk/ -name "*.gz" -mtime +7 -delete 2>/dev/null || true
+find /var/log/asterisk/ -name "*.[0-9]" -size +{max_size_mb}M -delete 2>/dev/null || true
+"""
+    try:
+        with open('/etc/cron.hourly/asterisk-log-guard', 'w') as f:
+            f.write(cron_script)
+        os.chmod('/etc/cron.hourly/asterisk-log-guard', 0o755)
+    except Exception:
+        pass
+
+@app.route('/settings/security/logs-quota', methods=['POST'])
+def api_save_log_quota():
+    cfg = load_integrations()
+    max_size = int(request.form.get('max_size_mb', 50))
+    rotate_count = int(request.form.get('rotate_count', 3))
+    auto_compress = True if request.form.get('auto_compress') else False
+    
+    cfg['log_quota'] = {
+        'max_size_mb': max_size,
+        'rotate_count': rotate_count,
+        'auto_compress': auto_compress
+    }
+    save_integrations(cfg)
+    apply_system_logrotate(max_size, rotate_count, auto_compress)
+    
+    if request.form.get('action') == 'force_rotate':
+        subprocess.run(['asterisk', '-rx', 'logger rotate'], capture_output=True)
+        subprocess.run(['logrotate', '-f', '/etc/logrotate.d/asterisk'], capture_output=True)
+        flash('Ротация логов выполнена! Старые журналы заархивированы.')
+    elif request.form.get('action') == 'purge_logs':
+        subprocess.run('rm -f /var/log/asterisk/*.[0-9]* /var/log/asterisk/*.gz', shell=True)
+        subprocess.run('> /var/log/asterisk/messages; > /var/log/asterisk/full', shell=True)
+        subprocess.run(['asterisk', '-rx', 'logger reload'], capture_output=True)
+        flash('Журналы логов полностью очищены и сброшены!')
+    else:
+        flash(f'Правила ротации сохранены (Лимит: {max_size} MB, Хранить копий: {rotate_count})')
+        
+    return redirect(request.referrer or url_for('index'))
 
 
 if __name__ == '__main__':
