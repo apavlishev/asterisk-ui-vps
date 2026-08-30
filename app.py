@@ -274,6 +274,93 @@ def logout_page():
 
 
 # ================= FAIL2BAN ANTIFRAUD & SECURITY SHIELD BACKEND =================
+
+# ================= SIP EXTENSION GROUPS / QUEUES & RING GROUPS =================
+def get_sip_groups():
+    cfg = load_integrations()
+    return cfg.get('sip_groups', [
+        {
+            'id': 'group_sales',
+            'name': 'Отдел продаж (Sales)',
+            'exten': '600',
+            'strategy': 'ringall',
+            'timeout': 30,
+            'members': ['101', '102']
+        },
+        {
+            'id': 'group_support',
+            'name': 'Техническая поддержка (Support)',
+            'exten': '601',
+            'strategy': 'hunt',
+            'timeout': 20,
+            'members': ['103']
+        }
+    ])
+
+def save_sip_groups(groups):
+    cfg = load_integrations()
+    cfg['sip_groups'] = groups
+    save_integrations(cfg)
+    generate_dialplan_from_tree()
+
+@app.route('/api/sip/groups', methods=['GET'])
+def api_get_sip_groups():
+    return jsonify({'status': 'ok', 'groups': get_sip_groups()})
+
+@app.route('/api/sip/groups/save', methods=['POST'])
+def api_save_sip_group():
+    data = request.get_json() or {}
+    group_id = data.get('id') or f"group_{int(time.time())}"
+    name = data.get('name', '').strip()
+    exten = data.get('exten', '').strip()
+    strategy = data.get('strategy', 'ringall')
+    timeout = int(data.get('timeout', 30))
+    members = data.get('members', [])
+
+    if not name or not exten:
+        return jsonify({'status': 'error', 'message': 'Название и номер группы обязательны'})
+
+    groups = get_sip_groups()
+    updated = False
+    for g in groups:
+        if g['id'] == group_id or g['exten'] == exten:
+            g['id'] = group_id
+            g['name'] = name
+            g['exten'] = exten
+            g['strategy'] = strategy
+            g['timeout'] = timeout
+            g['members'] = members
+            updated = True
+            break
+
+    if not updated:
+        groups.append({
+            'id': group_id,
+            'name': name,
+            'exten': exten,
+            'strategy': strategy,
+            'timeout': timeout,
+            'members': members
+        })
+
+    save_sip_groups(groups)
+    flash(f"Группа абонентов «{name}» (№ {exten}) сохранена!")
+    return jsonify({'status': 'ok', 'message': 'Группа сохранена', 'groups': groups})
+
+@app.route('/api/sip/groups/delete', methods=['POST'])
+def api_delete_sip_group():
+    data = request.get_json() or {}
+    group_id = data.get('id') or request.form.get('id', '')
+    if not group_id:
+        return jsonify({'status': 'error', 'message': 'ID группы не указан'})
+
+    groups = get_sip_groups()
+    groups = [g for g in groups if g['id'] != group_id]
+    save_sip_groups(groups)
+    flash("Группа абонентов удалена!")
+    return jsonify({'status': 'ok', 'message': 'Группа удалена', 'groups': groups})
+
+
 def get_antifraud_status():
     """Fetches live status, banned IP list, and stats from Fail2ban."""
     status_data = {
@@ -4553,6 +4640,54 @@ def generate_dialplan_from_tree():
     all_extens = [a['exten'] for a in accounts]
     outbound_dialplan_block = build_outbound_dialplan_lines(cfg)
 
+    # Compile SIP Groups into Dialplan
+    sip_groups = get_sip_groups()
+    group_dialplan_lines = []
+    for g in sip_groups:
+        g_ext = g.get('exten', '').strip()
+        g_name = g.get('name', 'Group')
+        g_timeout = g.get('timeout', 30)
+        g_strategy = g.get('strategy', 'ringall')
+        members = g.get('members', [])
+        
+        if not g_ext or not members: continue
+        
+        if g_strategy == 'ringall':
+            dial_str = "&".join([f"PJSIP/{m}" for m in members])
+            group_dialplan_lines.append(f"; Группа абонентов: {g_name} ({g_ext}) - Одновременный звонок всем")
+            group_dialplan_lines.append(f"exten => {g_ext},1,NoOp(Вызов группы: {g_name} -> {g_ext})")
+            group_dialplan_lines.append(f" same => n,Set(REC_FILE=${{STRFTIME(${{EPOCH}},,%Y%m%d-%H%M%S)}}_${{CALLERID(num)}}_group{g_ext}.wav)")
+            group_dialplan_lines.append(f" same => n,Set(__CALL_ID=${{UNIQUEID}})")
+            group_dialplan_lines.append(f" same => n,Set(__CALL_SRC=${{CALLERID(num)}})")
+            group_dialplan_lines.append(f" same => n,Set(__CALL_DST={g_ext})")
+            group_dialplan_lines.append(f" same => n,Set(__CALL_DIRECTION=internal)")
+            group_dialplan_lines.append(f" same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})")
+            group_dialplan_lines.append(f" same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)")
+            group_dialplan_lines.append(f" same => n,Answer()")
+            group_dialplan_lines.append(f" same => n,MixMonitor(${{REC_PATH}})")
+            group_dialplan_lines.append(f" same => n,Dial({dial_str},{g_timeout})")
+            group_dialplan_lines.append(f" same => n,Hangup()")
+        elif g_strategy == 'hunt':
+            # Sequential hunt
+            group_dialplan_lines.append(f"; Группа абонентов: {g_name} ({g_ext}) - Поочередный звонок (Hunt)")
+            group_dialplan_lines.append(f"exten => {g_ext},1,NoOp(Вызов группы поочередно: {g_name} -> {g_ext})")
+            group_dialplan_lines.append(f" same => n,Set(REC_FILE=${{STRFTIME(${{EPOCH}},,%Y%m%d-%H%M%S)}}_${{CALLERID(num)}}_group{g_ext}.wav)")
+            group_dialplan_lines.append(f" same => n,Set(__CALL_ID=${{UNIQUEID}})")
+            group_dialplan_lines.append(f" same => n,Set(__CALL_SRC=${{CALLERID(num)}})")
+            group_dialplan_lines.append(f" same => n,Set(__CALL_DST={g_ext})")
+            group_dialplan_lines.append(f" same => n,Set(__CALL_DIRECTION=internal)")
+            group_dialplan_lines.append(f" same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})")
+            group_dialplan_lines.append(f" same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)")
+            group_dialplan_lines.append(f" same => n,Answer()")
+            group_dialplan_lines.append(f" same => n,MixMonitor(${{REC_PATH}})")
+            hunt_to = max(5, int(g_timeout / len(members)))
+            for m in members:
+                group_dialplan_lines.append(f" same => n,Dial(PJSIP/{m},{hunt_to})")
+            group_dialplan_lines.append(f" same => n,Hangup()")
+
+    groups_dialplan_block = "\n".join(group_dialplan_lines)
+
+
     ivr_trees = cfg.get('ivr_trees', {})
     default_ivr_tree = cfg.get('ivr_tree', {})
     sip_trunks = cfg.get('sip_trunks', [])
@@ -4776,6 +4911,8 @@ exten => _[1-9]XXX,1,NoOp(Внутренний вызов 4-значный: ${{C
  same => n,MixMonitor(${{REC_PATH}})
  same => n,Dial(PJSIP/${{EXTEN}},60)
  same => n,Hangup()
+
+{groups_dialplan_block}
 
 {outbound_dialplan_block}
 
@@ -5119,7 +5256,8 @@ def index():
         installed_plugins=plugin_manager.get_installed_plugins(),
         modems_list=get_system_modems_info(),
         amocrm_account=get_amocrm_account_info(),
-        antifraud=get_antifraud_status()
+        antifraud=get_antifraud_status(),
+        sip_groups=get_sip_groups()
     )
 
 

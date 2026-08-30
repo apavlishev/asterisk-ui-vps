@@ -637,70 +637,166 @@
             </div>
 
             <div id="tab-accounts" class="tab-pane space-y-6">
+                <!-- HEADER & MAIN TITLE -->
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 class="text-2xl font-bold text-on-surface">Управление SIP-абонентами</h1>
-                        <p class="text-on-surface-variant text-sm">Внутренние номера сотрудников и учетные данные софтфонов.</p>
+                        <h1 class="text-2xl font-bold text-on-surface">Телефония & Абоненты</h1>
+                        <p class="text-on-surface-variant text-sm">Внутренние номера сотрудников, группы одновременного и поочередного вызова.</p>
                     </div>
-                    {% if accounts|length < max_users %}
-                    <button onclick="document.getElementById('modal-add-user').classList.remove('hidden')" class="px-5 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-medium flex items-center gap-2 shadow-sm hover:bg-primary/90 transition-all">
-                        <span class="material-symbols-outlined text-[18px]">person_add</span>
-                        Добавить абонента
-                    </button>
-                    {% else %}
-                    <button onclick="switchTab('marketplace')" class="px-5 py-2.5 rounded-xl bg-warning/20 border border-warning/30 text-warning text-sm font-semibold flex items-center gap-2 hover:bg-warning/30 transition-all">
-                        <span class="material-symbols-outlined text-[18px]">lock</span>
-                        Лимит базовой версии ({{ max_users }} польз.) &mdash; Расширить
-                    </button>
-                    {% endif %}
+
+                    <div class="flex items-center gap-2">
+                        {% if accounts|length < max_users %}
+                        <button onclick="document.getElementById('modal-add-user').classList.remove('hidden')" class="px-4 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-semibold flex items-center gap-1.5 shadow-sm hover:bg-primary/90 transition-all">
+                            <span class="material-symbols-outlined text-[18px]">person_add</span>
+                            <span>Добавить абонента</span>
+                        </button>
+                        {% endif %}
+                        <button onclick="openAddGroupModal()" class="px-4 py-2.5 rounded-xl bg-secondary text-on-primary text-xs font-semibold flex items-center gap-1.5 shadow-sm hover:bg-secondary/90 transition-all">
+                            <span class="material-symbols-outlined text-[18px]">group_add</span>
+                            <span>Создать группу</span>
+                        </button>
+                    </div>
                 </div>
 
-                <!-- USERS TABLE -->
-                <div class="bg-surface rounded-2xl border border-outline/30 shadow-sm overflow-hidden">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-surface-container-low border-b border-surface-container text-on-surface-variant font-semibold text-xs uppercase tracking-wider">
-                                <th class="px-6 py-4">Номер / SIP URI</th>
-                                <th class="px-6 py-4">Пароль</th>
-                                <th class="px-6 py-4">Контекст</th>
-                                <th class="px-6 py-4">Сетевой статус</th>
-                                <th class="px-6 py-4 text-right">Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-surface-container">
-                            {% for acc in accounts %}
-                            <tr class="hover:bg-surface-container-low/40 transition-colors">
-                                <td class="px-6 py-4 font-mono font-bold text-on-surface flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
-                                        {{ acc.exten }}
+                <!-- SUB-NAVIGATION BAR (ACCOUNTS VS GROUPS) -->
+                <div class="flex items-center gap-2 border-b border-surface-container pb-2">
+                    <button type="button" onclick="switchAccountsSubTab('subtab-users', this)" class="subtab-btn px-4 py-2 rounded-xl text-xs font-bold bg-primary text-on-primary shadow-sm flex items-center gap-2 transition-all">
+                        <span class="material-symbols-outlined text-[18px]">people</span>
+                        <span>Список абонентов</span>
+                        <span class="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-mono">{{ accounts|length }}</span>
+                    </button>
+                    <button type="button" onclick="switchAccountsSubTab('subtab-groups', this)" class="subtab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-surface text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2 border border-outline/30">
+                        <span class="material-symbols-outlined text-[18px] text-secondary">groups</span>
+                        <span>Группы абонентов (Ring Groups)</span>
+                        <span class="px-2 py-0.5 rounded-full bg-secondary/10 text-secondary text-[10px] font-mono font-bold">{{ sip_groups|length if sip_groups else 0 }}</span>
+                    </button>
+                </div>
+
+                <!-- SUBTAB 1: USERS LIST -->
+                <div id="subtab-users" class="space-y-4">
+                    <div class="bg-surface rounded-2xl border border-outline/30 shadow-sm overflow-hidden">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-surface-container-low border-b border-surface-container text-on-surface-variant font-semibold text-xs uppercase tracking-wider">
+                                    <th class="px-6 py-4">Номер / SIP URI</th>
+                                    <th class="px-6 py-4">Пароль</th>
+                                    <th class="px-6 py-4">Контекст</th>
+                                    <th class="px-6 py-4">Сетевой статус</th>
+                                    <th class="px-6 py-4 text-right">Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-surface-container">
+                                {% for acc in accounts %}
+                                <tr class="hover:bg-surface-container-low/40 transition-colors">
+                                    <td class="px-6 py-4 font-mono font-bold text-on-surface flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
+                                            {{ acc.exten }}
+                                        </div>
+                                        <span>sip:{{ acc.exten }}@{{ host }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono text-on-surface-variant">{{ acc.password }}</td>
+                                    <td class="px-6 py-4 text-xs font-mono text-on-surface-variant">{{ acc.context }}</td>
+                                    <td class="px-6 py-4">
+                                        {% if acc.exten in active_contacts %}
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-success/10 text-success">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-success"></span> В сети (Online)
+                                        </span>
+                                        {% else %}
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-surface-container text-on-surface-variant">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-outline"></span> Офлайн (Offline)
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <form action="/sip/delete" method="POST" onsubmit="return confirm('Удалить SIP абонента {{ acc.exten }}?');" class="inline">
+                                            <input type="hidden" name="exten" value="{{ acc.exten }}">
+                                            <button type="submit" class="p-2 rounded-lg text-error hover:bg-error/10 transition-colors" title="Удалить">
+                                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SUBTAB 2: RING GROUPS & HUNT GROUPS -->
+                <div id="subtab-groups" class="hidden space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {% if sip_groups %}
+                        {% for g in sip_groups %}
+                        <div class="p-6 rounded-2xl bg-surface border border-outline/30 shadow-sm space-y-4 hover:border-secondary/50 transition-all">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center font-bold text-lg shrink-0">
+                                        <span class="material-symbols-outlined text-2xl">groups</span>
                                     </div>
-                                    <span>sip:{{ acc.exten }}@{{ host }}</span>
-                                </td>
-                                <td class="px-6 py-4 font-mono text-on-surface-variant">{{ acc.password }}</td>
-                                <td class="px-6 py-4 text-xs font-mono text-on-surface-variant">{{ acc.context }}</td>
-                                <td class="px-6 py-4">
-                                    {% if acc.exten in active_contacts %}
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-success/10 text-success">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-success"></span> В сети (Online)
+                                    <div>
+                                        <h3 class="text-base font-bold text-on-surface">{{ g.name }}</h3>
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            <span class="text-xs font-mono font-bold text-secondary px-2 py-0.5 rounded bg-secondary/10">№ {{ g.exten }}</span>
+                                            <span class="text-[11px] text-on-surface-variant">Таймаут: {{ g.timeout }} сек</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-1">
+                                    <button type="button" onclick='editSipGroup({{ g|tojson|safe }})' class="p-2 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors" title="Редактировать группу">
+                                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                                    </button>
+                                    <button type="button" onclick="deleteSipGroup('{{ g.id }}', '{{ g.name }}')" class="p-2 rounded-xl text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors" title="Удалить группу">
+                                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- STRATEGY BADGE -->
+                            <div class="flex items-center justify-between text-xs py-2 px-3 rounded-xl bg-surface-container-low border border-outline/20">
+                                <span class="text-on-surface-variant font-semibold">Стратегия дозвона:</span>
+                                {% if g.strategy == 'ringall' %}
+                                <span class="font-bold text-primary flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">call</span>
+                                    <span>Одновременно всем (Ringall)</span>
+                                </span>
+                                {% else %}
+                                <span class="font-bold text-amber-600 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">format_list_numbered</span>
+                                    <span>Поочередно (Hunt)</span>
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            <!-- MEMBERS PILLS -->
+                            <div>
+                                <div class="text-xs font-semibold text-on-surface-variant mb-2">Участники группы ({{ g.members|length }}):</div>
+                                <div class="flex flex-wrap gap-1.5">
+                                    {% for m in g.members %}
+                                    <span class="px-2.5 py-1 rounded-lg bg-surface-container text-xs font-mono font-bold text-on-surface flex items-center gap-1 border border-outline/20">
+                                        <span class="w-1.5 h-1.5 rounded-full {{ 'bg-success' if m in active_contacts else 'bg-slate-400' }}"></span>
+                                        <span>EXT {{ m }}</span>
                                     </span>
                                     {% else %}
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-surface-container text-on-surface-variant">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-outline"></span> Офлайн (Offline)
-                                    </span>
-                                    {% endif %}
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <form action="/sip/delete" method="POST" onsubmit="return confirm('Удалить SIP абонента {{ acc.exten }}?');" class="inline">
-                                        <input type="hidden" name="exten" value="{{ acc.exten }}">
-                                        <button type="submit" class="p-2 rounded-lg text-error hover:bg-error/10 transition-colors" title="Удалить">
-                                            <span class="material-symbols-outlined text-[18px]">delete</span>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                    <span class="text-xs text-slate-400 italic">Нет участников</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="col-span-2 p-12 rounded-2xl bg-surface-container-low/40 border border-outline/20 text-center space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-secondary/10 text-secondary mx-auto flex items-center justify-center">
+                                <span class="material-symbols-outlined text-2xl">groups</span>
+                            </div>
+                            <h3 class="text-sm font-bold text-on-surface">Группы абонентов еще не созданы</h3>
+                            <p class="text-xs text-on-surface-variant max-w-sm mx-auto">Создайте отдел продаж или техподдержки с одновременным дозвоном нескольким сотрудникам.</p>
+                            <button onclick="openAddGroupModal()" class="px-4 py-2 rounded-xl bg-secondary text-on-primary text-xs font-bold hover:bg-secondary/90 transition-all">
+                                Создать первую группу
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 
@@ -4709,5 +4805,166 @@
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 </script>
+
+    <!-- MODAL: ADD / EDIT SIP GROUP -->
+    <div id="modal-group" class="hidden fixed inset-0 bg-on-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-surface rounded-2xl max-w-md w-full p-6 border border-outline/30 shadow-xl space-y-4">
+            <div class="flex justify-between items-center pb-2 border-b border-surface-container">
+                <h3 class="text-lg font-bold text-on-surface flex items-center gap-2" id="modal-group-title">
+                    <span class="material-symbols-outlined text-secondary">groups</span>
+                    <span>Новая группа абонентов</span>
+                </h3>
+                <button type="button" onclick="closeGroupModal()" class="text-on-surface-variant hover:text-on-surface p-1 rounded-lg">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+            </div>
+
+            <form id="form-sip-group" onsubmit="handleSaveSipGroup(event)" class="space-y-4">
+                <input type="hidden" id="group-id" name="id" value="">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Название группы / Отдела</label>
+                    <input type="text" id="group-name" name="name" placeholder="Отдел продаж (Sales)" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Внутренний номер</label>
+                        <input type="text" id="group-exten" name="exten" placeholder="600" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Таймаут (сек)</label>
+                        <input type="number" id="group-timeout" name="timeout" value="30" min="5" max="120" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Стратегия дозвона</label>
+                    <select id="group-strategy" name="strategy" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs font-semibold text-on-surface">
+                        <option value="ringall">📞 Одновременно всем (Ringall)</option>
+                        <option value="hunt">🔄 Поочередно по списку (Hunt)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-2">Выберите участников группы (Абонентов):</label>
+                    <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-3 rounded-xl bg-surface-container-low border border-outline/20">
+                        {% for acc in accounts %}
+                        <label class="flex items-center gap-2 text-xs font-medium text-on-surface cursor-pointer select-none">
+                            <input type="checkbox" name="members" value="{{ acc.exten }}" class="group-member-checkbox rounded text-secondary w-4 h-4">
+                            <span class="font-mono font-bold">{{ acc.exten }}</span>
+                            <span class="text-on-surface-variant text-[11px]">({{ acc.name or 'Абонент' }})</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-3">
+                    <button type="button" onclick="closeGroupModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:bg-surface-container">
+                        Отмена
+                    </button>
+                    <button type="submit" class="px-6 py-2 rounded-xl bg-secondary text-on-primary text-xs font-semibold hover:bg-secondary/90 transition-all shadow-sm">
+                        Сохранить группу
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function switchAccountsSubTab(subtabId, btn) {
+            document.getElementById('subtab-users').classList.add('hidden');
+            document.getElementById('subtab-groups').classList.add('hidden');
+            document.getElementById(subtabId).classList.remove('hidden');
+
+            document.querySelectorAll('.subtab-btn').forEach(b => {
+                b.className = 'subtab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-surface text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2 border border-outline/30';
+            });
+            btn.className = 'subtab-btn px-4 py-2 rounded-xl text-xs font-bold bg-primary text-on-primary shadow-sm flex items-center gap-2 transition-all';
+        }
+
+        function openAddGroupModal() {
+            document.getElementById('modal-group-title').innerHTML = '<span class="material-symbols-outlined text-secondary">groups</span><span>Новая группа абонентов</span>';
+            document.getElementById('group-id').value = '';
+            document.getElementById('group-name').value = '';
+            document.getElementById('group-exten').value = '';
+            document.getElementById('group-timeout').value = '30';
+            document.getElementById('group-strategy').value = 'ringall';
+            document.querySelectorAll('.group-member-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('modal-group').classList.remove('hidden');
+        }
+
+        function editSipGroup(group) {
+            document.getElementById('modal-group-title').innerHTML = '<span class="material-symbols-outlined text-secondary">groups</span><span>Редактирование группы</span>';
+            document.getElementById('group-id').value = group.id || '';
+            document.getElementById('group-name').value = group.name || '';
+            document.getElementById('group-exten').value = group.exten || '';
+            document.getElementById('group-timeout').value = group.timeout || '30';
+            document.getElementById('group-strategy').value = group.strategy || 'ringall';
+            
+            const members = group.members || [];
+            document.querySelectorAll('.group-member-checkbox').forEach(cb => {
+                cb.checked = members.includes(cb.value);
+            });
+            document.getElementById('modal-group').classList.remove('hidden');
+        }
+
+        function closeGroupModal() {
+            document.getElementById('modal-group').classList.add('hidden');
+        }
+
+        async function handleSaveSipGroup(e) {
+            e.preventDefault();
+            const id = document.getElementById('group-id').value;
+            const name = document.getElementById('group-name').value.trim();
+            const exten = document.getElementById('group-exten').value.trim();
+            const timeout = parseInt(document.getElementById('group-timeout').value) || 30;
+            const strategy = document.getElementById('group-strategy').value;
+            
+            const members = [];
+            document.querySelectorAll('.group-member-checkbox:checked').forEach(cb => {
+                members.push(cb.value);
+            });
+
+            if (members.length === 0) {
+                alert("Пожалуйста, выберите хотя бы одного участника группы!");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/sip/groups/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, name, exten, timeout, strategy, members })
+                });
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    location.reload();
+                } else {
+                    alert("Ошибка: " + data.message);
+                }
+            } catch (err) {
+                alert("Ошибка сохранения: " + err);
+            }
+        }
+
+        async function deleteSipGroup(id, name) {
+            if (!confirm(`Удалить группу «${name}»?`)) return;
+            try {
+                const res = await fetch('/api/sip/groups/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    location.reload();
+                }
+            } catch (err) {
+                alert("Ошибка удаления: " + err);
+            }
+        }
+    </script>
+
 </body>
 </html>
