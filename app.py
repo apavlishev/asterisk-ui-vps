@@ -5435,14 +5435,14 @@ def parse_log_line(raw_line, default_type='system'):
 
 @app.route('/api/logs/stream')
 def api_logs_stream():
-    """Continuous EventSource stream yielding live Asterisk & PBX events."""
+    """Continuous EventSource stream yielding live Asterisk & PBX events with non-blocking polling and heartbeats."""
     def event_stream():
-        # Send initial batch of 60 lines
+        # 1. Send initial batch of recent lines
         lines_buffer = []
         for log_f, def_t in [('/var/log/asterisk/messages', 'trunks'), ('/opt/amocrm_debug.log', 'amocrm'), ('/opt/crm-yandex-uploader.log', 'plugins')]:
             if os.path.exists(log_f):
                 try:
-                    res = subprocess.run(['tail', '-n', '30', log_f], capture_output=True, text=True, errors='ignore')
+                    res = subprocess.run(['tail', '-n', '25', log_f], capture_output=True, text=True, errors='ignore')
                     for line in res.stdout.splitlines():
                         p = parse_log_line(line, def_t)
                         if p: lines_buffer.append(p)
@@ -5454,35 +5454,52 @@ def api_logs_stream():
                 'timestamp': datetime.datetime.now().strftime("%H:%M:%S"),
                 'level': 'info',
                 'type': 'system',
-                'message': 'Asterisk Logic Core Logger initialized. Listening for active channels and live calls...'
+                'message': 'Asterisk Logic Core Live Logger активен. Ожидание событий...'
             })
 
         yield f"data: {json.dumps({'type': 'init', 'logs': lines_buffer[-80:]})}\n\n"
 
-        # Continuous streaming via tail -F
-        p_tail = subprocess.Popen(
-            ['tail', '-n', '0', '-F', '/var/log/asterisk/messages', '/opt/amocrm_debug.log', '/opt/crm-yandex-uploader.log'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            text=True,
-            bufsize=1
-        )
+        # 2. Track last file position to stream only newly appended lines
+        files_pos = {}
+        for path in ['/var/log/asterisk/messages', '/opt/amocrm_debug.log', '/opt/crm-yandex-uploader.log']:
+            if os.path.exists(path):
+                try:
+                    files_pos[path] = os.path.getsize(path)
+                except Exception:
+                    files_pos[path] = 0
 
-        try:
-            while True:
-                line = p_tail.stdout.readline()
-                if line:
-                    p = parse_log_line(line, 'system')
-                    if p:
-                        yield f"data: {json.dumps({'type': 'batch', 'logs': [p]})}\n\n"
-                else:
-                    time.sleep(0.5)
-        except GeneratorExit:
-            p_tail.terminate()
-        except Exception:
-            p_tail.terminate()
+        while True:
+            time.sleep(1)
+            new_lines = []
+            for path, last_pos in list(files_pos.items()):
+                if os.path.exists(path):
+                    try:
+                        curr_size = os.path.getsize(path)
+                        if curr_size > last_pos:
+                            with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+                                f.seek(last_pos)
+                                added_text = f.read(curr_size - last_pos)
+                                files_pos[path] = curr_size
+                                for l in added_text.splitlines():
+                                    parsed = parse_log_line(l, 'trunks' if 'messages' in path else 'amocrm')
+                                    if parsed: new_lines.append(parsed)
+                        elif curr_size < last_pos:
+                            # Log rotated
+                            files_pos[path] = curr_size
+                    except Exception:
+                        pass
 
-    return Response(event_stream(), mimetype="text/event-stream")
+            if new_lines:
+                yield f"data: {json.dumps({'type': 'batch', 'logs': new_lines})}\n\n"
+            else:
+                # Keep-alive heartbeat ping for browser EventSource
+                yield f": ping\n\n"
+
+    response = Response(event_stream(), mimetype="text/event-stream")
+    response.headers['Cache-Control'] = 'no-cache, no-transform'
+    response.headers['X-Accel-Buffering'] = 'no'
+    return response
+
 
 @app.route('/api/logs/query', methods=['GET'])
 def api_logs_query():
