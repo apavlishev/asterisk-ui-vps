@@ -1,0 +1,15 @@
+{
+  "id": "gohighlevel",
+  "name": "GoHighLevel (GHL) Agency Connector",
+  "category": "crm",
+  "category_name": "CRM & Бизнес",
+  "version": "v2.0.0",
+  "author": "Logic Core Global",
+  "icon": "auto_graph",
+  "color": "indigo-500",
+  "rating": "5.0 (460)",
+  "price": "Free",
+  "price_sub": "Included",
+  "description": "Интеграция с GoHighLevel (GHL): отправка вебхуков о звонках, запуск Workflows, авто-SMS/WhatsApp при пропущенных вызовах и сохранение записей.",
+  "entry_point": "plugin_main.py"
+}

@@ -1,0 +1,15 @@
+{
+  "id": "pipedrive",
+  "name": "Pipedrive Sales Pipeline Pro",
+  "category": "crm",
+  "category_name": "CRM & Бизнес",
+  "version": "v2.4.0",
+  "author": "Logic Core CRM Labs",
+  "icon": "pie_chart",
+  "color": "emerald-500",
+  "rating": "4.9 (380)",
+  "price": "Free",
+  "price_sub": "Included",
+  "description": "Интеграция с Pipedrive CRM: логирование звонков через Call Activities API, связка с Person / Organization / Deal, встроенный плеер аудиозаписей.",
+  "entry_point": "plugin_main.py"
+}

@@ -1,0 +1,15 @@
+{
+  "id": "hubspot",
+  "name": "HubSpot Enterprise CRM Sync",
+  "category": "crm",
+  "category_name": "CRM & Бизнес",
+  "version": "v3.1.0",
+  "author": "Logic Core Global",
+  "icon": "hub",
+  "color": "orange-500",
+  "rating": "5.0 (510)",
+  "price": "Free",
+  "price_sub": "Included",
+  "description": "Официальный коннектор для HubSpot: автоматическая регистрация звонков в CRM v3 API, прикрепление плеера записи, привязка к сделкам (Deals) и контактам (Contacts).",
+  "entry_point": "plugin_main.py"
+}

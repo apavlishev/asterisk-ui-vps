@@ -1,0 +1,15 @@
+{
+  "id": "bitrix24",
+  "name": "Битрикс24 Telephony REST Hub",
+  "category": "crm",
+  "category_name": "CRM & Бизнес",
+  "version": "v2.2.0",
+  "author": "Logic Core CRM Labs",
+  "icon": "call_to_action",
+  "color": "blue-500",
+  "rating": "4.9 (420)",
+  "price": "Free",
+  "price_sub": "Included",
+  "description": "Сквозная интеграция с Битрикс24: всплывающая карточка клиента (CTI), автосоздание Лидов/Сделок, передача аудиозаписей разговоров и привязка к ответственным менеджерам.",
+  "entry_point": "plugin_main.py"
+}

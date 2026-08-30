@@ -1,0 +1,15 @@
+{
+  "id": "zoho",
+  "name": "Zoho CRM & PhoneBridge Connector",
+  "category": "crm",
+  "category_name": "CRM & Бизнес",
+  "version": "v1.9.0",
+  "author": "Logic Core Global",
+  "icon": "business_center",
+  "color": "amber-500",
+  "rating": "4.8 (290)",
+  "price": "Free",
+  "price_sub": "Included",
+  "description": "Подключение экосистемы Zoho CRM: фиксация завершенных звонков в модуле Calls, всплывающие карточки клиентов и прикрепление облачных записей разговоров.",
+  "entry_point": "plugin_main.py"
+}

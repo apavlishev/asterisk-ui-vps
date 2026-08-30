@@ -5573,6 +5573,86 @@ def save_gdrive():
     return redirect(url_for('index'))
 
 
+
+# ================= MODULAR CRM CONNECTORS (BITRIX24, HUBSPOT, PIPEDRIVE, ZOHO, GHL, ZENDESK) =================
+@app.route('/settings/bitrix24', methods=['POST'])
+def api_save_bitrix24():
+    cfg = load_integrations()
+    b24 = cfg.get('bitrix24', {})
+    b24['enabled'] = True if request.form.get('enabled') else False
+    b24['webhook_url'] = request.form.get('webhook_url', '').strip()
+    b24['create_lead'] = True if request.form.get('create_lead') else False
+    b24['send_recording'] = True if request.form.get('send_recording') else False
+    b24['default_user_id'] = request.form.get('default_user_id', '1').strip()
+    cfg['bitrix24'] = b24
+    save_integrations(cfg)
+    flash('Настройки Битрикс24 Telephony сохранены!')
+    return redirect(request.referrer or url_for('index'))
+
+@app.route('/settings/hubspot', methods=['POST'])
+def api_save_hubspot():
+    cfg = load_integrations()
+    hs = cfg.get('hubspot', {})
+    hs['enabled'] = True if request.form.get('enabled') else False
+    hs['token'] = request.form.get('token', '').strip()
+    hs['portal_id'] = request.form.get('portal_id', '').strip()
+    hs['auto_create_contact'] = True if request.form.get('auto_create_contact') else False
+    cfg['hubspot'] = hs
+    save_integrations(cfg)
+    flash('Настройки HubSpot CRM сохранены!')
+    return redirect(request.referrer or url_for('index'))
+
+@app.route('/settings/pipedrive', methods=['POST'])
+def api_save_pipedrive():
+    cfg = load_integrations()
+    pipe = cfg.get('pipedrive', {})
+    pipe['enabled'] = True if request.form.get('enabled') else False
+    pipe['token'] = request.form.get('token', '').strip()
+    pipe['subdomain'] = request.form.get('subdomain', '').strip()
+    cfg['pipedrive'] = pipe
+    save_integrations(cfg)
+    flash('Настройки Pipedrive сохранены!')
+    return redirect(request.referrer or url_for('index'))
+
+@app.route('/settings/zoho', methods=['POST'])
+def api_save_zoho():
+    cfg = load_integrations()
+    zh = cfg.get('zoho', {})
+    zh['enabled'] = True if request.form.get('enabled') else False
+    zh['domain'] = request.form.get('domain', 'zoho.com').strip()
+    zh['client_id'] = request.form.get('client_id', '').strip()
+    zh['client_secret'] = request.form.get('client_secret', '').strip()
+    cfg['zoho'] = zh
+    save_integrations(cfg)
+    flash('Настройки Zoho CRM сохранены!')
+    return redirect(request.referrer or url_for('index'))
+
+@app.route('/settings/gohighlevel', methods=['POST'])
+def api_save_gohighlevel():
+    cfg = load_integrations()
+    ghl = cfg.get('gohighlevel', {})
+    ghl['enabled'] = True if request.form.get('enabled') else False
+    ghl['webhook_url'] = request.form.get('webhook_url', '').strip()
+    ghl['api_key'] = request.form.get('api_key', '').strip()
+    cfg['gohighlevel'] = ghl
+    save_integrations(cfg)
+    flash('Настройки GoHighLevel (GHL) сохранены!')
+    return redirect(request.referrer or url_for('index'))
+
+@app.route('/settings/zendesk', methods=['POST'])
+def api_save_zendesk():
+    cfg = load_integrations()
+    zd = cfg.get('zendesk', {})
+    zd['enabled'] = True if request.form.get('enabled') else False
+    zd['subdomain'] = request.form.get('subdomain', '').strip()
+    zd['email'] = request.form.get('email', '').strip()
+    zd['token'] = request.form.get('token', '').strip()
+    cfg['zendesk'] = zd
+    save_integrations(cfg)
+    flash('Настройки Zendesk Talk сохранены!')
+    return redirect(request.referrer or url_for('index'))
+
+
 @app.route('/settings/telegram', methods=['POST'])
 def save_telegram():
     cfg = load_integrations()

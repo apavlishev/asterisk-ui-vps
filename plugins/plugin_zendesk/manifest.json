@@ -1,0 +1,15 @@
+{
+  "id": "zendesk",
+  "name": "Zendesk Talk Voice Support",
+  "category": "crm",
+  "category_name": "CRM & Бизнес",
+  "version": "v1.5.0",
+  "author": "Logic Core Global",
+  "icon": "support_agent",
+  "color": "teal-500",
+  "rating": "4.9 (210)",
+  "price": "Free",
+  "price_sub": "Included",
+  "description": "Интеграция со службой заботы Zendesk: автоматическое создание Voice Tickets при входящих обращениях, таймлайн разговоров и аудиозаписи.",
+  "entry_point": "plugin_main.py"
+}
