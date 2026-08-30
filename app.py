@@ -5741,63 +5741,65 @@ def parse_log_line(raw_line, default_type='system'):
 
 @app.route('/api/logs/stream')
 def api_logs_stream():
-    """Continuous EventSource stream yielding live Asterisk & PBX events with non-blocking delta tracking & heartbeats."""
+    """Continuous EventSource stream yielding live Asterisk & PBX events."""
     def event_stream():
-        # 1. Send initial batch of recent lines from both full and messages
-        lines_buffer = []
-        for log_f, def_t in [('/var/log/asterisk/full', 'trunks'), ('/var/log/asterisk/messages', 'trunks'), ('/opt/amocrm_debug.log', 'amocrm'), ('/opt/crm-yandex-uploader.log', 'plugins')]:
+        # 1. Send initial batch of recent lines from journalctl and module files
+        init_logs = []
+        try:
+            res = subprocess.run(['journalctl', '-u', 'asterisk', '-n', '50', '--no-pager', '-o', 'cat'], capture_output=True, text=True, errors='ignore', timeout=2)
+            if res.stdout:
+                for line in res.stdout.splitlines():
+                    p = parse_log_line(line, 'trunks')
+                    if p: init_logs.append(p)
+        except Exception:
+            pass
+
+        for log_f, def_t in [('/opt/amocrm_debug.log', 'amocrm'), ('/opt/crm-yandex-uploader.log', 'plugins'), ('/var/log/fail2ban.log', 'plugins')]:
             if os.path.exists(log_f):
                 try:
-                    res = subprocess.run(['tail', '-n', '30', log_f], capture_output=True, text=True, errors='ignore')
+                    res = subprocess.run(['tail', '-n', '20', log_f], capture_output=True, text=True, errors='ignore', timeout=1)
                     for line in res.stdout.splitlines():
                         p = parse_log_line(line, def_t)
-                        if p: lines_buffer.append(p)
+                        if p: init_logs.append(p)
                 except Exception:
                     pass
 
-        if not lines_buffer:
-            lines_buffer.append({
+        if not init_logs:
+            init_logs.append({
                 'timestamp': datetime.datetime.now().strftime("%H:%M:%S"),
                 'level': 'info',
                 'type': 'system',
-                'message': 'Asterisk Logic Core Live Logger активен. Ожидание событий...'
+                'message': 'Asterisk Logic Core Live Logger активен. Ожидание вызовов...'
             })
 
-        yield f"data: {json.dumps({'type': 'init', 'logs': lines_buffer[-80:]})}\n\n"
+        yield f"data: {json.dumps({'type': 'init', 'logs': init_logs[-80:]})}\n\n"
 
-        # 2. Track last file position to stream only newly appended lines
-        files_pos = {}
-        for path in ['/var/log/asterisk/full', '/var/log/asterisk/messages', '/opt/amocrm_debug.log', '/opt/crm-yandex-uploader.log']:
-            if os.path.exists(path):
-                try:
-                    files_pos[path] = os.path.getsize(path)
-                except Exception:
-                    files_pos[path] = 0
+        # 2. Live streaming using journalctl -u asterisk -f -n 0 -o cat
+        p_journal = None
+        try:
+            import select
+            p_journal = subprocess.Popen(
+                ['journalctl', '-u', 'asterisk', '-f', '-n', '0', '-o', 'cat'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True,
+                bufsize=1
+            )
 
-        while True:
-            time.sleep(1)
-            new_lines = []
-            for path, last_pos in list(files_pos.items()):
-                if os.path.exists(path):
-                    try:
-                        curr_size = os.path.getsize(path)
-                        if curr_size > last_pos:
-                            with open(path, 'r', encoding='utf-8', errors='ignore') as f:
-                                f.seek(last_pos)
-                                added_text = f.read(curr_size - last_pos)
-                                files_pos[path] = curr_size
-                                for l in added_text.splitlines():
-                                    parsed = parse_log_line(l, 'trunks' if 'asterisk' in path else 'amocrm')
-                                    if parsed: new_lines.append(parsed)
-                        elif curr_size < last_pos:
-                            files_pos[path] = curr_size
-                    except Exception:
-                        pass
-
-            if new_lines:
-                yield f"data: {json.dumps({'type': 'batch', 'logs': new_lines})}\n\n"
-            else:
-                yield f": ping\n\n"
+            while True:
+                rlist, _, _ = select.select([p_journal.stdout], [], [], 1.0)
+                if rlist:
+                    line = p_journal.stdout.readline()
+                    if line:
+                        p = parse_log_line(line, 'trunks')
+                        if p:
+                            yield f"data: {json.dumps({'type': 'batch', 'logs': [p]})}\n\n"
+                else:
+                    yield f": ping\n\n"
+        except GeneratorExit:
+            if p_journal: p_journal.terminate()
+        except Exception:
+            if p_journal: p_journal.terminate()
 
     response = Response(event_stream(), mimetype="text/event-stream")
     response.headers['Cache-Control'] = 'no-cache, no-transform'
