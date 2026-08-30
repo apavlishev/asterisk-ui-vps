@@ -272,6 +272,146 @@ def logout_page():
     flash('Вы успешно вышли из системы.')
     return redirect(url_for('login_page'))
 
+
+# ================= FAIL2BAN ANTIFRAUD & SECURITY SHIELD BACKEND =================
+def get_antifraud_status():
+    """Fetches live status, banned IP list, and stats from Fail2ban."""
+    status_data = {
+        'running': False,
+        'jail': 'asterisk-antifraud',
+        'currently_failed': 0,
+        'total_failed': 0,
+        'currently_banned': 0,
+        'total_banned': 0,
+        'banned_ips': [],
+        'maxretry': 5,
+        'findtime': 600,
+        'bantime': 86400,
+        'whitelist': []
+    }
+    
+    try:
+        # Check fail2ban-client status
+        res = subprocess.run(['fail2ban-client', 'status', 'asterisk-antifraud'], capture_output=True, text=True, timeout=3)
+        if res.returncode == 0:
+            status_data['running'] = True
+            out = res.stdout
+            
+            m_cur_f = re.search(r'Currently failed:\s*([0-9]+)', out)
+            m_tot_f = re.search(r'Total failed:\s*([0-9]+)', out)
+            m_cur_b = re.search(r'Currently banned:\s*([0-9]+)', out)
+            m_tot_b = re.search(r'Total banned:\s*([0-9]+)', out)
+            m_ips = re.search(r'Banned IP list:\s*(.*)', out)
+            
+            if m_cur_f: status_data['currently_failed'] = int(m_cur_f.group(1))
+            if m_tot_f: status_data['total_failed'] = int(m_tot_f.group(1))
+            if m_cur_b: status_data['currently_banned'] = int(m_cur_b.group(1))
+            if m_tot_b: status_data['total_banned'] = int(m_tot_b.group(1))
+            if m_ips and m_ips.group(1).strip():
+                raw_ips = m_ips.group(1).strip().split()
+                status_data['banned_ips'] = raw_ips
+
+        # Read config params
+        cfg = load_integrations()
+        sec_cfg = cfg.get('antifraud', {})
+        status_data['maxretry'] = sec_cfg.get('maxretry', 5)
+        status_data['findtime'] = sec_cfg.get('findtime', 600)
+        status_data['bantime'] = sec_cfg.get('bantime', 86400)
+        status_data['whitelist'] = sec_cfg.get('whitelist', ['127.0.0.1/8', '::1'])
+        
+    except Exception as e:
+        print(f"[Antifraud Error]: {e}")
+        
+    return status_data
+
+@app.route('/api/security/antifraud/status')
+def api_security_antifraud_status():
+    return jsonify(get_antifraud_status())
+
+@app.route('/api/security/antifraud/unban', methods=['POST'])
+def api_security_antifraud_unban():
+    data = request.get_json() or {}
+    ip = data.get('ip') or request.form.get('ip', '').strip()
+    if not ip:
+        return jsonify({'status': 'error', 'message': 'IP-адрес не указан'})
+        
+    try:
+        res = subprocess.run(['fail2ban-client', 'set', 'asterisk-antifraud', 'unbanip', ip], capture_output=True, text=True, timeout=5)
+        if res.returncode == 0 or '1' in res.stdout or '0' in res.stdout:
+            flash(f"IP-адрес {ip} успешно разблокирован!")
+            return jsonify({'status': 'ok', 'message': f'IP {ip} разблокирован'})
+        return jsonify({'status': 'error', 'message': res.stderr or res.stdout})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
+
+@app.route('/api/security/antifraud/ban', methods=['POST'])
+def api_security_antifraud_ban_manual():
+    data = request.get_json() or {}
+    ip = data.get('ip') or request.form.get('ip', '').strip()
+    if not ip:
+        return jsonify({'status': 'error', 'message': 'IP-адрес не указан'})
+        
+    try:
+        res = subprocess.run(['fail2ban-client', 'set', 'asterisk-antifraud', 'banip', ip], capture_output=True, text=True, timeout=5)
+        flash(f"IP-адрес {ip} добавлен в бан-лист!")
+        return jsonify({'status': 'ok', 'message': f'IP {ip} заблокирован'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
+
+@app.route('/settings/security/antifraud', methods=['POST'])
+def save_security_antifraud_settings():
+    cfg = load_integrations()
+    maxretry = int(request.form.get('maxretry', 5))
+    findtime = int(request.form.get('findtime', 600))
+    bantime = int(request.form.get('bantime', 86400))
+    whitelist_raw = request.form.get('whitelist', '').strip()
+    
+    whitelist = [ip.strip() for ip in re.split(r'[\s,]+', whitelist_raw) if ip.strip()]
+    if '127.0.0.1/8' not in whitelist: whitelist.insert(0, '127.0.0.1/8')
+    if '::1' not in whitelist: whitelist.insert(1, '::1')
+    
+    if 'antifraud' not in cfg:
+        cfg['antifraud'] = {}
+        
+    cfg['antifraud'] = {
+        'maxretry': maxretry,
+        'findtime': findtime,
+        'bantime': bantime,
+        'whitelist': whitelist
+    }
+    save_integrations(cfg)
+    
+    # Apply to fail2ban jail.local configuration
+    ignore_str = " ".join(whitelist)
+    jail_conf_content = f"""[DEFAULT]
+bantime  = {bantime}
+findtime = {findtime}
+maxretry = {maxretry}
+backend = auto
+ignoreip = {ignore_str}
+
+[asterisk-antifraud]
+enabled  = true
+port     = 5060,5061
+protocol = all
+filter   = asterisk-antifraud
+logpath  = /var/log/asterisk/messages
+maxretry = {maxretry}
+findtime = {findtime}
+bantime  = {bantime}
+action   = iptables-allports[name=ASTERISK-ANTIFRAUD, protocol=all]
+"""
+    try:
+        with open('/etc/fail2ban/jail.local', 'w') as jf:
+            jf.write(jail_conf_content)
+        subprocess.run(['fail2ban-client', 'reload'], capture_output=True, timeout=5)
+    except Exception as e:
+        print(f"[Apply Fail2ban Error]: {e}")
+        
+    flash('Настройки Антифрода Fail2ban успешно сохранены и применены!')
+    return redirect(url_for('index'))
+
+
 @app.route('/settings/security/auth', methods=['POST'])
 def save_security_auth():
     cfg = load_integrations()
@@ -4978,7 +5118,8 @@ def index():
         get_system_network_info=get_system_network_info,
         installed_plugins=plugin_manager.get_installed_plugins(),
         modems_list=get_system_modems_info(),
-        amocrm_account=get_amocrm_account_info()
+        amocrm_account=get_amocrm_account_info(),
+        antifraud=get_antifraud_status()
     )
 
 

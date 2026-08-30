@@ -2042,15 +2042,163 @@
             </div>
 
         
-            <!-- // ================= TAB: SECURITY & ACCESS // ================= -->
-            <div id="tab-security" class="tab-pane space-y-6">
-                <div class="bg-surface rounded-2xl p-8 border border-outline/30 shadow-sm max-w-2xl">
-                    <div class="flex items-center gap-4 mb-6 pb-4 border-b border-surface-container">
-                        <div class="w-12 h-12 rounded-2xl bg-error/10 text-error flex items-center justify-center">
-                            <span class="material-symbols-outlined text-2xl">shield_lock</span>
+            <!-- // ================= TAB: SECURITY CENTER & ANTIFRAUD // ================= -->
+            <div id="tab-security" class="tab-pane space-y-6 max-w-5xl">
+                
+                <!-- 1. ANTIFRAUD SHIELD OVERVIEW BANNER -->
+                <div class="bg-surface rounded-2xl p-6 sm:p-8 border border-outline/30 shadow-sm relative overflow-hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-14 h-14 rounded-2xl bg-error/10 text-error flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-3xl">local_police</span>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2.5">
+                                    <h1 class="text-2xl font-bold text-on-surface">Центр безопасности & Антифрод</h1>
+                                    <span class="text-xs px-2.5 py-0.5 rounded-full bg-success/10 text-success font-bold border border-success/20 flex items-center gap-1">
+                                        <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+                                        <span>Fail2ban Shield Активен</span>
+                                    </span>
+                                </div>
+                                <p class="text-xs text-on-surface-variant mt-1 max-w-xl leading-relaxed">
+                                    Автоматическая сетевая блокировка ботнетов, SIP-сканеров (Sipvicious, Friendly-Scanner) и брутфорс-атак на порты Asterisk (5060/5061 UDP/TCP).
+                                </p>
+                            </div>
                         </div>
+
+                        <!-- STATS BADGES -->
+                        <div class="flex items-center gap-3">
+                            <div class="px-4 py-3 rounded-xl bg-surface-container-low border border-outline/20 text-center min-w-[110px]">
+                                <div class="text-[10px] text-on-surface-variant uppercase font-bold">В бане сейчас</div>
+                                <div class="text-xl font-bold text-error font-mono mt-0.5" id="stat-currently-banned">{{ antifraud.currently_banned if antifraud else 0 }}</div>
+                            </div>
+                            <div class="px-4 py-3 rounded-xl bg-surface-container-low border border-outline/20 text-center min-w-[110px]">
+                                <div class="text-[10px] text-on-surface-variant uppercase font-bold">Всего отражено</div>
+                                <div class="text-xl font-bold text-primary font-mono mt-0.5" id="stat-total-failed">{{ (antifraud.total_banned or antifraud.total_failed) if antifraud else 0 }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. BANNED IP LIST & MANUAL BAN/UNBAN TOOLBAR -->
+                <div class="bg-surface rounded-2xl border border-outline/30 shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-surface-container flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
-                            <h2 class="text-xl font-bold text-on-surface">Парольная защита панели</h2>
+                            <h2 class="text-lg font-bold text-on-surface flex items-center gap-2">
+                                <span class="material-symbols-outlined text-error text-[20px]">block</span>
+                                Список заблокированных IP-адресов (Ботнеты & Сканеры)
+                            </h2>
+                            <p class="text-xs text-on-surface-variant mt-0.5">IP-адреса, заблокированные в фаерволе iptables за превышение лимита неавторизованных запросов.</p>
+                        </div>
+                        
+                        <!-- MANUAL BAN FORM -->
+                        <form action="/api/security/antifraud/ban" method="POST" class="flex items-center gap-2 w-full sm:w-auto">
+                            <input type="text" name="ip" placeholder="192.168.1.100" required class="px-3.5 py-2 rounded-xl bg-surface-container-low border border-outline text-xs font-mono w-44">
+                            <button type="submit" class="px-4 py-2 rounded-xl bg-error text-on-primary text-xs font-semibold hover:bg-error/90 transition-all shadow-sm shrink-0 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[15px]">add_moderator</span>
+                                <span>Забанить IP</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- BANNED IP TABLE -->
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-surface-container-low border-b border-surface-container text-on-surface-variant font-semibold text-xs uppercase tracking-wider">
+                                <th class="px-6 py-3.5">Заблокированный IP</th>
+                                <th class="px-6 py-3.5">Причина блокировки</th>
+                                <th class="px-6 py-3.5">Срок действия</th>
+                                <th class="px-6 py-3.5 text-right">Действие</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-surface-container">
+                            {% if antifraud and antifraud.banned_ips %}
+                            {% for ip in antifraud.banned_ips %}
+                            <tr class="hover:bg-surface-container-low/40 transition-colors">
+                                <td class="px-6 py-3.5 font-mono font-bold text-error flex items-center gap-2.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-error"></span>
+                                    <span>{{ ip }}</span>
+                                </td>
+                                <td class="px-6 py-3.5 text-xs text-on-surface-variant">
+                                    <span>SIP Registration / Scanning Failure (Брутфорс паролей)</span>
+                                </td>
+                                <td class="px-6 py-3.5 text-xs font-mono text-on-surface-variant">
+                                    <span>24 часа (iptables DROP)</span>
+                                </td>
+                                <td class="px-6 py-3.5 text-right">
+                                    <form action="/api/security/antifraud/unban" method="POST" class="inline" onsubmit="return confirm('Разблокировать IP {{ ip }}?');">
+                                        <input type="hidden" name="ip" value="{{ ip }}">
+                                        <button type="submit" class="px-3.5 py-1.5 rounded-lg bg-surface-container-high hover:bg-success/10 hover:text-success text-xs font-semibold text-on-surface transition-all border border-outline/30 flex items-center gap-1 ml-auto">
+                                            <span class="material-symbols-outlined text-[14px]">lock_open</span>
+                                            <span>Разблокировать (Unban)</span>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="px-6 py-8 text-center text-on-surface-variant text-xs">
+                                    <div class="flex flex-col items-center justify-center gap-1 text-slate-500">
+                                        <span class="material-symbols-outlined text-2xl text-success">verified_user</span>
+                                        <span class="font-semibold text-on-surface text-sm">Активных блокировок нет</span>
+                                        <span>Все входящие подключения чисты, подозрительная активность не зафиксирована.</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 3. FAIL2BAN THRESHOLDS & WHITELIST SETTINGS FORM -->
+                <div class="bg-surface rounded-2xl p-6 sm:p-8 border border-outline/30 shadow-sm space-y-6">
+                    <div class="flex items-center gap-3 pb-4 border-b border-surface-container">
+                        <span class="material-symbols-outlined text-primary text-2xl">tune</span>
+                        <div>
+                            <h2 class="text-base font-bold text-on-surface">Условия срабатывания антифрода и белый список</h2>
+                            <p class="text-xs text-on-surface-variant">Тонкая настройка порогов блокировки неавторизованных SIP-пакетов</p>
+                        </div>
+                    </div>
+
+                    <form action="/settings/security/antifraud" method="POST" class="space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Количество попыток (Max Retry)</label>
+                                <input type="number" name="maxretry" value="{{ antifraud.maxretry if antifraud else 5 }}" min="1" max="20" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono" title="Количество неудачных попыток до бана">
+                                <span class="text-[10px] text-on-surface-variant mt-1 block">Например: 5 неудачных попыток</span>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Окно проверки (Find Time, сек)</label>
+                                <input type="number" name="findtime" value="{{ antifraud.findtime if antifraud else 600 }}" min="30" max="86400" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono" title="Интервал времени для подсчета ошибок">
+                                <span class="text-[10px] text-on-surface-variant mt-1 block">600 сек = в течение 10 минут</span>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Длительность бана (Ban Time, сек)</label>
+                                <input type="number" name="bantime" value="{{ antifraud.bantime if antifraud else 86400 }}" min="60" max="604800" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono" title="Время сетевой блокировки">
+                                <span class="text-[10px] text-on-surface-variant mt-1 block">86400 сек = блокировка на 24 часа</span>
+                            </div>
+                        </div>
+
+                        <!-- WHITELIST -->
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Белый список IP-адресов (Whitelist / Ignore IP)</label>
+                            <textarea name="whitelist" rows="2" placeholder="127.0.0.1/8, 192.168.1.0/24, 91.226.93.233" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs font-mono leading-relaxed">{{ (antifraud.whitelist if antifraud else ['127.0.0.1/8', '::1'])|join(', ') }}</textarea>
+                            <span class="text-[11px] text-on-surface-variant mt-1 block">Доверенные IP-адреса офиса и SIP-провайдеров, которые никогда не будут заблокированы (через запятую или пробел).</span>
+                        </div>
+
+                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition-all shadow-sm">
+                            Применить параметры Антифрода
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 4. WEB GUI PASSWORD PROTECTION -->
+                <div class="bg-surface rounded-2xl p-6 sm:p-8 border border-outline/30 shadow-sm space-y-6">
+                    <div class="flex items-center gap-3 pb-4 border-b border-surface-container">
+                        <span class="material-symbols-outlined text-secondary text-2xl">lock_person</span>
+                        <div>
+                            <h2 class="text-base font-bold text-on-surface">Парольная защита веб-интерфейса</h2>
                             <p class="text-xs text-on-surface-variant">Ограничение доступа к панели управления при открытом внешнем IP</p>
                         </div>
                     </div>
@@ -2083,11 +2231,12 @@
                             <div>Статус защиты: <b class="{{ 'text-success' if auth_enabled else 'text-error' }}">{{ "АКТИВНА" if auth_enabled else "ОТКЛЮЧЕНА (Вход без пароля)" }}</b></div>
                         </div>
 
-                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:bg-primary/90 transition-all shadow-sm">
-                            Сохранить настройки безопасности
+                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-secondary text-on-primary text-xs font-semibold hover:bg-secondary/90 transition-all shadow-sm">
+                            Сохранить пароль панели
                         </button>
                     </form>
                 </div>
+
             </div>
 
         </main>
