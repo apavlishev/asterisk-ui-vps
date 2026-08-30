@@ -5853,38 +5853,6 @@ def api_logs_query():
 
     return jsonify({'status': 'ok', 'logs': filtered[-limit:]})
 
-@app.route('/settings/security/auth', methods=['POST'])
-def save_security_auth():
-    cfg = load_integrations()
-    enabled = True if request.form.get('enabled') else False
-    username = request.form.get('username', 'admin').strip()
-    password = request.form.get('password', '').strip()
-
-    if 'security_auth' not in cfg:
-        cfg['security_auth'] = {}
-
-    cfg['security_auth']['enabled'] = enabled
-    if username:
-        cfg['security_auth']['username'] = username
-    if password:
-        cfg['security_auth']['password'] = password
-    
-    if request.form.get('dismiss_prompt'):
-        cfg['security_auth']['prompt_dismissed'] = True
-
-    save_integrations(cfg)
-    
-    if enabled:
-        session['logged_in'] = True
-        session['username'] = username
-        flash('Парольная защита панели успешно активирована!')
-    else:
-        flash('Настройки безопасности сохранены.')
-        
-    return redirect(url_for('index'))
-
-
-
 
 if __name__ == '__main__':
     try:
