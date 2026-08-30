@@ -2053,6 +2053,19 @@
                             </div>
                         </div>
 
+                        <!-- QUICK STEP-BY-STEP SETUP GUIDE: BITRIX24 -->
+                        <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs space-y-2">
+                            <div class="font-bold text-blue-500 flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">menu_book</span>
+                                <span>Инструкция по подключению Битрикс24 за 3 шага:</span>
+                            </div>
+                            <ol class="list-decimal list-inside space-y-1 text-on-surface-variant leading-relaxed">
+                                <li>Откройте ваш портал Битрикс24 $\rightarrow$ раздел <b>«Разработчикам»</b> $\rightarrow$ <b>«Другое»</b> $\rightarrow$ <b>«Входящий вебхук»</b>.</li>
+                                <li>В правах доступа отметьте галочками: <code>Телефония (telephony)</code> и <code>CRM (crm)</code>.</li>
+                                <li>Скопируйте <b>URL вебхука</b> (вида <code>https://xxx.bitrix24.ru/rest/1/yyyy/</code>) и вставьте в поле ниже.</li>
+                            </ol>
+                        </div>
+
                         <form action="/settings/bitrix24" method="POST" class="bg-surface p-6 rounded-2xl border border-outline/30 shadow-sm space-y-4">
                             <div>
                                 <label class="block text-xs font-semibold text-on-surface-variant mb-1">Входящий Вебхук Битрикс24 (Inbound Webhook URL)</label>
@@ -2103,6 +2116,19 @@
                             </div>
                         </div>
 
+                        <!-- QUICK STEP-BY-STEP SETUP GUIDE: HUBSPOT -->
+                        <div class="p-4 rounded-xl bg-orange-500/10 border border-orange-500/20 text-xs space-y-2">
+                            <div class="font-bold text-orange-500 flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">menu_book</span>
+                                <span>Инструкция по подключению HubSpot CRM:</span>
+                            </div>
+                            <ol class="list-decimal list-inside space-y-1 text-on-surface-variant leading-relaxed">
+                                <li>В HubSpot перейдите в <b>Settings (Шестеренка)</b> $\rightarrow$ <b>Integrations</b> $\rightarrow$ <b>Private Apps</b> $\rightarrow$ Нажмите <b>Create a private app</b>.</li>
+                                <li>Во вкладке <b>Scopes</b> включите: <code>crm.objects.contacts.write</code>, <code>crm.objects.calls.write</code>, <code>crm.objects.deals.write</code>.</li>
+                                <li>Нажмите <b>Create app</b>, скопируйте полученный <b>Access Token</b> (начинается с <code>pat-na1-...</code>) и вставьте ниже.</li>
+                            </ol>
+                        </div>
+
                         <form action="/settings/hubspot" method="POST" class="bg-surface p-6 rounded-2xl border border-outline/30 shadow-sm space-y-4">
                             <div>
                                 <label class="block text-xs font-semibold text-on-surface-variant mb-1">Private App Access Token (Bearer Token)</label>
@@ -2147,6 +2173,19 @@
                             </div>
                         </div>
 
+                        <!-- QUICK STEP-BY-STEP SETUP GUIDE: PIPEDRIVE -->
+                        <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs space-y-2">
+                            <div class="font-bold text-emerald-500 flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">menu_book</span>
+                                <span>Инструкция по подключению Pipedrive:</span>
+                            </div>
+                            <ol class="list-decimal list-inside space-y-1 text-on-surface-variant leading-relaxed">
+                                <li>В Pipedrive откройте <b>Personal preferences (Профиль)</b> $\rightarrow$ вкладка <b>API</b>.</li>
+                                <li>Скопируйте <b>Personal API token</b> и вставьте в поле ниже.</li>
+                                <li>Укажите ваш субдомен (например, если адрес <code>company.pipedrive.com</code>, введите <code>company</code>).</li>
+                            </ol>
+                        </div>
+
                         <form action="/settings/pipedrive" method="POST" class="bg-surface p-6 rounded-2xl border border-outline/30 shadow-sm space-y-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
@@ -2188,6 +2227,19 @@
                             </div>
                         </div>
 
+                        <!-- QUICK STEP-BY-STEP SETUP GUIDE: GOHIGHLEVEL -->
+                        <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs space-y-2">
+                            <div class="font-bold text-indigo-500 flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">menu_book</span>
+                                <span>Инструкция по подключению GoHighLevel (GHL):</span>
+                            </div>
+                            <ol class="list-decimal list-inside space-y-1 text-on-surface-variant leading-relaxed">
+                                <li>В кабинете GHL перейдите в <b>Automation</b> $\rightarrow$ <b>Workflows</b> $\rightarrow$ Создайте Workflow.</li>
+                                <li>Добавьте триггер <b>Inbound Webhook</b> и скопируйте предоставленный <b>Webhook URL</b> в поле ниже.</li>
+                                <li>Вставьте ваш <b>Location API Key</b> из раздела <b>Settings $\rightarrow$ Business Profile</b>.</li>
+                            </ol>
+                        </div>
+
                         <form action="/settings/gohighlevel" method="POST" class="bg-surface p-6 rounded-2xl border border-outline/30 shadow-sm space-y-4">
                             <div>
                                 <label class="block text-xs font-semibold text-on-surface-variant mb-1">Inbound Webhook URL (GHL Workflow Trigger)</label>
@@ -2211,8 +2263,31 @@
 
                     <!-- 5. ZOHO & ZENDESK FORMS -->
                     {% elif p.id == 'zoho' %}
-                    <form action="/settings/zoho" method="POST" class="space-y-4 max-w-xl bg-surface p-6 rounded-2xl border border-outline/30 shadow-sm">
-                        <h4 class="text-sm font-bold text-on-surface">Параметры Zoho CRM PhoneBridge</h4>
+                    <div class="space-y-6 max-w-2xl">
+                        <div class="p-6 rounded-2xl bg-surface border border-amber-500/40 shadow-sm flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold text-2xl shrink-0">
+                                <span class="material-symbols-outlined text-3xl">business_center</span>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-on-surface">Zoho CRM & PhoneBridge Connector</h4>
+                                <p class="text-xs text-on-surface-variant mt-0.5">Синхронизация звонков в модуль Calls, прикрепление аудиозаписей и связка с лидами Zoho.</p>
+                            </div>
+                        </div>
+
+                        <!-- QUICK STEP-BY-STEP SETUP GUIDE: ZOHO -->
+                        <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs space-y-2">
+                            <div class="font-bold text-amber-500 flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">menu_book</span>
+                                <span>Инструкция по подключению Zoho CRM:</span>
+                            </div>
+                            <ol class="list-decimal list-inside space-y-1 text-on-surface-variant leading-relaxed">
+                                <li>Перейдите в <b>Zoho Developer Console</b> (<code>api-console.zoho.com</code>) $\rightarrow$ <b>Add Client</b> (Server-based Applications).</li>
+                                <li>Скопируйте полученные <b>Client ID</b> и <b>Client Secret</b> в поля ниже.</li>
+                                <li>Выберите правильный датацентр вашего аккаунта (для Европы — <code>zoho.eu</code>, для США/ОАЭ — <code>zoho.com</code>).</li>
+                            </ol>
+                        </div>
+
+                        <form action="/settings/zoho" method="POST" class="space-y-4 bg-surface p-6 rounded-2xl border border-outline/30 shadow-sm">
                         <div>
                             <label class="block text-xs font-semibold text-on-surface-variant mb-1">Датацентр Zoho</label>
                             <select name="domain" class="w-full px-4 py-2 rounded-xl bg-surface-container-low border border-outline text-xs">
@@ -2237,10 +2312,34 @@
                             Сохранить Zoho CRM
                         </button>
                     </form>
+                    </div>
 
                     {% elif p.id == 'zendesk' %}
-                    <form action="/settings/zendesk" method="POST" class="space-y-4 max-w-xl bg-surface p-6 rounded-2xl border border-outline/30 shadow-sm">
-                        <h4 class="text-sm font-bold text-on-surface">Параметры Zendesk Talk Voice</h4>
+                    <div class="space-y-6 max-w-2xl">
+                        <div class="p-6 rounded-2xl bg-surface border border-teal-500/40 shadow-sm flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-teal-500/10 text-teal-500 flex items-center justify-center font-bold text-2xl shrink-0">
+                                <span class="material-symbols-outlined text-3xl">support_agent</span>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-on-surface">Zendesk Talk Voice Support</h4>
+                                <p class="text-xs text-on-surface-variant mt-0.5">Создание голосовых тикетов службы заботы при входящих обращениях клиентов.</p>
+                            </div>
+                        </div>
+
+                        <!-- QUICK STEP-BY-STEP SETUP GUIDE: ZENDESK -->
+                        <div class="p-4 rounded-xl bg-teal-500/10 border border-teal-500/20 text-xs space-y-2">
+                            <div class="font-bold text-teal-500 flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">menu_book</span>
+                                <span>Инструкция по подключению Zendesk:</span>
+                            </div>
+                            <ol class="list-decimal list-inside space-y-1 text-on-surface-variant leading-relaxed">
+                                <li>В Zendesk перейдите в <b>Admin Center</b> $\rightarrow$ <b>Apps and integrations</b> $\rightarrow$ <b>Zendesk API</b>.</li>
+                                <li>Включите <b>Token Access</b> и создайте новый <b>API Token</b>.</li>
+                                <li>Введите ваш <b>Субдомен</b> (например, <code>myhelpdesk</code>), <b>Admin Email</b> и полученный токен.</li>
+                            </ol>
+                        </div>
+
+                        <form action="/settings/zendesk" method="POST" class="space-y-4 bg-surface p-6 rounded-2xl border border-outline/30 shadow-sm">
                         <div>
                             <label class="block text-xs font-semibold text-on-surface-variant mb-1">Субдомен Zendesk (например: mycompany)</label>
                             <input type="text" name="subdomain" value="{{ integrations.get('zendesk', {}).get('subdomain', '') }}" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs font-mono">
@@ -2261,6 +2360,7 @@
                             Сохранить Zendesk
                         </button>
                     </form>
+                    </div>
 
                     {% elif p.id == 'telegram_alerts' %}
                     <form action="/settings/telegram" method="POST" class="space-y-4 max-w-xl">
