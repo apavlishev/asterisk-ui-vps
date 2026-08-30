@@ -5741,14 +5741,14 @@ def parse_log_line(raw_line, default_type='system'):
 
 @app.route('/api/logs/stream')
 def api_logs_stream():
-    """Continuous EventSource stream yielding live Asterisk & PBX events with non-blocking polling and heartbeats."""
+    """Continuous EventSource stream yielding live Asterisk & PBX events with non-blocking delta tracking & heartbeats."""
     def event_stream():
-        # 1. Send initial batch of recent lines
+        # 1. Send initial batch of recent lines from both full and messages
         lines_buffer = []
-        for log_f, def_t in [('/var/log/asterisk/messages', 'trunks'), ('/opt/amocrm_debug.log', 'amocrm'), ('/opt/crm-yandex-uploader.log', 'plugins')]:
+        for log_f, def_t in [('/var/log/asterisk/full', 'trunks'), ('/var/log/asterisk/messages', 'trunks'), ('/opt/amocrm_debug.log', 'amocrm'), ('/opt/crm-yandex-uploader.log', 'plugins')]:
             if os.path.exists(log_f):
                 try:
-                    res = subprocess.run(['tail', '-n', '25', log_f], capture_output=True, text=True, errors='ignore')
+                    res = subprocess.run(['tail', '-n', '30', log_f], capture_output=True, text=True, errors='ignore')
                     for line in res.stdout.splitlines():
                         p = parse_log_line(line, def_t)
                         if p: lines_buffer.append(p)
@@ -5767,7 +5767,7 @@ def api_logs_stream():
 
         # 2. Track last file position to stream only newly appended lines
         files_pos = {}
-        for path in ['/var/log/asterisk/messages', '/opt/amocrm_debug.log', '/opt/crm-yandex-uploader.log']:
+        for path in ['/var/log/asterisk/full', '/var/log/asterisk/messages', '/opt/amocrm_debug.log', '/opt/crm-yandex-uploader.log']:
             if os.path.exists(path):
                 try:
                     files_pos[path] = os.path.getsize(path)
@@ -5787,10 +5787,9 @@ def api_logs_stream():
                                 added_text = f.read(curr_size - last_pos)
                                 files_pos[path] = curr_size
                                 for l in added_text.splitlines():
-                                    parsed = parse_log_line(l, 'trunks' if 'messages' in path else 'amocrm')
+                                    parsed = parse_log_line(l, 'trunks' if 'asterisk' in path else 'amocrm')
                                     if parsed: new_lines.append(parsed)
                         elif curr_size < last_pos:
-                            # Log rotated
                             files_pos[path] = curr_size
                     except Exception:
                         pass
@@ -5798,7 +5797,6 @@ def api_logs_stream():
             if new_lines:
                 yield f"data: {json.dumps({'type': 'batch', 'logs': new_lines})}\n\n"
             else:
-                # Keep-alive heartbeat ping for browser EventSource
                 yield f": ping\n\n"
 
     response = Response(event_stream(), mimetype="text/event-stream")
