@@ -728,6 +728,91 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- INTERACTIVE DOCUMENTATION & KNOWLEDGE BASE: SIP PARAMETERS & CONTEXTS -->
+                    <div class="bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm space-y-5">
+                        <div class="flex items-center gap-3 pb-3 border-b border-surface-container">
+                            <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold">
+                                <span class="material-symbols-outlined text-2xl">help</span>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-on-surface">Справочник параметров абонента и архитектура «Контекстов»</h3>
+                                <p class="text-xs text-on-surface-variant">Подробное руководство: назначение каждого поля, безопасность и влияние контекста на маршрутизацию звонков</p>
+                            </div>
+                        </div>
+
+                        <!-- GRID WITH FIELD DEFINITIONS -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <!-- 1. Extension & Name -->
+                            <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-2">
+                                <div class="flex items-center gap-2 font-bold text-on-surface">
+                                    <span class="material-symbols-outlined text-primary text-[18px]">badge</span>
+                                    <span>Имя (CallerID) и Внутренний номер (Extension)</span>
+                                </div>
+                                <p class="text-on-surface-variant leading-relaxed">
+                                    <b>Номер:</b> уникальный цифровой идентификатор сотрудника (101, 102...). Используется для коротких звонков внутри офиса.<br>
+                                    <b>Имя (CallerID Name):</b> отображается на дисплеях телефонов коллег при звонке и автоматически привязывается к карточке сделки в CRM (например, <i>«Иван Иванов (Отдел продаж)»</i>).
+                                </p>
+                            </div>
+
+                            <!-- 2. Secret & Transport -->
+                            <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-2">
+                                <div class="flex items-center gap-2 font-bold text-on-surface">
+                                    <span class="material-symbols-outlined text-amber-500 text-[18px]">key</span>
+                                    <span>SIP Пароль (Secret / Auth Password)</span>
+                                </div>
+                                <p class="text-on-surface-variant leading-relaxed">
+                                    Секретный ключ авторизации для регистрации физического IP-телефона или софтфона. Сервер автоматически защищает этот порт через <b>Fail2ban Shield</b>: при 5 неверных попытках ввода пароля IP-клиента мгновенно блокируется в <code>iptables</code>.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- DEEP DIVE: WHAT IS CONTEXT & HOW IT WORKS -->
+                        <div class="p-5 rounded-xl bg-surface-container-low border border-primary/20 space-y-3">
+                            <div class="flex items-center gap-2 text-sm font-bold text-primary">
+                                <span class="material-symbols-outlined text-xl">route</span>
+                                <span>Что такое «Контекст вызовов» (Dialplan Context) и на что он влияет?</span>
+                            </div>
+                            <p class="text-xs text-on-surface-variant leading-relaxed">
+                                <b>Контекст в Asterisk</b> — это изолированная зона прав и правил диалплана (<code>extensions.conf</code>), в которую попадает абонент при совершении звонка. Он определяет: <i>куда этот номер имеет право звонить, через какие GSM-модемы или транки выходить в город, и разрешены ли ему международные вызовы.</i>
+                            </p>
+
+                            <!-- CONTEXT EXAMPLES TABLE -->
+                            <div class="overflow-x-auto pt-2">
+                                <table class="w-full text-xs font-mono bg-surface rounded-xl border border-outline/20 overflow-hidden">
+                                    <thead>
+                                        <tr class="bg-surface-container text-on-surface-variant border-b border-outline/20 text-left font-sans">
+                                            <th class="py-2.5 px-3">Контекст</th>
+                                            <th class="py-2.5 px-3">Права и логика маршрутизации</th>
+                                            <th class="py-2.5 px-3">Пример применения</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-surface-container text-[11px]">
+                                        <tr>
+                                            <td class="py-2.5 px-3 font-bold text-primary">from-internal</td>
+                                            <td class="py-2.5 px-3 font-sans text-on-surface"><b>Стандартный корпоративный:</b> Разрешены звонки коллегам на 101–199, в группы, на сервисные номера (*43, 888) и выход на внешние линии через модемы/транки.</td>
+                                            <td class="py-2.5 px-3 text-on-surface-variant font-sans">Основной персонал офиса, менеджеры продаж.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2.5 px-3 font-bold text-secondary">internal-only</td>
+                                            <td class="py-2.5 px-3 font-sans text-on-surface"><b>Только внутренняя связь:</b> Запрещен выход в город на городские/мобильные номера. Звонки только между сотрудниками.</td>
+                                            <td class="py-2.5 px-3 text-on-surface-variant font-sans">Телефоны на складе, в переговорных, на ресепшн или у стажеров.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2.5 px-3 font-bold text-warning">sales-trunk-only</td>
+                                            <td class="py-2.5 px-3 font-sans text-on-surface"><b>Принудительная линия:</b> Исходящие звонки направляются строго через указанный SIP-транк или конкретный GSM-модем (например, для звонков по РФ).</td>
+                                            <td class="py-2.5 px-3 text-on-surface-variant font-sans">Отдел телемаркетинга, холодные звонки по выделенным безлимитным тарифам.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2.5 px-3 font-bold text-error">vip-international</td>
+                                            <td class="py-2.5 px-3 font-sans text-on-surface"><b>Полный доступ:</b> Включая прямые международные направления (+1..., +971...), конференц-комнаты и приоритетный перехват.</td>
+                                            <td class="py-2.5 px-3 text-on-surface-variant font-sans">Руководство, генеральный директор.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- SUBTAB 2: RING GROUPS & HUNT GROUPS -->
