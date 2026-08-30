@@ -1182,58 +1182,85 @@
                     </table>
                 </div>
 
-                <!-- DOCUMENTATION & KNOWLEDGE BASE: SIP TRUNKS & CARRIERS -->
+                <!-- DOCUMENTATION & KNOWLEDGE BASE: GSM 3G/4G DONGLES & HARDWARE -->
                 <div class="bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm space-y-5">
                     <div class="flex items-center gap-3 pb-3 border-b border-surface-container">
-                        <div class="w-10 h-10 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center font-bold">
-                            <span class="material-symbols-outlined text-2xl">help</span>
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold">
+                            <span class="material-symbols-outlined text-2xl">cell_tower</span>
                         </div>
                         <div>
-                            <h3 class="text-sm font-bold text-on-surface">Руководство по настройке SIP-транков и внешних провайдеров</h3>
-                            <p class="text-xs text-on-surface-variant">Разбор всех технических параметров подключения операторов связи (Zadarma, Mango, Мегафон, Билайн, du, Etisalat, Twilio)</p>
+                            <h3 class="text-sm font-bold text-on-surface">Руководство по USB GSM-модемам, chan_dongle и голосовым чипсетам</h3>
+                            <p class="text-xs text-on-surface-variant">Требования к физическим модемам для Asterisk, поддержка передачи голоса (Voice Enabled), драйверы и питание</p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <!-- 1. Voice firmware -->
                         <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
                             <div class="flex items-center gap-2 font-bold text-on-surface">
-                                <span class="material-symbols-outlined text-primary text-[18px]">dns</span>
-                                <span>Хост / Домен провайдера (SIP Registrar) и Порт</span>
+                                <span class="material-symbols-outlined text-amber-500 text-[18px]">record_voice_over</span>
+                                <span>1. Поддержка передачи голоса (Voice-прошивка)</span>
                             </div>
                             <p class="text-on-surface-variant leading-relaxed">
-                                Адрес сервера оператора (например: <code>sip.zadarma.com</code>, <code>multifon.megafon.ru</code>, <code>vpbx.mangosip.ru</code>).<br>
-                                <b>Порт:</b> по умолчанию <code>5060</code> (UDP/TCP) или <code>5061</code> (TLS). Сервер непрерывно опрашивает хост механизмом OPTIONS Keep-Alive.
+                                Обычные модемы для 4G-интернета (HiLink / NDIS) <b>не умеют передавать голос</b> в Asterisk. Требуется режим <b>Stick (Serial/Modem)</b> с активными голосовыми AT-командами и поддержкой аудио-потока PCM 8kHz.
                             </p>
                         </div>
 
+                        <!-- 2. Power & Hubs -->
                         <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
                             <div class="flex items-center gap-2 font-bold text-on-surface">
-                                <span class="material-symbols-outlined text-amber-500 text-[18px]">badge</span>
-                                <span>Логин (Auth User) и Пароль (Secret)</span>
+                                <span class="material-symbols-outlined text-primary text-[18px]">power</span>
+                                <span>2. Питание USB-хаба (Active USB 2.0 Hub)</span>
                             </div>
                             <p class="text-on-surface-variant leading-relaxed">
-                                Учетные данные SIP-линии из личного кабинета провайдера. При включенной опции <i>«Используется»</i> Asterisk отправляет дайджест-регистрацию (SIP REGISTER) каждые 60 секунд.
+                                В момент установления звонка модем потребляет в пике до <b>1.5–2.0 Ампер</b>. При подключении более 1–2 модемов к серверу обязательно используйте <b>активный USB-хаб с внешним блоком питания (12V 3-5A)</b> во избежание «отваливания» портов <code>/dev/ttyUSB*</code>.
                             </p>
                         </div>
+                    </div>
 
-                        <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
-                            <div class="flex items-center gap-2 font-bold text-on-surface">
-                                <span class="material-symbols-outlined text-secondary text-[18px]">call</span>
-                                <span>АОН / CallerID (Outbound Caller ID)</span>
-                            </div>
-                            <p class="text-on-surface-variant leading-relaxed">
-                                Городской или мобильный номер в международном формате (например, <code>+74951234567</code> или <code>+97142000000</code>), который будет высвечиваться у клиентов при исходящих звонках менеджеров.
-                            </p>
+                    <!-- COMPATIBLE HARDWARE LIST -->
+                    <div class="p-5 rounded-xl bg-surface-container-low border border-amber-500/20 space-y-3">
+                        <div class="flex items-center gap-2 text-sm font-bold text-amber-500">
+                            <span class="material-symbols-outlined text-xl">devices</span>
+                            <span>Проверенные модели 3G / 4G модемов и модулей для Asterisk</span>
                         </div>
-
-                        <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
-                            <div class="flex items-center gap-2 font-bold text-on-surface">
-                                <span class="material-symbols-outlined text-success text-[18px]">alt_route</span>
-                                <span>Входящий контекст (Inbound Context)</span>
-                            </div>
-                            <p class="text-on-surface-variant leading-relaxed">
-                                Автоматически генерируемый маршрут (например: <code>trunk-in-trunk_megafon</code>). Вызовы с этого транка попадают в назначенный IVR-сценарий или распределяются на сотрудников по расписанию.
-                            </p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs font-mono bg-surface rounded-xl border border-outline/20 overflow-hidden">
+                                <thead>
+                                    <tr class="bg-surface-container text-on-surface-variant border-b border-outline/20 text-left font-sans">
+                                        <th class="py-2.5 px-3">Модель / Чипсет</th>
+                                        <th class="py-2.5 px-3">Стандарты связи</th>
+                                        <th class="py-2.5 px-3">Драйвер в PBX</th>
+                                        <th class="py-2.5 px-3">Статус поддержки</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-surface-container text-[11px]">
+                                    <tr>
+                                        <td class="py-2.5 px-3 font-bold text-on-surface">Huawei E1550 / E1750 / E173</td>
+                                        <td class="py-2.5 px-3 font-sans text-on-surface-variant">2G GSM / 3G UMTS (Voice Native)</td>
+                                        <td class="py-2.5 px-3 text-primary">chan_dongle (ttyUSB)</td>
+                                        <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold">100% Эталон (Voice активен)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2.5 px-3 font-bold text-on-surface">Huawei E352 / E353 / E3131</td>
+                                        <td class="py-2.5 px-3 font-sans text-on-surface-variant">3G+ HSPA+ до 21 Мбит/с</td>
+                                        <td class="py-2.5 px-3 text-primary">chan_dongle</td>
+                                        <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold">Отлично (В Stick-режиме)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2.5 px-3 font-bold text-on-surface">Quectel EC25 / EG25-G (PCIe / USB)</td>
+                                        <td class="py-2.5 px-3 font-sans text-on-surface-variant">4G LTE Cat 4 + VoLTE / 3G / 2G</td>
+                                        <td class="py-2.5 px-3 text-secondary">chan_quectel / ALSA PCM</td>
+                                        <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 font-bold">Современный Enterprise 4G</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2.5 px-3 font-bold text-on-surface">SIMCom SIM7600E-H (4G USB Dongle)</td>
+                                        <td class="py-2.5 px-3 font-sans text-on-surface-variant">4G LTE / VoLTE Digital Audio</td>
+                                        <td class="py-2.5 px-3 text-secondary">ttyUSB AT + USB Audio</td>
+                                        <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 font-bold">Промышленный стандарт 4G</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -1331,58 +1358,85 @@
                     </table>
                 </div>
 
-                <!-- DOCUMENTATION & KNOWLEDGE BASE: SIP TRUNKS & CARRIERS -->
+                <!-- DOCUMENTATION & KNOWLEDGE BASE: GSM 3G/4G DONGLES & HARDWARE -->
                 <div class="bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm space-y-5">
                     <div class="flex items-center gap-3 pb-3 border-b border-surface-container">
-                        <div class="w-10 h-10 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center font-bold">
-                            <span class="material-symbols-outlined text-2xl">help</span>
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold">
+                            <span class="material-symbols-outlined text-2xl">cell_tower</span>
                         </div>
                         <div>
-                            <h3 class="text-sm font-bold text-on-surface">Руководство по настройке SIP-транков и внешних провайдеров</h3>
-                            <p class="text-xs text-on-surface-variant">Разбор всех технических параметров подключения операторов связи (Zadarma, Mango, Мегафон, Билайн, du, Etisalat, Twilio)</p>
+                            <h3 class="text-sm font-bold text-on-surface">Руководство по USB GSM-модемам, chan_dongle и голосовым чипсетам</h3>
+                            <p class="text-xs text-on-surface-variant">Требования к физическим модемам для Asterisk, поддержка передачи голоса (Voice Enabled), драйверы и питание</p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <!-- 1. Voice firmware -->
                         <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
                             <div class="flex items-center gap-2 font-bold text-on-surface">
-                                <span class="material-symbols-outlined text-primary text-[18px]">dns</span>
-                                <span>Хост / Домен провайдера (SIP Registrar) и Порт</span>
+                                <span class="material-symbols-outlined text-amber-500 text-[18px]">record_voice_over</span>
+                                <span>1. Поддержка передачи голоса (Voice-прошивка)</span>
                             </div>
                             <p class="text-on-surface-variant leading-relaxed">
-                                Адрес сервера оператора (например: <code>sip.zadarma.com</code>, <code>multifon.megafon.ru</code>, <code>vpbx.mangosip.ru</code>).<br>
-                                <b>Порт:</b> по умолчанию <code>5060</code> (UDP/TCP) или <code>5061</code> (TLS). Сервер непрерывно опрашивает хост механизмом OPTIONS Keep-Alive.
+                                Обычные модемы для 4G-интернета (HiLink / NDIS) <b>не умеют передавать голос</b> в Asterisk. Требуется режим <b>Stick (Serial/Modem)</b> с активными голосовыми AT-командами и поддержкой аудио-потока PCM 8kHz.
                             </p>
                         </div>
 
+                        <!-- 2. Power & Hubs -->
                         <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
                             <div class="flex items-center gap-2 font-bold text-on-surface">
-                                <span class="material-symbols-outlined text-amber-500 text-[18px]">badge</span>
-                                <span>Логин (Auth User) и Пароль (Secret)</span>
+                                <span class="material-symbols-outlined text-primary text-[18px]">power</span>
+                                <span>2. Питание USB-хаба (Active USB 2.0 Hub)</span>
                             </div>
                             <p class="text-on-surface-variant leading-relaxed">
-                                Учетные данные SIP-линии из личного кабинета провайдера. При включенной опции <i>«Используется»</i> Asterisk отправляет дайджест-регистрацию (SIP REGISTER) каждые 60 секунд.
+                                В момент установления звонка модем потребляет в пике до <b>1.5–2.0 Ампер</b>. При подключении более 1–2 модемов к серверу обязательно используйте <b>активный USB-хаб с внешним блоком питания (12V 3-5A)</b> во избежание «отваливания» портов <code>/dev/ttyUSB*</code>.
                             </p>
                         </div>
+                    </div>
 
-                        <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
-                            <div class="flex items-center gap-2 font-bold text-on-surface">
-                                <span class="material-symbols-outlined text-secondary text-[18px]">call</span>
-                                <span>АОН / CallerID (Outbound Caller ID)</span>
-                            </div>
-                            <p class="text-on-surface-variant leading-relaxed">
-                                Городской или мобильный номер в международном формате (например, <code>+74951234567</code> или <code>+97142000000</code>), который будет высвечиваться у клиентов при исходящих звонках менеджеров.
-                            </p>
+                    <!-- COMPATIBLE HARDWARE LIST -->
+                    <div class="p-5 rounded-xl bg-surface-container-low border border-amber-500/20 space-y-3">
+                        <div class="flex items-center gap-2 text-sm font-bold text-amber-500">
+                            <span class="material-symbols-outlined text-xl">devices</span>
+                            <span>Проверенные модели 3G / 4G модемов и модулей для Asterisk</span>
                         </div>
-
-                        <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
-                            <div class="flex items-center gap-2 font-bold text-on-surface">
-                                <span class="material-symbols-outlined text-success text-[18px]">alt_route</span>
-                                <span>Входящий контекст (Inbound Context)</span>
-                            </div>
-                            <p class="text-on-surface-variant leading-relaxed">
-                                Автоматически генерируемый маршрут (например: <code>trunk-in-trunk_megafon</code>). Вызовы с этого транка попадают в назначенный IVR-сценарий или распределяются на сотрудников по расписанию.
-                            </p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs font-mono bg-surface rounded-xl border border-outline/20 overflow-hidden">
+                                <thead>
+                                    <tr class="bg-surface-container text-on-surface-variant border-b border-outline/20 text-left font-sans">
+                                        <th class="py-2.5 px-3">Модель / Чипсет</th>
+                                        <th class="py-2.5 px-3">Стандарты связи</th>
+                                        <th class="py-2.5 px-3">Драйвер в PBX</th>
+                                        <th class="py-2.5 px-3">Статус поддержки</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-surface-container text-[11px]">
+                                    <tr>
+                                        <td class="py-2.5 px-3 font-bold text-on-surface">Huawei E1550 / E1750 / E173</td>
+                                        <td class="py-2.5 px-3 font-sans text-on-surface-variant">2G GSM / 3G UMTS (Voice Native)</td>
+                                        <td class="py-2.5 px-3 text-primary">chan_dongle (ttyUSB)</td>
+                                        <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold">100% Эталон (Voice активен)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2.5 px-3 font-bold text-on-surface">Huawei E352 / E353 / E3131</td>
+                                        <td class="py-2.5 px-3 font-sans text-on-surface-variant">3G+ HSPA+ до 21 Мбит/с</td>
+                                        <td class="py-2.5 px-3 text-primary">chan_dongle</td>
+                                        <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold">Отлично (В Stick-режиме)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2.5 px-3 font-bold text-on-surface">Quectel EC25 / EG25-G (PCIe / USB)</td>
+                                        <td class="py-2.5 px-3 font-sans text-on-surface-variant">4G LTE Cat 4 + VoLTE / 3G / 2G</td>
+                                        <td class="py-2.5 px-3 text-secondary">chan_quectel / ALSA PCM</td>
+                                        <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 font-bold">Современный Enterprise 4G</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2.5 px-3 font-bold text-on-surface">SIMCom SIM7600E-H (4G USB Dongle)</td>
+                                        <td class="py-2.5 px-3 font-sans text-on-surface-variant">4G LTE / VoLTE Digital Audio</td>
+                                        <td class="py-2.5 px-3 text-secondary">ttyUSB AT + USB Audio</td>
+                                        <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 font-bold">Промышленный стандарт 4G</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
