@@ -93,7 +93,13 @@
         
         ws.onmessage = function(event) {
             const data = JSON.parse(event.data);
-            if(data.type === 'transcription') {
+            if(data.type === 'error') {
+                const el = document.createElement('div');
+                el.className = 'flex flex-col items-center mt-2 mb-2 w-full';
+                el.innerHTML = `<div class="bg-error/20 text-error border border-error/40 px-4 py-2 rounded-xl text-xs font-mono max-w-[80%] break-words shadow-sm flex items-start gap-2"><span class="material-symbols-outlined text-[14px]">warning</span><span>${data.message}</span></div>`;
+                box.appendChild(el);
+                box.scrollTop = box.scrollHeight;
+            } else if(data.type === 'transcription') {
                 const el = document.createElement('div');
                 el.className = 'flex flex-col ' + (data.speaker === 'operator' ? 'items-end' : 'items-start');
                 
