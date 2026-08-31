@@ -4754,7 +4754,7 @@ def build_outbound_dialplan_lines(cfg):
         lines.append(" same => n,Set(__CALL_DIRECTION=outbound)")
         lines.append(" same => n,Set(__REC_PATH=${RECORD_DIR}/${REC_FILE})")
         lines.append(" same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)")
-        lines.append(" same => n,MixMonitor(${REC_PATH})")
+        lines.append(" same => n,MixMonitor(${REC_PATH},r(${REC_PATH}_rx.wav) t(${REC_PATH}_tx.wav))")
         
         for og in op_gotos:
             lines.append(og)
