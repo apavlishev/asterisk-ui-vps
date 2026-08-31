@@ -6545,7 +6545,7 @@ def tg_send_code():
         if not loop.run_until_complete(client.is_user_authorized()):
             res = loop.run_until_complete(client.send_code_request(phone))
             tg_clients[phone] = {'api_id': api_id, 'api_hash': api_hash, 'phone_code_hash': res.phone_code_hash}
-            loop.run_until_complete(client.disconnect())
+            client.disconnect()
             return jsonify({"success": True})
         else:
             return jsonify({"success": False, "error": "Already authorized"})
@@ -6582,7 +6582,7 @@ def tg_login():
                 loop.run_until_complete(client.sign_in(password=password))
             else:
                 return jsonify({"success": False, "error": str(e)})
-        loop.run_until_complete(client.disconnect())
+        client.disconnect()
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
