@@ -2872,5 +2872,17 @@
   "Добавьте следующий код в конфигурацию ядра Asterisk, чтобы разрешить звонки в обе стороны:": {
     "ru": "Добавьте следующий код в конфигурацию ядра Asterisk, чтобы разрешить звонки в обе стороны:",
     "en": "Add the following code to your Asterisk core configuration to allow bidirectional calls:"
+  },
+  "Проверка...": {
+    "ru": "Проверка...",
+    "en": "Checking..."
+  },
+  "Транк Онлайн": {
+    "ru": "Транк Онлайн",
+    "en": "Trunk Online"
+  },
+  "Шлюз Отключен": {
+    "ru": "Шлюз Отключен",
+    "en": "Gateway Offline"
   }
 }

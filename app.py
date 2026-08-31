@@ -4553,36 +4553,54 @@ def generate_pjsip_conf():
         t_user = t.get('username', '')
         t_pass = t.get('password', '')
         t_cid = t.get('callerid', '')
+        t_transport = t.get('transport', 'udp')
 
-        if not t_host or not t_user:
+        if not t_host:
             continue
 
-        out.append(f"; SIP Регистрация: {t_name}")
-        out.append(f"[{t_id}_auth]")
-        out.append("type=auth")
-        out.append("auth_type=userpass")
-        out.append(f"username={t_user}")
-        out.append(f"password={t_pass}")
-        out.append("")
-        out.append(f"[{t_id}_reg]")
-        out.append("type=registration")
-        out.append(f"outbound_auth={t_id}_auth")
-        out.append(f"server_uri=sip:{t_host}:{t_port}")
-        out.append(f"client_uri=sip:{t_user}@{t_host}:{t_port}")
-        out.append(f"contact_user={t_user}")
-        out.append("retry_interval=10")
-        out.append("max_retries=1000")
-        out.append("expiration=60")
-        out.append("line=yes")
-        out.append(f"endpoint={t_id}")
-        out.append("")
-        out.append(f"[{t_id}]")
-        out.append("type=aor")
-        out.append(f"contact=sip:{t_user}@{t_host}:{t_port}")
-        out.append("qualify_frequency=30")
+        out.append(f"; SIP Транк: {t_name}")
+        
+        if t_user:
+            # Сценарий 1: Транк с регистрацией (логин/пароль)
+            out.append(f"[{t_id}_auth]")
+            out.append("type=auth")
+            out.append("auth_type=userpass")
+            out.append(f"username={t_user}")
+            out.append(f"password={t_pass}")
+            out.append("")
+            out.append(f"[{t_id}_reg]")
+            out.append("type=registration")
+            out.append(f"transport=transport-{t_transport}")
+            out.append(f"outbound_auth={t_id}_auth")
+            out.append(f"server_uri=sip:{t_host}:{t_port}")
+            out.append(f"client_uri=sip:{t_user}@{t_host}:{t_port}")
+            out.append(f"contact_user={t_user}")
+            out.append("retry_interval=10")
+            out.append("max_retries=1000")
+            out.append("expiration=60")
+            out.append("line=yes")
+            out.append(f"endpoint={t_id}")
+            out.append("")
+            out.append(f"[{t_id}]")
+            out.append("type=aor")
+            out.append(f"contact=sip:{t_user}@{t_host}:{t_port}")
+            out.append("qualify_frequency=30")
+        else:
+            # Сценарий 2: IP-транк (без регистрации, аутентификация по IP)
+            out.append(f"[{t_id}_identify]")
+            out.append("type=identify")
+            out.append(f"endpoint={t_id}")
+            out.append(f"match={t_host}")
+            out.append("")
+            out.append(f"[{t_id}]")
+            out.append("type=aor")
+            out.append(f"contact=sip:{t_host}:{t_port}")
+            out.append("qualify_frequency=30")
+            
         out.append("")
         out.append(f"[{t_id}]")
         out.append("type=endpoint")
+        out.append(f"transport=transport-{t_transport}")
         out.append(f"context=trunk-in-{t_id}")
         out.append("disallow=all")
         out.append("allow=alaw")
@@ -4593,10 +4611,12 @@ def generate_pjsip_conf():
         out.append("rtp_symmetric=yes")
         out.append("force_rport=yes")
         out.append("rewrite_contact=yes")
-        out.append(f"outbound_auth={t_id}_auth")
+        if t_user:
+            out.append(f"outbound_auth={t_id}_auth")
+            out.append(f"from_user={t_user}")
         out.append(f"aors={t_id}")
-        out.append(f"from_user={t_user}")
         out.append(f"from_domain={t_host}:{t_port}")
+        
         if t_cid:
             out.append(f"callerid={t_cid}")
         out.append("")
@@ -5875,7 +5895,7 @@ def api_save_sip_trunk():
     transport = request.form.get('trunk_transport', 'udp').strip()
     context = request.form.get('trunk_context', '').strip()
     
-    if not name or not host or not username:
+    if not name or not host:
         flash('Название, хост и логин транка обязательны!')
         return redirect(url_for('index'))
         
@@ -6582,8 +6602,29 @@ def tg_login():
                 loop.run_until_complete(client.sign_in(password=password))
             else:
                 return jsonify({"success": False, "error": str(e)})
+        
+        # Get authorized user info
+        me = loop.run_until_complete(client.get_me())
+        account_info = {
+            "id": me.id,
+            "first_name": me.first_name or "",
+            "last_name": me.last_name or "",
+            "username": me.username or "",
+            "phone": me.phone or phone
+        }
+        
+        # Save to integrations.json
+        cfg = load_integrations()
+        if 'telegram_trunk' not in cfg:
+            cfg['telegram_trunk'] = {}
+        cfg['telegram_trunk']['account_info'] = account_info
+        cfg['telegram_trunk']['api_id'] = api_id
+        cfg['telegram_trunk']['api_hash'] = api_hash
+        cfg['telegram_trunk']['phone'] = phone
+        save_integrations(cfg)
+        
         client.disconnect()
-        return jsonify({"success": True})
+        return jsonify({"success": True, "account": account_info})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
 
@@ -6609,6 +6650,30 @@ def tg_start_tg2sip():
     
     # Mocking the docker run command for tg2sip
     return jsonify({"success": True, "msg": f"tg2sip scheduled on port {port}"})
+
+@app.route('/api/telegram/status', methods=['GET'])
+@login_required
+def tg_status():
+    cfg = load_integrations()
+    tg = cfg.get('telegram_trunk', {})
+    port = int(tg.get('port', 5062))
+    
+    import socket
+    is_online = False
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        try:
+            s.bind(('127.0.0.1', port))
+            # If we CAN bind to it, it means nothing is listening on it!
+            is_online = False
+        except OSError:
+            # If we CANNOT bind, something (tg2sip) is using it!
+            is_online = True
+            
+    return jsonify({
+        "online": is_online,
+        "port": port
+    })
+
 
 if __name__ == '__main__':
     try:

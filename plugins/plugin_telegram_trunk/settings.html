@@ -10,6 +10,50 @@
             </div>
         </div>
 
+        {% set tg_account = integrations.get('telegram_trunk', {}).get('account_info') %}
+        {% if tg_account %}
+        <!-- Authorized Account Profile -->
+        <div class="mt-4 p-4 rounded-2xl bg-surface border border-outline/30 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center text-lg font-bold">
+                    {{ (tg_account.first_name[0] if tg_account.first_name else tg_account.username[0] if tg_account.username else '?') | upper }}
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-on-surface">{{ tg_account.first_name }} {{ tg_account.last_name }}</h4>
+                    <p class="text-xs text-on-surface-variant font-mono mt-0.5">
+                        {% if tg_account.username %}@{{ tg_account.username }} &bull; {% endif %}+{{ tg_account.phone }}
+                    </p>
+                </div>
+            </div>
+            
+            <div id="tg-live-status" class="px-3 py-1.5 rounded-lg border border-outline/30 text-xs font-bold flex items-center gap-1.5 bg-surface-container">
+                <span class="material-symbols-outlined text-[16px] animate-spin">sync</span>
+                <span class="tg-translate">Проверка...</span>
+            </div>
+        </div>
+        
+        <script>
+            // Poll for status
+            async function checkTgStatus() {
+                try {
+                    const res = await fetch('/api/telegram/status');
+                    const data = await res.json();
+                    const badge = document.getElementById('tg-live-status');
+                    if (data.online) {
+                        badge.className = 'px-3 py-1.5 rounded-lg border border-success/30 text-success text-xs font-bold flex items-center gap-1.5 bg-success/10';
+                        badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-success animate-pulse"></span><span class="tg-translate">Транк Онлайн</span>';
+                    } else {
+                        badge.className = 'px-3 py-1.5 rounded-lg border border-error/30 text-error text-xs font-bold flex items-center gap-1.5 bg-error/10';
+                        badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-error"></span><span class="tg-translate">Шлюз Отключен</span>';
+                    }
+                } catch(e) {}
+            }
+            setInterval(checkTgStatus, 5000);
+            setTimeout(checkTgStatus, 500);
+        </script>
+        {% endif %}
+
+
         <div class="mt-6 space-y-6">
             <!-- Documentation -->
             <div class="p-5 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-xs text-on-surface-variant leading-relaxed space-y-4">
