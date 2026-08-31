@@ -11,5 +11,6 @@
   "price": "Free",
   "price_sub": "Included",
   "description": "Полнофункциональный двойной VPN-сервер прямо на АТС: OpenVPN (для офисных IP-телефонов Yealink/Grandstream/Fanvil) + VLESS Reality XTLS (для смартфонов и софтфонов с маскировкой под HTTPS и обходом любых блокировок).",
-  "entry_point": "plugin_main.py"
+  "entry_point": "plugin_main.py",
+  "name_ru": "Корпоративный VPN Хаб"
 }

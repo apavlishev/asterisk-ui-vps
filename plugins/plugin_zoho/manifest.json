@@ -11,5 +11,6 @@
   "price": "Free",
   "price_sub": "Included",
   "description": "Подключение экосистемы Zoho CRM: фиксация завершенных звонков в модуле Calls, всплывающие карточки клиентов и прикрепление облачных записей разговоров.",
-  "entry_point": "plugin_main.py"
+  "entry_point": "plugin_main.py",
+  "name_ru": "Zoho CRM и PhoneBridge"
 }

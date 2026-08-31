@@ -13,7 +13,7 @@ if not os.path.exists(PLUGINS_DIR):
 
 MARKETPLACE_API_URL = "https://marketplace.logiccore.io/api/v1"
 
-def get_installed_plugins():
+def get_installed_plugins(lang="en"):
     """Returns a list of all locally installed and validated plugins."""
     installed = []
     if not os.path.exists(PLUGINS_DIR):
@@ -29,9 +29,14 @@ def get_installed_plugins():
             try:
                 with open(manifest_path, 'r', encoding='utf-8') as f:
                     meta = json.load(f)
-                meta['dir_name'] = entry
+meta['dir_name'] = entry
                 meta['is_installed'] = True
                 meta['has_settings'] = os.path.exists(os.path.join(entry_path, 'settings.html'))
+                
+                # Apply localization
+                if lang == 'ru' and 'name_ru' in meta:
+                    meta['name'] = meta['name_ru']
+                    
                 installed.append(meta)
             except Exception as e:
                 print(f"Error loading plugin manifest {entry}: {e}")

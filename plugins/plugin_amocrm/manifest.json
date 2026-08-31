@@ -11,5 +11,6 @@
   "price": "$15",
   "price_sub": "/ mo",
   "description": "Сквозная синхронизация с amoCRM (API v4), автосоздание сделок и контактов, нативная выгрузка аудиозаписей в amoCRM Drive с плеером в таймлайне.",
-  "entry_point": "plugin_main.py"
+  "entry_point": "plugin_main.py",
+  "name_ru": "Интеграция с amoCRM"
 }

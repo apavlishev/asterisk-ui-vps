@@ -11,5 +11,6 @@
   "price": "Free",
   "price_sub": "Included",
   "description": "Официальный коннектор для HubSpot: автоматическая регистрация звонков в CRM v3 API, прикрепление плеера записи, привязка к сделкам (Deals) и контактам (Contacts).",
-  "entry_point": "plugin_main.py"
+  "entry_point": "plugin_main.py",
+  "name_ru": "Синхронизация с HubSpot CRM"
 }

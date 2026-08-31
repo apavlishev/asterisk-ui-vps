@@ -10,5 +10,6 @@
   "rating": "0.0",
   "price": "Free",
   "description": "Short description of the plugin",
-  "entry_point": "plugin_main.py"
+  "entry_point": "plugin_main.py",
+  "name_ru": "Мой новый плагин"
 }

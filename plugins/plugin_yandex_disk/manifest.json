@@ -11,5 +11,6 @@
   "price": "$8",
   "price_sub": "/ mo",
   "description": "Прямая выгрузка аудиозаписей разговоров на Яндекс.Диск через OAuth REST API в защищенную корпоративную папку.",
-  "entry_point": "plugin_main.py"
+  "entry_point": "plugin_main.py",
+  "name_ru": "Облачный архив Яндекс.Диск"
 }

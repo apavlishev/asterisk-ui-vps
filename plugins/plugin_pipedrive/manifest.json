@@ -11,5 +11,6 @@
   "price": "Free",
   "price_sub": "Included",
   "description": "Интеграция с Pipedrive CRM: логирование звонков через Call Activities API, связка с Person / Organization / Deal, встроенный плеер аудиозаписей.",
-  "entry_point": "plugin_main.py"
+  "entry_point": "plugin_main.py",
+  "name_ru": "Воронка продаж Pipedrive"
 }

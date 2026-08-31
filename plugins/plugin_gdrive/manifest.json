@@ -11,5 +11,6 @@
   "price": "$10",
   "price_sub": "/ mo",
   "description": "Резервное копирование записей звонков в облачную папку Google Drive через Google REST API с управлением квотами и постоянным хранением.",
-  "entry_point": "plugin_main.py"
+  "entry_point": "plugin_main.py",
+  "name_ru": "Облачный архив Google Drive"
 }

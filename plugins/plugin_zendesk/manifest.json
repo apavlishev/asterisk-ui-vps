@@ -11,5 +11,6 @@
   "price": "Free",
   "price_sub": "Included",
   "description": "Интеграция со службой заботы Zendesk: автоматическое создание Voice Tickets при входящих обращениях, таймлайн разговоров и аудиозаписи.",
-  "entry_point": "plugin_main.py"
+  "entry_point": "plugin_main.py",
+  "name_ru": "Zendesk: Поддержка голоса"
 }

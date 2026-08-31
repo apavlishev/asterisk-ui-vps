@@ -11,5 +11,6 @@
   "price": "Free",
   "price_sub": "Included",
   "description": "Интеграция с GoHighLevel (GHL): отправка вебхуков о звонках, запуск Workflows, авто-SMS/WhatsApp при пропущенных вызовах и сохранение записей.",
-  "entry_point": "plugin_main.py"
+  "entry_point": "plugin_main.py",
+  "name_ru": "Коннектор GoHighLevel (GHL)"
 }

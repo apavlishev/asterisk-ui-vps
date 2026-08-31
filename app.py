@@ -5377,7 +5377,7 @@ def index():
         marketplace_plugins=plugins,
         current_version=get_current_version(),
         get_system_network_info=get_system_network_info,
-        installed_plugins=plugin_manager.get_installed_plugins(),
+        installed_plugins=plugin_manager.get_installed_plugins(get_current_language()),
         modems_list=get_system_modems_info(),
         amocrm_account=get_amocrm_account_info(),
         antifraud=get_antifraud_status(),

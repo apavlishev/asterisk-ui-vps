@@ -6,5 +6,6 @@
   "category": "core",
   "icon": "send",
   "color": "blue-500",
-  "description": "Полноценный SIP-транк на базе Telegram. Позволяет принимать и совершать звонки через Telegram-аккаунт."
+  "description": "Полноценный SIP-транк на базе Telegram. Позволяет принимать и совершать звонки через Telegram-аккаунт.",
+  "name_ru": "SIP Транк Telegram"
 }
