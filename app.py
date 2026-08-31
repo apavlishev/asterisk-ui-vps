@@ -5084,6 +5084,30 @@ def api_check_update():
     except Exception as e:
         return jsonify({"error": str(e)})
 
+
+@app.route('/plugins/toggle/<plugin_id>', methods=['POST'])
+def toggle_plugin(plugin_id):
+    cfg = load_integrations()
+    disabled = cfg.get('plugins_disabled', [])
+    if not isinstance(disabled, list):
+        disabled = []
+        
+    if plugin_id in disabled:
+        disabled.remove(plugin_id)
+    else:
+        disabled.append(plugin_id)
+        
+    cfg['plugins_disabled'] = disabled
+    save_integrations(cfg)
+    return redirect(request.referrer or url_for('index'))
+
+
+@app.route('/plugins/delete/<plugin_id>', methods=['POST'])
+def delete_plugin_route(plugin_id):
+    from plugin_manager import uninstall_plugin
+    uninstall_plugin(plugin_id)
+    return redirect(request.referrer or url_for('index'))
+
 @app.route('/action/do-update', methods=['POST'])
 def action_do_update():
     try:
