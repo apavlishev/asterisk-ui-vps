@@ -6568,7 +6568,27 @@ def tg_send_code():
             client.disconnect()
             return jsonify({"success": True})
         else:
-            return jsonify({"success": False, "error": "Already authorized"})
+            # If already authorized, just fetch the user info to save it to integrations.json
+            me = loop.run_until_complete(client.get_me())
+            account_info = {
+                "id": me.id,
+                "first_name": me.first_name or "",
+                "last_name": me.last_name or "",
+                "username": me.username or "",
+                "phone": me.phone or phone
+            }
+            
+            cfg = load_integrations()
+            if 'telegram_trunk' not in cfg:
+                cfg['telegram_trunk'] = {}
+            cfg['telegram_trunk']['account_info'] = account_info
+            cfg['telegram_trunk']['api_id'] = api_id
+            cfg['telegram_trunk']['api_hash'] = api_hash
+            cfg['telegram_trunk']['phone'] = phone
+            save_integrations(cfg)
+            
+            client.disconnect()
+            return jsonify({"success": True, "already_authorized": True, "account": account_info})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
 

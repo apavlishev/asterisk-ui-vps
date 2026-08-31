@@ -201,7 +201,11 @@ async function sendTgCode() {
             body: JSON.stringify({api_id, api_hash, phone})
         });
         const data = await res.json();
-        if(data.success) {
+        if(data.success && data.already_authorized) {
+            alertBox.className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-success/10 text-success block animate-pulse';
+            alertBox.innerText = 'Вы уже авторизованы! Данные профиля загружены.';
+            setTimeout(() => window.location.reload(), 1500);
+        } else if(data.success) {
             alertBox.className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-success/10 text-success block';
             alertBox.innerText = 'Код успешно отправлен! Введите его ниже.';
             document.getElementById('tg-code-step').classList.remove('hidden');
