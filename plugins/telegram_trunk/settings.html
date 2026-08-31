@@ -16,6 +16,17 @@
                 <div class="space-y-4">
                     <h4 class="text-sm font-bold text-primary tg-translate">1. Авторизация</h4>
                     
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">API ID</label>
+                            <input type="text" id="tg_api_id" placeholder="1234567" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">API Hash</label>
+                            <input type="text" id="tg_api_hash" placeholder="xxxxxxxxxxxx" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                        </div>
+                    </div>
+
                     <div id="tg-phone-step">
                         <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">Номер телефона (с кодом страны)</label>
                         <div class="flex gap-2">
@@ -29,9 +40,9 @@
                             <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">Код из Telegram</label>
                             <input type="text" id="tg_code" placeholder="12345" class="w-full px-4 py-2.5 rounded-xl bg-surface border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
                         </div>
-                        <div id="tg-2fa-block" class="hidden">
+                        <div>
                             <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">Облачный пароль (2FA)</label>
-                            <input type="password" id="tg_password" placeholder="Пароль" class="w-full px-4 py-2.5 rounded-xl bg-surface border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                            <input type="password" id="tg_password" placeholder="Пароль (если есть)" class="w-full px-4 py-2.5 rounded-xl bg-surface border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
                         </div>
                         <button type="button" onclick="loginTg()" class="w-full py-2.5 bg-success text-on-primary rounded-xl font-bold text-xs hover:bg-success/90 transition-colors tg-translate">Войти в аккаунт</button>
                     </div>
@@ -42,11 +53,6 @@
                 <!-- Profile & SIP -->
                 <div class="space-y-4">
                     <h4 class="text-sm font-bold text-primary tg-translate">2. Профиль и Маршрутизация</h4>
-                    
-                    <div>
-                        <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">Имя профиля (First Name)</label>
-                        <input type="text" id="tg_first_name" placeholder="Asterisk PBX" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface">
-                    </div>
                     
                     <div>
                         <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">Локальный SIP-порт для WebRTC моста</label>
@@ -60,7 +66,7 @@
                 <button type="button" class="px-5 py-2.5 rounded-xl font-bold text-xs border border-outline text-on-surface hover:bg-surface-container transition-all tg-translate">Отмена</button>
                 <button type="button" onclick="saveTgSettings()" class="px-5 py-2.5 rounded-xl font-bold text-xs bg-primary text-on-primary hover:shadow-lg hover:shadow-primary/30 transition-all flex items-center gap-2">
                     <span class="material-symbols-outlined text-[18px]">save</span>
-                    <span class="tg-translate">Сохранить настройки</span>
+                    <span class="tg-translate">Запустить tg2sip</span>
                 </button>
             </div>
         </div>
@@ -68,34 +74,75 @@
 </div>
 
 <script>
-// Mock functions for UI behavior
-function sendTgCode() {
+async function sendTgCode() {
+    const api_id = document.getElementById('tg_api_id').value;
+    const api_hash = document.getElementById('tg_api_hash').value;
     const phone = document.getElementById('tg_phone').value;
-    if(!phone) return alert('Введите номер телефона');
     
-    document.getElementById('tg-status-alert').className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-primary/10 text-primary';
+    if(!api_id || !api_hash || !phone) return alert('Введите API ID, API Hash и номер телефона');
+    
+    document.getElementById('tg-status-alert').className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-primary/10 text-primary block';
     document.getElementById('tg-status-alert').innerText = 'Отправка кода (Telethon)...';
     
-    setTimeout(() => {
-        document.getElementById('tg-status-alert').innerText = 'Код отправлен в Telegram!';
-        document.getElementById('tg-code-step').classList.remove('hidden');
-    }, 1000);
+    try {
+        const res = await fetch('/api/telegram/send_code', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({api_id, api_hash, phone})
+        });
+        const data = await res.json();
+        if(data.success) {
+            document.getElementById('tg-status-alert').className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-success/10 text-success block';
+            document.getElementById('tg-status-alert').innerText = 'Код отправлен в Telegram! Введите его ниже.';
+            document.getElementById('tg-code-step').classList.remove('hidden');
+        } else {
+            document.getElementById('tg-status-alert').className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-error/10 text-error block';
+            document.getElementById('tg-status-alert').innerText = 'Ошибка: ' + (data.error || 'Неизвестная ошибка');
+        }
+    } catch (e) {
+        document.getElementById('tg-status-alert').innerText = 'Ошибка соединения';
+    }
 }
 
-function loginTg() {
+async function loginTg() {
+    const phone = document.getElementById('tg_phone').value;
     const code = document.getElementById('tg_code').value;
+    const password = document.getElementById('tg_password').value;
     if(!code) return alert('Введите код');
     
-    document.getElementById('tg-status-alert').className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-warning/10 text-warning';
+    document.getElementById('tg-status-alert').className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-warning/10 text-warning block';
     document.getElementById('tg-status-alert').innerText = 'Авторизация в Telegram (MTProto)...';
     
-    setTimeout(() => {
-        document.getElementById('tg-status-alert').className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-success/10 text-success';
-        document.getElementById('tg-status-alert').innerText = 'Успешная авторизация! Аккаунт готов к звонкам.';
-    }, 1500);
+    try {
+        const res = await fetch('/api/telegram/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({phone, code, password})
+        });
+        const data = await res.json();
+        if(data.success) {
+            document.getElementById('tg-status-alert').className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-success/10 text-success block';
+            document.getElementById('tg-status-alert').innerText = 'Успешная авторизация! Аккаунт готов к работе.';
+        } else {
+            document.getElementById('tg-status-alert').className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-error/10 text-error block';
+            document.getElementById('tg-status-alert').innerText = 'Ошибка: ' + (data.error || 'Неверный код/пароль');
+        }
+    } catch (e) {
+        document.getElementById('tg-status-alert').innerText = 'Ошибка соединения';
+    }
 }
 
-function saveTgSettings() {
-    alert('Настройки Telegram Trunk сохранены. Мост tg2sip перезапущен.');
+async function saveTgSettings() {
+    const port = document.getElementById('tg_sip_port').value;
+    try {
+        await fetch('/api/telegram/start_tg2sip', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({port})
+        });
+        alert('Демон tg2sip (контейнер) запущен на порту ' + port);
+    } catch (e) {
+        alert('Ошибка запуска');
+    }
 }
 </script>

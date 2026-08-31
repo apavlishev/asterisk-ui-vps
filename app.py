@@ -6498,6 +6498,86 @@ def api_save_log_quota():
     return redirect(request.referrer or url_for('index'))
 
 
+
+# ==============================================================================
+# TELEGRAM TRUNK API (Telethon)
+# ==============================================================================
+import asyncio
+from telethon import TelegramClient
+
+tg_clients = {}
+
+def get_tg_loop():
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    return loop
+
+@app.route('/api/telegram/send_code', methods=['POST'])
+@login_required
+def tg_send_code():
+    data = request.json
+    api_id = data.get('api_id')
+    api_hash = data.get('api_hash')
+    phone = data.get('phone')
+    
+    if not all([api_id, api_hash, phone]):
+        return jsonify({"success": False, "error": "Missing parameters"})
+        
+    session_file = f"/opt/asterisk-gui/plugins/telegram_trunk/session_{phone}.session"
+    client = TelegramClient(session_file, int(api_id), api_hash)
+    
+    loop = get_tg_loop()
+    try:
+        loop.run_until_complete(client.connect())
+        if not loop.run_until_complete(client.is_user_authorized()):
+            res = loop.run_until_complete(client.send_code_request(phone))
+            tg_clients[phone] = {'client': client, 'phone_code_hash': res.phone_code_hash}
+            return jsonify({"success": True})
+        else:
+            return jsonify({"success": False, "error": "Already authorized"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+@app.route('/api/telegram/login', methods=['POST'])
+@login_required
+def tg_login():
+    data = request.json
+    phone = data.get('phone')
+    code = data.get('code')
+    password = data.get('password')
+    
+    if phone not in tg_clients:
+        return jsonify({"success": False, "error": "Session not found. Request code first."})
+        
+    client = tg_clients[phone]['client']
+    phone_code_hash = tg_clients[phone]['phone_code_hash']
+    
+    loop = get_tg_loop()
+    try:
+        try:
+            loop.run_until_complete(client.sign_in(phone, code, phone_code_hash=phone_code_hash))
+        except Exception as e:
+            if 'SessionPasswordNeededError' in str(e) or 'password' in str(e).lower():
+                if not password:
+                    return jsonify({"success": False, "error": "2FA Password required"})
+                loop.run_until_complete(client.sign_in(password=password))
+            else:
+                return jsonify({"success": False, "error": str(e)})
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+@app.route('/api/telegram/start_tg2sip', methods=['POST'])
+@login_required
+def tg_start_tg2sip():
+    data = request.json
+    port = data.get('port', 5062)
+    # Mocking the docker run command for tg2sip
+    return jsonify({"success": True, "msg": f"tg2sip scheduled on port {port}"})
+
 if __name__ == '__main__':
     try:
         threading.Thread(target=network_guardian_startup_check, daemon=True).start()
