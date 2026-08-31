@@ -2965,7 +2965,25 @@
             <!-- // ================= TAB: SECURITY CENTER & ANTIFRAUD // ================= -->
             <div id="tab-security" class="tab-pane space-y-6 max-w-5xl">
                 
-                <!-- 1. ANTIFRAUD SHIELD OVERVIEW BANNER -->
+                
+                <!-- SECURITY SUB-TABS -->
+                <div class="flex items-center gap-2 border-b border-surface-container pb-2 mb-2 overflow-x-auto">
+                    <button type="button" onclick="switchSecuritySubTab('sec-antifraud', this)" class="sec-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-primary text-on-primary shadow-sm flex items-center gap-2 transition-all shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">local_police</span>
+                        <span>{{ t.k_fail2ban_antifrod or 'Fail2ban & Антифрод' }}</span>
+                    </button>
+                    <button type="button" onclick="switchSecuritySubTab('sec-auth', this)" class="sec-tab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-surface text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2 border border-outline/30 shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">vpn_key</span>
+                        <span>{{ t.k_avtorizatsia_paneli or 'Авторизация панели' }}</span>
+                    </button>
+                    <button type="button" onclick="switchSecuritySubTab('sec-logs', this)" class="sec-tab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-surface text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2 border border-outline/30 shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">sd_storage</span>
+                        <span>{{ t.k_kvoty_i_logi or 'Квоты и Логи' }}</span>
+                    </button>
+                </div>
+                
+                <div id="sec-antifraud" class="space-y-6">
+<!-- 1. ANTIFRAUD SHIELD OVERVIEW BANNER -->
                 <div class="bg-surface rounded-2xl p-6 sm:p-8 border border-outline/30 shadow-sm relative overflow-hidden">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                         <div class="flex items-start gap-4">
@@ -3157,6 +3175,9 @@
                     </form>
                 </div>
 
+                </div>
+
+                <div id="sec-logs" class="space-y-6 hidden">
                 <!-- 5. DISK QUOTA & AUTOMATIC LOG ROTATION CONTROLS -->
                 <div class="bg-surface rounded-2xl p-6 sm:p-8 border border-outline/30 shadow-sm space-y-6">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-surface-container">
@@ -6028,6 +6049,19 @@
     </div>
 
     <script>
+        
+        function switchSecuritySubTab(subtabId, btn) {
+            document.getElementById('sec-antifraud').classList.add('hidden');
+            document.getElementById('sec-auth').classList.add('hidden');
+            document.getElementById('sec-logs').classList.add('hidden');
+            document.getElementById(subtabId).classList.remove('hidden');
+
+            document.querySelectorAll('.sec-tab-btn').forEach(b => {
+                b.className = 'sec-tab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-surface text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2 border border-outline/30 shrink-0';
+            });
+            btn.className = 'sec-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-primary text-on-primary shadow-sm flex items-center gap-2 transition-all shrink-0';
+        }
+
         function switchAccountsSubTab(subtabId, btn) {
             document.getElementById('subtab-users').classList.add('hidden');
             document.getElementById('subtab-groups').classList.add('hidden');
