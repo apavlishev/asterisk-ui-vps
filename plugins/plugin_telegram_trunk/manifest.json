@@ -4,7 +4,7 @@
   "version": "v1.0.0",
   "author": "Logic Core AI",
   "category": "core",
-  "icon": "telegram",
+  "icon": "send",
   "color": "blue-500",
   "description": "Полноценный SIP-транк на базе Telegram. Позволяет принимать и совершать звонки через Telegram-аккаунт."
 }

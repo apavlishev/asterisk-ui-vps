@@ -2916,6 +2916,175 @@
                             </div>
                         </form>
                     </div>
+                    {% elif p.id == 'telegram_trunk' %}
+                    <div class="space-y-6 max-w-4xl">
+                        <div class="bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm">
+                            <div class="flex items-center gap-3 pb-4 border-b border-surface-container">
+                                <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center font-bold">
+                                    <span class="material-symbols-outlined text-3xl">telegram</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-base font-bold text-on-surface tg-translate">Настройки Telegram SIP Trunk</h3>
+                                    <p class="text-xs text-on-surface-variant tg-translate">Авторизация клиентского аккаунта через MTProto (Telethon) для интеграции в ядро.</p>
+                                </div>
+                            </div>
+                    
+                            <div class="mt-6 space-y-6">
+                                <!-- Documentation -->
+                                <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-on-surface-variant leading-relaxed">
+                                    <p class="font-bold text-blue-500 mb-2 flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[16px]">info</span> Инструкция по настройке:
+                                    </p>
+                                    <ol class="list-decimal pl-4 space-y-1">
+                                        <li class="tg-translate">Перейдите на официальный портал <a href="https://my.telegram.org/" target="_blank" class="text-blue-500 hover:underline">my.telegram.org</a>.</li>
+                                        <li class="tg-translate">Авторизуйтесь по номеру телефона, который будет использоваться как SIP-транк.</li>
+                                        <li class="tg-translate">Перейдите в раздел <b>API development tools</b> и создайте приложение (App).</li>
+                                        <li class="tg-translate">Скопируйте <b>App api_id</b> и <b>App api_hash</b> и вставьте их в поля ниже.</li>
+                                        <li class="tg-translate">Введите номер телефона, запросите код и завершите авторизацию.</li>
+                                    </ol>
+                                </div>
+                    
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- Phone & Auth -->
+                                    <div class="space-y-4">
+                                        <h4 class="text-sm font-bold text-primary flex items-center gap-1.5"><span class="material-symbols-outlined text-base">vpn_key</span> <span class="tg-translate">Авторизация</span></h4>
+                                        
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">API ID</label>
+                                                <input type="text" id="tg_api_id" placeholder="1234567" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">API Hash</label>
+                                                <input type="text" id="tg_api_hash" placeholder="xxxxxxxxxxxx" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                                            </div>
+                                        </div>
+                    
+                                        <div id="tg-phone-step">
+                                            <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">Номер телефона (с кодом страны)</label>
+                                            <div class="flex gap-2">
+                                                <input type="text" id="tg_phone" placeholder="+79991234567" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                                                <button type="button" onclick="sendTgCode()" class="px-4 py-2 bg-primary text-on-primary rounded-xl font-bold text-xs hover:bg-primary/90 transition-colors whitespace-nowrap tg-translate">Отправить код</button>
+                                            </div>
+                                        </div>
+                    
+                                        <div id="tg-code-step" class="hidden space-y-4 p-4 rounded-xl bg-surface-container border border-outline/30 shadow-inner">
+                                            <div>
+                                                <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">Код из Telegram</label>
+                                                <input type="text" id="tg_code" placeholder="12345" class="w-full px-4 py-2.5 rounded-xl bg-surface border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">Облачный пароль (если 2FA включена)</label>
+                                                <input type="password" id="tg_password" placeholder="Пароль" class="w-full px-4 py-2.5 rounded-xl bg-surface border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                                            </div>
+                                            <button type="button" onclick="loginTg()" class="w-full py-2.5 bg-success text-on-primary rounded-xl font-bold text-xs hover:bg-success/90 transition-colors shadow-sm tg-translate">Войти в аккаунт</button>
+                                        </div>
+                    
+                                        <div id="tg-status-alert" class="hidden p-3 rounded-xl text-xs font-bold mt-2"></div>
+                                    </div>
+                    
+                                    <!-- Profile & SIP -->
+                                    <div class="space-y-4">
+                                        <h4 class="text-sm font-bold text-primary flex items-center gap-1.5"><span class="material-symbols-outlined text-base">settings_ethernet</span> <span class="tg-translate">Маршрутизация</span></h4>
+                                        
+                                        <div>
+                                            <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">Локальный SIP-порт</label>
+                                            <input type="number" id="tg_sip_port" value="5062" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface font-mono">
+                                            <p class="text-[11px] text-on-surface-variant mt-1.5 leading-relaxed tg-translate">Через этот UDP-порт транзитный шлюз будет связываться с ядром Asterisk. Добавьте его в <code>pjsip.conf</code>.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="pt-4 border-t border-surface-container flex justify-end gap-3 mt-4">
+                                    <button type="button" class="px-5 py-2.5 rounded-xl font-bold text-xs border border-outline text-on-surface hover:bg-surface-container transition-all tg-translate">Отмена</button>
+                                    <button type="button" onclick="saveTgSettings()" class="px-5 py-2.5 rounded-xl font-bold text-xs bg-primary text-on-primary hover:shadow-lg transition-all flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-[18px]">play_circle</span>
+                                        <span class="tg-translate">Запустить транк</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <script>
+                    async function sendTgCode() {
+                        const api_id = document.getElementById('tg_api_id').value;
+                        const api_hash = document.getElementById('tg_api_hash').value;
+                        const phone = document.getElementById('tg_phone').value;
+                        
+                        if(!api_id || !api_hash || !phone) {
+                            alert('Введите API ID, API Hash и номер телефона');
+                            return;
+                        }
+                        
+                        const alertBox = document.getElementById('tg-status-alert');
+                        alertBox.className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-primary/10 text-primary block';
+                        alertBox.innerText = 'Отправка запроса к серверам Telegram...';
+                        
+                        try {
+                            const res = await fetch('/api/telegram/send_code', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({api_id, api_hash, phone})
+                            });
+                            const data = await res.json();
+                            if(data.success) {
+                                alertBox.className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-success/10 text-success block';
+                                alertBox.innerText = 'Код успешно отправлен! Введите его ниже.';
+                                document.getElementById('tg-code-step').classList.remove('hidden');
+                            } else {
+                                alertBox.className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-error/10 text-error block';
+                                alertBox.innerText = 'Ошибка: ' + (data.error || 'Неизвестная ошибка');
+                            }
+                        } catch (e) {
+                            alertBox.innerText = 'Ошибка сетевого соединения с PBX';
+                        }
+                    }
+                    
+                    async function loginTg() {
+                        const phone = document.getElementById('tg_phone').value;
+                        const code = document.getElementById('tg_code').value;
+                        const password = document.getElementById('tg_password').value;
+                        if(!code) return alert('Введите полученный код');
+                        
+                        const alertBox = document.getElementById('tg-status-alert');
+                        alertBox.className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-warning/10 text-warning block';
+                        alertBox.innerText = 'Авторизация в Telegram (MTProto)...';
+                        
+                        try {
+                            const res = await fetch('/api/telegram/login', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({phone, code, password})
+                            });
+                            const data = await res.json();
+                            if(data.success) {
+                                alertBox.className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-success/10 text-success block animate-pulse';
+                                alertBox.innerText = 'Успешная авторизация! Сессия сохранена.';
+                            } else {
+                                alertBox.className = 'p-3 rounded-xl text-xs font-bold mt-2 bg-error/10 text-error block';
+                                alertBox.innerText = 'Ошибка: ' + (data.error || 'Неверный код/пароль');
+                            }
+                        } catch (e) {
+                            alertBox.innerText = 'Ошибка соединения';
+                        }
+                    }
+                    
+                    async function saveTgSettings() {
+                        const port = document.getElementById('tg_sip_port').value;
+                        try {
+                            await fetch('/api/telegram/start_tg2sip', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({port})
+                            });
+                            alert('Сигнал на запуск транзитного шлюза отправлен.');
+                        } catch (e) {
+                            alert('Ошибка запуска');
+                        }
+                    }
+                    </script>
+                    
                     {% else %}
                     <div class="p-6 rounded-2xl bg-surface-container-low text-xs text-on-surface-variant leading-relaxed">
                         Модуль <b>{{ p.name }}</b> активен и работает в фоновом режиме Asterisk Core.
