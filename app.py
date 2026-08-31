@@ -20,6 +20,16 @@ from flask import Flask, render_template_string, render_template, request, redir
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+
+import jinja2
+import os
+
+# Add plugins directory to Jinja template search path for dynamic UI loading
+plugins_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'plugins')
+app.jinja_loader = jinja2.ChoiceLoader([
+    app.jinja_loader,
+    jinja2.FileSystemLoader(plugins_dir)
+])
 app.secret_key = 'asterisk-web-secret-key-2026'
 
 
