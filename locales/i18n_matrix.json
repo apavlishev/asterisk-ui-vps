@@ -2217,9 +2217,9 @@
   },
   "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk.": {
     "ru": "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk.",
-    "en": "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk.",
-    "es": "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk.",
-    "ar": "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk.",
+    "en": "A detailed description of the types of nodes, communication ports and call flow algorithm in the Asterisk dialplan.",
+    "es": "Una descripción detallada de los tipos de nodos, puertos de comunicación y algoritmo de flujo de llamadas en el plan de marcado de Asterisk.",
+    "ar": "وصف تفصيلي لأنواع العقد ومنافذ الاتصال وخوارزمية تدفق المكالمات في مخطط الاتصال النجمي.",
     "zh": "详细描述了Asterisk dialplan中的节点类型、通信端口和呼叫流算法。",
     "fr": "Une description détaillée des types de nœuds, des ports de communication et de l'algorithme de flux d'appels dans le plan de numérotation Asterisk.",
     "de": "Eine detaillierte Beschreibung der Knotentypen, Kommunikationsports und Anrufflussalgorithmen im Asterisk-Wählplan.",
@@ -3043,7 +3043,11 @@
     "es": "Soporte"
   },
   "История вызовов активна": {
-    "ru": "История вызовов активна"
+    "ru": "История вызовов активна",
+    "en": "Call history active",
+    "es": "Historial de llamadas activo",
+    "zh": "通话记录处于活动状态",
+    "ar": "سجل المكالمات نشط"
   },
   "Редактирование абонента": {
     "ru": "Редактирование абонента",
@@ -3106,97 +3110,221 @@
     "es": "Nombre (CallerID):"
   },
   "Создайте Private App в HubSpot с разрешениями": {
-    "ru": "Создайте Private App в HubSpot с разрешениями"
+    "ru": "Создайте Private App в HubSpot с разрешениями",
+    "en": "Create a Private App in HubSpot with Permissions",
+    "es": "Crea una aplicación privada en HubSpot con permisos",
+    "zh": "在 HubSpot 中创建具有权限的私有应用程序",
+    "ar": "أنشئ تطبيقًا خاصًا في HubSpot بأذونات"
   },
   "Протянуть стрелку отсюда...": {
-    "ru": "Протянуть стрелку отсюда..."
+    "ru": "Протянуть стрелку отсюда...",
+    "en": "Draw an arrow from here...",
+    "es": "Dibuja una flecha desde aquí...",
+    "zh": "从这里画一个箭头...",
+    "ar": "ارسم سهما من هنا..."
   },
   "amoCRM Синхронизация": {
-    "ru": "amoCRM Синхронизация"
+    "ru": "amoCRM Синхронизация",
+    "en": "amoCRM Synchronization",
+    "es": "Sincronización amoCRM",
+    "zh": "amoCRM 同步",
+    "ar": "تزامن اموCRM"
   },
   "Имя (CallerID) и Внутренний номер (Extension)": {
-    "ru": "Имя (CallerID) и Внутренний номер (Extension)"
+    "ru": "Имя (CallerID) и Внутренний номер (Extension)",
+    "en": "Name (CallerID) and Extension number (Extension)",
+    "es": "Nombre (CallerID) y número de extensión (Extensión)",
+    "zh": "姓名 (CallerID) 和分机号码 (Extension)",
+    "ar": "الاسم (معرف المتصل) والرقم الداخلي (الامتداد)"
   },
   "Участники группы (1):": {
-    "ru": "Участники группы (1):"
+    "ru": "Участники группы (1):",
+    "en": "Group members (1):",
+    "es": "Miembros del grupo (1):",
+    "zh": "小组成员（1人）：",
+    "ar": "أعضاء المجموعة (1):"
   },
   "Имя сотрудника / Отдел (CallerID)": {
-    "ru": "Имя сотрудника / Отдел (CallerID)"
+    "ru": "Имя сотрудника / Отдел (CallerID)",
+    "en": "Employee Name/Department (CallerID)",
+    "es": "Nombre del empleado/Departamento (identificador de llamadas)",
+    "zh": "员工姓名/部门（来电显示）",
+    "ar": "اسم الموظف/القسم (معرف المتصل)"
   },
   "Сохранить настройки Telegram": {
-    "ru": "Сохранить настройки Telegram"
+    "ru": "Сохранить настройки Telegram",
+    "en": "Save Telegram settings",
+    "es": "Guardar la configuración de Telegram",
+    "zh": "保存电报设置",
+    "ar": "حفظ إعدادات تيليجرام"
   },
   "Имя пользователя (Логин)": {
-    "ru": "Имя пользователя (Логин)"
+    "ru": "Имя пользователя (Логин)",
+    "en": "Username (Login)",
+    "es": "Nombre de usuario (iniciar sesión)",
+    "zh": "用户名（登录）",
+    "ar": "اسم المستخدم (تسجيل الدخول)"
   },
   "Активировать GoHighLevel Sync": {
-    "ru": "Активировать GoHighLevel Sync"
+    "ru": "Активировать GoHighLevel Sync",
+    "en": "Activate GoHighLevel Sync",
+    "es": "Activar la sincronización GoHighLevel",
+    "zh": "激活 GoHighLevel 同步",
+    "ar": "قم بتنشيط GoHighLevel Sync"
   },
   "Транспорт": {
-    "ru": "Транспорт"
+    "ru": "Транспорт",
+    "en": "Transport",
+    "es": "Transporte",
+    "zh": "运输",
+    "ar": "ينقل"
   },
   "срабатывает при ошибочном вводе, а": {
-    "ru": "срабатывает при ошибочном вводе, а"
+    "ru": "срабатывает при ошибочном вводе, а",
+    "en": "triggers when there is an erroneous input, and",
+    "es": "se activa cuando hay una entrada errónea, y",
+    "zh": "当输入错误时触发，并且",
+    "ar": "يطلق عندما يكون هناك إدخال خاطئ، و"
   },
   "Таймаут: 20 сек": {
-    "ru": "Таймаут: 20 сек"
+    "ru": "Таймаут: 20 сек",
+    "en": "Timeout: 20 sec",
+    "es": "Tiempo de espera: 20 segundos",
+    "zh": "超时：20 秒",
+    "ar": "المهلة: 20 ثانية"
   },
   "ID: zendesk • Версия: v1.5.0 • Автор: Logic Core Global": {
-    "ru": "ID: zendesk • Версия: v1.5.0 • Автор: Logic Core Global"
+    "ru": "ID: zendesk • Версия: v1.5.0 • Автор: Logic Core Global",
+    "en": "ID: zendesk • Version: v1.5.0 • Author: Logic Core Global",
+    "es": "ID: zendesk • Versión: v1.5.0 • Autor: Logic Core Global",
+    "zh": "ID：zendesk • 版本：v1.5.0 • 作者：Logic Core Global",
+    "ar": "المعرف: zendesk • الإصدار: v1.5.0 • المؤلف: Logic Core Global"
   },
   "Выполнить ротацию сейчас": {
-    "ru": "Выполнить ротацию сейчас"
+    "ru": "Выполнить ротацию сейчас",
+    "en": "Rotate now",
+    "es": "Girar ahora",
+    "zh": "立即旋转",
+    "ar": "تدوير الآن"
   },
   "Сменить аккаунт": {
-    "ru": "Сменить аккаунт"
+    "ru": "Сменить аккаунт",
+    "en": "Change account",
+    "es": "Cambiar cuenta",
+    "zh": "更改帐户",
+    "ar": "تغيير الحساب"
   },
   "Начало рабочего дня": {
-    "ru": "Начало рабочего дня"
+    "ru": "Начало рабочего дня",
+    "en": "Start of the working day",
+    "es": "Inicio de la jornada laboral",
+    "zh": "工作日开始",
+    "ar": "بداية يوم العمل"
   },
   "Сохранить группу": {
-    "ru": "Сохранить группу"
+    "ru": "Сохранить группу",
+    "en": "Save group",
+    "es": "Guardar grupo",
+    "zh": "保存组",
+    "ar": "حفظ المجموعة"
   },
   "Контекст в Asterisk": {
-    "ru": "Контекст в Asterisk"
+    "ru": "Контекст в Asterisk",
+    "en": "Context in Asterisk",
+    "es": "Contexto en asterisco",
+    "zh": "星号中的上下文",
+    "ar": "السياق في النجمة"
   },
   "в Telegram и отправьте команду": {
-    "ru": "в Telegram и отправьте команду"
+    "ru": "в Telegram и отправьте команду",
+    "en": "in Telegram and send the command",
+    "es": "en Telegram y envía el comando",
+    "zh": "在 Telegram 中并发送命令",
+    "ar": "في برقية وإرسال الأمر"
   },
   "куда этот номер имеет право звонить, через какие GSM-модемы или транки выходить в город, и разрешены ли ему международные вызовы.": {
-    "ru": "куда этот номер имеет право звонить, через какие GSM-модемы или транки выходить в город, и разрешены ли ему международные вызовы."
+    "ru": "куда этот номер имеет право звонить, через какие GSM-модемы или транки выходить в город, и разрешены ли ему международные вызовы.",
+    "en": "where this number has the right to call, through which GSM modems or trunks it can reach the city, and whether it is allowed to make international calls.",
+    "es": "dónde este número tiene derecho a llamar, a través de qué módems GSM o troncales puede llegar a la ciudad y si puede realizar llamadas internacionales.",
+    "zh": "该号码有权拨打哪里，可以通过哪些 GSM 调制解调器或中继到达该城市，以及是否允许拨打国际电话。",
+    "ar": "حيث يحق لهذا الرقم الاتصال، ومن خلاله يمكن لأجهزة مودم أو قنوات GSM الوصول إلى المدينة، وما إذا كان مسموحًا له بإجراء مكالمات دولية."
   },
   "Создание активностей типа Call, выгрузка ссылок на записи в сделки и воронки продаж.": {
-    "ru": "Создание активностей типа Call, выгрузка ссылок на записи в сделки и воронки продаж."
+    "ru": "Создание активностей типа Call, выгрузка ссылок на записи в сделки и воронки продаж.",
+    "en": "Creating Call type activities, uploading links to records into deals and sales funnels.",
+    "es": "Creación de actividades de tipo Llamada, carga de enlaces a registros en ofertas y embudos de ventas.",
+    "zh": "创建呼叫类型活动，将记录链接上传到交易和销售渠道中。",
+    "ar": "إنشاء أنشطة نوع الاتصال وتحميل الروابط إلى السجلات في الصفقات ومسارات المبيعات."
   },
   "Файл автоматически конвертируется и сохраняется в звуковую директорию Asterisk.": {
-    "ru": "Файл автоматически конвертируется и сохраняется в звуковую директорию Asterisk."
+    "ru": "Файл автоматически конвертируется и сохраняется в звуковую директорию Asterisk.",
+    "en": "The file is automatically converted and saved to the Asterisk sound directory.",
+    "es": "El archivo se convierte automáticamente y se guarda en el directorio de sonido de Asterisk.",
+    "zh": "文件会自动转换并保存到 Asterisk 声音目录。",
+    "ar": "يتم تحويل الملف تلقائيًا وحفظه في دليل الصوت Asterisk."
   },
   "Журнал последних звонков": {
-    "ru": "Журнал последних звонков"
+    "ru": "Журнал последних звонков",
+    "en": "Latest call log",
+    "es": "Registro de últimas llamadas",
+    "zh": "最新通话记录",
+    "ar": "أحدث سجل المكالمات"
   },
   "Алерты Антифрода и Банов (Fail2ban)": {
-    "ru": "Алерты Антифрода и Банов (Fail2ban)"
+    "ru": "Алерты Антифрода и Банов (Fail2ban)",
+    "en": "Antifraud and Ban Alerts (Fail2ban)",
+    "es": "Alertas Antifraude y Ban (Fail2ban)",
+    "zh": "反欺诈和禁令警报 (Fail2ban)",
+    "ar": "تنبيهات مكافحة الاحتيال والحظر (Fail2ban)"
   },
   "Сохранить настройки Яндекс.Диска": {
-    "ru": "Сохранить настройки Яндекс.Диска"
+    "ru": "Сохранить настройки Яндекс.Диска",
+    "en": "Save Yandex.Disk settings",
+    "es": "Guarde la configuración de Yandex.Disk",
+    "zh": "保存 Yandex.Disk 设置",
+    "ar": "احفظ إعدادات Yandex.Disk"
   },
   "Всего отражено": {
-    "ru": "Всего отражено"
+    "ru": "Всего отражено",
+    "en": "Total reflected",
+    "es": "Total reflejado",
+    "zh": "总反映",
+    "ar": "المجموع ينعكس"
   },
   "🚀 Groq Whisper Large-v3 (Сверхбыстрое распознавание ~0.5 сек)": {
-    "ru": "🚀 Groq Whisper Large-v3 (Сверхбыстрое распознавание ~0.5 сек)"
+    "ru": "🚀 Groq Whisper Large-v3 (Сверхбыстрое распознавание ~0.5 сек)",
+    "en": "🚀 Groq Whisper Large-v3 (Ultra-fast recognition ~0.5 sec)",
+    "es": "🚀 Groq Whisper Large-v3 (reconocimiento ultrarrápido ~0,5 segundos)",
+    "zh": "🚀 Groq Whisper Large-v3（超快识别~0.5秒）",
+    "ar": "🚀 Groq Whisper Large-v3 (التعرف فائق السرعة ~ 0.5 ثانية)"
   },
   "Статус поддержки": {
-    "ru": "Статус поддержки"
+    "ru": "Статус поддержки",
+    "en": "Support status",
+    "es": "Estado de soporte",
+    "zh": "支持状态",
+    "ar": "حالة الدعم"
   },
   "🔗 Брать ссылку из облака / FTP (Рекомендуется, экономит диск amoCRM)": {
-    "ru": "🔗 Брать ссылку из облака / FTP (Рекомендуется, экономит диск amoCRM)"
+    "ru": "🔗 Брать ссылку из облака / FTP (Рекомендуется, экономит диск amoCRM)",
+    "en": "🔗 Take a link from the cloud / FTP (Recommended, saves amoCRM disk)",
+    "es": "🔗 Tome un enlace desde la nube / FTP (Recomendado, guarda un disco amoCRM)",
+    "zh": "🔗 从云端/FTP获取链接（推荐，节省amoCRM磁盘）",
+    "ar": "🔗 خذ رابطًا من السحابة / FTP (مستحسن، يحفظ قرص amoCRM)"
   },
   "Прямая доставка сообщений через защищенные HTTPS / MTProto каналы без риска замедления API Telegram.": {
-    "ru": "Прямая доставка сообщений через защищенные HTTPS / MTProto каналы без риска замедления API Telegram."
+    "ru": "Прямая доставка сообщений через защищенные HTTPS / MTProto каналы без риска замедления API Telegram.",
+    "en": "Direct message delivery via HTTPS/MTProto secure channels without the risk of slowing down the Telegram API.",
+    "es": "Entrega de mensajes directos a través de HTTPS/MTPro a canales seguros sin riesgo de ralentizar la API de Telegram.",
+    "zh": "通过 HTTPS/MTProto 安全通道直接传递消息，不会有减慢 Telegram API 速度的风险。",
+    "ar": "تسليم الرسائل المباشرة عبر قنوات HTTPS/MTPro الآمنة دون المخاطرة بإبطاء واجهة برمجة تطبيقات Telegram."
   },
   "SIP Абонент (Extension)": {
-    "ru": "SIP Абонент (Extension)"
+    "ru": "SIP Абонент (Extension)",
+    "en": "SIP Subscriber (Extension)",
+    "es": "Suscriptor SIP (Extensión)",
+    "zh": "SIP 用户（分机）",
+    "ar": "مشترك SIP (امتداد)"
   },
   "Сохранить Zendesk": {
     "ru": "Сохранить Zendesk"
