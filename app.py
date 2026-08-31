@@ -6516,7 +6516,7 @@ def get_tg_loop():
     return loop
 
 @app.route('/api/telegram/send_code', methods=['POST'])
-@login_required
+
 def tg_send_code():
     data = request.json
     api_id = data.get('api_id')
@@ -6542,7 +6542,7 @@ def tg_send_code():
         return jsonify({"success": False, "error": str(e)})
 
 @app.route('/api/telegram/login', methods=['POST'])
-@login_required
+
 def tg_login():
     data = request.json
     phone = data.get('phone')
@@ -6571,7 +6571,7 @@ def tg_login():
         return jsonify({"success": False, "error": str(e)})
 
 @app.route('/api/telegram/start_tg2sip', methods=['POST'])
-@login_required
+
 def tg_start_tg2sip():
     data = request.json
     port = data.get('port', 5062)
