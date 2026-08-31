@@ -1,0 +1,14 @@
+{
+  "id": "my_new_plugin",
+  "name": "My New Plugin",
+  "category": "core",
+  "category_name": "General",
+  "version": "v1.0.0",
+  "author": "Developer Name",
+  "icon": "extension",
+  "color": "gray-500",
+  "rating": "0.0",
+  "price": "Free",
+  "description": "Short description of the plugin",
+  "entry_point": "plugin_main.py"
+}
