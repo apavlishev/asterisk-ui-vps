@@ -1269,8 +1269,8 @@
   },
   "— при молчании абонента по таймауту.": {
     "ru": "— при молчании абонента по таймауту.",
-    "en": "— при молчании абонента по таймауту.",
-    "es": "— при молчании абонента по таймауту.",
+    "en": "— triggers when the caller is silent for a timeout.",
+    "es": "— se activa cuando el que llama se queda en silencio por tiempo de espera.",
     "ar": "— عندما يكون المشترك صامتًا بسبب انتهاء المهلة.",
     "zh": "— при молчании абонента по таймауту.",
     "fr": "— при молчании абонента по таймауту.",
@@ -1593,8 +1593,8 @@
   },
   "Точка входа звонка от внешнего провайдера связи. Принимает внешний вызов и сразу направляет его в связанное голосовое меню.": {
     "ru": "Точка входа звонка от внешнего провайдера связи. Принимает внешний вызов и сразу направляет его в связанное голосовое меню.",
-    "en": "Entry point for a call from an external communication provider. Receives an external call and immediately routes it to the associated voice menu.",
-    "es": "Точка входа звонка от внешнего провайдера связи. Принимает внешний вызов и сразу направляет его в связанное голосовое меню.",
+    "en": "Call entry point from an external provider. Receives incoming calls and routes them directly to a linked IVR.",
+    "es": "Punto de entrada de llamadas de un proveedor externo. Recibe llamadas entrantes y las enruta a un IVR.",
     "ar": "Точка входа звонка от внешнего провайдера связи. Принимает внешний вызов и сразу направляет его в связанное голосовое меню.",
     "zh": "来自外部通信提供商的调用的入口点。接收外部呼叫并立即将其路由至关联的语音菜单。",
     "fr": "Point d'entrée pour un appel provenant d'un fournisseur de communication externe. Reçoit un appel externe et l'achemine immédiatement vers le menu vocal associé.",
@@ -1785,8 +1785,8 @@
   },
   "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.": {
     "ru": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
-    "en": "When you click “Apply IVR scheme”, the visual graph is automatically converted into an Asterisk combat context with a dialplan reboot.",
-    "es": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
+    "en": "Clicking 'Apply IVR Scheme' automatically compiles the visual graph into a live Asterisk context and reloads the dialplan.",
+    "es": "Al hacer clic en 'Aplicar Esquema IVR', el gráfico se compila en un contexto de Asterisk y se recarga el plan de marcado.",
     "ar": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
     "zh": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
     "fr": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
@@ -2624,7 +2624,9 @@
     "ru": "Транспорт"
   },
   "срабатывает при ошибочном вводе, а": {
-    "ru": "срабатывает при ошибочном вводе, а"
+    "ru": "срабатывает при ошибочном вводе, а",
+    "en": "triggers on invalid input, and",
+    "es": "se activa por entrada no válida, y"
   },
   "Таймаут: 20 сек": {
     "ru": "Таймаут: 20 сек"
@@ -2741,7 +2743,9 @@
     "ru": "Логи в реальном времени"
   },
   "Целевые узлы назначения. Переводят звонок на конкретного сотрудника (101, 102) или запускают параллельный вызов группы операторов.": {
-    "ru": "Целевые узлы назначения. Переводят звонок на конкретного сотрудника (101, 102) или запускают параллельный вызов группы операторов."
+    "ru": "Целевые узлы назначения. Переводят звонок на конкретного сотрудника (101, 102) или запускают параллельный вызов группы операторов.",
+    "en": "Target destination nodes. Routes the call to a specific employee (101, 102) or triggers a ring group for operators.",
+    "es": "Nodos de destino. Enruta la llamada a un empleado específico o activa un grupo de timbre para operadores."
   },
   "OpenVPN (IP-Телефоны Yealink / Grandstream)": {
     "ru": "OpenVPN (IP-Телефоны Yealink / Grandstream)"
@@ -2931,7 +2935,9 @@
     "ru": "Автоматическая расшифровка звонков (Speech-to-Text), разделение реплик оператора и клиента (Диаризация L/R) и нейросетевой анализ качества диалога."
   },
   "Ветки отказоустойчивости: клавиша": {
-    "ru": "Ветки отказоустойчивости: клавиша"
+    "ru": "Ветки отказоустойчивости: клавиша",
+    "en": "Failover branches: key",
+    "es": "Ramas de conmutación por error: tecla"
   },
   "600 сек = в течение 10 минут": {
     "ru": "600 сек = в течение 10 минут"
@@ -2952,7 +2958,9 @@
     "ru": "Офисный Grandstream GXP1625 (Абонент 102)"
   },
   "Если звонящий не выбрал пункт за указанный таймаут (сек), система повторит меню заданное число раз (Retries) или переведет звонок по ветке [t].": {
-    "ru": "Если звонящий не выбрал пункт за указанный таймаут (сек), система повторит меню заданное число раз (Retries) или переведет звонок по ветке [t]."
+    "ru": "Если звонящий не выбрал пункт за указанный таймаут (сек), система повторит меню заданное число раз (Retries) или переведет звонок по ветке [t].",
+    "en": "If the caller does not select an option within the timeout, the system will retry (Retries) or route to the [t] branch.",
+    "es": "Si el que llama no selecciona una opción en el tiempo de espera, el sistema reintentará o enrutará a la rama [t]."
   },
   "Голосовая почта (Voicemail)": {
     "ru": "Голосовая почта (Voicemail)"
@@ -3172,7 +3180,9 @@
     "ru": "Статус защиты:"
   },
   "Потяните за круглый порт справа от блока к любому другому блоку, чтобы задать правило перехода при нажатии клавиши DTMF.": {
-    "ru": "Потяните за круглый порт справа от блока к любому другому блоку, чтобы задать правило перехода при нажатии клавиши DTMF."
+    "ru": "Потяните за круглый порт справа от блока к любому другому блоку, чтобы задать правило перехода при нажатии клавиши DTMF.",
+    "en": "Drag from the circular port on the right of a block to another block to set routing rules for DTMF key presses.",
+    "es": "Arrastre desde el puerto circular a la derecha de un bloque a otro para configurar reglas de enrutamiento DTMF."
   },
   "Модуль «Neural Speech AI (Whisper & LLM)» временно отключен": {
     "ru": "Модуль «Neural Speech AI (Whisper & LLM)» временно отключен"
@@ -3324,7 +3334,9 @@
     "ru": "Моментальное оповещение руководства и дежурных операторов о событиях телефонии, пропущенных лидах, взломах и системных инцидентах прямо в Telegram-чаты."
   },
   "Воспроизводит аудиоприветствие, ожидает нажатия DTMF клавиши (0-9, *, #) и обрабатывает прямой донабор номера (Direct Dial).": {
-    "ru": "Воспроизводит аудиоприветствие, ожидает нажатия DTMF клавиши (0-9, *, #) и обрабатывает прямой донабор номера (Direct Dial)."
+    "ru": "Воспроизводит аудиоприветствие, ожидает нажатия DTMF клавиши (0-9, *, #) и обрабатывает прямой донабор номера (Direct Dial).",
+    "en": "Plays an audio greeting, waits for DTMF input (0-9, *, #), and processes direct dialing to extensions.",
+    "es": "Reproduce un saludo de audio, espera la entrada DTMF y procesa la marcación directa a extensiones."
   },
   "📞 По входящему каналу / SIP-транку / GSM модему": {
     "ru": "📞 По входящему каналу / SIP-транку / GSM модему"
@@ -3663,5 +3675,10 @@
     "ru": "3. SIP Extensions и Группы",
     "en": "3. SIP Extensions and Groups",
     "es": "3. Extensiones SIP y Grupos"
+  },
+  "Потяните за кружок справа от блока, чтобы протянуть стрелку | Правый клик открывает меню": {
+    "ru": "Потяните за кружок справа от блока, чтобы протянуть стрелку | Правый клик открывает меню",
+    "en": "Pull the circle on the right of the block to draw an arrow | Right-click opens the menu",
+    "es": "Tire del círculo a la derecha del bloque para dibujar una flecha | Clic derecho abre el menú"
   }
 }
