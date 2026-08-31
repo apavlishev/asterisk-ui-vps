@@ -106,5 +106,7 @@
   "today_calls": "مكالمات اليوم",
   "modems_status": "بوابات GSM والشرائح",
   "security_status": "الأمان وجدار الحماية",
-  "system_resources": "موارد النظام"
+  "system_resources": "موارد النظام",
+  "nav_admin": "إدارة",
+  "nav_license": "ترخيص و OTA"
 }

@@ -2884,5 +2884,7 @@
   "Шлюз Отключен": {
     "ru": "Шлюз Отключен",
     "en": "Gateway Offline"
-  }
+  },
+  "nav_admin": "ADMINISTRATION",
+  "nav_license": "License & OTA"
 }

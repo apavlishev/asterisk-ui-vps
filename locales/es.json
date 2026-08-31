@@ -106,5 +106,7 @@
   "today_calls": "Llamadas Hoy",
   "modems_status": "Pasarelas GSM y SIM",
   "security_status": "Seguridad y Cortafuegos",
-  "system_resources": "Recursos del Sistema"
+  "system_resources": "Recursos del Sistema",
+  "nav_admin": "ADMINISTRACIÓN",
+  "nav_license": "Licencia & OTA"
 }

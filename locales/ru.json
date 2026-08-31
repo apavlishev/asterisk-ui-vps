@@ -108,5 +108,7 @@
   "today_calls": "Вызовов за сегодня",
   "modems_status": "GSM Шлюзы & SIM",
   "security_status": "Безопасность & Защита",
-  "system_resources": "Ресурсы Сервера"
+  "system_resources": "Ресурсы Сервера",
+  "nav_admin": "АДМИНИСТРИРОВАНИЕ",
+  "nav_license": "Лицензия & OTA"
 }

@@ -106,5 +106,7 @@
   "today_calls": "今日通话量",
   "modems_status": "GSM 网关与 SIM",
   "security_status": "安全防护与防火墙",
-  "system_resources": "系统资源"
+  "system_resources": "系统资源",
+  "nav_admin": "行政",
+  "nav_license": "许可证和 OTA"
 }

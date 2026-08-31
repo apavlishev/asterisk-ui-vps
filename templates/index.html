@@ -281,7 +281,7 @@
                     <button type="button" onclick="toggleExtensionsMenu()" id="btn-extensions-parent" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="Расширения">
                         <div class="flex items-center">
                             <span class="material-symbols-outlined mr-3.5 text-primary text-[22px]">extension</span>
-                            <span class="text-xs font-semibold text-on-surface sidebar-text">Расширения</span>
+                            <span class="text-xs font-semibold text-on-surface sidebar-text">{{ t.nav_extensions or "Расширения" }}</span>
                         </div>
                         <div class="flex items-center gap-1">
                             <span class="text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold sidebar-badge">{{ installed_plugins|length }}</span>
@@ -314,7 +314,7 @@
 
             <!-- GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ -->
             <div class="space-y-1">
-                <div class="px-3 pb-1 text-[10px] uppercase font-bold tracking-wider text-on-surface-variant/70 sidebar-text">Администрирование</div>
+                <div class="px-3 pb-1 text-[10px] uppercase font-bold tracking-wider text-on-surface-variant/70 sidebar-text">{{ t.nav_admin or "АДМИНИСТРИРОВАНИЕ" }}</div>
 
                 <button onclick="switchTab('security')" id="nav-security" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="Безопасность & Доступ">
                     <span class="material-symbols-outlined mr-3.5 text-error text-[22px]">lock_person</span>
@@ -326,7 +326,7 @@
 
                 <button onclick="switchTab('licensing')" id="nav-licensing" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="Лицензия & OTA">
                     <span class="material-symbols-outlined mr-3.5 text-success text-[22px]">verified_user</span>
-                    <span class="text-xs font-semibold sidebar-text">Лицензия & OTA</span>
+                    <span class="text-xs font-semibold sidebar-text">{{ t.nav_license or "Лицензия & OTA" }}</span>
                 </button>
             </div>
 
