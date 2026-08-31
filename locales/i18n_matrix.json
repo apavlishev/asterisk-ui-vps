@@ -2,14 +2,14 @@
   "Asterisk Core: ONLINE": {
     "ru": "Asterisk Core: ONLINE",
     "en": "Asterisk Core: ONLINE",
-    "es": "Núcleo Asterisk: EN LÍNEA",
+    "es": "Núcleo de Asterisk: EN LÍNEA",
     "ar": "نواة أستريسك: متصل",
     "zh": "Asterisk 核心: 运行中"
   },
   "Asterisk Core: OFFLINE": {
     "ru": "Asterisk Core: OFFLINE",
     "en": "Asterisk Core: OFFLINE",
-    "es": "Núcleo Asterisk: FUERA DE LÍNEA",
+    "es": "Núcleo de Asterisk: FUERA DE LÍNEA",
     "ar": "نواة أستريسك: غير متصل",
     "zh": "Asterisk 核心: 已停止"
   },
@@ -35,9 +35,9 @@
     "zh": "退出系统"
   },
   "Root Administrator": {
-    "ru": "Главный Администратор",
+    "ru": "Root Administrator",
     "en": "Root Administrator",
-    "es": "Administrador Principal",
+    "es": "Administrador Raíz",
     "ar": "المسؤول الرئيسي",
     "zh": "超级管理员"
   },
@@ -175,7 +175,7 @@
     "zh": "API 文档与回调"
   },
   "Telephony Control Center": {
-    "ru": "Центр управления телефонией",
+    "ru": "Telephony Control Center",
     "en": "Telephony Control Center",
     "es": "Centro de Control de Telefonía",
     "ar": "مركز التحكم في الهاتف",
@@ -1149,8 +1149,8 @@
   },
   "Верифицировать & Установить": {
     "ru": "Верифицировать & Установить",
-    "en": "Верифицировать & Установить",
-    "es": "Verificar e instalar",
+    "en": "Verify & Install",
+    "es": "Verificar e Instalar",
     "ar": "Верифицировать & Установить",
     "zh": "Верифицировать & Установить",
     "fr": "Vérifier et installer",
@@ -1161,8 +1161,8 @@
   },
   "в Asterisk. Требуется режим": {
     "ru": "в Asterisk. Требуется режим",
-    "en": "в Asterisk. Требуется режим",
-    "es": "en Asterisco. Modo requerido",
+    "en": "in Asterisk. Requires mode",
+    "es": "en Asterisk. Requiere modo",
     "ar": "في النجمة. الوضع مطلوب",
     "zh": "в Asterisk. Требуется режим",
     "fr": "dans Astérisque. Mode requis",
@@ -1174,7 +1174,7 @@
   "Связывание блоков стрелками:": {
     "ru": "Связывание блоков стрелками:",
     "en": "Linking blocks with arrows:",
-    "es": "Vinculando bloques con flechas:",
+    "es": "Vincular bloques con flechas:",
     "ar": "Связывание блоков стрелками:",
     "zh": "Связывание блоков стрелками:",
     "fr": "Lier des blocs avec des flèches :",
@@ -1209,8 +1209,8 @@
   },
   "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.": {
     "ru": "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.",
-    "en": "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.",
-    "es": "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.",
+    "en": "SIP traffic encryption and remote telephony without exposing port 5060 to the internet.",
+    "es": "Cifrado de tráfico SIP sin exponer puertos a internet.",
     "ar": "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.",
     "zh": "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.",
     "fr": "Cryptage du trafic SIP et de la téléphonie à distance sans redirection des ports ouverts 5060 vers Internet.",
@@ -1221,7 +1221,7 @@
   },
   "Подключен к API v4": {
     "ru": "Подключен к API v4",
-    "en": "Подключен к API v4",
+    "en": "Connected to API v4",
     "es": "Conectado a API v4",
     "ar": "متصل بـ API v4",
     "zh": "Подключен к API v4",
@@ -1233,8 +1233,8 @@
   },
   "Сохранить конфигурацию VPN Hub": {
     "ru": "Сохранить конфигурацию VPN Hub",
-    "en": "Сохранить конфигурацию VPN Hub",
-    "es": "Guardar la configuración del concentrador VPN",
+    "en": "Save VPN Hub Configuration",
+    "es": "Guardar Configuración VPN Hub",
     "ar": "احفظ تكوين VPN Hub",
     "zh": "Сохранить конфигурацию VPN Hub",
     "fr": "Enregistrer la configuration du hub VPN",
@@ -1245,8 +1245,8 @@
   },
   "Контроль времени ожидания:": {
     "ru": "Контроль времени ожидания:",
-    "en": "Timeout control:",
-    "es": "Control de tiempo de espera:",
+    "en": "Timeout Control:",
+    "es": "Control de Tiempo de Espera:",
     "ar": "التحكم في وقت الانتظار:",
     "zh": "Контроль времени ожидания:",
     "fr": "Contrôle du temps d'attente :",
@@ -1257,8 +1257,8 @@
   },
   "Автоматически создавать Contact в HubSpot для новых номеров": {
     "ru": "Автоматически создавать Contact в HubSpot для новых номеров",
-    "en": "Автоматически создавать Contact в HubSpot для новых номеров",
-    "es": "Crear contacto automáticamente en HubSpot para nuevos números",
+    "en": "Automatically create Contact in HubSpot for new numbers",
+    "es": "Crear contacto en HubSpot para números nuevos",
     "ar": "إنشاء جهة اتصال تلقائيًا في HubSpot للأرقام الجديدة",
     "zh": "Автоматически создавать Contact в HubSpot для новых номеров",
     "fr": "Créez automatiquement un contact dans HubSpot pour les nouveaux numéros",
@@ -1269,8 +1269,8 @@
   },
   "— при молчании абонента по таймауту.": {
     "ru": "— при молчании абонента по таймауту.",
-    "en": "— triggers when the caller is silent for a timeout.",
-    "es": "— se activa cuando el que llama se queda en silencio por tiempo de espera.",
+    "en": "— upon caller silence timeout.",
+    "es": "— por tiempo de silencio.",
     "ar": "— عندما يكون المشترك صامتًا بسبب انتهاء المهلة.",
     "zh": "— при молчании абонента по таймауту.",
     "fr": "— при молчании абонента по таймауту.",
@@ -1281,8 +1281,8 @@
   },
   "(начинается с": {
     "ru": "(начинается с",
-    "en": "(начинается с",
-    "es": "(начинается с",
+    "en": "(starts with",
+    "es": "(comienza con",
     "ar": "(يبدأ ب",
     "zh": "(начинается с",
     "fr": "(commence par",
@@ -1293,8 +1293,8 @@
   },
   "Холст IVR": {
     "ru": "Холст IVR",
-    "en": "Холст IVR",
-    "es": "Холст IVR",
+    "en": "IVR Canvas",
+    "es": "Lienzo IVR",
     "ar": "قماش الرد الآلي",
     "zh": "Холст IVR",
     "fr": "SVI sur toile",
@@ -1305,8 +1305,8 @@
   },
   "Инструкция по подключению HubSpot CRM:": {
     "ru": "Инструкция по подключению HubSpot CRM:",
-    "en": "Инструкция по подключению HubSpot CRM:",
-    "es": "Инструкция по подключению HubSpot CRM:",
+    "en": "HubSpot CRM Connection Guide:",
+    "es": "Guía de Conexión HubSpot CRM:",
     "ar": "Инструкция по подключению HubSpot CRM:",
     "zh": "连接 HubSpot CRM 的说明：",
     "fr": "Instructions pour connecter HubSpot CRM :",
@@ -1317,8 +1317,8 @@
   },
   "Расписание": {
     "ru": "Расписание",
-    "en": "Расписание",
-    "es": "Расписание",
+    "en": "Schedule",
+    "es": "Horario",
     "ar": "جدول",
     "zh": "Расписание",
     "fr": "Calendrier",
@@ -1329,8 +1329,8 @@
   },
   "в поля ниже.": {
     "ru": "в поля ниже.",
-    "en": "в поля ниже.",
-    "es": "в поля ниже.",
+    "en": "in the fields below.",
+    "es": "en los campos a continuación.",
     "ar": "في الحقول أدناه.",
     "zh": "在下面的字段中。",
     "fr": "dans les champs ci-dessous.",
@@ -1389,8 +1389,8 @@
   },
   "Скачайте готовый файл .ovpn со встроенными ключами и загрузите в веб-интерфейс телефона": {
     "ru": "Скачайте готовый файл .ovpn со встроенными ключами и загрузите в веб-интерфейс телефона",
-    "en": "Скачайте готовый файл .ovpn со встроенными ключами и загрузите в веб-интерфейс телефона",
-    "es": "Скачайте готовый файл .ovpn со встроенными ключами и загрузите в веб-интерфейс телефона",
+    "en": "Download the ready .ovpn file with built-in keys and upload it to the phone's web interface",
+    "es": "Descargue el archivo .ovpn e impórtelo en el teléfono",
     "ar": "قم بتنزيل ملف .ovpn النهائي باستخدام المفاتيح المضمنة وقم بتحميله على واجهة الويب الخاصة بالهاتف",
     "zh": "Скачайте готовый файл .ovpn со встроенными ключами и загрузите в веб-интерфейс телефона",
     "fr": "Téléchargez le fichier .ovpn terminé avec les clés intégrées et téléchargez-le sur l'interface Web du téléphone",
@@ -1401,8 +1401,8 @@
   },
   "не умеют передавать голос": {
     "ru": "не умеют передавать голос",
-    "en": "не умеют передавать голос",
-    "es": "no puedo transmitir la voz",
+    "en": "cannot transmit voice",
+    "es": "no puede transmitir voz",
     "ar": "لا يستطيع نقل الصوت",
     "zh": "无法传达声音",
     "fr": "je ne peux pas transmettre la voix",
@@ -1413,8 +1413,8 @@
   },
   "Телефония (telephony)": {
     "ru": "Телефония (telephony)",
-    "en": "Телефония (telephony)",
-    "es": "Телефония (telephony)",
+    "en": "Telephony (telephony)",
+    "es": "Telefonía (telephony)",
     "ar": "الاتصالات الهاتفية",
     "zh": "Телефония (telephony)",
     "fr": "Téléphonie",
@@ -1425,8 +1425,8 @@
   },
   "ID: ai_whisper • Версия: v2.5.0 • Автор: Logic Core AI Labs": {
     "ru": "ID: ai_whisper • Версия: v2.5.0 • Автор: Logic Core AI Labs",
-    "en": "ID: ai_whisper • Версия: v2.5.0 • Автор: Logic Core AI Labs",
-    "es": "ID: ai_whisper • Версия: v2.5.0 • Автор: Logic Core AI Labs",
+    "en": "ID: ai_whisper • Version: v2.5.0 • Author: Logic Core AI Labs",
+    "es": "ID: ai_whisper",
     "ar": "المعرف: ai_whisper • الإصدار: v2.5.0 • المؤلف: Logic Core AI Labs",
     "zh": "ID：ai_whisper • 版本：v2.5.0 • 作者：Logic Core AI Labs",
     "fr": "ID : ai_whisper • Version : v2.5.0 • Auteur : Logic Core AI Labs",
@@ -1437,8 +1437,8 @@
   },
   "Нейросетевой движок распознавания (STT Engine)": {
     "ru": "Нейросетевой движок распознавания (STT Engine)",
-    "en": "Нейросетевой движок распознавания (STT Engine)",
-    "es": "Нейросетевой движок распознавания (STT Engine)",
+    "en": "Neural Speech Engine (STT)",
+    "es": "Motor STT Neuronal",
     "ar": "محرك التعرف على الشبكة العصبية (محرك STT)",
     "zh": "Нейросетевой движок распознавания (STT Engine)",
     "fr": "Moteur de reconnaissance de réseau neuronal (STT Engine)",
@@ -1451,8 +1451,8 @@
     "ru": "Лицензия & OTA",
     "en": "License & OTA",
     "es": "Licencia & OTA",
-    "ar": "الترخيص",
-    "zh": "许可 & OTA",
+    "ar": "الترخيص وعبر الهواء",
+    "zh": "Лицензия & OTA",
     "fr": "Licence et OTA",
     "de": "Лицензия & OTA",
     "pt": "Лицензия & OTA",
@@ -1461,8 +1461,8 @@
   },
   "Попыток ввода": {
     "ru": "Попыток ввода",
-    "en": "Попыток ввода",
-    "es": "Попыток ввода",
+    "en": "Input Attempts",
+    "es": "Intentos",
     "ar": "Попыток ввода",
     "zh": "Попыток ввода",
     "fr": "Tentatives de saisie",
@@ -1593,8 +1593,8 @@
   },
   "Точка входа звонка от внешнего провайдера связи. Принимает внешний вызов и сразу направляет его в связанное голосовое меню.": {
     "ru": "Точка входа звонка от внешнего провайдера связи. Принимает внешний вызов и сразу направляет его в связанное голосовое меню.",
-    "en": "Call entry point from an external provider. Receives incoming calls and routes them directly to a linked IVR.",
-    "es": "Punto de entrada de llamadas de un proveedor externo. Recibe llamadas entrantes y las enruta a un IVR.",
+    "en": "Entry point for a call from an external communication provider. Receives an external call and immediately routes it to the associated voice menu.",
+    "es": "Точка входа звонка от внешнего провайдера связи. Принимает внешний вызов и сразу направляет его в связанное голосовое меню.",
     "ar": "Точка входа звонка от внешнего провайдера связи. Принимает внешний вызов и сразу направляет его в связанное голосовое меню.",
     "zh": "来自外部通信提供商的调用的入口点。接收外部呼叫并立即将其路由至关联的语音菜单。",
     "fr": "Point d'entrée pour un appel provenant d'un fournisseur de communication externe. Reçoit un appel externe et l'achemine immédiatement vers le menu vocal associé.",
@@ -1641,8 +1641,8 @@
   },
   "Модули (Диски & Чанки)": {
     "ru": "Модули (Диски & Чанки)",
-    "en": "Модули (Диски & Чанки)",
-    "es": "Модули (Диски & Чанки)",
+    "en": "Modules (Disks & Chunks)",
+    "es": "Módulos",
     "ar": "Модули (Диски & Чанки)",
     "zh": "Модули (Диски & Чанки)",
     "fr": "Модули (Диски & Чанки)",
@@ -1677,8 +1677,8 @@
   },
   "Источник ссылки на аудио:": {
     "ru": "Источник ссылки на аудио:",
-    "en": "Источник ссылки на аудио:",
-    "es": "Источник ссылки на аудио:",
+    "en": "Audio Link Source:",
+    "es": "Fuente de Audio:",
     "ar": "Источник ссылки на аудио:",
     "zh": "Источник ссылки на аудио:",
     "fr": "Source du lien audio :",
@@ -1689,8 +1689,8 @@
   },
   "(Абонент)": {
     "ru": "(Абонент)",
-    "en": "(Абонент)",
-    "es": "(Абонент)",
+    "en": "(Extension)",
+    "es": "(Extensión)",
     "ar": "(Абонент)",
     "zh": "(Абонент)",
     "fr": "(Abonné)",
@@ -1701,8 +1701,8 @@
   },
   "Субдомен": {
     "ru": "Субдомен",
-    "en": "Субдомен",
-    "es": "Субдомен",
+    "en": "Subdomain",
+    "es": "Subdominio",
     "ar": "Субдомен",
     "zh": "Субдомен",
     "fr": "Субдомен",
@@ -1713,8 +1713,8 @@
   },
   "Стандарты связи": {
     "ru": "Стандарты связи",
-    "en": "Стандарты связи",
-    "es": "Estándares de comunicación",
+    "en": "Communication Standards",
+    "es": "Estándares",
     "ar": "Стандарты связи",
     "zh": "通讯标准",
     "fr": "Стандарты связи",
@@ -1725,8 +1725,8 @@
   },
   "⚡ Автовыбор (Первое доступное хранилище)": {
     "ru": "⚡ Автовыбор (Первое доступное хранилище)",
-    "en": "⚡ Автовыбор (Первое доступное хранилище)",
-    "es": "⚡ Автовыбор (Первое доступное хранилище)",
+    "en": "⚡ Auto (First Available Storage)",
+    "es": "⚡ Auto",
     "ar": "⚡ التحديد التلقائي (أول مساحة تخزين متاحة)",
     "zh": "⚡ Автовыбор (Первое доступное хранилище)",
     "fr": "⚡ Sélection automatique (premier stockage disponible)",
@@ -1737,8 +1737,8 @@
   },
   "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global": {
     "ru": "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global",
-    "en": "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global",
-    "es": "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global",
+    "en": "ID: gohighlevel • Version: v2.0.0",
+    "es": "ID: gohighlevel",
     "ar": "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global",
     "zh": "ID：gohighlevel • 版本：v2.0.0 • 作者：Logic Core Global",
     "fr": "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global",
@@ -1785,8 +1785,8 @@
   },
   "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.": {
     "ru": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
-    "en": "Clicking 'Apply IVR Scheme' automatically compiles the visual graph into a live Asterisk context and reloads the dialplan.",
-    "es": "Al hacer clic en 'Aplicar Esquema IVR', el gráfico se compila en un contexto de Asterisk y se recarga el plan de marcado.",
+    "en": "When you click “Apply IVR scheme”, the visual graph is automatically converted into an Asterisk combat context with a dialplan reboot.",
+    "es": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
     "ar": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
     "zh": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
     "fr": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
@@ -1797,8 +1797,8 @@
   },
   "Активация лицензии / плагина": {
     "ru": "Активация лицензии / плагина",
-    "en": "Активация лицензии / плагина",
-    "es": "Activación de licencia/complemento",
+    "en": "Plugin / License Activation",
+    "es": "Activación de Licencia",
     "ar": "Активация лицензии / плагина",
     "zh": "Активация лицензии / плагина",
     "fr": "Активация лицензии / плагина",
@@ -1809,8 +1809,8 @@
   },
   "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team": {
     "ru": "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team",
-    "en": "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team",
-    "es": "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team",
+    "en": "ID: amocrm_pro • Version: v3.2.0",
+    "es": "ID: amocrm_pro",
     "ar": "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team",
     "zh": "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team",
     "fr": "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team",
@@ -1821,8 +1821,8 @@
   },
   "Офисный Yealink SIP-T31P (Абонент 101)": {
     "ru": "Офисный Yealink SIP-T31P (Абонент 101)",
-    "en": "Офисный Yealink SIP-T31P (Абонент 101)",
-    "es": "Офисный Yealink SIP-T31P (Абонент 101)",
+    "en": "Office Yealink SIP-T31P (Ext 101)",
+    "es": "Yealink Oficina",
     "ar": "Офисный Yealink SIP-T31P (Абонент 101)",
     "zh": "Офисный Yealink SIP-T31P (Абонент 101)",
     "fr": "Офисный Yealink SIP-T31P (Абонент 101)",
@@ -1833,8 +1833,8 @@
   },
   "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team": {
     "ru": "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team",
-    "en": "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team",
-    "es": "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team",
+    "en": "ID: yandex_disk",
+    "es": "ID: yandex_disk",
     "ar": "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team",
     "zh": "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team",
     "fr": "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team",
@@ -1845,8 +1845,8 @@
   },
   "Группа": {
     "ru": "Группа",
-    "en": "Группа",
-    "es": "Группа",
+    "en": "Group",
+    "es": "Grupo",
     "ar": "Группа",
     "zh": "Группа",
     "fr": "Группа",
@@ -1857,8 +1857,8 @@
   },
   "Закрыть": {
     "ru": "Закрыть",
-    "en": "Закрыть",
-    "es": "Закрыть",
+    "en": "Close",
+    "es": "Cerrar",
     "ar": "Закрыть",
     "zh": "Закрыть",
     "fr": "Закрыть",
@@ -1869,8 +1869,8 @@
   },
   "Все источники": {
     "ru": "Все источники",
-    "en": "Все источники",
-    "es": "Все источники",
+    "en": "All Sources",
+    "es": "Todas las fuentes",
     "ar": "Все источники",
     "zh": "Все источники",
     "fr": "Все источники",
@@ -1881,8 +1881,8 @@
   },
   "SIP Транки & Вызовы": {
     "ru": "SIP Транки & Вызовы",
-    "en": "SIP Транки & Вызовы",
-    "es": "SIP Транки & Вызовы",
+    "en": "SIP Trunks & Calls",
+    "es": "Troncales SIP y Llamadas",
     "ar": "SIP Транки & Вызовы",
     "zh": "SIP Транки & Вызовы",
     "fr": "SIP Транки & Вызовы",
@@ -1893,8 +1893,8 @@
   },
   "и полученный токен.": {
     "ru": "и полученный токен.",
-    "en": "и полученный токен.",
-    "es": "и полученный токен.",
+    "en": "and the generated token.",
+    "es": "y el token.",
     "ar": "и полученный токен.",
     "zh": "и полученный токен.",
     "fr": "и полученный токен.",
@@ -1905,8 +1905,8 @@
   },
   "Редактирование SIP-Транка": {
     "ru": "Редактирование SIP-Транка",
-    "en": "Редактирование SIP-Транка",
-    "es": "Редактирование SIP-Транка",
+    "en": "Edit SIP Trunk",
+    "es": "Editar Troncal SIP",
     "ar": "Редактирование SIP-Транка",
     "zh": "Редактирование SIP-Транка",
     "fr": "Редактирование SIP-Транка",
@@ -1917,8 +1917,8 @@
   },
   "Воронка amoCRM": {
     "ru": "Воронка amoCRM",
-    "en": "Воронка amoCRM",
-    "es": "Воронка amoCRM",
+    "en": "amoCRM Pipeline",
+    "es": "Embudo amoCRM",
     "ar": "Воронка amoCRM",
     "zh": "Воронка amoCRM",
     "fr": "Воронка amoCRM",
@@ -1929,8 +1929,8 @@
   },
   "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global": {
     "ru": "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global",
-    "en": "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global",
-    "es": "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global",
+    "en": "ID: hubspot",
+    "es": "ID: hubspot",
     "ar": "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global",
     "zh": "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global",
     "fr": "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global",
@@ -1941,8 +1941,8 @@
   },
   "Добавьте триггер": {
     "ru": "Добавьте триггер",
-    "en": "Добавьте триггер",
-    "es": "Добавьте триггер",
+    "en": "Add Trigger",
+    "es": "Agregar Disparador",
     "ar": "Добавьте триггер",
     "zh": "Добавьте триггер",
     "fr": "Добавьте триггер",
@@ -1953,8 +1953,8 @@
   },
   "Подключение SIP Транка": {
     "ru": "Подключение SIP Транка",
-    "en": "Подключение SIP Транка",
-    "es": "Подключение SIP Транка",
+    "en": "Add SIP Trunk",
+    "es": "Agregar Troncal SIP",
     "ar": "Подключение SIP Транка",
     "zh": "Подключение SIP Транка",
     "fr": "Подключение SIP Транка",
@@ -1965,8 +1965,8 @@
   },
   "Логин: s1921687209": {
     "ru": "Логин: s1921687209",
-    "en": "Логин: s1921687209",
-    "es": "Логин: s1921687209",
+    "en": "Login: s1921687209",
+    "es": "Usuario: s1921687209",
     "ar": "Логин: s1921687209",
     "zh": "Логин: s1921687209",
     "fr": "Логин: s1921687209",
@@ -1989,8 +1989,8 @@
   },
   "Контекст вызовов": {
     "ru": "Контекст вызовов",
-    "en": "Контекст вызовов",
-    "es": "Контекст вызовов",
+    "en": "Call Context",
+    "es": "Contexto de Llamada",
     "ar": "Контекст вызовов",
     "zh": "Контекст вызовов",
     "fr": "Контекст вызовов",
@@ -2001,8 +2001,8 @@
   },
   "TLS (Зашифрованный)": {
     "ru": "TLS (Зашифрованный)",
-    "en": "TLS (Зашифрованный)",
-    "es": "TLS (Зашифрованный)",
+    "en": "TLS (Encrypted)",
+    "es": "TLS (Cifrado)",
     "ar": "TLS (Зашифрованный)",
     "zh": "TLS (Зашифрованный)",
     "fr": "TLS (Зашифрованный)",
@@ -2013,8 +2013,8 @@
   },
   "Тест распознавания": {
     "ru": "Тест распознавания",
-    "en": "Тест распознавания",
-    "es": "Тест распознавания",
+    "en": "Recognition Test",
+    "es": "Prueba de Reconocimiento",
     "ar": "اختبار الاعتراف",
     "zh": "Тест распознавания",
     "fr": "Тест распознавания",
@@ -2025,8 +2025,8 @@
   },
   "Новая группа абонентов": {
     "ru": "Новая группа абонентов",
-    "en": "Новая группа абонентов",
-    "es": "Новая группа абонентов",
+    "en": "New Extension Group",
+    "es": "Nuevo Grupo",
     "ar": "مجموعة جديدة من المشتركين",
     "zh": "Новая группа абонентов",
     "fr": "Новая группа абонентов",
@@ -2037,8 +2037,8 @@
   },
   "Табличный вид": {
     "ru": "Табличный вид",
-    "en": "Табличный вид",
-    "es": "Табличный вид",
+    "en": "Table View",
+    "es": "Vista de Tabla",
     "ar": "Табличный вид",
     "zh": "Табличный вид",
     "fr": "Табличный вид",
@@ -2049,8 +2049,8 @@
   },
   "Целевой номер / Ресурс": {
     "ru": "Целевой номер / Ресурс",
-    "en": "Целевой номер / Ресурс",
-    "es": "Целевой номер / Ресурс",
+    "en": "Target Number / Resource",
+    "es": "Destino",
     "ar": "الرقم المستهدف/المورد",
     "zh": "Целевой номер / Ресурс",
     "fr": "Целевой номер / Ресурс",
@@ -2061,8 +2061,8 @@
   },
   "Название блока": {
     "ru": "Название блока",
-    "en": "Название блока",
-    "es": "Название блока",
+    "en": "Block Name",
+    "es": "Nombre del Bloque",
     "ar": "Название блока",
     "zh": "Название блока",
     "fr": "Название блока",
@@ -2073,8 +2073,8 @@
   },
   ". При подключении более 1–2 модемов к серверу обязательно используйте": {
     "ru": ". При подключении более 1–2 модемов к серверу обязательно используйте",
-    "en": ". При подключении более 1–2 модемов к серверу обязательно используйте",
-    "es": ". При подключении более 1–2 модемов к серверу обязательно используйте",
+    "en": ". If connecting >2 modems, you must use",
+    "es": ". Al conectar >2 módems use",
     "ar": ". При подключении более 1–2 модемов к серверу обязательно используйте",
     "zh": ". При подключении более 1–2 модемов к серверу обязательно используйте",
     "fr": ". При подключении более 1–2 модемов к серверу обязательно используйте",
@@ -2085,8 +2085,8 @@
   },
   "Занято логами:": {
     "ru": "Занято логами:",
-    "en": "Занято логами:",
-    "es": "Занято логами:",
+    "en": "Logs Size:",
+    "es": "Tamaño de Logs:",
     "ar": "Занято логами:",
     "zh": "Занято логами:",
     "fr": "Занято логами:",
@@ -2097,8 +2097,8 @@
   },
   "Драйвер в PBX": {
     "ru": "Драйвер в PBX",
-    "en": "Драйвер в PBX",
-    "es": "Драйвер в PBX",
+    "en": "PBX Driver",
+    "es": "Controlador PBX",
     "ar": "Драйвер в PBX",
     "zh": "Драйвер в PBX",
     "fr": "Драйвер в PBX",
@@ -2109,8 +2109,8 @@
   },
   "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка": {
     "ru": "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка",
-    "en": "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка",
-    "es": "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка",
+    "en": "3. Audio Recording Upload and Player",
+    "es": "3. Grabaciones y Reproductor",
     "ar": "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка",
     "zh": "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка",
     "fr": "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка",
@@ -2121,8 +2121,8 @@
   },
   "Длительность бана (Ban Time, сек)": {
     "ru": "Длительность бана (Ban Time, сек)",
-    "en": "Длительность бана (Ban Time, сек)",
-    "es": "Длительность бана (Ban Time, сек)",
+    "en": "Ban Duration (Ban Time, sec)",
+    "es": "Duración de Ban (seg)",
     "ar": "Длительность бана (Ban Time, сек)",
     "zh": "Длительность бана (Ban Time, сек)",
     "fr": "Длительность бана (Ban Time, сек)",
@@ -2133,8 +2133,8 @@
   },
   "активный USB-хаб с внешним блоком питания (12V 3-5A)": {
     "ru": "активный USB-хаб с внешним блоком питания (12V 3-5A)",
-    "en": "активный USB-хаб с внешним блоком питания (12V 3-5A)",
-    "es": "активный USB-хаб с внешним блоком питания (12V 3-5A)",
+    "en": "active USB hub with external power (12V 3-5A)",
+    "es": "hub USB activo",
     "ar": "активный USB-хаб с внешним блоком питания (12V 3-5A)",
     "zh": "带外部电源的有源 USB 集线器（12V 3-5A）",
     "fr": "Hub USB actif avec alimentation externe (12V 3-5A)",
@@ -2145,8 +2145,8 @@
   },
   "МегаФон (Тестовый)": {
     "ru": "МегаФон (Тестовый)",
-    "en": "МегаФон (Тестовый)",
-    "es": "МегаФон (Тестовый)",
+    "en": "MegaFon (Test)",
+    "es": "MegaFon (Prueba)",
     "ar": "МегаФон (Тестовый)",
     "zh": "МегаФон (Тестовый)",
     "fr": "MégaFon (Test)",
@@ -2157,8 +2157,8 @@
   },
   "(вида": {
     "ru": "(вида",
-    "en": "(вида",
-    "es": "(вида",
+    "en": "(like",
+    "es": "(como",
     "ar": "(вида",
     "zh": "（类型",
     "fr": "(вида",
@@ -2181,8 +2181,8 @@
   },
   "Двигать / Редактировать": {
     "ru": "Двигать / Редактировать",
-    "en": "Двигать / Редактировать",
-    "es": "Двигать / Редактировать",
+    "en": "Move / Edit",
+    "es": "Mover / Editar",
     "ar": "Двигать / Редактировать",
     "zh": "移动/编辑",
     "fr": "Déplacer / Modifier",
@@ -2205,8 +2205,8 @@
   },
   "GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ": {
     "ru": "GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ",
-    "en": "GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ",
-    "es": "GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ",
+    "en": "GROUP 4: SYSTEM & SECURITY",
+    "es": "SISTEMA",
     "ar": "GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ",
     "zh": "GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ",
     "fr": "GROUPE 4 : SYSTÈME & SÉCURITÉ",
@@ -2217,8 +2217,8 @@
   },
   "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk.": {
     "ru": "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk.",
-    "en": "Detailed description of node types, interaction ports, and call flow algorithm in the Asterisk dialplan.",
-    "es": "Descripción detallada de tipos de nodos, puertos de interacción y algoritmo de flujo de llamadas.",
+    "en": "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk.",
+    "es": "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk.",
     "ar": "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk.",
     "zh": "详细描述了Asterisk dialplan中的节点类型、通信端口和呼叫流算法。",
     "fr": "Une description détaillée des types de nœuds, des ports de communication et de l'algorithme de flux d'appels dans le plan de numérotation Asterisk.",
@@ -2229,8 +2229,8 @@
   },
   "Узел IVR": {
     "ru": "Узел IVR",
-    "en": "Узел IVR",
-    "es": "Узел IVR",
+    "en": "IVR Node",
+    "es": "Nodo IVR",
     "ar": "Узел IVR",
     "zh": "IVR节点",
     "fr": "Nœud SVI",
@@ -2241,8 +2241,8 @@
   },
   "Автоскролл": {
     "ru": "Автоскролл",
-    "en": "Автоскролл",
-    "es": "Автоскролл",
+    "en": "Autoscroll",
+    "es": "Autoscroll",
     "ar": "التمرير التلقائي",
     "zh": "自动滚动",
     "fr": "Défilement automatique",
@@ -2253,8 +2253,8 @@
   },
   "Сохранить Zoho CRM": {
     "ru": "Сохранить Zoho CRM",
-    "en": "Сохранить Zoho CRM",
-    "es": "Сохранить Zoho CRM",
+    "en": "Save Zoho CRM",
+    "es": "Guardar Zoho",
     "ar": "Сохранить Zoho CRM",
     "zh": "保存 Zoho CRM",
     "fr": "Сохранить Zoho CRM",
@@ -2265,8 +2265,8 @@
   },
   "Введите криптографический ключ, полученный при покупке в Маркетплейсе для Server ID": {
     "ru": "Введите криптографический ключ, полученный при покупке в Маркетплейсе для Server ID",
-    "en": "Введите криптографический ключ, полученный при покупке в Маркетплейсе для Server ID",
-    "es": "Введите криптографический ключ, полученный при покупке в Маркетплейсе для Server ID",
+    "en": "Enter cryptographic key for your Server ID",
+    "es": "Ingrese la clave criptográfica",
     "ar": "Введите криптографический ключ, полученный при покупке в Маркетплейсе для Server ID",
     "zh": "输入在 Marketplace 中购买时收到的服务器 ID 密钥",
     "fr": "Saisissez la clé cryptographique reçue lors de l'achat sur la Marketplace pour Server ID",
@@ -2277,8 +2277,8 @@
   },
   "Сохранить пароль панели": {
     "ru": "Сохранить пароль панели",
-    "en": "Сохранить пароль панели",
-    "es": "Сохранить пароль панели",
+    "en": "Save UI Password",
+    "es": "Guardar Contraseña",
     "ar": "حفظ كلمة مرور اللوحة",
     "zh": "保存面板密码",
     "fr": "Enregistrer le mot de passe du panneau",
@@ -2289,8 +2289,8 @@
   },
   "Целевой номер / SIP Абонент": {
     "ru": "Целевой номер / SIP Абонент",
-    "en": "Целевой номер / SIP Абонент",
-    "es": "Целевой номер / SIP Абонент",
+    "en": "Target Extension",
+    "es": "Extensión de Destino",
     "ar": "الرقم المستهدف / مشترك SIP",
     "zh": "目标号码/SIP 用户",
     "fr": "Numéro cible / Abonné SIP",
@@ -2337,8 +2337,8 @@
   },
   "Например: 5 неудачных попыток": {
     "ru": "Например: 5 неудачных попыток",
-    "en": "Например: 5 неудачных попыток",
-    "es": "Например: 5 неудачных попыток",
+    "en": "E.g., 5 failed attempts",
+    "es": "Ej. 5 intentos",
     "ar": "على سبيل المثال: 5 محاولات فاشلة",
     "zh": "例如：5次失败的尝试",
     "fr": "Par exemple : 5 tentatives infructueuses",
@@ -2348,250 +2348,762 @@
     "hi": "उदाहरण के लिए: 5 असफल प्रयास"
   },
   "Voicemail:ALL — Оставить голосовое сообщение": {
-    "ru": "Voicemail:ALL — Оставить голосовое сообщение"
+    "ru": "Voicemail:ALL — Оставить голосовое сообщение",
+    "en": "Voicemail:ALL — Leave voicemail",
+    "es": "Buzón de Voz",
+    "ar": "البريد الصوتي:الكل — اترك رسالة صوتية",
+    "zh": "语音信箱：全部 — 留下语音留言",
+    "fr": "Messagerie vocale : TOUS – Laisser un message vocal",
+    "de": "Voicemail:ALL – Hinterlassen Sie eine Sprachnachricht",
+    "pt": "Correio de voz: TODOS – Deixe uma mensagem de voz",
+    "ja": "Voicemail:ALL — 音声メッセージを残す",
+    "hi": "वॉइसमेल:सभी - एक वॉइस संदेश छोड़ें"
   },
   "Не авторизован": {
-    "ru": "Не авторизован"
+    "ru": "Не авторизован",
+    "en": "Unauthorized",
+    "es": "No Autorizado",
+    "ar": "غير مصرح به",
+    "zh": "未授权",
+    "fr": "Non autorisé",
+    "de": "Nicht autorisiert",
+    "pt": "Não autorizado",
+    "ja": "許可されていません",
+    "hi": "अधिकृत नहीं हैं"
   },
   "IVR Меню": {
-    "ru": "IVR Меню"
+    "ru": "IVR Меню",
+    "en": "IVR Menu",
+    "es": "Menú IVR",
+    "ar": "IVR Меню",
+    "zh": "IVR 菜单",
+    "fr": "Menu SVI",
+    "de": "IVR-Menü",
+    "pt": "Menu URA",
+    "ja": "IVRメニュー",
+    "hi": "आईवीआर मेनू"
   },
   "Применить IVR схему в Asterisk": {
-    "ru": "Применить IVR схему в Asterisk"
+    "ru": "Применить IVR схему в Asterisk",
+    "en": "Apply IVR Scheme to Asterisk",
+    "es": "Aplicar Esquema IVR",
+    "ar": "تطبيق نظام الرد الصوتي التفاعلي (IVR) في النجمة",
+    "zh": "在Asterisk中应用IVR方案",
+    "fr": "Appliquer le schéma IVR dans Asterisk",
+    "de": "Wenden Sie das IVR-Schema in Asterisk an",
+    "pt": "Aplicar esquema IVR no Asterisk",
+    "ja": "アスタリスクで IVR スキームを適用する",
+    "hi": "एस्टरिस्क में आईवीआर योजना लागू करें"
   },
   "Пароль (Secret)": {
-    "ru": "Пароль (Secret)"
+    "ru": "Пароль (Secret)",
+    "en": "Password (Secret)",
+    "es": "Contraseña",
+    "ar": "كلمة المرور (سرية)",
+    "zh": "密码（秘密）",
+    "fr": "Mot de passe (secret)",
+    "de": "Passwort (Geheim)",
+    "pt": "Senha (secreta)",
+    "ja": "パスワード(シークレット)",
+    "hi": "पासवर्ड (गुप्त)"
   },
   "Количество неудачных попыток до бана": {
-    "ru": "Количество неудачных попыток до бана"
+    "ru": "Количество неудачных попыток до бана",
+    "en": "Failed attempts before ban",
+    "es": "Intentos antes del bloqueo",
+    "ar": "عدد المحاولات الفاشلة قبل الحظر",
+    "zh": "禁令前尝试失败的次数",
+    "fr": "Nombre de tentatives infructueuses avant le bannissement",
+    "de": "Anzahl der Fehlversuche vor der Sperre",
+    "pt": "Número de tentativas fracassadas antes do banimento",
+    "ja": "禁止されるまでの失敗した試行回数",
+    "hi": "प्रतिबंध से पहले असफल प्रयासों की संख्या"
   },
   ": при 5 неверных попытках ввода пароля IP-клиента мгновенно блокируется в": {
-    "ru": ": при 5 неверных попытках ввода пароля IP-клиента мгновенно блокируется в"
+    "ru": ": при 5 неверных попытках ввода пароля IP-клиента мгновенно блокируется в",
+    "en": ": on 5 failed attempts, client is instantly banned in",
+    "es": ": baneado tras 5 intentos en",
+    "ar": ": بعد 5 محاولات غير صحيحة لإدخال كلمة مرور عميل IP، يتم حظر عميل IP على الفور",
+    "zh": "：5次错误尝试输入IP客户端密码后，IP客户端立即被阻止",
+    "fr": ": après 5 tentatives incorrectes de saisie du mot de passe du client IP, le client IP est instantanément bloqué dans",
+    "de": ": Nach 5 falschen Eingabeversuchen des IP-Client-Passworts wird der IP-Client sofort gesperrt",
+    "pt": ": após 5 tentativas incorretas de inserir a senha do cliente IP, o cliente IP é instantaneamente bloqueado em",
+    "ja": ": IP クライアントのパスワードを 5 回誤って入力すると、IP クライアントは即座にブロックされます。",
+    "hi": ": आईपी क्लाइंट पासवर्ड दर्ज करने के 5 गलत प्रयासों के बाद, आईपी क्लाइंट तुरंत ब्लॉक हो जाता है"
   },
   "Запрещен выход в город на городские/мобильные номера. Звонки только между сотрудниками.": {
-    "ru": "Запрещен выход в город на городские/мобильные номера. Звонки только между сотрудниками."
+    "ru": "Запрещен выход в город на городские/мобильные номера. Звонки только между сотрудниками.",
+    "en": "External calls prohibited. Internal extension calls only.",
+    "es": "Solo llamadas internas.",
+    "ar": "يحظر الوصول إلى المدينة عبر أرقام الهاتف الثابت/المحمول. المكالمات بين الموظفين فقط.",
+    "zh": "禁止通过固定电话/手机号码进入城市。通话仅在员工之间进行。",
+    "fr": "L'accès à la ville via les numéros fixes/mobiles est interdit. Les appels se font uniquement entre employés.",
+    "de": "Der Zugang zur Stadt über Festnetz-/Mobilfunknummern ist verboten. Gespräche finden nur zwischen Mitarbeitern statt.",
+    "pt": "É proibido o acesso à cidade através de números fixos/móveis. As ligações são apenas entre funcionários.",
+    "ja": "固定電話・携帯電話番号による市へのアクセスは禁止されています。通話は従業員間のみです。",
+    "hi": "लैंडलाइन/मोबाइल नंबरों के माध्यम से शहर में प्रवेश निषिद्ध है। कॉल केवल कर्मचारियों के बीच हैं।"
   },
   "Таймаут (сек)": {
-    "ru": "Таймаут (сек)"
+    "ru": "Таймаут (сек)",
+    "en": "Timeout (sec)",
+    "es": "Tiempo Espera",
+    "ar": "المهلة (ثانية)",
+    "zh": "超时（秒）",
+    "fr": "Délai d'expiration (s)",
+    "de": "Zeitüberschreitung (Sek.)",
+    "pt": "Tempo limite (seg)",
+    "ja": "タイムアウト (秒)",
+    "hi": "टाइमआउट (सेकंड)"
   },
   "Подробное руководство: назначение каждого поля, безопасность и влияние контекста на маршрутизацию звонков": {
-    "ru": "Подробное руководство: назначение каждого поля, безопасность и влияние контекста на маршрутизацию звонков"
+    "ru": "Подробное руководство: назначение каждого поля, безопасность и влияние контекста на маршрутизацию звонков",
+    "en": "Detailed guide: field purpose, security, and context routing.",
+    "es": "Guía detallada de campos y contexto.",
+    "ar": "Подробное руководство: назначение каждого поля, безопасность и влияние контекста на маршрутизацию звонков",
+    "zh": "详细指南：每个字段的用途、安全性以及上下文对呼叫路由的影响",
+    "fr": "Guide détaillé : la finalité de chaque champ, la sécurité et l'impact du contexte sur le routage des appels",
+    "de": "Ausführlicher Leitfaden: Zweck der einzelnen Felder, Sicherheit und Einfluss des Kontexts auf die Anrufweiterleitung",
+    "pt": "Guia detalhado: a finalidade de cada campo, a segurança e o impacto do contexto no roteamento de chamadas",
+    "ja": "詳細ガイド: 各フィールドの目的、セキュリティ、コール ルーティングに対するコンテキストの影響",
+    "hi": "विस्तृत मार्गदर्शिका: प्रत्येक क्षेत्र का उद्देश्य, सुरक्षा और कॉल रूटिंग पर संदर्भ का प्रभाव"
   },
   "Редактировать данные абонента": {
-    "ru": "Редактировать данные абонента"
+    "ru": "Редактировать данные абонента",
+    "en": "Edit Extension Data",
+    "es": "Editar Extensión",
+    "ar": "Редактировать данные абонента",
+    "zh": "编辑订阅者详细信息",
+    "fr": "Modifier les détails de l'abonné",
+    "de": "Abonnentendetails bearbeiten",
+    "pt": "Editar detalhes do assinante",
+    "ja": "購読者の詳細を編集する",
+    "hi": "ग्राहक विवरण संपादित करें"
   },
   "Выберите правильный датацентр вашего аккаунта (для Европы —": {
-    "ru": "Выберите правильный датацентр вашего аккаунта (для Европы —"
+    "ru": "Выберите правильный датацентр вашего аккаунта (для Европы —",
+    "en": "Select the correct datacenter (e.g. EU —",
+    "es": "Seleccione el datacenter",
+    "ar": "حدد مركز البيانات الصحيح لحسابك (لأوروبا -",
+    "zh": "为您的帐户选择正确的数据中心（对于欧洲 -",
+    "fr": "Sélectionnez le centre de données approprié pour votre compte (pour l'Europe -",
+    "de": "Wählen Sie das richtige Rechenzentrum für Ihr Konto aus (für Europa –",
+    "pt": "Selecione o data center correto para sua conta (para a Europa -",
+    "ja": "アカウントに適切なデータセンターを選択してください (ヨーロッパの場合 -",
+    "hi": "अपने खाते के लिए सही डेटा सेंटर चुनें (यूरोप के लिए -"
   },
   "ID: enterprise_vpn • Версия: v1.1.0 • Автор: Logic Core Security": {
-    "ru": "ID: enterprise_vpn • Версия: v1.1.0 • Автор: Logic Core Security"
+    "ru": "ID: enterprise_vpn • Версия: v1.1.0 • Автор: Logic Core Security",
+    "en": "ID: enterprise_vpn",
+    "es": "ID: enterprise_vpn",
+    "ar": "ID: enterprise_vpn • Версия: v1.1.0 • Автор: Logic Core Security",
+    "zh": "ID：enterprise_vpn • 版本：v1.1.0 • 作者：Logic Core Security",
+    "fr": "ID : Enterprise_vpn • Version : v1.1.0 • Auteur : Logic Core Security",
+    "de": "ID: Enterprise_vpn • Version: v1.1.0 • Autor: Logic Core Security",
+    "pt": "ID: enterprise_vpn • Versão: v1.1.0 • Autor: Logic Core Security",
+    "ja": "ID: enterprise_vpn • バージョン: v1.1.0 • 作成者: Logic Core Security",
+    "hi": "आईडी: एंटरप्राइज़_वीपीएन • संस्करण: v1.1.0 • लेखक: लॉजिक कोर सिक्योरिटी"
   },
   "Инициализация потока телеметрии Asterisk Live Logs...": {
-    "ru": "Инициализация потока телеметрии Asterisk Live Logs..."
+    "ru": "Инициализация потока телеметрии Asterisk Live Logs...",
+    "en": "Initializing Asterisk Live Logs telemetry...",
+    "es": "Iniciando telemetría...",
+    "ar": "جارٍ تهيئة دفق القياس عن بعد لسجلات Asterisk Live...",
+    "zh": "正在初始化 Asterisk Live Logs 遥测流...",
+    "fr": "Initialisation du flux de télémétrie Asterisk Live Logs...",
+    "de": "Initialisieren des Asterisk Live Logs-Telemetriestreams...",
+    "pt": "Inicializando o fluxo de telemetria do Asterisk Live Logs...",
+    "ja": "アスタリスク ライブ ログ テレメトリ ストリームを初期化しています...",
+    "hi": "एस्टरिस्क लाइव लॉग्स टेलीमेट्री स्ट्रीम प्रारंभ किया जा रहा है..."
   },
   "Выберите воронку и целевой статус amoCRM с живым поиском и автоподгрузкой этапов.": {
-    "ru": "Выберите воронку и целевой статус amoCRM с живым поиском и автоподгрузкой этапов."
+    "ru": "Выберите воронку и целевой статус amoCRM с живым поиском и автоподгрузкой этапов.",
+    "en": "Select pipeline and stage for amoCRM.",
+    "es": "Seleccione embudo amoCRM.",
+    "ar": "حدد مسار التحويل وحالة الهدف amoCRM مع البحث المباشر والتحميل التلقائي للمراحل.",
+    "zh": "通过实时搜索和自动加载阶段来选择漏斗和目标状态 amoCRM。",
+    "fr": "Sélectionnez un entonnoir et un statut cible amoCRM avec recherche en direct et chargement automatique des étapes.",
+    "de": "Wählen Sie einen Trichter und einen Zielstatus amoCRM mit Live-Suche und automatischem Laden von Stufen.",
+    "pt": "Selecione um funil e status de destino amoCRM com pesquisa ao vivo e carregamento automático de etapas.",
+    "ja": "ファネルとターゲット ステータスを選択します。ライブ検索とステージの自動読み込みを備えた amoCRM。",
+    "hi": "लाइव खोज और चरणों की स्वचालित लोडिंग के साथ एक फ़नल और लक्ष्य स्थिति एमोसीआरएम का चयन करें।"
   },
   "Создать VLESS ключ": {
-    "ru": "Создать VLESS ключ"
+    "ru": "Создать VLESS ключ",
+    "en": "Create VLESS Key",
+    "es": "Crear Clave VLESS",
+    "ar": "إنشاء مفتاح VLESS",
+    "zh": "创建 VLESS 密钥",
+    "fr": "Créer une clé VLESS",
+    "de": "Erstellen Sie einen VLESS-Schlüssel",
+    "pt": "Criar chave VLESS",
+    "ja": "VLESSキーの作成",
+    "hi": "VLESS कुंजी बनाएं"
   },
   "Клиентские профили для аппаратных IP-телефонов": {
-    "ru": "Клиентские профили для аппаратных IP-телефонов"
+    "ru": "Клиентские профили для аппаратных IP-телефонов",
+    "en": "Client profiles for IP Phones",
+    "es": "Perfiles VPN IP",
+    "ar": "ملفات تعريف العميل لهواتف IP الخاصة بالأجهزة",
+    "zh": "硬件 IP 电话的客户端配置文件",
+    "fr": "Profils client pour les téléphones IP matériels",
+    "de": "Client-Profile für Hardware-IP-Telefone",
+    "pt": "Perfis de cliente para telefones IP de hardware",
+    "ja": "ハードウェア IP 電話のクライアント プロファイル",
+    "hi": "हार्डवेयर आईपी फोन के लिए क्लाइंट प्रोफाइल"
   },
   "Исходящие звонки направляются строго через указанный SIP-транк или конкретный GSM-модем (например, для звонков по РФ).": {
-    "ru": "Исходящие звонки направляются строго через указанный SIP-транк или конкретный GSM-модем (например, для звонков по РФ)."
+    "ru": "Исходящие звонки направляются строго через указанный SIP-транк или конкретный GSM-модем (например, для звонков по РФ).",
+    "en": "Outbound calls route specifically through this trunk/modem.",
+    "es": "Rutas de salida a través del troncal especificado.",
+    "ar": "يتم توجيه المكالمات الصادرة بشكل صارم من خلال خط SIP محدد أو مودم GSM محدد (على سبيل المثال، للمكالمات داخل الاتحاد الروسي).",
+    "zh": "拨出呼叫严格通过指定的 SIP 中继或特定的 GSM 调制解调器进行路由（例如，对于俄罗斯联邦境内的呼叫）。",
+    "fr": "Les appels sortants sont acheminés strictement via une ligne réseau SIP spécifiée ou un modem GSM spécifique (par exemple, pour les appels au sein de la Fédération de Russie).",
+    "de": "Ausgehende Anrufe werden ausschließlich über einen bestimmten SIP-Trunk oder ein bestimmtes GSM-Modem weitergeleitet (z. B. für Anrufe innerhalb der Russischen Föderation).",
+    "pt": "As chamadas de saída são roteadas estritamente através de um tronco SIP específico ou de um modem GSM específico (por exemplo, para chamadas dentro da Federação Russa).",
+    "ja": "発信通話は、指定された SIP トランクまたは特定の GSM モデムを介して厳密にルーティングされます (たとえば、ロシア連邦内の通話の場合)。",
+    "hi": "आउटगोइंग कॉल को एक निर्दिष्ट एसआईपी ट्रंक या एक विशिष्ट जीएसएम मॉडेम (उदाहरण के लिए, रूसी संघ के भीतर कॉल के लिए) के माध्यम से सख्ती से रूट किया जाता है।"
   },
   "Протокол сквозного тестирования SHA-256": {
-    "ru": "Протокол сквозного тестирования SHA-256"
+    "ru": "Протокол сквозного тестирования SHA-256",
+    "en": "End-to-End SHA-256 Test Protocol",
+    "es": "Protocolo SHA-256",
+    "ar": "SHA-256 بروتوكول الاختبار الشامل",
+    "zh": "SHA-256 端到端测试协议",
+    "fr": "Protocole de test de bout en bout SHA-256",
+    "de": "Протокол сквозного тестирования SHA-256",
+    "pt": "Protocolo de teste ponta a ponta SHA-256",
+    "ja": "SHA-256 エンドツーエンド テスト プロトコル",
+    "hi": "SHA-256 एंड-टू-एंड परीक्षण प्रोटोकॉल"
   },
   "Gzip сжатие (-90% места)": {
-    "ru": "Gzip сжатие (-90% места)"
+    "ru": "Gzip сжатие (-90% места)",
+    "en": "Gzip compression (-90% size)",
+    "es": "Compresión Gzip",
+    "ar": "ضغط Gzip (مساحة -90%)",
+    "zh": "Gzip 压缩（-90% 空间）",
+    "fr": "Compression Gzip (-90 % d'espace)",
+    "de": "Gzip-Komprimierung (-90 % Speicherplatz)",
+    "pt": "Compressão Gzip (-90% de espaço)",
+    "ja": "Gzip 圧縮 (-90% スペース)",
+    "hi": "Gzip संपीड़न (-90% स्थान)"
   },
   "Пароль (Secret SIP)": {
-    "ru": "Пароль (Secret SIP)"
+    "ru": "Пароль (Secret SIP)",
+    "en": "Password (SIP Secret)",
+    "es": "Contraseña SIP",
+    "ar": "كلمة المرور (SIP السرية)",
+    "zh": "密码（秘密 SIP）",
+    "fr": "Mot de passe (SIP secret)",
+    "de": "Passwort (Geheimes SIP)",
+    "pt": "Senha (SIP secreto)",
+    "ja": "パスワード（シークレットSIP）",
+    "hi": "पासवर्ड (गुप्त एसआईपी)"
   },
   "Укажите ваш субдомен (например, если адрес": {
-    "ru": "Укажите ваш субдомен (например, если адрес"
+    "ru": "Укажите ваш субдомен (например, если адрес",
+    "en": "Enter your subdomain (e.g. if address is",
+    "es": "Ingrese su subdominio",
+    "ar": "حدد المجال الفرعي الخاص بك (على سبيل المثال، إذا كان العنوان",
+    "zh": "指定您的子域（例如，如果地址",
+    "fr": "Précisez votre sous-domaine (par exemple, si l'adresse",
+    "de": "Geben Sie Ihre Subdomain an (z. B. wenn die Adresse",
+    "pt": "Especifique o seu subdomínio (por exemplo, se o endereço",
+    "ja": "サブドメインを指定します (たとえば、アドレスが",
+    "hi": "अपना उपडोमेन निर्दिष्ट करें (उदाहरण के लिए, यदि पता"
   },
   "В Zendesk перейдите в": {
-    "ru": "В Zendesk перейдите в"
+    "ru": "В Zendesk перейдите в",
+    "en": "In Zendesk, navigate to",
+    "es": "En Zendesk vaya a",
+    "ar": "في Zendesk، انتقل إلى",
+    "zh": "在 Zendesk 中，转至",
+    "fr": "Dans Zendesk, accédez à",
+    "de": "Gehen Sie in Zendesk zu",
+    "pt": "No Zendesk, vá para",
+    "ja": "Zendesk で、次の場所に移動します。",
+    "hi": "ज़ेंडेस्क में, पर जाएँ"
   },
   "), в которую попадает абонент при совершении звонка. Он определяет:": {
-    "ru": "), в которую попадает абонент при совершении звонка. Он определяет:"
+    "ru": "), в которую попадает абонент при совершении звонка. Он определяет:",
+    "en": "), where caller drops in. Determines:",
+    "es": "), a donde va la llamada.",
+    "ar": ") والتي يدخلها المشترك عند إجراء مكالمة. وهو يحدد:",
+    "zh": ")，用户在拨打电话时输入。它定义：",
+    "fr": "), que l'abonné saisit lors d'un appel. Il définit :",
+    "de": "), die der Teilnehmer beim Telefonieren eingibt. Es definiert:",
+    "pt": "), que o assinante insere ao fazer uma chamada. Ele define:",
+    "ja": "）、加入者が電話をかけるときに入力します。以下を定義します。",
+    "hi": "), जिसे ग्राहक कॉल करते समय दर्ज करता है। यह परिभाषित करता है:"
   },
   "STATUS 1: ИСПОЛЬЗУЕТСЯ ИЛИ НЕТ": {
-    "ru": "STATUS 1: ИСПОЛЬЗУЕТСЯ ИЛИ НЕТ"
+    "ru": "STATUS 1: ИСПОЛЬЗУЕТСЯ ИЛИ НЕТ",
+    "en": "STATUS 1: IN USE OR NOT",
+    "es": "ESTADO 1: EN USO",
+    "ar": "الحالة 1: مستخدمة أم لا",
+    "zh": "状态 1：使用或未使用",
+    "fr": "STATUT 1 : UTILISÉ OU NON",
+    "de": "STATUS 1: VERWENDET ODER NICHT",
+    "pt": "STATUS 1: USADO OU NÃO",
+    "ja": "ステータス 1: 使用済みか未使用",
+    "hi": "स्थिति 1: उपयोग किया गया या नहीं"
   },
   "Датацентр Zoho": {
-    "ru": "Датацентр Zoho"
+    "ru": "Датацентр Zoho",
+    "en": "Zoho Datacenter",
+    "es": "Datacenter Zoho",
+    "ar": "مركز بيانات زوهو",
+    "zh": "Zoho数据中心",
+    "fr": "Centre de données Zoho",
+    "de": "Zoho-Rechenzentrum",
+    "pt": "Centro de dados Zoho",
+    "ja": "ゾーホー データセンター",
+    "hi": "ज़ोहो डेटा सेंटर"
   },
   "Тип действия": {
-    "ru": "Тип действия"
+    "ru": "Тип действия",
+    "en": "Action Type",
+    "es": "Tipo de Acción",
+    "ar": "نوع العمل",
+    "zh": "动作类型",
+    "fr": "Type d'action",
+    "de": "Aktionstyp",
+    "pt": "Tipo de ação",
+    "ja": "アクションの種類",
+    "hi": "क्रिया प्रकार"
   },
   "Разрешить прямой донабор номера (Direct Dial)": {
-    "ru": "Разрешить прямой донабор номера (Direct Dial)"
+    "ru": "Разрешить прямой донабор номера (Direct Dial)",
+    "en": "Allow Direct Dial",
+    "es": "Permitir Marcación Directa",
+    "ar": "السماح بالاتصال المباشر (الاتصال المباشر)",
+    "zh": "允许直接拨号（Direct Dial）",
+    "fr": "Autoriser la numérotation directe (numérotation directe)",
+    "de": "Direktwahl zulassen (Direktwahl)",
+    "pt": "Permitir discagem direta (discagem direta)",
+    "ja": "直接ダイヤルを許可する（ダイレクトダイヤル）",
+    "hi": "सीधे डायल करने की अनुमति दें (डायरेक्ट डायल)"
   },
   "101 — Сотрудник": {
-    "ru": "101 — Сотрудник"
+    "ru": "101 — Сотрудник",
+    "en": "101 — Employee",
+    "es": "101 — Empleado",
+    "ar": "101 - الموظف",
+    "zh": "101 - 员工",
+    "fr": "101 - Employé",
+    "de": "101 – Mitarbeiter",
+    "pt": "101 - Funcionário",
+    "ja": "101 - 従業員",
+    "hi": "101 - कर्मचारी"
   },
   "Изменение параметров провайдера связи": {
-    "ru": "Изменение параметров провайдера связи"
+    "ru": "Изменение параметров провайдера связи",
+    "en": "Change provider parameters",
+    "es": "Cambiar parámetros de proveedor",
+    "ar": "تغيير إعدادات المزود الخاص بك",
+    "zh": "更改您的提供商设置",
+    "fr": "Modification des paramètres de votre fournisseur",
+    "de": "Ändern Ihrer Provider-Einstellungen",
+    "pt": "Alterando as configurações do seu provedor",
+    "ja": "プロバイダーの設定を変更する",
+    "hi": "अपनी प्रदाता सेटिंग बदल रहा है"
   },
   "О модуле": {
-    "ru": "О модуле"
+    "ru": "О модуле",
+    "en": "About Module",
+    "es": "Sobre el Módulo",
+    "ar": "حول الوحدة",
+    "zh": "关于模块",
+    "fr": "À propos du module",
+    "de": "Über das Modul",
+    "pt": "Sobre o módulo",
+    "ja": "モジュールについて",
+    "hi": "मॉड्यूल के बारे में"
   },
   "Основной Этап воронки": {
-    "ru": "Основной Этап воронки"
+    "ru": "Основной Этап воронки",
+    "en": "Primary Pipeline Stage",
+    "es": "Etapa Principal",
+    "ar": "مرحلة القمع الرئيسية",
+    "zh": "主漏斗阶段",
+    "fr": "Étape principale de l'entonnoir",
+    "de": "Haupttrichterstufe",
+    "pt": "Estágio principal do funil",
+    "ja": "メインファネルステージ",
+    "hi": "मुख्य फ़नल चरण"
   },
   "Отправка мгновенных хуков о входящих/пропущенных звонках в автоматизации и воронки GHL.": {
-    "ru": "Отправка мгновенных хуков о входящих/пропущенных звонках в автоматизации и воронки GHL."
+    "ru": "Отправка мгновенных хуков о входящих/пропущенных звонках в автоматизации и воронки GHL.",
+    "en": "Instant hooks for inbound/missed calls to GHL automations.",
+    "es": "Hooks instantáneos a GHL.",
+    "ar": "إرسال خطافات فورية حول المكالمات الواردة/الفائتة في أتمتة GHL ومسارات التحويل.",
+    "zh": "在 GHL 自动化和渠道中发送有关来电/未接来电的即时挂钩。",
+    "fr": "Envoi de hooks instantanés sur les appels entrants/manqués dans l'automatisation et les entonnoirs GHL.",
+    "de": "Senden Sie sofortige Hooks über eingehende/verpasste Anrufe in der GHL-Automatisierung und in GHL-Trichtern.",
+    "pt": "Envio de alertas instantâneos sobre chamadas recebidas/perdidas na automação e funis GHL.",
+    "ja": "GHL オートメーションおよびファネルでの着信/不在着信に関するインスタント フックの送信。",
+    "hi": "जीएचएल ऑटोमेशन और फ़नल में इनकमिंग/मिस्ड कॉल के बारे में तुरंत जानकारी भेजना।"
   },
   "Очистить экран": {
-    "ru": "Очистить экран"
+    "ru": "Очистить экран",
+    "en": "Clear Screen",
+    "es": "Limpiar Pantalla",
+    "ar": "شاشة واضحة",
+    "zh": "清晰的屏幕",
+    "fr": "Effacer l'écran",
+    "de": "Klarer Bildschirm",
+    "pt": "Limpar tela",
+    "ja": "画面をクリアする",
+    "hi": "स्क्रीन साफ़ करें"
   },
   "Сохранить настройки Speech AI": {
-    "ru": "Сохранить настройки Speech AI"
+    "ru": "Сохранить настройки Speech AI",
+    "en": "Save Speech AI Settings",
+    "es": "Guardar Ajustes IA",
+    "ar": "حفظ إعدادات الكلام AI",
+    "zh": "保存语音 AI 设置",
+    "fr": "Enregistrer les paramètres de l'IA vocale",
+    "de": "Speichern Sie die Sprach-KI-Einstellungen",
+    "pt": "Salvar configurações de Speech AI",
+    "ja": "音声AI設定の保存",
+    "hi": "स्पीच एआई सेटिंग्स सहेजें"
   },
   "Создайте входящий вебхук с правами «Телефония (telephony)» и «CRM (crm)» в кабинете Битрикс24.": {
-    "ru": "Создайте входящий вебхук с правами «Телефония (telephony)» и «CRM (crm)» в кабинете Битрикс24."
+    "ru": "Создайте входящий вебхук с правами «Телефония (telephony)» и «CRM (crm)» в кабинете Битрикс24.",
+    "en": "Create incoming webhook with Telephony and CRM permissions in Bitrix24.",
+    "es": "Crear webhook en Bitrix24.",
+    "ar": "قم بإنشاء خطاف ويب وارد بحقوق \"الاتصالات الهاتفية (الاتصالات الهاتفية)\" و\"CRM (crm)\" في حساب Bitrix24 الخاص بك.",
+    "zh": "在您的 Bitrix24 帐户中创建具有“Telephony（电话）”和“CRM（crm）”权限的传入 Webhook。",
+    "fr": "Créez un webhook entrant avec les droits « Téléphonie (téléphonie) » et « CRM (crm) » dans votre compte Bitrix24.",
+    "de": "Erstellen Sie in Ihrem Bitrix24-Konto einen eingehenden Webhook mit den Rechten „Telefonie (Telefonie)“ und „CRM (crm)“.",
+    "pt": "Crie um webhook de entrada com os direitos “Telefonia (telefonia)” e “CRM (crm)” em sua conta Bitrix24.",
+    "ja": "Bitrix24 アカウントに「Telephony (テレフォニー)」および「CRM (crm)」権限を持つ受信 Webhook を作成します。",
+    "hi": "अपने Bitrix24 खाते में \"टेलीफोनी (टेलीफोनी)\" और \"सीआरएम (सीआरएम)\" अधिकारों के साथ एक इनकमिंग वेबहुक बनाएं।"
   },
   "Субдомен: https://mrvasilich.amocrm.ru": {
-    "ru": "Субдомен: https://mrvasilich.amocrm.ru"
+    "ru": "Субдомен: https://mrvasilich.amocrm.ru",
+    "en": "Subdomain: https://mrvasilich.amocrm.ru",
+    "es": "Subdominio",
+    "ar": "النطاق الفرعي: https://mrvasilich.amocrm.ru",
+    "zh": "子域名：https://mrvasilich.amocrm.ru",
+    "fr": "Sous-domaine : https://mrvasilich.amocrm.ru",
+    "de": "Subdomain: https://mrvasilich.amocrm.ru",
+    "pt": "Subdomínio: https://mrvasilich.amocrm.ru",
+    "ja": "サブドメイン: https://mrvasilich.amocrm.ru",
+    "hi": "उपडोमेन: https://mrvasilich.amocrm.ru"
   },
   "🔒 Локальный Faster-Whisper (На сервере, без отправки в облако)": {
-    "ru": "🔒 Локальный Faster-Whisper (На сервере, без отправки в облако)"
+    "ru": "🔒 Локальный Faster-Whisper (На сервере, без отправки в облако)",
+    "en": "🔒 Local Faster-Whisper (On Server)",
+    "es": "Faster-Whisper Local",
+    "ar": "🔒 الهمس المحلي الأسرع (على الخادم، دون الإرسال إلى السحابة)",
+    "zh": "🔒本地Faster-Whisper（在服务器上，无需发送到云端）",
+    "fr": "🔒 Local Faster-Whisper (Sur le serveur, sans envoi vers le cloud)",
+    "de": "🔒 Local Faster-Whisper (Auf dem Server, ohne an die Cloud zu senden)",
+    "pt": "🔒 Local Faster-Whisper (No servidor, sem enviar para a nuvem)",
+    "ja": "🔒 Local Faster-Whisper (クラウドに送信せず、サーバー上で)",
+    "hi": "🔒 लोकल फास्टर-व्हिस्पर (सर्वर पर, क्लाउड पर भेजे बिना)"
   },
   "Рейтинг сообщества": {
-    "ru": "Рейтинг сообщества"
+    "ru": "Рейтинг сообщества",
+    "en": "Community Rating",
+    "es": "Calificación",
+    "ar": "تصنيف المجتمع",
+    "zh": "社区评级",
+    "fr": "Évaluation de la communauté",
+    "de": "Community-Bewertung",
+    "pt": "Avaliação da comunidade",
+    "ja": "コミュニティの評価",
+    "hi": "सामुदायिक रेटिंग"
   },
   "STATUS 2: АВТОРИЗОВАН, НЕТ, ИДЕТ ПОДКЛЮЧЕНИЕ": {
-    "ru": "STATUS 2: АВТОРИЗОВАН, НЕТ, ИДЕТ ПОДКЛЮЧЕНИЕ"
+    "ru": "STATUS 2: АВТОРИЗОВАН, НЕТ, ИДЕТ ПОДКЛЮЧЕНИЕ",
+    "en": "STATUS 2: AUTH, NO, CONNECTING",
+    "es": "ESTADO 2",
+    "ar": "الحالة 2: مرخص، لا، متصل",
+    "zh": "状态 2：已授权，否，正在连接",
+    "fr": "ÉTAT 2 : AUTORISÉ, NON, CONNEXION",
+    "de": "STATUS 2: AUTORISIERT, NEIN, VERBINDUNG WIRD HERGESTELLT",
+    "pt": "STATUS 2: AUTORIZADO, NÃO, CONECTANDO",
+    "ja": "ステータス 2: 承認済み、いいえ、接続中",
+    "hi": "स्थिति 2: अधिकृत, नहीं, कनेक्ट हो रहा है"
   },
   "Установлен": {
-    "ru": "Установлен"
+    "ru": "Установлен",
+    "en": "Installed",
+    "es": "Instalado",
+    "ar": "تم التثبيت",
+    "zh": "已安装",
+    "fr": "Installé",
+    "de": "Installiert",
+    "pt": "Instalado",
+    "ja": "インストール済み",
+    "hi": "स्थापित"
   },
   "Войти с аккаунтом Google": {
-    "ru": "Войти с аккаунтом Google"
+    "ru": "Войти с аккаунтом Google",
+    "en": "Sign in with Google",
+    "es": "Iniciar con Google",
+    "ar": "تسجيل الدخول باستخدام حساب جوجل",
+    "zh": "使用 Google 帐户登录",
+    "fr": "Connectez-vous avec un compte Google",
+    "de": "Melden Sie sich mit einem Google-Konto an",
+    "pt": "Faça login com a conta do Google",
+    "ja": "Googleアカウントでサインイン",
+    "hi": "Google खाते से साइन इन करें"
   },
   "amoCRM & Сделки": {
-    "ru": "amoCRM & Сделки"
+    "ru": "amoCRM & Сделки",
+    "en": "amoCRM & Deals",
+    "es": "amoCRM & Tratos",
+    "ar": "amoCRM والمعاملات",
+    "zh": "amoCRM 和交易",
+    "fr": "amoCRM et transactions",
+    "de": "amoCRM & Transaktionen",
+    "pt": "amoCRM e transações",
+    "ja": "amoCRMとトランザクション",
+    "hi": "एमोसीआरएम और लेनदेन"
   },
   "Минимальная длина звонка (сек)": {
-    "ru": "Минимальная длина звонка (сек)"
+    "ru": "Минимальная длина звонка (сек)",
+    "en": "Min call length (sec)",
+    "es": "Largo mínimo",
+    "ar": "الحد الأدنى لطول المكالمة (ثانية)",
+    "zh": "最短通话时长（秒）",
+    "fr": "Durée minimale de l'appel (sec)",
+    "de": "Mindestanruflänge (Sek.)",
+    "pt": "Duração mínima da chamada (seg)",
+    "ja": "最小通話時間 (秒)",
+    "hi": "न्यूनतम कॉल अवधि (सेकंड)"
   },
   "Сохранить настройки HubSpot": {
-    "ru": "Сохранить настройки HubSpot"
+    "ru": "Сохранить настройки HubSpot",
+    "en": "Save HubSpot Settings",
+    "es": "Guardar HubSpot",
+    "ar": "احفظ إعدادات HubSpot",
+    "zh": "保存 HubSpot 设置",
+    "fr": "Enregistrer les paramètres HubSpot",
+    "de": "Speichern Sie die HubSpot-Einstellungen",
+    "pt": "Salvar configurações do HubSpot",
+    "ja": "HubSpot 設定を保存する",
+    "hi": "हबस्पॉट सेटिंग्स सहेजें"
   },
   "Создать группу": {
-    "ru": "Создать группу"
+    "ru": "Создать группу",
+    "en": "Create Group",
+    "es": "Crear Grupo",
+    "ar": "إنشاء مجموعة",
+    "zh": "创建一个群组",
+    "fr": "Créer un groupe",
+    "de": "Erstellen Sie eine Gruppe",
+    "pt": "Crie um grupo",
+    "ja": "グループを作成する",
+    "hi": "एक समूह बनाएं"
   },
   "Интерактивный IVR Конструктор": {
-    "ru": "Интерактивный IVR Конструктор"
+    "ru": "Интерактивный IVR Конструктор",
+    "en": "Interactive IVR Builder",
+    "es": "Constructor IVR",
+    "ar": "منشئ IVR التفاعلي",
+    "zh": "交互式 IVR 构造器",
+    "fr": "Constructeur IVR interactif",
+    "de": "Interaktiver IVR-Konstruktor",
+    "pt": "Construtor IVR interativo",
+    "ja": "インタラクティブ IVR コンストラクター",
+    "hi": "इंटरएक्टिव आईवीआर कंस्ट्रक्टर"
   },
   "Пример применения": {
-    "ru": "Пример применения"
+    "ru": "Пример применения",
+    "en": "Example usage",
+    "es": "Ejemplo de uso",
+    "ar": "مثال التطبيق",
+    "zh": "应用实例",
+    "fr": "Exemple d'application",
+    "de": "Anwendungsbeispiel",
+    "pt": "Exemplo de aplicação",
+    "ja": "応用例",
+    "hi": "आवेदन उदाहरण"
   },
   "Автоматическое приведение номеров к международному формату E.164 (+7..., +971..., +1...)": {
-    "ru": "Автоматическое приведение номеров к международному формату E.164 (+7..., +971..., +1...)"
+    "ru": "Автоматическое приведение номеров к международному формату E.164 (+7..., +971..., +1...)",
+    "en": "Automatic E.164 formatting",
+    "es": "Formato Automático E.164",
+    "ar": "التحويل التلقائي للأرقام إلى التنسيق الدولي E.164 (+7...، +971...، +1...)",
+    "zh": "自动将号码转换为国际 E.164 格式（+7...、+971...、+1...）",
+    "fr": "Conversion automatique des nombres au format international E.164 (+7..., +971..., +1...)",
+    "de": "Automatische Konvertierung von Nummern in das internationale E.164-Format (+7..., +971..., +1...)",
+    "pt": "Conversão automática de números para o formato internacional E.164 (+7..., +971..., +1...)",
+    "ja": "番号を国際 E.164 形式に自動変換 (+7...、+971...、+1...)",
+    "hi": "संख्याओं का अंतर्राष्ट्रीय E.164 प्रारूप में स्वचालित रूपांतरण (+7..., +971..., +1...)"
   },
   "Встроенный Proxy / Обход блокировок": {
-    "ru": "Встроенный Proxy / Обход блокировок"
+    "ru": "Встроенный Proxy / Обход блокировок",
+    "en": "Built-in Proxy / Anti-Ban",
+    "es": "Proxy Integrado",
+    "ar": "المدمج في الوكيل / تجاوز الكتلة",
+    "zh": "内置代理/块绕过",
+    "fr": "Proxy intégré / contournement de bloc",
+    "de": "Integrierter Proxy/Block-Bypass",
+    "pt": "Proxy integrado / desvio de bloco",
+    "ja": "内蔵プロキシ/ブロックバイパス",
+    "hi": "अंतर्निहित प्रॉक्सी/ब्लॉक बाईपास"
   },
   "Отключить выполнение модуля (сохраняя настройки)": {
-    "ru": "Отключить выполнение модуля (сохраняя настройки)"
+    "ru": "Отключить выполнение модуля (сохраняя настройки)",
+    "en": "Disable module (keep settings)",
+    "es": "Desactivar módulo"
   },
   "Таймаут: 30 сек": {
-    "ru": "Таймаут: 30 сек"
+    "ru": "Таймаут: 30 сек",
+    "en": "Timeout: 30 sec",
+    "es": "Timeout: 30 seg"
   },
   "Настройка воронок для каждого оператора / добавочного номера:": {
-    "ru": "Настройка воронок для каждого оператора / добавочного номера:"
+    "ru": "Настройка воронок для каждого оператора / добавочного номера:",
+    "en": "Pipeline config per operator:",
+    "es": "Configuración de embudo:"
   },
   "Создайте группу для алертов (или напишите боту в ЛС) и добавьте бота в чат.": {
-    "ru": "Создайте группу для алертов (или напишите боту в ЛС) и добавьте бота в чат."
+    "ru": "Создайте группу для алертов (или напишите боту в ЛС) и добавьте бота в чат.",
+    "en": "Create alert group and add bot.",
+    "es": "Añadir bot al grupo."
   },
   "Название группы / Отдела": {
-    "ru": "Название группы / Отдела"
+    "ru": "Название группы / Отдела",
+    "en": "Group / Dept Name",
+    "es": "Nombre de Grupo"
   },
   "Завершение вызова (Hangup)": {
-    "ru": "Завершение вызова (Hangup)"
+    "ru": "Завершение вызова (Hangup)",
+    "en": "Hangup",
+    "es": "Colgar"
   },
   "в поле ниже.": {
-    "ru": "в поле ниже."
+    "ru": "в поле ниже.",
+    "en": "in the field below.",
+    "es": "abajo."
   },
   "Скачать .ovpn": {
-    "ru": "Скачать .ovpn"
+    "ru": "Скачать .ovpn",
+    "en": "Download .ovpn",
+    "es": "Descargar .ovpn"
   },
   "Окно проверки (Find Time, сек)": {
-    "ru": "Окно проверки (Find Time, сек)"
+    "ru": "Окно проверки (Find Time, сек)",
+    "en": "Find Time Window (sec)",
+    "es": "Ventana de Tiempo (seg)"
   },
   "Уведомления о пропущенных звонках": {
-    "ru": "Уведомления о пропущенных звонках"
+    "ru": "Уведомления о пропущенных звонках",
+    "en": "Missed Call Notifications",
+    "es": "Notificaciones de llamadas perdidas"
   },
   "(например,": {
-    "ru": "(например,"
+    "ru": "(например,",
+    "en": "(e.g.",
+    "es": "(ej."
   },
   "Авторизуйтесь через официальный аккаунт Google для архивации звонков.": {
-    "ru": "Авторизуйтесь через официальный аккаунт Google для архивации звонков."
+    "ru": "Авторизуйтесь через официальный аккаунт Google для архивации звонков.",
+    "en": "Sign in via official Google account for call archiving.",
+    "es": "Iniciar con Google"
   },
   "Активировать модуль Pipedrive": {
-    "ru": "Активировать модуль Pipedrive"
+    "ru": "Активировать модуль Pipedrive",
+    "en": "Activate Pipedrive",
+    "es": "Activar Pipedrive"
   },
   "Включить обработку нерабочего времени": {
-    "ru": "Включить обработку нерабочего времени"
+    "ru": "Включить обработку нерабочего времени",
+    "en": "Enable off-hours routing",
+    "es": "Habilitar horario no laboral"
   },
   "Описание возможностей плагина.": {
-    "ru": "Описание возможностей плагина."
+    "ru": "Описание возможностей плагина.",
+    "en": "Plugin features description.",
+    "es": "Descripción del plugin."
   },
   "Как настроить бота и получить Chat ID:": {
-    "ru": "Как настроить бота и получить Chat ID:"
+    "ru": "Как настроить бота и получить Chat ID:",
+    "en": "How to configure bot and get Chat ID:",
+    "es": "Obtener Chat ID:"
   },
   "Белый список IP-адресов (Whitelist / Ignore IP)": {
-    "ru": "Белый список IP-адресов (Whitelist / Ignore IP)"
+    "ru": "Белый список IP-адресов (Whitelist / Ignore IP)",
+    "en": "IP Whitelist (Ignore IP)",
+    "es": "Lista Blanca IP"
   },
   "86400 сек = блокировка на 24 часа": {
-    "ru": "86400 сек = блокировка на 24 часа"
+    "ru": "86400 сек = блокировка на 24 часа",
+    "en": "86400 sec = 24h ban",
+    "es": "86400 seg = 24h"
   },
   "Техническая поддержка (Support)": {
-    "ru": "Техническая поддержка (Support)"
+    "ru": "Техническая поддержка (Support)",
+    "en": "Technical Support",
+    "es": "Soporte"
   },
   "История вызовов активна": {
     "ru": "История вызовов активна"
   },
   "Редактирование абонента": {
-    "ru": "Редактирование абонента"
+    "ru": "Редактирование абонента",
+    "en": "Edit Extension",
+    "es": "Editar Extensión"
   },
   "Фоновые процессы, хуки и выполнение обработчиков приостановлены. Все настройки и учетные данные сохранены.": {
-    "ru": "Фоновые процессы, хуки и выполнение обработчиков приостановлены. Все настройки и учетные данные сохранены."
+    "ru": "Фоновые процессы, хуки и выполнение обработчиков приостановлены. Все настройки и учетные данные сохранены.",
+    "en": "Background hooks paused. Data saved.",
+    "es": "Ganchos pausados."
   },
   "Категория": {
-    "ru": "Категория"
+    "ru": "Категория",
+    "en": "Category",
+    "es": "Categoría"
   },
   "Обновить список воронок": {
-    "ru": "Обновить список воронок"
+    "ru": "Обновить список воронок",
+    "en": "Refresh Pipelines",
+    "es": "Actualizar Embudos"
   },
   "$\\rightarrow$ Нажмите": {
-    "ru": "$\\rightarrow$ Нажмите"
+    "ru": "$\\rightarrow$ Нажмите",
+    "en": "$\\rightarrow$ Click",
+    "es": "$\\rightarrow$ Clic"
   },
   "Лицензионный ключ": {
-    "ru": "Лицензионный ключ"
+    "ru": "Лицензионный ключ",
+    "en": "License Key",
+    "es": "Clave de Licencia"
   },
   "Заблокированный IP": {
-    "ru": "Заблокированный IP"
+    "ru": "Заблокированный IP",
+    "en": "Banned IP",
+    "es": "IP Bloqueada"
   },
   ", скопируйте полученный": {
-    "ru": ", скопируйте полученный"
+    "ru": ", скопируйте полученный",
+    "en": ", copy the generated",
+    "es": ", copie el"
   },
   "50 MB (Рекомендуется)": {
-    "ru": "50 MB (Рекомендуется)"
+    "ru": "50 MB (Рекомендуется)",
+    "en": "50 MB (Recommended)",
+    "es": "50 MB (Recomendado)"
   },
   "Включить модуль в работу": {
-    "ru": "Включить модуль в работу"
+    "ru": "Включить модуль в работу",
+    "en": "Enable Module",
+    "es": "Habilitar Módulo"
   },
   "Внутренние номера сотрудников, группы одновременного и поочередного вызова.": {
-    "ru": "Внутренние номера сотрудников, группы одновременного и поочередного вызова."
+    "ru": "Внутренние номера сотрудников, группы одновременного и поочередного вызова.",
+    "en": "Employee extensions and ring groups.",
+    "es": "Extensiones y grupos."
   },
   "Имя (CallerID Name):": {
-    "ru": "Имя (CallerID Name):"
+    "ru": "Имя (CallerID Name):",
+    "en": "Name (CallerID Name):",
+    "es": "Nombre (CallerID):"
   },
   "Создайте Private App в HubSpot с разрешениями": {
     "ru": "Создайте Private App в HubSpot с разрешениями"
@@ -2624,9 +3136,7 @@
     "ru": "Транспорт"
   },
   "срабатывает при ошибочном вводе, а": {
-    "ru": "срабатывает при ошибочном вводе, а",
-    "en": "triggers on invalid input, and",
-    "es": "se activa por entrada no válida, y"
+    "ru": "срабатывает при ошибочном вводе, а"
   },
   "Таймаут: 20 сек": {
     "ru": "Таймаут: 20 сек"
@@ -2743,9 +3253,7 @@
     "ru": "Логи в реальном времени"
   },
   "Целевые узлы назначения. Переводят звонок на конкретного сотрудника (101, 102) или запускают параллельный вызов группы операторов.": {
-    "ru": "Целевые узлы назначения. Переводят звонок на конкретного сотрудника (101, 102) или запускают параллельный вызов группы операторов.",
-    "en": "Target destination nodes. Routes the call to a specific employee (101, 102) or triggers a ring group for operators.",
-    "es": "Nodos de destino. Enruta la llamada a un empleado específico o activa un grupo de timbre para operadores."
+    "ru": "Целевые узлы назначения. Переводят звонок на конкретного сотрудника (101, 102) или запускают параллельный вызов группы операторов."
   },
   "OpenVPN (IP-Телефоны Yealink / Grandstream)": {
     "ru": "OpenVPN (IP-Телефоны Yealink / Grandstream)"
@@ -2850,9 +3358,7 @@
     "ru": "Центрировать"
   },
   "Руководство по архитектуре блоков и логике маршрутизации": {
-    "ru": "Руководство по архитектуре блоков и логике маршрутизации",
-    "en": "Guide to Block Architecture and Routing Logic",
-    "es": "Guía de Arquitectura de Bloques y Lógica de Enrutamiento"
+    "ru": "Руководство по архитектуре блоков и логике маршрутизации"
   },
   "Отправлять расшифровку и резюме в примечание сделки amoCRM": {
     "ru": "Отправлять расшифровку и резюме в примечание сделки amoCRM"
@@ -2888,9 +3394,7 @@
     "ru": "Выберите участников группы (Абонентов):"
   },
   "Автоматическая компиляция:": {
-    "ru": "Автоматическая компиляция:",
-    "en": "Automatic compilation:",
-    "es": "Compilación automática:"
+    "ru": "Автоматическая компиляция:"
   },
   "При переходе на панель с внешних IP потребуется ввести пароль": {
     "ru": "При переходе на панель с внешних IP потребуется ввести пароль"
@@ -2935,9 +3439,7 @@
     "ru": "Автоматическая расшифровка звонков (Speech-to-Text), разделение реплик оператора и клиента (Диаризация L/R) и нейросетевой анализ качества диалога."
   },
   "Ветки отказоустойчивости: клавиша": {
-    "ru": "Ветки отказоустойчивости: клавиша",
-    "en": "Failover branches: key",
-    "es": "Ramas de conmutación por error: tecla"
+    "ru": "Ветки отказоустойчивости: клавиша"
   },
   "600 сек = в течение 10 минут": {
     "ru": "600 сек = в течение 10 минут"
@@ -2958,9 +3460,7 @@
     "ru": "Офисный Grandstream GXP1625 (Абонент 102)"
   },
   "Если звонящий не выбрал пункт за указанный таймаут (сек), система повторит меню заданное число раз (Retries) или переведет звонок по ветке [t].": {
-    "ru": "Если звонящий не выбрал пункт за указанный таймаут (сек), система повторит меню заданное число раз (Retries) или переведет звонок по ветке [t].",
-    "en": "If the caller does not select an option within the timeout, the system will retry (Retries) or route to the [t] branch.",
-    "es": "Si el que llama no selecciona una opción en el tiempo de espera, el sistema reintentará o enrutará a la rama [t]."
+    "ru": "Если звонящий не выбрал пункт за указанный таймаут (сек), система повторит меню заданное число раз (Retries) или переведет звонок по ветке [t]."
   },
   "Голосовая почта (Voicemail)": {
     "ru": "Голосовая почта (Voicemail)"
@@ -2969,11 +3469,7 @@
     "ru": "Изменение номера, имени и пароля"
   },
   "Администрирование": {
-    "ru": "Администрирование",
-    "en": "Administration",
-    "es": "Administración",
-    "ar": "الإدارة",
-    "zh": "管理"
+    "ru": "Администрирование"
   },
   "История входящих и исходящих соединений, длительность и записи разговоров": {
     "ru": "История входящих и исходящих соединений, длительность и записи разговоров"
@@ -3018,9 +3514,7 @@
     "ru": "Хост / Домен сервера"
   },
   "2. Голосовое Меню (IVR)": {
-    "ru": "2. Голосовое Меню (IVR)",
-    "en": "2. Voice Menu (IVR)",
-    "es": "2. Menú de Voz (IVR)"
+    "ru": "2. Голосовое Меню (IVR)"
   },
   ") и вставьте в поле ниже.": {
     "ru": ") и вставьте в поле ниже."
@@ -3032,9 +3526,7 @@
     "ru": "🌐 Общий сценарий (По умолчанию)"
   },
   "1. Входящий SIP-Транк": {
-    "ru": "1. Входящий SIP-Транк",
-    "en": "1. Inbound SIP Trunk",
-    "es": "1. Troncal SIP Entrante"
+    "ru": "1. Входящий SIP-Транк"
   },
   "Доверенные IP-адреса офиса и SIP-провайдеров, которые никогда не будут заблокированы (через запятую или пробел).": {
     "ru": "Доверенные IP-адреса офиса и SIP-провайдеров, которые никогда не будут заблокированы (через запятую или пробел)."
@@ -3046,9 +3538,7 @@
     "ru": "отображается на дисплеях телефонов коллег при звонке и автоматически привязывается к карточке сделки в CRM (например,"
   },
   "Как блоки взаимодействуют между собой (Алгоритм потока звонка)": {
-    "ru": "Как блоки взаимодействуют между собой (Алгоритм потока звонка)",
-    "en": "How Blocks Interact (Call Flow Algorithm)",
-    "es": "Cómo Interactúan los Bloques (Algoritmo de Flujo de Llamadas)"
+    "ru": "Как блоки взаимодействуют между собой (Алгоритм потока звонка)"
   },
   "Принудительная линия:": {
     "ru": "Принудительная линия:"
@@ -3180,9 +3670,7 @@
     "ru": "Статус защиты:"
   },
   "Потяните за круглый порт справа от блока к любому другому блоку, чтобы задать правило перехода при нажатии клавиши DTMF.": {
-    "ru": "Потяните за круглый порт справа от блока к любому другому блоку, чтобы задать правило перехода при нажатии клавиши DTMF.",
-    "en": "Drag from the circular port on the right of a block to another block to set routing rules for DTMF key presses.",
-    "es": "Arrastre desde el puerto circular a la derecha de un bloque a otro para configurar reglas de enrutamiento DTMF."
+    "ru": "Потяните за круглый порт справа от блока к любому другому блоку, чтобы задать правило перехода при нажатии клавиши DTMF."
   },
   "Модуль «Neural Speech AI (Whisper & LLM)» временно отключен": {
     "ru": "Модуль «Neural Speech AI (Whisper & LLM)» временно отключен"
@@ -3191,9 +3679,7 @@
     "ru": "Источник:"
   },
   "4. Обработчики [i] и [t]": {
-    "ru": "4. Обработчики [i] и [t]",
-    "en": "4. Handlers [i] and [t]",
-    "es": "4. Manejadores [i] y [t]"
+    "ru": "4. Обработчики [i] и [t]"
   },
   "Контекст вызовов (Диалплан)": {
     "ru": "Контекст вызовов (Диалплан)"
@@ -3334,9 +3820,7 @@
     "ru": "Моментальное оповещение руководства и дежурных операторов о событиях телефонии, пропущенных лидах, взломах и системных инцидентах прямо в Telegram-чаты."
   },
   "Воспроизводит аудиоприветствие, ожидает нажатия DTMF клавиши (0-9, *, #) и обрабатывает прямой донабор номера (Direct Dial).": {
-    "ru": "Воспроизводит аудиоприветствие, ожидает нажатия DTMF клавиши (0-9, *, #) и обрабатывает прямой донабор номера (Direct Dial).",
-    "en": "Plays an audio greeting, waits for DTMF input (0-9, *, #), and processes direct dialing to extensions.",
-    "es": "Reproduce un saludo de audio, espera la entrada DTMF y procesa la marcación directa a extensiones."
+    "ru": "Воспроизводит аудиоприветствие, ожидает нажатия DTMF клавиши (0-9, *, #) и обрабатывает прямой донабор номера (Direct Dial)."
   },
   "📞 По входящему каналу / SIP-транку / GSM модему": {
     "ru": "📞 По входящему каналу / SIP-транку / GSM модему"
@@ -3670,15 +4154,5 @@
   },
   "Инструкция по подключению Zoho CRM:": {
     "ru": "Инструкция по подключению Zoho CRM:"
-  },
-  "3. SIP Extensions и Группы": {
-    "ru": "3. SIP Extensions и Группы",
-    "en": "3. SIP Extensions and Groups",
-    "es": "3. Extensiones SIP y Grupos"
-  },
-  "Потяните за кружок справа от блока, чтобы протянуть стрелку | Правый клик открывает меню": {
-    "ru": "Потяните за кружок справа от блока, чтобы протянуть стрелку | Правый клик открывает меню",
-    "en": "Pull the circle on the right of the block to draw an arrow | Right-click opens the menu",
-    "es": "Tire del círculo a la derecha del bloque para dibujar una flecha | Clic derecho abre el menú"
   }
 }
