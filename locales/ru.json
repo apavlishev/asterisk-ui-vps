@@ -110,5 +110,8 @@
   "security_status": "Безопасность & Защита",
   "system_resources": "Ресурсы Сервера",
   "nav_admin": "АДМИНИСТРИРОВАНИЕ",
-  "nav_license": "Лицензия & OTA"
+  "nav_license": "Лицензия & OTA",
+  "btn_delete_node": "Удалить блок",
+  "btn_cancel": "Отмена",
+  "btn_save_node": "Сохранить блок"
 }

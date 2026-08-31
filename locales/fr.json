@@ -108,5 +108,8 @@
   "security_status": "Security & Firewall",
   "system_resources": "System Resources",
   "nav_admin": "ADMINISTRATION",
-  "nav_license": "Licence & OTA"
+  "nav_license": "Licence & OTA",
+  "btn_delete_node": "Delete Node",
+  "btn_cancel": "Cancel",
+  "btn_save_node": "Save Node"
 }

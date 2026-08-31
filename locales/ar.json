@@ -108,5 +108,8 @@
   "security_status": "الأمان وجدار الحماية",
   "system_resources": "موارد النظام",
   "nav_admin": "إدارة",
-  "nav_license": "ترخيص و OTA"
+  "nav_license": "ترخيص و OTA",
+  "btn_delete_node": "Delete Node",
+  "btn_cancel": "Cancel",
+  "btn_save_node": "Save Node"
 }

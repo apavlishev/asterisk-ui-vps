@@ -2886,5 +2886,8 @@
     "en": "Gateway Offline"
   },
   "nav_admin": "ADMINISTRATION",
-  "nav_license": "License & OTA"
+  "nav_license": "License & OTA",
+  "btn_delete_node": "Delete Node",
+  "btn_cancel": "Cancel",
+  "btn_save_node": "Save Node"
 }

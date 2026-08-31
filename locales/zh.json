@@ -108,5 +108,8 @@
   "security_status": "安全防护与防火墙",
   "system_resources": "系统资源",
   "nav_admin": "行政",
-  "nav_license": "许可证和 OTA"
+  "nav_license": "许可证和 OTA",
+  "btn_delete_node": "Delete Node",
+  "btn_cancel": "Cancel",
+  "btn_save_node": "Save Node"
 }
