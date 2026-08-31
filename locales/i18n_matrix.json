@@ -4324,5 +4324,30 @@
     "ru": "Потяните за кружок справа от блока, чтобы протянуть стрелку | Правый клик открывает меню",
     "en": "Pull the circle on the right of the block to draw an arrow | Right-click opens the menu",
     "es": "Tire del círculo a la derecha del bloque para dibujar una flecha | Clic derecho abre el menú"
+  },
+  "Правила регистрации (Registration), авторизация по IP и маршрутизация входящих вызовов (Inbound Context).": {
+    "ru": "Правила регистрации (Registration), авторизация по IP и маршрутизация входящих вызовов (Inbound Context).",
+    "en": "Registration rules, IP-based authorization, and inbound call routing (Inbound Context).",
+    "es": "Reglas de registro, autorización basada en IP y enrutamiento de llamadas entrantes."
+  },
+  "1. Авторизация и Регистрация": {
+    "ru": "1. Авторизация и Регистрация",
+    "en": "1. Authorization & Registration",
+    "es": "1. Autorización y Registro"
+  },
+  "Если провайдер выдал логин и пароль, Asterisk должен отправить запрос REGISTER. Если используется привязка к статическому IP, поле пароля остается пустым.": {
+    "ru": "Если провайдер выдал логин и пароль, Asterisk должен отправить запрос REGISTER. Если используется привязка к статическому IP, поле пароля остается пустым.",
+    "en": "If the provider gave a login and password, Asterisk must send a REGISTER request. If static IP binding is used, the password field remains empty.",
+    "es": "Si el proveedor le dio un usuario y contraseña, Asterisk debe enviar REGISTER. Si se usa IP estática, la contraseña queda vacía."
+  },
+  "2. Контекст вызовов (Context)": {
+    "ru": "2. Контекст вызовов (Context)",
+    "en": "2. Call Context",
+    "es": "2. Contexto de Llamadas"
+  },
+  "По умолчанию входящие звонки направляются в контекст <b>from-trunk</b>, который передает вызов в модуль IVR (Голосовое меню) для дальнейшей обработки.": {
+    "ru": "По умолчанию входящие звонки направляются в контекст <b>from-trunk</b>, который передает вызов в модуль IVR (Голосовое меню) для дальнейшей обработки.",
+    "en": "By default, incoming calls are routed to the <b>from-trunk</b> context, which passes the call to the IVR module for further processing.",
+    "es": "Por defecto, las llamadas entrantes van al contexto <b>from-trunk</b>, que las pasa al IVR para ser procesadas."
   }
 }
