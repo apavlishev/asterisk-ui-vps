@@ -29,7 +29,7 @@ def get_installed_plugins(lang="en"):
             try:
                 with open(manifest_path, 'r', encoding='utf-8') as f:
                     meta = json.load(f)
-meta['dir_name'] = entry
+                meta['dir_name'] = entry
                 meta['is_installed'] = True
                 meta['has_settings'] = os.path.exists(os.path.join(entry_path, 'settings.html'))
                 
