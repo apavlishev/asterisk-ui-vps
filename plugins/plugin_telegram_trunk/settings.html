@@ -12,17 +12,65 @@
 
         <div class="mt-6 space-y-6">
             <!-- Documentation -->
-            <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-on-surface-variant leading-relaxed">
-                <p class="font-bold text-blue-500 mb-2 flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[16px]">info</span> Инструкция по настройке:
-                </p>
-                <ol class="list-decimal pl-4 space-y-1">
-                    <li class="tg-translate">Перейдите на официальный портал <a href="https://my.telegram.org/" target="_blank" class="text-blue-500 hover:underline">my.telegram.org</a>.</li>
-                    <li class="tg-translate">Авторизуйтесь по номеру телефона, который будет использоваться как SIP-транк.</li>
-                    <li class="tg-translate">Перейдите в раздел <b>API development tools</b> и создайте приложение (App).</li>
-                    <li class="tg-translate">Скопируйте <b>App api_id</b> и <b>App api_hash</b> и вставьте их в поля ниже.</li>
-                    <li class="tg-translate">Введите номер телефона, запросите код и завершите авторизацию.</li>
-                </ol>
+            <div class="p-5 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-xs text-on-surface-variant leading-relaxed space-y-4">
+                <div>
+                    <h4 class="font-bold text-blue-500 mb-2 flex items-center gap-1.5 text-sm">
+                        <span class="material-symbols-outlined text-[18px]">info</span> 
+                        <span class="tg-translate">Инструкция по настройке транка</span>
+                    </h4>
+                    <p class="mb-3 tg-translate">Для работы Telegram SIP Trunk необходимо авторизовать аккаунт (MTProto) и настроить ядро Asterisk на прием звонков с локального шлюза.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Шаг 1 -->
+                    <div>
+                        <h5 class="font-bold text-on-surface mb-2 tg-translate">Шаг 1: Авторизация Telegram</h5>
+                        <ol class="list-decimal pl-4 space-y-1">
+                            <li class="tg-translate">Перейдите на <a href="https://my.telegram.org/" target="_blank" class="text-blue-500 hover:underline">my.telegram.org</a>.</li>
+                            <li class="tg-translate">Авторизуйтесь по номеру транка.</li>
+                            <li class="tg-translate">Перейдите в <b>API development tools</b>.</li>
+                            <li class="tg-translate">Скопируйте <b>api_id</b> и <b>api_hash</b>.</li>
+                            <li class="tg-translate">Внесите их ниже, запросите код и войдите.</li>
+                        </ol>
+                    </div>
+
+                    <!-- Шаг 2 -->
+                    <div>
+                        <h5 class="font-bold text-on-surface mb-2 tg-translate">Шаг 2: Безопасность и Порты</h5>
+                        <p class="tg-translate mb-1">
+                            Транзитный шлюз <code>tg2sip</code> разворачивается в Docker и биндится <b>СТРОГО на localhost (127.0.0.1)</b>. 
+                        </p>
+                        <p class="tg-translate">
+                            Порт <code class="font-bold">5062</code> (или любой выбранный ниже) недоступен из интернета. Asterisk обращается к шлюзу напрямую внутри сервера, поэтому SIP-логин и пароль (Registration) не требуются — используется авторизация по локальному IP.
+                        </p>
+                    </div>
+                </div>
+                
+                <hr class="border-blue-500/20 my-2">
+
+                <!-- Шаг 3 -->
+                <div>
+                    <h5 class="font-bold text-on-surface mb-2 tg-translate">Шаг 3: Настройка PJSIP (pjsip.conf)</h5>
+                    <p class="tg-translate mb-2">Добавьте следующий код в конфигурацию ядра Asterisk, чтобы разрешить звонки в обе стороны:</p>
+                    <pre class="p-3 bg-surface-container-highest rounded-xl border border-outline/30 font-mono text-[11px] text-on-surface whitespace-pre-wrap select-all">
+[telegram-trunk]
+type=endpoint
+transport=transport-udp
+context=from-telegram
+disallow=all
+allow=alaw,ulaw
+aors=telegram-trunk
+
+[telegram-trunk]
+type=aor
+contact=sip:127.0.0.1:5062
+
+[telegram-trunk]
+type=identify
+endpoint=telegram-trunk
+match=127.0.0.1
+                    </pre>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

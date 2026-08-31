@@ -2217,7 +2217,8 @@
     "ru": "Руководство, генеральный директор."
   },
   "Перейдите в": {
-    "ru": "Перейдите в"
+    "ru": "Перейдите в",
+    "en": "Go to"
   },
   "86400 сек = блокировка на 24 часа": {
     "ru": "86400 сек = блокировка на 24 часа"
@@ -2827,5 +2828,49 @@
   "Маршрутизация": {
     "ru": "Маршрутизация",
     "en": "Routing"
+  },
+  "Инструкция по настройке транка": {
+    "ru": "Инструкция по настройке транка",
+    "en": "Trunk Setup Instructions"
+  },
+  "Для работы Telegram SIP Trunk необходимо авторизовать аккаунт (MTProto) и настроить ядро Asterisk на прием звонков с локального шлюза.": {
+    "ru": "Для работы Telegram SIP Trunk необходимо авторизовать аккаунт (MTProto) и настроить ядро Asterisk на прием звонков с локального шлюза.",
+    "en": "To use the Telegram SIP Trunk, you need to authorize the account (MTProto) and configure the Asterisk core to accept calls from the local gateway."
+  },
+  "Шаг 1: Авторизация Telegram": {
+    "ru": "Шаг 1: Авторизация Telegram",
+    "en": "Step 1: Telegram Authorization"
+  },
+  "Перейдите на": {
+    "ru": "Перейдите на",
+    "en": "Go to"
+  },
+  "Авторизуйтесь по номеру транка.": {
+    "ru": "Авторизуйтесь по номеру транка.",
+    "en": "Log in using the trunk phone number."
+  },
+  "Внесите их ниже, запросите код и войдите.": {
+    "ru": "Внесите их ниже, запросите код и войдите.",
+    "en": "Enter them below, request the code, and log in."
+  },
+  "Шаг 2: Безопасность и Порты": {
+    "ru": "Шаг 2: Безопасность и Порты",
+    "en": "Step 2: Security and Ports"
+  },
+  "Транзитный шлюз <code>tg2sip</code> разворачивается в Docker и биндится <b>СТРОГО на localhost (127.0.0.1)</b>.": {
+    "ru": "Транзитный шлюз <code>tg2sip</code> разворачивается в Docker и биндится <b>СТРОГО на localhost (127.0.0.1)</b>.",
+    "en": "The <code>tg2sip</code> transit gateway is deployed in Docker and binds <b>STRICTLY to localhost (127.0.0.1)</b>."
+  },
+  "Порт <code class=\"font-bold\">5062</code> (или любой выбранный ниже) недоступен из интернета. Asterisk обращается к шлюзу напрямую внутри сервера, поэтому SIP-логин и пароль (Registration) не требуются — используется авторизация по локальному IP.": {
+    "ru": "Порт <code class=\"font-bold\">5062</code> (или любой выбранный ниже) недоступен из интернета. Asterisk обращается к шлюзу напрямую внутри сервера, поэтому SIP-логин и пароль (Registration) не требуются — используется авторизация по локальному IP.",
+    "en": "The port <code class=\"font-bold\">5062</code> (or any selected below) is inaccessible from the Internet. Asterisk accesses the gateway directly inside the server, so SIP login and password (Registration) are not required — authorization by local IP is used."
+  },
+  "Шаг 3: Настройка PJSIP (pjsip.conf)": {
+    "ru": "Шаг 3: Настройка PJSIP (pjsip.conf)",
+    "en": "Step 3: PJSIP Configuration (pjsip.conf)"
+  },
+  "Добавьте следующий код в конфигурацию ядра Asterisk, чтобы разрешить звонки в обе стороны:": {
+    "ru": "Добавьте следующий код в конфигурацию ядра Asterisk, чтобы разрешить звонки в обе стороны:",
+    "en": "Add the following code to your Asterisk core configuration to allow bidirectional calls:"
   }
 }
