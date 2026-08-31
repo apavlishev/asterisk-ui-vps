@@ -6652,7 +6652,7 @@ def tg_start_tg2sip():
     return jsonify({"success": True, "msg": f"tg2sip scheduled on port {port}"})
 
 @app.route('/api/telegram/status', methods=['GET'])
-@login_required
+
 def tg_status():
     cfg = load_integrations()
     tg = cfg.get('telegram_trunk', {})
