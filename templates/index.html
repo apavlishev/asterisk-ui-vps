@@ -1227,10 +1227,10 @@
                         <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
                             <div class="flex items-center gap-2 font-bold text-on-surface">
                                 <span class="material-symbols-outlined text-amber-500 text-[18px]">record_voice_over</span>
-                                <span>1. Поддержка передачи голоса (Voice-прошивка)</span>
+                                <span>{{ t.gsm_guide_1_title or "1. Поддержка передачи голоса (Voice-прошивка)" }}</span>
                             </div>
                             <p class="text-on-surface-variant leading-relaxed">
-                                Обычные модемы для 4G-интернета (HiLink / NDIS) <b>не умеют передавать голос</b> в Asterisk. Требуется режим <b>Stick (Serial/Modem)</b> с активными голосовыми AT-командами и поддержкой аудио-потока PCM 8kHz.
+                                {{ t.gsm_guide_1_text|safe if t.gsm_guide_1_text else "Обычные модемы для 4G-интернета (HiLink / NDIS) <b>не умеют передавать голос</b> в Asterisk. Требуется режим <b>Stick (Serial/Modem)</b> с активными голосовыми AT-командами и поддержкой аудио-потока PCM 8kHz."|safe }}
                             </p>
                         </div>
 
@@ -1238,10 +1238,10 @@
                         <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
                             <div class="flex items-center gap-2 font-bold text-on-surface">
                                 <span class="material-symbols-outlined text-primary text-[18px]">power</span>
-                                <span>2. Питание USB-хаба (Active USB 2.0 Hub)</span>
+                                <span>{{ t.gsm_guide_2_title or "2. Питание USB-хаба (Active USB 2.0 Hub)" }}</span>
                             </div>
                             <p class="text-on-surface-variant leading-relaxed">
-                                В момент установления звонка модем потребляет в пике до <b>1.5–2.0 Ампер</b>. При подключении более 1–2 модемов к серверу обязательно используйте <b>активный USB-хаб с внешним блоком питания (12V 3-5A)</b> во избежание «отваливания» портов <code>/dev/ttyUSB*</code>.
+                                {{ t.gsm_guide_2_text|safe if t.gsm_guide_2_text else "В момент установления звонка модем потребляет в пике до <b>1.5–2.0 Ампер</b>. При подключении более 1–2 модемов к серверу обязательно используйте <b>активный USB-хаб с внешним блоком питания (12V 3-5A)</b> во избежание «отваливания» портов <code>/dev/ttyUSB*</code>."|safe }}
                             </p>
                         </div>
                     </div>
@@ -1250,15 +1250,15 @@
                     <div class="p-5 rounded-xl bg-surface-container-low border border-amber-500/20 space-y-3">
                         <div class="flex items-center gap-2 text-sm font-bold text-amber-500">
                             <span class="material-symbols-outlined text-xl">devices</span>
-                            <span>Проверенные модели 3G / 4G модемов и модулей для Asterisk</span>
+                            <span>{{ t.gsm_guide_3_title or "Проверенные модели 3G / 4G модемов и модулей для Asterisk" }}</span>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-xs font-mono bg-surface rounded-xl border border-outline/20 overflow-hidden">
                                 <thead>
                                     <tr class="bg-surface-container text-on-surface-variant border-b border-outline/20 text-left font-sans">
-                                        <th class="py-2.5 px-3">Модель / Чипсет</th>
-                                        <th class="py-2.5 px-3">Стандарты связи</th>
-                                        <th class="py-2.5 px-3">Драйвер в PBX</th>
+                                        <th class="py-2.5 px-3">{{ t.gsm_table_col1 or "Модель / Чипсет" }}</th>
+                                        <th class="py-2.5 px-3">{{ t.gsm_table_col2 or "Стандарты связи" }}</th>
+                                        <th class="py-2.5 px-3">{{ t.gsm_table_col3 or "Драйвер в PBX" }}</th>
                                         <th class="py-2.5 px-3">Статус поддержки</th>
                                     </tr>
                                 </thead>
@@ -1434,22 +1434,22 @@
                                     <h1 class="text-2xl font-bold text-on-surface">Интерактивный IVR Конструктор</h1>
                                     <span class="text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 whitespace-nowrap">PRO Multi-Trunk</span>
                                 </div>
-                                <p class="text-on-surface-variant text-sm mt-0.5">Визуальное проектирование голосовых сценариев, прямого донабора (Direct Dial), очередей и расписаний.</p>
+                                <p class="text-on-surface-variant text-sm mt-0.5">{{ t.ivr_subtitle or "Визуальное проектирование голосовых сценариев, прямого донабора (Direct Dial), очередей и расписаний." }}</p>
                             </div>
                             
                             <div class="flex items-center gap-3 shrink-0">
                                 <button type="button" onclick="saveIvrCanvasToServer()" id="btn-save-canvas" class="px-5 py-2.5 rounded-xl bg-success text-on-primary text-xs font-semibold hover:bg-success/90 transition-all shadow-sm">
-                                    <span>Применить IVR схему в Asterisk</span>
+                                    <span>{{ t.ivr_btn_apply or "Применить IVR схему в Asterisk" }}</span>
                                 </button>
                                 <div class="inline-flex p-1 rounded-2xl bg-surface-container-low border border-outline/40 shadow-inner">
                                     <button type="button" onclick="setIvrViewMode('canvas')" id="btn-ivr-mode-canvas" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-primary text-on-primary shadow-sm">
-                                        <span>Блок-схема (Canvas)</span>
+                                        <span>{{ t.ivr_tab_canvas or "Блок-схема (Canvas)" }}</span>
                                     </button>
                                     <button type="button" onclick="setIvrViewMode('table')" id="btn-ivr-mode-table" class="px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">
-                                        <span>Табличный вид</span>
+                                        <span>{{ t.ivr_tab_table or "Табличный вид" }}</span>
                                     </button>
                                     <button type="button" onclick="setIvrViewMode('schedule')" id="btn-ivr-mode-schedule" class="px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">
-                                        <span>Расписание</span>
+                                        <span>{{ t.ivr_tab_schedule or "Расписание" }}</span>
                                     </button>
                                 </div>
                             </div>
@@ -1459,10 +1459,10 @@
                         <div class="flex items-center gap-3 p-3 rounded-2xl bg-surface-container-low border border-outline/30">
                             <span class="text-xs font-semibold text-on-surface flex items-center gap-1.5">
                                 <span class="material-symbols-outlined text-[16px] text-primary">route</span>
-                                Настройка голосового сценария для линии:
+                                {{ t.ivr_label_trunk or "Настройка голосового сценария для линии:" }}
                             </span>
                             <select id="ivr-trunk-selector" onchange="switchIvrTrunkRoute(this.value)" class="px-3.5 py-1.5 rounded-xl bg-surface border border-outline text-xs font-bold text-primary cursor-pointer shadow-sm min-w-[260px]">
-                                <option value="default">🌐 Общий сценарий (По умолчанию)</option>
+                                <option value="default">🌐 {{ t.ivr_opt_default or "Общий сценарий (По умолчанию)" }}</option>
                                 <option value="gsm_pool">📱 GSM Модемы (Пул сим-карт)</option>
                                 {% for t in sip_trunks %}
                                 <option value="{{ t.id }}">📞 SIP Транк: {{ t.name }} ({{ t.host }})</option>
@@ -1482,7 +1482,7 @@
                                 </button>
                                 <button type="button" onclick="setCanvasTool('link')" id="tool-btn-link" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface flex items-center gap-1 transition-all" title="Соединить узлы стрелкой: Кликните начальный узел, затем целевой">
                                     <span class="material-symbols-outlined text-[16px]">arrow_right_alt</span>
-                                    <span>Создать связь (Стрелку)</span>
+                                    <span>{{ t.ivr_btn_link or "Создать связь (Стрелку)" }}</span>
                                 </button>
                             </div>
 
@@ -1493,10 +1493,10 @@
                                     <button type="button" onclick="zoomCanvas(0.1)" class="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container text-on-surface font-bold">&plus;</button>
                                 </div>
                                 <button type="button" onclick="resetCanvasView()" class="px-3 py-1.5 rounded-lg border border-outline text-xs text-on-surface hover:bg-surface-container transition-colors flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-[16px]">restart_alt</span> Центрировать
+                                    <span class="material-symbols-outlined text-[16px]">restart_alt</span> {{ t.ivr_btn_center or "Центрировать" }}
                                 </button>
                                 <button type="button" onclick="openAddNodePopup()" class="px-4 py-1.5 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-[16px]">add_circle</span> Создать блок
+                                    <span class="material-symbols-outlined text-[16px]">add_circle</span> {{ t.ivr_btn_add or "Создать блок" }}
                                 </button>
                             </div>
                         </div>
@@ -3824,7 +3824,7 @@
             document.getElementById('popup-is-new').value = '0';
             document.getElementById('popup-node-id').value = node.id;
             document.getElementById('popup-node-title').value = node.title || '';
-            document.getElementById('popup-node-modal-title').textContent = 'Редактирование блока: ' + node.title;
+            document.getElementById('popup-node-modal-title').textContent = '{{ t.ivr_modal_title or "Редактирование блока:" }} ' + node.title;
             document.getElementById('popup-node-modal-subtitle').textContent = 'Node ID: ' + node.id;
 
             const typeSelect = document.getElementById('popup-node-type');
@@ -5444,12 +5444,12 @@
                 <input type="hidden" id="popup-is-new" value="0">
 
                 <div>
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Название блока</label>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.ivr_modal_name or "Название блока" }}</label>
                     <input type="text" id="popup-node-title" required placeholder="Например: Отдел продаж / Главное меню" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Тип блока (Type)</label>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.ivr_modal_type or "Тип блока (Type)" }}</label>
                     <select id="popup-node-type" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs" onchange="handlePopupTypeChange(this.value)">
                         <option value="ivr">Голосовое меню с DTMF выбором (IVR Root)</option>
                         <option value="extension">SIP Абонент (Extension)</option>
@@ -5526,7 +5526,7 @@
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <label class="block text-xs font-semibold text-on-surface-variant">Целевой номер / SIP Абонент</label>
+                            <label class="block text-xs font-semibold text-on-surface-variant">{{ t.ivr_modal_target or "Целевой номер / SIP Абонент" }}</label>
                             <span class="text-[10px] text-primary font-mono font-bold">Select2 Live Search</span>
                         </div>
                         <select id="popup-node-target" class="w-full">
@@ -5605,7 +5605,7 @@
             </button>
             <button onclick="ctxHandleAction('reset_view')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-on-surface hover:bg-surface-container transition-colors text-left">
                 <span class="material-symbols-outlined text-[16px]">restart_alt</span>
-                <span>Центрировать камеру</span>
+                <span>{{ t.ivr_btn_center or "Центрировать" }} камеру</span>
             </button>
         </div>
     </div>
@@ -6774,26 +6774,26 @@
     "zh": "安装新插件",
     "ru": "Установить плагин"
   },
-  "1. Поддержка передачи голоса (Voice-прошивка)": {
+  "{{ t.gsm_guide_1_title or "1. Поддержка передачи голоса (Voice-прошивка)" }}": {
     "en": "1. Voice Calls Support (Voice-Enabled Firmware)",
     "es": "1. Soporte de Llamadas de Voz (Firmware Habilitado)",
     "ar": "1. دعم المكالمات الصوتية (برامج ثابتة تدعم الصوت)",
     "zh": "1. 语音传输支持 (Voice-Enabled 固件)",
-    "ru": "1. Поддержка передачи голоса (Voice-прошивка)"
+    "ru": "{{ t.gsm_guide_1_title or "1. Поддержка передачи голоса (Voice-прошивка)" }}"
   },
-  "2. Питание USB-хаба (Active USB 2.0 Hub)": {
+  "{{ t.gsm_guide_2_title or "2. Питание USB-хаба (Active USB 2.0 Hub)" }}": {
     "en": "2. Powered USB Hub (Active USB 2.0 Hub)",
     "es": "2. Concentrador USB con Alimentación (Hub USB 2.0 Activo)",
     "ar": "2. موزع USB نشط مزود بالطاقة (Active USB 2.0 Hub)",
     "zh": "2. 独立供电 USB 集线器 (Active USB 2.0 Hub)",
-    "ru": "2. Питание USB-хаба (Active USB 2.0 Hub)"
+    "ru": "{{ t.gsm_guide_2_title or "2. Питание USB-хаба (Active USB 2.0 Hub)" }}"
   },
-  "Проверенные модели 3G / 4G модемов и модулей для Asterisk": {
+  "{{ t.gsm_guide_3_title or "Проверенные модели 3G / 4G модемов и модулей для Asterisk" }}": {
     "en": "Verified 3G / 4G Modems and Voice Cellular Modules for Asterisk",
     "es": "Modelos probados de módems 3G / 4G y módulos celulares para Asterisk",
     "ar": "طرازات أجهزة المودم 3G / 4G المعتمدة ووحدات الصوت لـ Asterisk",
     "zh": "经过验证的 Asterisk 3G / 4G 语音调制解调器及工业模组",
-    "ru": "Проверенные модели 3G / 4G модемов и модулей для Asterisk"
+    "ru": "{{ t.gsm_guide_3_title or "Проверенные модели 3G / 4G модемов и модулей для Asterisk" }}"
   },
   "100% Эталон (Voice активен)": {
     "en": "100% Benchmark (Voice Active)",
