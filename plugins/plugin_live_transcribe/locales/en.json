@@ -1,0 +1,8 @@
+{
+    "Настройки транскрибации": "Transcription Settings",
+    "API Ключ провайдера (Gemini / Google)": "Provider API Key (Gemini / Google)",
+    "Webhook для отправки текстов": "Webhook URL (for completed transcripts)",
+    "Сохранить настройки": "Save Settings",
+    "Активные диалоги (Live)": "Active Dialogues (Live)",
+    "Ожидание вызовов...": "Waiting for calls. Dial into PBX to start stream."
+}

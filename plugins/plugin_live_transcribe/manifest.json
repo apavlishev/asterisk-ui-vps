@@ -1,0 +1,9 @@
+{
+  "id": "live_transcribe",
+  "name": "Live Speech Transcription",
+  "name_ru": "Умный Суфлер (Транскрибация)",
+  "version": "1.0.0",
+  "author": "Asterisk Logic Core",
+  "description": "Расширяет интерфейс активных вызовов: потоковое распознавание речи (Стерео) через Gemini/Whisper, разделение диалога на Оператора и Клиента, сохранение и отправка Webhook.",
+  "icon": "record_voice_over"
+}
