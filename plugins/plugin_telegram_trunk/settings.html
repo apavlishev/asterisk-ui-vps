@@ -33,18 +33,18 @@
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">API ID</label>
-                            <input type="text" id="tg_api_id" placeholder="1234567" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                            <input type="text" id="tg_api_id" placeholder="1234567" value="{{ integrations.get('telegram_trunk', {}).get('api_id', '') }}" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">API Hash</label>
-                            <input type="text" id="tg_api_hash" placeholder="xxxxxxxxxxxx" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                            <input type="text" id="tg_api_hash" placeholder="xxxxxxxxxxxx" value="{{ integrations.get('telegram_trunk', {}).get('api_hash', '') }}" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
                         </div>
                     </div>
 
                     <div id="tg-phone-step">
                         <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">Номер телефона (с кодом страны)</label>
                         <div class="flex gap-2">
-                            <input type="text" id="tg_phone" placeholder="+79991234567" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                            <input type="text" id="tg_phone" placeholder="+79991234567" value="{{ integrations.get('telegram_trunk', {}).get('phone', '') }}" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
                             <button type="button" onclick="sendTgCode()" class="px-4 py-2 bg-primary text-on-primary rounded-xl font-bold text-xs hover:bg-primary/90 transition-colors whitespace-nowrap tg-translate">Отправить код</button>
                         </div>
                     </div>
@@ -70,7 +70,7 @@
                     
                     <div>
                         <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">Локальный SIP-порт</label>
-                        <input type="number" id="tg_sip_port" value="5062" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface font-mono">
+                        <input type="number" id="tg_sip_port" value="{{ integrations.get('telegram_trunk', {}).get('port', '5062') }}" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface font-mono">
                         <p class="text-[11px] text-on-surface-variant mt-1.5 leading-relaxed tg-translate">Через этот UDP-порт транзитный шлюз будет связываться с ядром Asterisk. Добавьте его в <code>pjsip.conf</code>.</p>
                     </div>
                 </div>
@@ -153,15 +153,18 @@ async function loginTg() {
 
 async function saveTgSettings() {
     const port = document.getElementById('tg_sip_port').value;
+    const api_id = document.getElementById('tg_api_id').value;
+    const api_hash = document.getElementById('tg_api_hash').value;
+    const phone = document.getElementById('tg_phone').value;
     try {
         await fetch('/api/telegram/start_tg2sip', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({port})
+            body: JSON.stringify({port, api_id, api_hash, phone})
         });
-        alert('Сигнал на запуск транзитного шлюза отправлен.');
+        alert('Настройки успешно сохранены. Сигнал на запуск транзитного шлюза отправлен.');
     } catch (e) {
-        alert('Ошибка запуска');
+        alert('Ошибка запуска/сохранения');
     }
 }
 </script>

@@ -6592,6 +6592,21 @@ def tg_login():
 def tg_start_tg2sip():
     data = request.json
     port = data.get('port', 5062)
+    api_id = data.get('api_id', '')
+    api_hash = data.get('api_hash', '')
+    phone = data.get('phone', '')
+    
+    cfg = load_integrations()
+    if 'telegram_trunk' not in cfg:
+        cfg['telegram_trunk'] = {}
+    
+    cfg['telegram_trunk']['port'] = port
+    cfg['telegram_trunk']['api_id'] = api_id
+    cfg['telegram_trunk']['api_hash'] = api_hash
+    cfg['telegram_trunk']['phone'] = phone
+    
+    save_integrations(cfg)
+    
     # Mocking the docker run command for tg2sip
     return jsonify({"success": True, "msg": f"tg2sip scheduled on port {port}"})
 
