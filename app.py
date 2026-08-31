@@ -5099,206 +5099,29 @@ def action_do_update():
         subprocess.Popen(['nohup', 'bash', '/opt/asterisk-gui/updater.sh'], start_new_session=True)
     
     # Возвращаем HTML страницу, которая через 15 секунд перезагрузится
-    return """
-    <html><head><meta charset="utf-8"><title>Обновление...</title>
-    <style>body{background:#0b0f19; color:#f8fafc; font-family:sans-serif; text-align:center; padding-top:100px;}
-        .sub-nav-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            background: #090d16;
-            padding: 6px;
-            border-radius: 10px;
-            border: 1px solid #1e293b;
-            overflow-x: auto;
-        }
-        .sub-tab-btn {
-            background: transparent;
-            border: none;
-            color: #94a3b8;
-            padding: 9px 18px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-        .sub-tab-btn:hover {
-            color: #f8fafc;
-            background: rgba(255, 255, 255, 0.05);
-        }
-        .sub-tab-btn.active {
-            background: #0284c7;
-            color: #ffffff;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
-        }
-        .subtab-content {
-            display: none;
-        }
-        .subtab-content.active {
-            display: block;
-        }
-
-    
-        /* СТИЛИ ПАГИНАЦИИ ТАБЛИЦЫ ВЫЗОВОВ */
-        .pagination-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 18px;
-            padding-top: 14px;
-            border-top: 1px solid #1e293b;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .page-info {
-            font-size: 13px;
-            color: #94a3b8;
-        }
-        .page-info b {
-            color: #f8fafc;
-        }
-        .pagination-buttons {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        .page-btn {
-            width: auto !important;
-            min-width: 36px;
-            height: 36px;
-            padding: 0 12px !important;
-            margin: 0 !important;
-            font-size: 13px !important;
-            font-weight: 600;
-            border-radius: 8px !important;
-            border: 1px solid #334155 !important;
-            background: #0f172a !important;
-            color: #cbd5e1 !important;
-            display: inline-flex !important;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .page-btn:hover:not(:disabled) {
-            background: #1e293b !important;
-            border-color: #38bdf8 !important;
-            color: #fff !important;
-        }
-        .page-btn.active {
-            background: #0284c7 !important;
-            border-color: #38bdf8 !important;
-            color: #fff !important;
-            box-shadow: 0 0 10px rgba(2, 132, 199, 0.4);
-        }
-        .page-btn:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-            background: #090d16 !important;
-            border-color: #1e293b !important;
-            color: #64748b !important;
-        }
-
-    </style>
+    html_content = """
+    <html><head><meta charset="utf-8"><title>{{ t.k_obnovlenie or 'Обновление' }}</title>
+    <style>body{background:#0b0f19; color:#f8fafc; font-family:sans-serif; text-align:center; padding-top:100px;}</style>
     </head><body>
-    <h2>🚀 Обновление запущено в фоновом режиме...</h2>
-    <p>Сервер сейчас скачивает новые файлы и устанавливает обновления.</p>
-    <p>Страница автоматически перезагрузится через <span id="sec">15</span> секунд.</p>
+    <h2>🚀 {{ t.k_obnovlenie_zapuscheno_v_fonom or 'Обновление запущено в фоновом режиме...' }}</h2>
+    <p>{{ t.k_server_seychas_skachivaet_no or 'Сервер сейчас скачивает новые файлы и устанавливает обновления.' }}</p>
+    <p>{{ t.k_stranitsa_avtomaticheski_pere or 'Страница автоматически перезагрузится через' }} <span id="sec">7</span> {{ t.k_sekund_ or 'секунд.' }}</p>
     <script>
-    let s = 15;
+    let s = 7;
     setInterval(() => {
         s--;
         document.getElementById('sec').innerText = s;
-        if(s <= 0) window.location.href = '/';
-    }, 1000);
-    
-function copyApiToken() {
-    const input = document.getElementById('webhook_api_token');
-    if (input) {
-        input.select();
-        document.execCommand('copy');
-        alert('API-ключ успешно скопирован в буфер обмена!');
-    }
-}
-
-function showDocSnippet(snippetId, btn) {
-    document.querySelectorAll('.doc-code-snippet').forEach(el => el.style.display = 'none');
-    const target = document.getElementById(snippetId);
-    if (target) target.style.display = 'block';
-    
-    btn.parentElement.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-}
-
-async function executeCallToTest() {
-    const operator = document.getElementById('test_callto_operator').value.trim();
-    const phone = document.getElementById('test_callto_phone').value.trim();
-    const resultBox = document.getElementById('callto_test_result');
-    
-    if (!phone) {
-        alert('Пожалуйста, введите номер телефона клиента!');
-        return;
-    }
-    
-    resultBox.style.display = 'block';
-    resultBox.style.background = '#1e293b';
-    resultBox.style.color = '#38bdf8';
-    resultBox.style.border = '1px solid #0284c7';
-    resultBox.innerHTML = '⏳ Отправка запроса в Asterisk... Набираем оператора ' + (operator || '101') + '...';
-    
-    try {
-        const res = await fetch('/api/v1/callto', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                operator: operator || '101',
-                phone: phone
-            })
-        });
-        const data = await res.json();
-        
-        if (data.status === 'success') {
-            resultBox.style.background = '#064e3b';
-            resultBox.style.color = '#34d399';
-            resultBox.style.border = '1px solid #059669';
-            resultBox.innerHTML = '✅ <b>Успешно!</b> ' + data.message + '<br><small style="color:#a7f3d0;">Поднимите трубку на софтфоне оператора ' + data.operator + ' — вызов автоматически соединится с ' + data.phone + '</small>';
-        } else {
-            resultBox.style.background = '#4c0519';
-            resultBox.style.color = '#fda4af';
-            resultBox.style.border = '1px solid #e11d48';
-            resultBox.innerHTML = '❌ <b>Ошибка:</b> ' + (data.error || data.message || 'Не удалось инициировать вызов');
+        if(s <= 0) {
+            window.location.href = '/';
         }
-    } catch (e) {
-        resultBox.style.background = '#4c0519';
-        resultBox.style.color = '#fda4af';
-        resultBox.style.border = '1px solid #e11d48';
-        resultBox.innerHTML = '❌ <b>Ошибка сети:</b> ' + e;
-    }
-}
-
-
-function toggleNetMode(mode) {
-    const staticFields1 = document.getElementById('static_ip_fields');
-    const staticFields2 = document.getElementById('static_gw_fields');
-    if (mode === 'dhcp') {
-        if (staticFields1) staticFields1.style.opacity = '0.4';
-        if (staticFields2) staticFields2.style.opacity = '0.4';
-    } else {
-        if (staticFields1) staticFields1.style.opacity = '1';
-        if (staticFields2) staticFields2.style.opacity = '1';
-    }
-}
-
-</script>
-    
-
-
-</body></html>
+    }, 1000);
+    </script>
+    </body></html>
     """
+    from flask import render_template_string
+    lang = get_current_language()
+    t = get_locale_translations(lang)
+    return render_template_string(html_content, t=t)
 
 @app.route('/')
 def index():
