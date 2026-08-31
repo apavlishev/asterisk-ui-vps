@@ -509,6 +509,24 @@ action   = iptables-allports[name=ASTERISK-ANTIFRAUD, protocol=all]
     return redirect(url_for('index'))
 
 
+
+@app.route('/settings/live_transcribe', methods=['POST'])
+def save_live_transcribe():
+    cfg = load_integrations()
+    if 'live_transcribe' not in cfg:
+        cfg['live_transcribe'] = {}
+        
+    api_key = request.form.get('api_key', '').strip()
+    webhook_url = request.form.get('webhook_url', '').strip()
+    
+    if api_key:
+        cfg['live_transcribe']['api_key'] = api_key
+    if webhook_url:
+        cfg['live_transcribe']['webhook_url'] = webhook_url
+        
+    save_integrations(cfg)
+    return redirect(request.referrer or url_for('index'))
+
 @app.route('/settings/security/auth', methods=['POST'])
 def save_security_auth():
     cfg = load_integrations()
