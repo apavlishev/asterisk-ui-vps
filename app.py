@@ -4754,7 +4754,7 @@ def build_outbound_dialplan_lines(cfg):
         lines.append(" same => n,Set(__CALL_DIRECTION=outbound)")
         lines.append(" same => n,Set(__REC_PATH=${RECORD_DIR}/${REC_FILE})")
         lines.append(" same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)")
-        lines.append(" same => n,MixMonitor(${REC_PATH},r(${REC_PATH}_rx.wav) t(${REC_PATH}_tx.wav))")
+        lines.append(" same => n,MixMonitor(${REC_PATH},r(${REC_PATH}_rx.wav)t(${REC_PATH}_tx.wav))")
         
         for og in op_gotos:
             lines.append(og)
@@ -4802,7 +4802,7 @@ def generate_dialplan_from_tree():
             group_dialplan_lines.append(f" same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})")
             group_dialplan_lines.append(f" same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)")
             group_dialplan_lines.append(f" same => n,Answer()")
-            group_dialplan_lines.append(f" same => n,MixMonitor(${{REC_PATH}},r(${{REC_PATH}}_rx.wav) t(${{REC_PATH}}_tx.wav))")
+            group_dialplan_lines.append(f" same => n,MixMonitor(${{REC_PATH}},r(${{REC_PATH}}_rx.wav)t(${{REC_PATH}}_tx.wav))")
             group_dialplan_lines.append(f" same => n,Dial({dial_str},{g_timeout})")
             group_dialplan_lines.append(f" same => n,Hangup()")
         elif g_strategy == 'hunt':
@@ -4817,7 +4817,7 @@ def generate_dialplan_from_tree():
             group_dialplan_lines.append(f" same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})")
             group_dialplan_lines.append(f" same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)")
             group_dialplan_lines.append(f" same => n,Answer()")
-            group_dialplan_lines.append(f" same => n,MixMonitor(${{REC_PATH}},r(${{REC_PATH}}_rx.wav) t(${{REC_PATH}}_tx.wav))")
+            group_dialplan_lines.append(f" same => n,MixMonitor(${{REC_PATH}},r(${{REC_PATH}}_rx.wav)t(${{REC_PATH}}_tx.wav))")
             hunt_to = max(5, int(g_timeout / len(members)))
             for m in members:
                 group_dialplan_lines.append(f" same => n,Dial(PJSIP/{m},{hunt_to})")
@@ -5033,7 +5033,7 @@ exten => _[1-9]XX,1,NoOp(Внутренний вызов 3-значный: ${{CA
  same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})
  same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)
  same => n,Answer()
- same => n,MixMonitor(${{REC_PATH}},r(${{REC_PATH}}_rx.wav) t(${{REC_PATH}}_tx.wav))
+ same => n,MixMonitor(${{REC_PATH}},r(${{REC_PATH}}_rx.wav)t(${{REC_PATH}}_tx.wav))
  same => n,Dial(PJSIP/${{EXTEN}},60)
  same => n,Hangup()
 
@@ -5046,7 +5046,7 @@ exten => _[1-9]XXX,1,NoOp(Внутренний вызов 4-значный: ${{C
  same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})
  same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)
  same => n,Answer()
- same => n,MixMonitor(${{REC_PATH}},r(${{REC_PATH}}_rx.wav) t(${{REC_PATH}}_tx.wav))
+ same => n,MixMonitor(${{REC_PATH}},r(${{REC_PATH}}_rx.wav)t(${{REC_PATH}}_tx.wav))
  same => n,Dial(PJSIP/${{EXTEN}},60)
  same => n,Hangup()
 
