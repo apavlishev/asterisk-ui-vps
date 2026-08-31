@@ -6526,7 +6526,7 @@ def tg_send_code():
     if not all([api_id, api_hash, phone]):
         return jsonify({"success": False, "error": "Missing parameters"})
         
-    session_file = f"/opt/asterisk-gui/plugins/telegram_trunk/session_{phone}.session"
+    session_file = f"/opt/asterisk-gui/plugins/plugin_telegram_trunk/session_{phone}.session"
     client = TelegramClient(session_file, int(api_id), api_hash)
     
     loop = get_tg_loop()
