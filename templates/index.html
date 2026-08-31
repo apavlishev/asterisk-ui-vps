@@ -649,7 +649,7 @@
                             <span class="text-[11px] text-slate-400 font-bold ml-2">asterisk-core-telemetry@vps:/var/log/messages</span>
                         </div>
                         <div class="flex items-center gap-3 text-[11px] text-slate-400">
-                            <span id="log-counter-badge" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-bold">{{ t.0_strok }}</span>
+                            <span id="log-counter-badge" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-bold">{{ t.k_0_strok }}</span>
                             <label class="flex items-center gap-1 cursor-pointer select-none text-[11px] hover:text-white">
                                 <input type="checkbox" id="chk-autoscroll" checked class="rounded border-slate-700 bg-slate-900 text-primary">
                                 <span>{{ t.avtoskroll }}</span>
@@ -1241,7 +1241,7 @@
                                 <span>{{ t.gsm_guide_2_title or "2. Питание USB-хаба (Active USB 2.0 Hub)" }}</span>
                             </div>
                             <p class="text-on-surface-variant leading-relaxed">
-                                {{ t.gsm_guide_2_text|safe if t.gsm_guide_2_text else "В момент установления звонка модем потребляет в пике до <b>{{ t.1_5_2_0_amper }}</b>{{ t.pri_podklucenii_bolee_1_2_mode }} <b>{{ t.aktivnyj_usb_hab_s_vnesnim_blo }}</b> {{ t.vo_izbejanie_otvalivania_porto }} <code>/dev/ttyUSB*</code>."|safe }}
+                                {{ t.gsm_guide_2_text|safe if t.gsm_guide_2_text else "В момент установления звонка модем потребляет в пике до <b>{{ t.k_1_5_2_0_amper }}</b>{{ t.pri_podklucenii_bolee_1_2_mode }} <b>{{ t.aktivnyj_usb_hab_s_vnesnim_blo }}</b> {{ t.vo_izbejanie_otvalivania_porto }} <code>/dev/ttyUSB*</code>."|safe }}
                             </p>
                         </div>
                     </div>
@@ -1267,11 +1267,11 @@
                                         <td class="py-2.5 px-3 font-bold text-on-surface">Huawei E1550 / E1750 / E173</td>
                                         <td class="py-2.5 px-3 font-sans text-on-surface-variant">2G GSM / 3G UMTS (Voice Native)</td>
                                         <td class="py-2.5 px-3 text-primary">chan_dongle (ttyUSB)</td>
-                                        <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold">{{ t.100_etalon_voice_aktiven }}</span></td>
+                                        <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold">{{ t.k_100_etalon_voice_aktiven }}</span></td>
                                     </tr>
                                     <tr>
                                         <td class="py-2.5 px-3 font-bold text-on-surface">Huawei E352 / E353 / E3131</td>
-                                        <td class="py-2.5 px-3 font-sans text-on-surface-variant">{{ t.3g_hspa_do_21_mbit_s }}</td>
+                                        <td class="py-2.5 px-3 font-sans text-on-surface-variant">{{ t.k_3g_hspa_do_21_mbit_s }}</td>
                                         <td class="py-2.5 px-3 text-primary">chan_dongle</td>
                                         <td class="py-2.5 px-3 font-sans"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold">{{ t.otlicno_v_stick_rejime }}</span></td>
                                     </tr>
@@ -1314,8 +1314,8 @@
                                 <th class="px-6 py-4">{{ t.nazvanie_tranka }}</th>
                                 <th class="px-6 py-4">{{ t.host_provajder }}</th>
                                 <th class="px-6 py-4">{{ t.login_cid }}</th>
-                                <th class="px-6 py-4">{{ t.1_ispol_zovanie }}</th>
-                                <th class="px-6 py-4">{{ t.2_status_registrazii }}</th>
+                                <th class="px-6 py-4">{{ t.k_1_ispol_zovanie }}</th>
+                                <th class="px-6 py-4">{{ t.k_2_status_registrazii }}</th>
                                 <th class="px-6 py-4 text-right">{{ t.dejstvia }}</th>
                             </tr>
                         </thead>
@@ -1402,7 +1402,7 @@
                         <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
                             <div class="flex items-center gap-2 font-bold text-on-surface">
                                 <span class="material-symbols-outlined text-primary text-[18px]">vpn_key</span>
-                                <span>{{ t.1_avtorizazia_i_registrazia }}</span>
+                                <span>{{ t.k_1_avtorizazia_i_registrazia }}</span>
                             </div>
                             <p class="text-on-surface-variant leading-relaxed">
                                 {{ t.esli_provajder_vydal_login_i_p }}
@@ -1412,7 +1412,7 @@
                         <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5">
                             <div class="flex items-center gap-2 font-bold text-on-surface">
                                 <span class="material-symbols-outlined text-success text-[18px]">call_received</span>
-                                <span>{{ t.2_kontekst_vyzovov_context }}</span>
+                                <span>{{ t.k_2_kontekst_vyzovov_context }}</span>
                             </div>
                             <p class="text-on-surface-variant leading-relaxed">
                                 {{ t.po_umolcaniu_vhodasie_zvonki_n }} <b>from-trunk</b>{{ t.kotoryj_peredaet_vyzov_v_modul }}
@@ -1611,7 +1611,7 @@
                             <div class="p-4 rounded-2xl bg-surface-container-low border border-emerald-500/30 space-y-2">
                                 <div class="flex items-center gap-2">
                                     <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-                                    <span class="text-xs font-bold text-on-surface">{{ t.1_vhodasij_sip_trank }}</span>
+                                    <span class="text-xs font-bold text-on-surface">{{ t.k_1_vhodasij_sip_trank }}</span>
                                 </div>
                                 <p class="text-[11px] text-on-surface-variant leading-relaxed">
                                     {{ t.tocka_vhoda_zvonka_ot_vnesnego }}
@@ -1625,7 +1625,7 @@
                             <div class="p-4 rounded-2xl bg-surface-container-low border border-blue-500/30 space-y-2">
                                 <div class="flex items-center gap-2">
                                     <span class="w-3 h-3 rounded-full bg-blue-500"></span>
-                                    <span class="text-xs font-bold text-on-surface">{{ t.2_golosovoe_menu_ivr }}</span>
+                                    <span class="text-xs font-bold text-on-surface">{{ t.k_2_golosovoe_menu_ivr }}</span>
                                 </div>
                                 <p class="text-[11px] text-on-surface-variant leading-relaxed">
                                     {{ t.vosproizvodit_audioprivetstvie }}
@@ -1639,7 +1639,7 @@
                             <div class="p-4 rounded-2xl bg-surface-container-low border border-purple-500/30 space-y-2">
                                 <div class="flex items-center gap-2">
                                     <span class="w-3 h-3 rounded-full bg-purple-500"></span>
-                                    <span class="text-xs font-bold text-on-surface">{{ t.3_sip_abonenty_i_gruppy }}</span>
+                                    <span class="text-xs font-bold text-on-surface">{{ t.k_3_sip_abonenty_i_gruppy }}</span>
                                 </div>
                                 <p class="text-[11px] text-on-surface-variant leading-relaxed">
                                     {{ t.zelevye_uzly_naznacenia_perevo }}
@@ -1653,7 +1653,7 @@
                             <div class="p-4 rounded-2xl bg-surface-container-low border border-rose-500/30 space-y-2">
                                 <div class="flex items-center gap-2">
                                     <span class="w-3 h-3 rounded-full bg-rose-500"></span>
-                                    <span class="text-xs font-bold text-on-surface">{{ t.4_obrabotciki_i_i_t }}</span>
+                                    <span class="text-xs font-bold text-on-surface">{{ t.k_4_obrabotciki_i_i_t }}</span>
                                 </div>
                                 <p class="text-[11px] text-on-surface-variant leading-relaxed">
                                     {{ t.vetki_otkazoustojcivosti_klavi }} <b class="font-mono text-white">[i]</b> {{ t.srabatyvaet_pri_osibocnom_vvod }} <b class="font-mono text-white">[t]</b> {{ t.pri_molcanii_abonenta_po_tajma }}
@@ -1830,7 +1830,7 @@
                             <div class="p-6 rounded-2xl bg-surface border border-outline/30 shadow-sm space-y-4">
                                 <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
                                     <span class="material-symbols-outlined text-primary text-[18px]">key</span>
-                                    {{ t.1_avtorizazia_i_dostup_k_akkau }}
+                                    {{ t.k_1_avtorizazia_i_dostup_k_akkau }}
                                 </h3>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
@@ -1853,7 +1853,7 @@
                                 <div>
                                     <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
                                         <span class="material-symbols-outlined text-secondary text-[18px]">account_tree</span>
-                                        {{ t.2_marsrutizazia_sdelok_voronki }}
+                                        {{ t.k_2_marsrutizazia_sdelok_voronki }}
                                     </h3>
                                     <p class="text-xs text-on-surface-variant mt-0.5">{{ t.vyberite_voronku_i_zelevoj_sta }}</p>
                                 </div>
@@ -1974,7 +1974,7 @@
                             <div>
                                 <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
                                     <span class="material-symbols-outlined text-amber-500 text-[18px]">audiotrack</span>
-                                    {{ t.3_vygruzka_audiozapisej_razgov }}
+                                    {{ t.k_3_vygruzka_audiozapisej_razgov }}
                                 </h3>
                                 <p class="text-xs text-on-surface-variant mt-0.5">{{ t.nastrojte_kuda_otpravlat_audio }}</p>
                             </div>
@@ -3043,7 +3043,7 @@
                                     <span>{{ t.sip_registration_scanning_fail }}</span>
                                 </td>
                                 <td class="px-6 py-3.5 text-xs font-mono text-on-surface-variant">
-                                    <span>{{ t.24_casa_iptables_drop }}</span>
+                                    <span>{{ t.k_24_casa_iptables_drop }}</span>
                                 </td>
                                 <td class="px-6 py-3.5 text-right">
                                     <form action="/api/security/antifraud/unban" method="POST" class="inline" onsubmit="return confirm('Разблокировать IP {{ ip }}?');">
@@ -3091,12 +3091,12 @@
                             <div>
                                 <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.okno_proverki_find_time_sek }}</label>
                                 <input type="number" name="findtime" value="{{ antifraud.findtime if antifraud else 600 }}" min="30" max="86400" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono" title="{{ t.interval_vremeni_dla_podsceta_ }}">
-                                <span class="text-[10px] text-on-surface-variant mt-1 block">{{ t.600_sek_v_tecenie_10_minut }}</span>
+                                <span class="text-[10px] text-on-surface-variant mt-1 block">{{ t.k_600_sek_v_tecenie_10_minut }}</span>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.dlitel_nost_bana_ban_time_sek }}</label>
                                 <input type="number" name="bantime" value="{{ antifraud.bantime if antifraud else 86400 }}" min="60" max="604800" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono" title="{{ t.vrema_setevoj_blokirovki }}">
-                                <span class="text-[10px] text-on-surface-variant mt-1 block">{{ t.86400_sek_blokirovka_na_24_cas }}</span>
+                                <span class="text-[10px] text-on-surface-variant mt-1 block">{{ t.k_86400_sek_blokirovka_na_24_cas }}</span>
                             </div>
                         </div>
 
@@ -3179,8 +3179,8 @@
                             <div>
                                 <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.maksimal_nyj_razmer_log_fajla_ }}</label>
                                 <select name="max_size_mb" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs font-semibold text-on-surface">
-                                    <option value="10" {% if log_quota and log_quota.config.max_size_mb == 10 %}selected{% endif %}>{{ t.10_mb_dla_kompaktnyh_serverov }}</option>
-                                    <option value="50" {% if not log_quota or log_quota.config.max_size_mb == 50 %}selected{% endif %}>{{ t.50_mb_rekomenduetsa }}</option>
+                                    <option value="10" {% if log_quota and log_quota.config.max_size_mb == 10 %}selected{% endif %}>{{ t.k_10_mb_dla_kompaktnyh_serverov }}</option>
+                                    <option value="50" {% if not log_quota or log_quota.config.max_size_mb == 50 %}selected{% endif %}>{{ t.k_50_mb_rekomenduetsa }}</option>
                                     <option value="100" {% if log_quota and log_quota.config.max_size_mb == 100 %}selected{% endif %}>100 MB</option>
                                     <option value="250" {% if log_quota and log_quota.config.max_size_mb == 250 %}selected{% endif %}>250 MB</option>
                                 </select>
@@ -4351,7 +4351,7 @@
                             </div>
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400">{{ t.1_j_etap_start }}</span>
+                                    <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400">{{ t.k_1_j_etap_start }}</span>
                                     <h4 class="text-base font-bold text-on-surface">${rootNode.title || 'Главное Меню'}</h4>
                                 </div>
                                 <div class="flex flex-wrap items-center gap-3 text-xs text-on-surface-variant mt-1 font-mono">
@@ -4380,7 +4380,7 @@
                 <tr class="bg-primary/5 border-b border-primary/20 font-semibold">
                     <td class="px-4 py-3.5 font-mono text-primary flex items-center gap-2">
                         <span class="px-2 py-0.5 rounded bg-primary text-on-primary text-[10px] font-bold">{{ t.vhod }}</span>
-                        <span class="text-xs">{{ t.0_j_etap }}</span>
+                        <span class="text-xs">{{ t.k_0_j_etap }}</span>
                     </td>
                     <td class="px-4 py-3.5">
                         <div class="font-bold text-on-surface text-sm">${rootNode.title || 'Главное Меню'}</div>
