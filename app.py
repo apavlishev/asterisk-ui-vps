@@ -6564,6 +6564,16 @@ def tg_status():
     })
 
 
+
+@app.route('/settings/modems/toggle-test', methods=['POST'])
+def toggle_modems_test_mode():
+    cfg = load_integrations()
+    # Checkbox sends 'on' if checked, else doesn't send anything
+    enabled = request.form.get('enabled') == 'on'
+    cfg['modems_test_mode'] = enabled
+    save_integrations(cfg)
+    return redirect(request.referrer or url_for('index'))
+
 if __name__ == '__main__':
     try:
         threading.Thread(target=network_guardian_startup_check, daemon=True).start()
