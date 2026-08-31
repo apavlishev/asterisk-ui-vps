@@ -6544,7 +6544,8 @@ def tg_send_code():
         loop.run_until_complete(client.connect())
         if not loop.run_until_complete(client.is_user_authorized()):
             res = loop.run_until_complete(client.send_code_request(phone))
-            tg_clients[phone] = {'client': client, 'phone_code_hash': res.phone_code_hash}
+            tg_clients[phone] = {'api_id': api_id, 'api_hash': api_hash, 'phone_code_hash': res.phone_code_hash}
+            loop.run_until_complete(client.disconnect())
             return jsonify({"success": True})
         else:
             return jsonify({"success": False, "error": "Already authorized"})
@@ -6562,11 +6563,16 @@ def tg_login():
     if phone not in tg_clients:
         return jsonify({"success": False, "error": "Session not found. Request code first."})
         
-    client = tg_clients[phone]['client']
+    api_id = tg_clients[phone]['api_id']
+    api_hash = tg_clients[phone]['api_hash']
     phone_code_hash = tg_clients[phone]['phone_code_hash']
+    
+    session_file = f"/opt/asterisk-gui/plugins/plugin_telegram_trunk/session_{phone}.session"
+    client = TelegramClient(session_file, int(api_id), api_hash)
     
     loop = get_tg_loop()
     try:
+        loop.run_until_complete(client.connect())
         try:
             loop.run_until_complete(client.sign_in(phone, code, phone_code_hash=phone_code_hash))
         except Exception as e:
@@ -6576,6 +6582,7 @@ def tg_login():
                 loop.run_until_complete(client.sign_in(password=password))
             else:
                 return jsonify({"success": False, "error": str(e)})
+        loop.run_until_complete(client.disconnect())
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
