@@ -147,11 +147,11 @@
     "zh": "系统设置"
   },
   "Настройки": {
+    "ru": "Настройки",
     "en": "Settings",
     "es": "Configuración",
     "ar": "الإعدادات",
-    "zh": "设置",
-    "ru": "Настройки"
+    "zh": "系统设置"
   },
   "Система & Сеть": {
     "ru": "Система & Сеть",
@@ -427,18 +427,18 @@
     "zh": "操作"
   },
   "Сохранить": {
+    "ru": "Сохранить",
     "en": "Save",
     "es": "Guardar",
     "ar": "حفظ",
-    "zh": "保存",
-    "ru": "Сохранить"
+    "zh": "保存"
   },
   "Отмена": {
+    "ru": "Отмена",
     "en": "Cancel",
     "es": "Cancelar",
     "ar": "إلغاء",
-    "zh": "取消",
-    "ru": "Отмена"
+    "zh": "取消"
   },
   "Удалить": {
     "ru": "Удалить",
@@ -1147,551 +1147,1286 @@
     "zh": "配置",
     "ru": "Settings"
   },
-  "Яндекс.Диск Cloud Storage": {
-    "en": "Yandex.Disk Cloud Storage",
-    "es": "Almacenamiento Yandex.Disk",
-    "ar": "تخزين Yandex.Disk السحابي",
-    "zh": "Yandex.Disk 云存储",
-    "ru": "Яндекс.Диск Cloud Storage"
+  "Верифицировать & Установить": {
+    "ru": "Верифицировать & Установить",
+    "en": "Верифицировать & Установить",
+    "es": "Verificar e instalar",
+    "ar": "Верифицировать & Установить",
+    "zh": "Верифицировать & Установить",
+    "fr": "Vérifier et installer",
+    "de": "Верифицировать & Установить",
+    "pt": "Верифицировать & Установить",
+    "ja": "Верифицировать & Установить",
+    "hi": "Верифицировать & Установить"
   },
-  "Автоматическая выгрузка MP3/WAV записей в облако с генерацией публичных ссылок для CRM.": {
-    "en": "Automatic upload of MP3/WAV recordings to the cloud with public links generation for CRM.",
-    "es": "Carga automática de grabaciones a la nube con enlaces públicos para CRM.",
-    "ar": "التحميل التلقائي للتسجيلات الصوتية مع إنشاء روابط عامة.",
-    "zh": "自动上传通话录音至云盘并生成公开链接。",
-    "ru": "Автоматическая выгрузка MP3/WAV записей в облако с генерацией публичных ссылок для CRM."
+  "в Asterisk. Требуется режим": {
+    "ru": "в Asterisk. Требуется режим",
+    "en": "в Asterisk. Требуется режим",
+    "es": "en Asterisco. Modo requerido",
+    "ar": "في النجمة. الوضع مطلوب",
+    "zh": "в Asterisk. Требуется режим",
+    "fr": "dans Astérisque. Mode requis",
+    "de": "в Asterisk. Требуется режим",
+    "pt": "в Asterisk. Требуется режим",
+    "ja": "в Asterisk. Требуется режим",
+    "hi": "в Asterisk. Требуется режим"
   },
-  "Google Drive Cloud Vault": {
-    "en": "Google Drive Cloud Vault",
-    "es": "Bóveda Google Drive",
-    "ar": "خزنة Google Drive",
-    "zh": "Google Drive 云盘保险库",
-    "ru": "Google Drive Cloud Vault"
+  "Связывание блоков стрелками:": {
+    "ru": "Связывание блоков стрелками:",
+    "en": "Linking blocks with arrows:",
+    "es": "Vinculando bloques con flechas:",
+    "ar": "Связывание блоков стрелками:",
+    "zh": "Связывание блоков стрелками:",
+    "fr": "Lier des blocs avec des flèches :",
+    "de": "Связывание блоков стрелками:",
+    "pt": "Связывание блоков стрелками:",
+    "ja": "Связывание блоков стрелками:",
+    "hi": "Связывание блоков стрелками:"
   },
-  "Архивация звонков в Google Drive с иерархией по папкам Год/Месяц и OAuth2 авторизацией.": {
-    "en": "Archiving calls to Google Drive with Year/Month hierarchy and OAuth2.",
-    "es": "Archivo de llamadas en Google Drive con jerarquía por Año/Mes y OAuth2.",
-    "ar": "أرشفة المكالمات في Google Drive مع تسلسل المجلدات وتخويل OAuth2.",
-    "zh": "使用 OAuth2 授权将通话记录按年/月归档至 Google Drive。",
-    "ru": "Архивация звонков в Google Drive с иерархией по папкам Год/Месяц и OAuth2 авторизацией."
+  "Android (Менеджер 103)": {
+    "ru": "Android (Менеджер 103)",
+    "en": "Android (Manager 103)",
+    "es": "Android (Менеджер 103)",
+    "ar": "أندرويد (مدير 103)",
+    "zh": "Android (Менеджер 103)",
+    "fr": "Android (Gestionnaire 103)",
+    "de": "Android (Менеджер 103)",
+    "pt": "Android (Gerente 103)",
+    "ja": "Android (Менеджер 103)",
+    "hi": "Android (Менеджер 103)"
   },
-  "Pipedrive Sales Pipeline Pro": {
-    "en": "Pipedrive Sales Pipeline Pro",
-    "es": "Pipedrive Sales Pipeline Pro",
-    "ar": "Pipedrive Sales Pipeline Pro",
-    "zh": "Pipedrive 销售漏斗 Pro",
-    "ru": "Pipedrive Sales Pipeline Pro"
+  "Скопировать ссылку": {
+    "ru": "Скопировать ссылку",
+    "en": "Copy link",
+    "es": "Copiar enlace",
+    "ar": "Скопировать ссылку",
+    "zh": "Скопировать ссылку",
+    "fr": "Copier le lien",
+    "de": "Скопировать ссылку",
+    "pt": "Скопировать ссылку",
+    "ja": "Скопировать ссылку",
+    "hi": "Скопировать ссылку"
   },
-  "Создание активностей типа Call, выгрузка ссылок на записи в сделки и воронки продаж.": {
-    "en": "Creating Call activities, attaching recording links to deals and pipelines.",
-    "es": "Creación de actividades tipo Llamada, enlaces a grabaciones en tratos.",
-    "ar": "إنشاء أنشطة مكالمات وإرفاق روابط التسجيل في الصفقات.",
-    "zh": "创建通话活动，将录音链接同步至销售线索和商机。",
-    "ru": "Создание активностей типа Call, выгрузка ссылок на записи в сделки и воронки продаж."
+  "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.": {
+    "ru": "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.",
+    "en": "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.",
+    "es": "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.",
+    "ar": "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.",
+    "zh": "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.",
+    "fr": "Cryptage du trafic SIP et de la téléphonie à distance sans redirection des ports ouverts 5060 vers Internet.",
+    "de": "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.",
+    "pt": "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.",
+    "ja": "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.",
+    "hi": "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет."
   },
-  "HubSpot Enterprise CRM Sync": {
-    "en": "HubSpot Enterprise CRM Sync",
-    "es": "Sincronización HubSpot Enterprise",
-    "ar": "مزامنة HubSpot Enterprise CRM",
-    "zh": "HubSpot 企业 CRM 同步",
-    "ru": "HubSpot Enterprise CRM Sync"
+  "Подключен к API v4": {
+    "ru": "Подключен к API v4",
+    "en": "Подключен к API v4",
+    "es": "Conectado a API v4",
+    "ar": "متصل بـ API v4",
+    "zh": "Подключен к API v4",
+    "fr": "Connecté à l'API v4",
+    "de": "Подключен к API v4",
+    "pt": "Подключен к API v4",
+    "ja": "Подключен к API v4",
+    "hi": "Подключен к API v4"
   },
-  "Логирование звонков через Call Objects API v3, встроенный плеер записи и автосвязка с Contacts/Deals.": {
-    "en": "Call logging via Call Objects API v3, built-in player and Contacts/Deals auto-linking.",
-    "es": "Registro de llamadas vía API v3, reproductor y enlace automático con Contactos.",
-    "ar": "تسجيل المكالمات عبر API مع مشغل مدمج وربط جهات الاتصال.",
-    "zh": "通过 API v3 记录通话，内置播放器并自动关联联系人/商机。",
-    "ru": "Логирование звонков через Call Objects API v3, встроенный плеер записи и автосвязка с Contacts/Deals."
+  "Сохранить конфигурацию VPN Hub": {
+    "ru": "Сохранить конфигурацию VPN Hub",
+    "en": "Сохранить конфигурацию VPN Hub",
+    "es": "Guardar la configuración del concentrador VPN",
+    "ar": "احفظ تكوين VPN Hub",
+    "zh": "Сохранить конфигурацию VPN Hub",
+    "fr": "Enregistrer la configuration du hub VPN",
+    "de": "Сохранить конфигурацию VPN Hub",
+    "pt": "Сохранить конфигурацию VPN Hub",
+    "ja": "Сохранить конфигурацию VPN Hub",
+    "hi": "Сохранить конфигурацию VPN Hub"
   },
-  "amoCRM / Kommo Pro Cloud Sync": {
-    "en": "amoCRM / Kommo Pro Cloud Sync",
-    "es": "Sincronización amoCRM / Kommo Pro",
-    "ar": "مزامنة amoCRM / Kommo Pro",
-    "zh": "amoCRM / Kommo Pro 云同步",
-    "ru": "amoCRM / Kommo Pro Cloud Sync"
+  "Контроль времени ожидания:": {
+    "ru": "Контроль времени ожидания:",
+    "en": "Timeout control:",
+    "es": "Control de tiempo de espera:",
+    "ar": "التحكم في وقت الانتظار:",
+    "zh": "Контроль времени ожидания:",
+    "fr": "Contrôle du temps d'attente :",
+    "de": "Контроль времени ожидания:",
+    "pt": "Контроль времени ожидания:",
+    "ja": "Контроль времени ожидания:",
+    "hi": "Контроль времени ожидания:"
   },
-  "Двусторонняя синхронизация с amoCRM: фиксация звонков, всплывающие карточки, аналитика и выгрузка записей разговоров.": {
-    "en": "Two-way amoCRM sync: call logging, popup cards, analytics and recording uploads.",
-    "es": "Sincronización bidireccional: registro, tarjetas emergentes y análisis.",
-    "ar": "مزامنة ثنائية الاتجاه: تسجيل المكالمات والبطاقات المنبثقة والتحليلات.",
-    "zh": "amoCRM 双向同步：通话记录、弹窗提示、分析及录音上传。",
-    "ru": "Двусторонняя синхронизация с amoCRM: фиксация звонков, всплывающие карточки, аналитика и выгрузка записей разговоров."
+  "Автоматически создавать Contact в HubSpot для новых номеров": {
+    "ru": "Автоматически создавать Contact в HubSpot для новых номеров",
+    "en": "Автоматически создавать Contact в HubSpot для новых номеров",
+    "es": "Crear contacto automáticamente en HubSpot para nuevos números",
+    "ar": "إنشاء جهة اتصال تلقائيًا في HubSpot للأرقام الجديدة",
+    "zh": "Автоматически создавать Contact в HubSpot для новых номеров",
+    "fr": "Créez automatiquement un contact dans HubSpot pour les nouveaux numéros",
+    "de": "Автоматически создавать Contact в HubSpot для новых номеров",
+    "pt": "Автоматически создавать Contact в HubSpot для новых номеров",
+    "ja": "Автоматически создавать Contact в HubSpot для новых номеров",
+    "hi": "नए नंबरों के लिए हबस्पॉट में स्वचालित रूप से संपर्क बनाएं"
   },
-  "Enterprise PBX VPN Server": {
-    "en": "Enterprise PBX VPN Server",
-    "es": "Servidor VPN PBX Enterprise",
-    "ar": "خادم VPN للمقسم",
-    "zh": "企业级 PBX VPN 服务器",
-    "ru": "Enterprise PBX VPN Server"
+  "— при молчании абонента по таймауту.": {
+    "ru": "— при молчании абонента по таймауту.",
+    "en": "— при молчании абонента по таймауту.",
+    "es": "— при молчании абонента по таймауту.",
+    "ar": "— عندما يكون المشترك صامتًا بسبب انتهاء المهلة.",
+    "zh": "— при молчании абонента по таймауту.",
+    "fr": "— при молчании абонента по таймауту.",
+    "de": "— при молчании абонента по таймауту.",
+    "pt": "— при молчании абонента по таймауту.",
+    "ja": "— при молчании абонента по таймауту.",
+    "hi": "— при молчании абонента по таймауту."
   },
-  "Защищенный VPN сервер (OpenVPN + VLESS) для безопасного подключения удаленных сотрудников.": {
-    "en": "Secure VPN server (OpenVPN + VLESS) for safe remote workers connection.",
-    "es": "Servidor VPN seguro para conexión de trabajadores remotos.",
-    "ar": "خادم VPN آمن لربط الموظفين عن بعد.",
-    "zh": "用于远程办公的安全 VPN 服务器 (OpenVPN + VLESS)。",
-    "ru": "Защищенный VPN сервер (OpenVPN + VLESS) для безопасного подключения удаленных сотрудников."
+  "(начинается с": {
+    "ru": "(начинается с",
+    "en": "(начинается с",
+    "es": "(начинается с",
+    "ar": "(يبدأ ب",
+    "zh": "(начинается с",
+    "fr": "(commence par",
+    "de": "(начинается с",
+    "pt": "(начинается с",
+    "ja": "(начинается с",
+    "hi": "(начинается с"
   },
-  "Telegram Smart Alerts & Proxy": {
-    "en": "Telegram Smart Alerts & Proxy",
-    "es": "Alertas y Proxy de Telegram",
-    "ar": "تنبيهات وبروكسي Telegram",
-    "zh": "Telegram 智能告警与代理",
-    "ru": "Telegram Smart Alerts & Proxy"
+  "Холст IVR": {
+    "ru": "Холст IVR",
+    "en": "Холст IVR",
+    "es": "Холст IVR",
+    "ar": "قماش الرد الآلي",
+    "zh": "Холст IVR",
+    "fr": "SVI sur toile",
+    "de": "Холст IVR",
+    "pt": "Холст IVR",
+    "ja": "Холст IVR",
+    "hi": "कैनवास आईवीआर"
   },
-  "Моментальное оповещение руководства и дежурных операторов о событиях телефонии, пропущенных лидах, взломах и системных инцидентах прямо в Telegram-чаты.": {
-    "en": "Instant alerts to management and operators about missed calls, security and incidents.",
-    "es": "Alertas instantáneas sobre llamadas perdidas e incidentes.",
-    "ar": "تنبيهات فورية للمشغلين حول المكالمات الفائتة وأحداث النظام.",
-    "zh": "将漏接电话、安全警告和系统故障即时推送至 Telegram 群组。",
-    "ru": "Моментальное оповещение руководства и дежурных операторов о событиях телефонии, пропущенных лидах, взломах и системных инцидентах прямо в Telegram-чаты."
+  "Инструкция по подключению HubSpot CRM:": {
+    "ru": "Инструкция по подключению HubSpot CRM:",
+    "en": "Инструкция по подключению HubSpot CRM:",
+    "es": "Инструкция по подключению HubSpot CRM:",
+    "ar": "Инструкция по подключению HubSpot CRM:",
+    "zh": "连接 HubSpot CRM 的说明：",
+    "fr": "Instructions pour connecter HubSpot CRM :",
+    "de": "Инструкция по подключению HubSpot CRM:",
+    "pt": "Инструкция по подключению HubSpot CRM:",
+    "ja": "Инструкция по подключению HubSpot CRM:",
+    "hi": "Инструкция по подключению HubSpot CRM:"
   },
-  "Groq Whisper-v3 AI Speech": {
-    "en": "Groq Whisper-v3 AI Speech",
-    "es": "IA de Voz Groq Whisper-v3",
-    "ar": "الذكاء الاصطناعي للصوت Groq Whisper",
-    "zh": "Groq Whisper-v3 AI 语音分析",
-    "ru": "Groq Whisper-v3 AI Speech"
+  "Расписание": {
+    "ru": "Расписание",
+    "en": "Расписание",
+    "es": "Расписание",
+    "ar": "جدول",
+    "zh": "Расписание",
+    "fr": "Calendrier",
+    "de": "Расписание",
+    "pt": "Расписание",
+    "ja": "Расписание",
+    "hi": "Расписание"
   },
-  "Автоматическая расшифровка звонков (Speech-to-Text), разделение реплик оператора и клиента (Диаризация L/R) и нейросетевой анализ качества диалога.": {
-    "en": "Auto speech-to-text, speaker diarization (L/R) and AI-driven call quality analysis.",
-    "es": "Transcripción automática, diarización y análisis de calidad por IA.",
-    "ar": "تحويل الصوت إلى نص وتقسيم المتحدثين وتحليل الجودة بالذكاء الاصطناعي.",
-    "zh": "自动语音转文字、双声道说话人分离 (L/R) 及 AI 驱动的对话质量分析。",
-    "ru": "Автоматическая расшифровка звонков (Speech-to-Text), разделение реплик оператора и клиента (Диаризация L/R) и нейросетевой анализ качества диалога."
+  "в поля ниже.": {
+    "ru": "в поля ниже.",
+    "en": "в поля ниже.",
+    "es": "в поля ниже.",
+    "ar": "في الحقول أدناه.",
+    "zh": "在下面的字段中。",
+    "fr": "dans les champs ci-dessous.",
+    "de": "в поля ниже.",
+    "pt": "в поля ниже.",
+    "ja": "в поля ниже.",
+    "hi": "नीचे के फ़ील्ड में."
   },
-  "Логин / SIP ID": {
-    "en": "Login / SIP ID",
-    "es": "Login / SIP ID",
-    "ar": "معرف SIP",
-    "zh": "登录名 / SIP ID",
-    "ru": "Логин / SIP ID"
-  },
-  "Пароль / Секрет": {
-    "en": "Password / Secret",
-    "es": "Contraseña / Secreto",
-    "ar": "كلمة المرور / السر",
-    "zh": "密码 / 密钥",
-    "ru": "Пароль / Секрет"
-  },
-  "Сохранить группу": {
-    "en": "Save Group",
-    "es": "Guardar Grupo",
-    "ar": "حفظ المجموعة",
-    "zh": "保存队列",
-    "ru": "Сохранить группу"
-  },
-  "Удалить группу": {
-    "en": "Delete Group",
-    "es": "Eliminar Grupo",
-    "ar": "حذف المجموعة",
-    "zh": "删除队列",
-    "ru": "Удалить группу"
-  },
-  "Описание": {
-    "en": "Description",
-    "es": "Descripción",
-    "ar": "الوصف",
-    "zh": "说明",
-    "ru": "Описание"
-  },
-  "Группа": {
-    "en": "Group",
-    "es": "Grupo",
-    "ar": "المجموعة",
-    "zh": "队列/组",
-    "ru": "Группа"
-  },
-  "Имя": {
-    "en": "Name",
-    "es": "Nombre",
-    "ar": "الاسم",
-    "zh": "名称",
-    "ru": "Имя"
-  },
-  "Инструкция": {
-    "en": "Instruction",
-    "es": "Instrucción",
-    "ar": "تعليمات",
-    "zh": "连接指南",
-    "ru": "Инструкция"
-  },
-  "Активировать": {
-    "en": "Activate",
-    "es": "Activar",
-    "ar": "تفعيل",
-    "zh": "激活",
-    "ru": "Активировать"
-  },
-  "Деактивировать": {
-    "en": "Deactivate",
-    "es": "Desactivar",
-    "ar": "إلغاء التفعيل",
-    "zh": "停用",
-    "ru": "Деактивировать"
-  },
-  "Сохранено успешно": {
-    "en": "Saved successfully",
-    "es": "Guardado exitosamente",
-    "ar": "تم الحفظ بنجاح",
-    "zh": "保存成功",
-    "ru": "Сохранено успешно"
-  },
-  "Ошибка сохранения": {
-    "en": "Save error",
-    "es": "Error al guardar",
-    "ar": "خطأ في الحفظ",
-    "zh": "保存失败",
-    "ru": "Ошибка сохранения"
-  },
-  "Загрузка...": {
-    "en": "Loading...",
-    "es": "Cargando...",
-    "ar": "جاري التحميل...",
-    "zh": "加载中...",
-    "ru": "Загрузка..."
-  },
-  "Вы уверены?": {
-    "en": "Are you sure?",
-    "es": "¿Estás seguro?",
-    "ar": "هل أنت متأكد؟",
-    "zh": "您确定吗？",
-    "ru": "Вы уверены?"
-  },
-  "Конец рабочего дня": {
-    "ru": "Конец рабочего дня"
-  },
-  "Инструкция по подключению Битрикс24 за 3 шага:": {
-    "ru": "Инструкция по подключению Битрикс24 за 3 шага:"
-  },
-  "Сквозная фиксация вызовов, создание Лидов и Сделок, всплывающая карточка (CTI) и прикрепление аудиозаписи.": {
-    "ru": "Сквозная фиксация вызовов, создание Лидов и Сделок, всплывающая карточка (CTI) и прикрепление аудиозаписи."
-  },
-  "Инструкция по подключению Zoho CRM:": {
-    "ru": "Инструкция по подключению Zoho CRM:"
-  },
-  "Хост / Домен сервера": {
-    "ru": "Хост / Домен сервера"
-  },
-  "Чтобы узнать ID группы/пользователя, перешлите любое сообщение в бота": {
-    "ru": "Чтобы узнать ID группы/пользователя, перешлите любое сообщение в бота"
-  },
-  "10 MB (Для компактных серверов)": {
-    "ru": "10 MB (Для компактных серверов)"
+  "Включая прямые международные направления (+1..., +971...), конференц-комнаты и приоритетный перехват.": {
+    "ru": "Включая прямые международные направления (+1..., +971...), конференц-комнаты и приоритетный перехват.",
+    "en": "Including direct international destinations (+1..., +971...), conference rooms and priority interception.",
+    "es": "Включая прямые международные направления (+1..., +971...), конференц-комнаты и приоритетный перехват.",
+    "ar": "بما في ذلك الوجهات الدولية المباشرة (+1..., +971...) وقاعات المؤتمرات وأولوية الاعتراض.",
+    "zh": "Включая прямые международные направления (+1..., +971...), конференц-комнаты и приоритетный перехват.",
+    "fr": "Y compris les destinations internationales directes (+1..., +971...), les salles de conférence et l'interception prioritaire.",
+    "de": "Включая прямые международные направления (+1..., +971...), конференц-комнаты и приоритетный перехват.",
+    "pt": "Включая прямые международные направления (+1..., +971...), конференц-комнаты и приоритетный перехват.",
+    "ja": "Включая прямые международные направления (+1..., +971...), конференц-комнаты и приоритетный перехват.",
+    "hi": "जिसमें प्रत्यक्ष अंतर्राष्ट्रीय गंतव्य (+1..., +971...), सम्मेलन कक्ष और प्राथमिकता अवरोधन शामिल हैं।"
   },
   "GPT-4o (Максимальная точность)": {
-    "ru": "GPT-4o (Максимальная точность)"
+    "ru": "GPT-4o (Максимальная точность)",
+    "en": "GPT-4o (Maximum precision)",
+    "es": "GPT-4o (Максимальная точность)",
+    "ar": "GPT-4o (الدقة القصوى)",
+    "zh": "GPT-4o (Максимальная точность)",
+    "fr": "GPT-4o (Précision maximale)",
+    "de": "GPT-4o (Максимальная точность)",
+    "pt": "GPT-4o (Максимальная точность)",
+    "ja": "GPT-4o (Максимальная точность)",
+    "hi": "GPT-4o (अधिकतम परिशुद्धता)"
   },
-  "Настройка воронок для каждого оператора / добавочного номера:": {
-    "ru": "Настройка воронок для каждого оператора / добавочного номера:"
+  "Субдомен компании": {
+    "ru": "Субдомен компании",
+    "en": "Company subdomain",
+    "es": "Субдомен компании",
+    "ar": "النطاق الفرعي للشركة",
+    "zh": "公司子域",
+    "fr": "Sous-domaine de l'entreprise",
+    "de": "Субдомен компании",
+    "pt": "Субдомен компании",
+    "ja": "Субдомен компании",
+    "hi": "कंपनी उपडोमेन"
   },
-  "amoCRM & Сделки": {
-    "ru": "amoCRM & Сделки"
+  "Что такое «Контекст вызовов» (Dialplan Context) и на что он влияет?": {
+    "ru": "Что такое «Контекст вызовов» (Dialplan Context) и на что он влияет?",
+    "en": "What is Dialplan Context and what does it affect?",
+    "es": "Что такое «Контекст вызовов» (Dialplan Context) и на что он влияет?",
+    "ar": "ما هو سياق Dialplan وما تأثيره؟",
+    "zh": "Что такое «Контекст вызовов» (Dialplan Context) и на что он влияет?",
+    "fr": "Qu’est-ce que le contexte Dialplan et qu’est-ce que cela affecte ?",
+    "de": "Что такое «Контекст вызовов» (Dialplan Context) и на что он влияет?",
+    "pt": "O que é o Contexto Dialplan e o que ele afeta?",
+    "ja": "Что такое «Контекст вызовов» (Dialplan Context) и на что он влияет?",
+    "hi": "डायलप्लान प्रसंग क्या है और इसका क्या प्रभाव पड़ता है?"
   },
-  "и создайте новый": {
-    "ru": "и создайте новый"
+  "Скачайте готовый файл .ovpn со встроенными ключами и загрузите в веб-интерфейс телефона": {
+    "ru": "Скачайте готовый файл .ovpn со встроенными ключами и загрузите в веб-интерфейс телефона",
+    "en": "Скачайте готовый файл .ovpn со встроенными ключами и загрузите в веб-интерфейс телефона",
+    "es": "Скачайте готовый файл .ovpn со встроенными ключами и загрузите в веб-интерфейс телефона",
+    "ar": "قم بتنزيل ملف .ovpn النهائي باستخدام المفاتيح المضمنة وقم بتحميله على واجهة الويب الخاصة بالهاتف",
+    "zh": "Скачайте готовый файл .ovpn со встроенными ключами и загрузите в веб-интерфейс телефона",
+    "fr": "Téléchargez le fichier .ovpn terminé avec les clés intégrées et téléchargez-le sur l'interface Web du téléphone",
+    "de": "Laden Sie die fertige .ovpn-Datei mit integrierten Schlüsseln herunter und laden Sie sie auf die Weboberfläche des Telefons hoch",
+    "pt": "Скачайте готовый файл .ovpn со встроенными ключами и загрузите в веб-интерфейс телефона",
+    "ja": "Скачайте готовый файл .ovpn со встроенными ключами и загрузите в веб-интерфейс телефона",
+    "hi": "तैयार .ovpn फ़ाइल को अंतर्निहित कुंजियों के साथ डाउनलोड करें और इसे फ़ोन के वेब इंटरफ़ेस पर अपलोड करें"
   },
-  "Табличный вид": {
-    "ru": "Табличный вид"
+  "не умеют передавать голос": {
+    "ru": "не умеют передавать голос",
+    "en": "не умеют передавать голос",
+    "es": "no puedo transmitir la voz",
+    "ar": "لا يستطيع نقل الصوت",
+    "zh": "无法传达声音",
+    "fr": "je ne peux pas transmettre la voix",
+    "de": "kann keine Stimme vermitteln",
+    "pt": "не умеют передавать голос",
+    "ja": "не умеют передавать голос",
+    "hi": "आवाज नहीं दे सकते"
   },
-  "GPT-4o Mini (Рекомендуется)": {
-    "ru": "GPT-4o Mini (Рекомендуется)"
-  },
-  "Как настроить бота и получить Chat ID:": {
-    "ru": "Как настроить бота и получить Chat ID:"
-  },
-  "Включить модуль": {
-    "ru": "Включить модуль"
-  },
-  "В HubSpot перейдите в": {
-    "ru": "В HubSpot перейдите в"
-  },
-  "Включить интеграцию с Zoho CRM": {
-    "ru": "Включить интеграцию с Zoho CRM"
-  },
-  "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global": {
-    "ru": "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global"
-  },
-  "Хост / IP": {
-    "ru": "Хост / IP"
+  "Телефония (telephony)": {
+    "ru": "Телефония (telephony)",
+    "en": "Телефония (telephony)",
+    "es": "Телефония (telephony)",
+    "ar": "الاتصالات الهاتفية",
+    "zh": "Телефония (telephony)",
+    "fr": "Téléphonie",
+    "de": "Телефония (telephony)",
+    "pt": "Телефония (telephony)",
+    "ja": "電話",
+    "hi": "टेलीफ़ोनी"
   },
   "ID: ai_whisper • Версия: v2.5.0 • Автор: Logic Core AI Labs": {
-    "ru": "ID: ai_whisper • Версия: v2.5.0 • Автор: Logic Core AI Labs"
+    "ru": "ID: ai_whisper • Версия: v2.5.0 • Автор: Logic Core AI Labs",
+    "en": "ID: ai_whisper • Версия: v2.5.0 • Автор: Logic Core AI Labs",
+    "es": "ID: ai_whisper • Версия: v2.5.0 • Автор: Logic Core AI Labs",
+    "ar": "المعرف: ai_whisper • الإصدار: v2.5.0 • المؤلف: Logic Core AI Labs",
+    "zh": "ID：ai_whisper • 版本：v2.5.0 • 作者：Logic Core AI Labs",
+    "fr": "ID : ai_whisper • Version : v2.5.0 • Auteur : Logic Core AI Labs",
+    "de": "ID: ai_whisper • Версия: v2.5.0 • Автор: Logic Core AI Labs",
+    "pt": "ID: ai_whisper • Версия: v2.5.0 • Автор: Logic Core AI Labs",
+    "ja": "ID: ai_whisper • バージョン: v2.5.0 • 作者: Logic Core AI Labs",
+    "hi": "आईडी: ai_whisper • संस्करण: v2.5.0 • लेखक: लॉजिक कोर AI लैब्स"
   },
-  "Воронка amoCRM": {
-    "ru": "Воронка amoCRM"
-  },
-  "Контекст в Asterisk": {
-    "ru": "Контекст в Asterisk"
-  },
-  "в поле ниже.": {
-    "ru": "в поле ниже."
-  },
-  "отображается на дисплеях телефонов коллег при звонке и автоматически привязывается к карточке сделки в CRM (например,": {
-    "ru": "отображается на дисплеях телефонов коллег при звонке и автоматически привязывается к карточке сделки в CRM (например,"
+  "Нейросетевой движок распознавания (STT Engine)": {
+    "ru": "Нейросетевой движок распознавания (STT Engine)",
+    "en": "Нейросетевой движок распознавания (STT Engine)",
+    "es": "Нейросетевой движок распознавания (STT Engine)",
+    "ar": "محرك التعرف على الشبكة العصبية (محرك STT)",
+    "zh": "Нейросетевой движок распознавания (STT Engine)",
+    "fr": "Moteur de reconnaissance de réseau neuronal (STT Engine)",
+    "de": "Erkennungsmaschine für neuronale Netze (STT Engine)",
+    "pt": "Нейросетевой движок распознавания (STT Engine)",
+    "ja": "Нейросетевой движок распознавания (STT Engine)",
+    "hi": "तंत्रिका नेटवर्क पहचान इंजन (एसटीटी इंजन)"
   },
   "Лицензия & OTA": {
-    "ru": "Лицензия & OTA"
+    "ru": "Лицензия & OTA",
+    "en": "License & OTA",
+    "es": "Licencia & OTA",
+    "ar": "الترخيص",
+    "zh": "许可 & OTA",
+    "fr": "Licence et OTA",
+    "de": "Лицензия & OTA",
+    "pt": "Лицензия & OTA",
+    "ja": "Лицензия & OTA",
+    "hi": "लाइसेंस और ओटीए"
+  },
+  "Попыток ввода": {
+    "ru": "Попыток ввода",
+    "en": "Попыток ввода",
+    "es": "Попыток ввода",
+    "ar": "Попыток ввода",
+    "zh": "Попыток ввода",
+    "fr": "Tentatives de saisie",
+    "de": "Попыток ввода",
+    "pt": "Tentativas de entrada",
+    "ja": "Попыток ввода",
+    "hi": "इनपुट प्रयास"
+  },
+  "Удалить этот блок": {
+    "ru": "Удалить этот блок",
+    "en": "Delete this block",
+    "es": "Удалить этот блок",
+    "ar": "احذف هذه الكتلة",
+    "zh": "Удалить этот блок",
+    "fr": "Supprimer ce bloc",
+    "de": "Löschen Sie diesen Block",
+    "pt": "Excluir este bloco",
+    "ja": "Удалить этот блок",
+    "hi": "इस ब्लॉक को हटा दें"
+  },
+  "Протокол проверки подключения amoCRM": {
+    "ru": "Протокол проверки подключения amoCRM",
+    "en": "amoCRM connection verification protocol",
+    "es": "Протокол проверки подключения amoCRM",
+    "ar": "amoCRM بروتوكول التحقق من الاتصال",
+    "zh": "Протокол проверки подключения amoCRM",
+    "fr": "protocole de vérification de connexion amoCRM",
+    "de": "amoCRM-Verbindungsüberprüfungsprotokoll",
+    "pt": "protocolo de verificação de conexão amoCRM",
+    "ja": "Протокол проверки подключения amoCRM",
+    "hi": "amoCRM कनेक्शन सत्यापन प्रोटोकॉल"
+  },
+  "Выберите подписанный .zip пакет расширения": {
+    "ru": "Выберите подписанный .zip пакет расширения",
+    "en": "Select signed .zip extension package",
+    "es": "Выберите подписанный .zip пакет расширения",
+    "ar": "Выберите подписанный .zip пакет расширения",
+    "zh": "Выберите подписанный .zip пакет расширения",
+    "fr": "Sélectionnez le package d'extension .zip signé",
+    "de": "Выберите подписанный .zip пакет расширения",
+    "pt": "Selecione o pacote de extensão .zip assinado",
+    "ja": "Выберите подписанный .zip пакет расширения",
+    "hi": "हस्ताक्षरित .zip एक्सटेंशन पैकेज चुनें"
+  },
+  "Вставьте ваш": {
+    "ru": "Вставьте ваш",
+    "en": "Insert your",
+    "es": "Вставьте ваш",
+    "ar": "أدخل الخاص بك",
+    "zh": "插入您的",
+    "fr": "Insérez votre",
+    "de": "Fügen Sie Ihre ein",
+    "pt": "Insira seu",
+    "ja": "Вставьте ваш",
+    "hi": "अपना डालें"
+  },
+  "Откройте ваш портал Битрикс24 $\\rightarrow$ раздел": {
+    "ru": "Откройте ваш портал Битрикс24 $\\rightarrow$ раздел",
+    "en": "Open your Bitrix24 portal $\\rightarrow$ section",
+    "es": "Откройте ваш портал Битрикс24 $\\rightarrow$ раздел",
+    "ar": "Откройте ваш портал Битрикс24 $\\rightarrow$ раздел",
+    "zh": "Откройте ваш портал Битрикс24 $\\rightarrow$ раздел",
+    "fr": "Ouvrez la section $\\rightarrow$ de votre portail Bitrix24",
+    "de": "Öffnen Sie den Abschnitt $\\rightarrow$ Ihres Bitrix24-Portals",
+    "pt": "Откройте ваш портал Битрикс24 $\\rightarrow$ раздел",
+    "ja": "Bitrix24 ポータルの $\\rightarrow$ セクションを開きます",
+    "hi": "अपना Bitrix24 पोर्टल $\\rightarrow$ अनुभाग खोलें"
+  },
+  "Запись разговоров": {
+    "ru": "Запись разговоров",
+    "en": "Recording conversations",
+    "es": "Запись разговоров",
+    "ar": "Запись разговоров",
+    "zh": "Запись разговоров",
+    "fr": "Enregistrement de conversations",
+    "de": "Запись разговоров",
+    "pt": "Gravando conversas",
+    "ja": "Запись разговоров",
+    "hi": "बातचीत रिकॉर्ड करना"
+  },
+  "Поиск по тексту лога...": {
+    "ru": "Поиск по тексту лога...",
+    "en": "Search by log text...",
+    "es": "Поиск по тексту лога...",
+    "ar": "Поиск по тексту лога...",
+    "zh": "Поиск по тексту лога...",
+    "fr": "Recherche par texte de journal...",
+    "de": "Nach Protokolltext suchen...",
+    "pt": "Pesquisar por texto de registro...",
+    "ja": "Поиск по тексту лога...",
+    "hi": "लॉग टेक्स्ट द्वारा खोजें..."
+  },
+  "Локальное или удаленное (OpenAI/Groq/Ollama) распознавание речи, разделение по ролям (L: оператор, R: клиент), суммаризация и оценка качества.": {
+    "ru": "Локальное или удаленное (OpenAI/Groq/Ollama) распознавание речи, разделение по ролям (L: оператор, R: клиент), суммаризация и оценка качества.",
+    "en": "Local or remote (OpenAI/Groq/Ollama) speech recognition, role separation (L: operator, R: client), summarization and quality assessment.",
+    "es": "Локальное или удаленное (OpenAI/Groq/Ollama) распознавание речи, разделение по ролям (L: оператор, R: клиент), суммаризация и оценка качества.",
+    "ar": "Локальное или удаленное (OpenAI/Groq/Ollama) распознавание речи, разделение по ролям (L: оператор, R: клиент), суммаризация и оценка качества.",
+    "zh": "Локальное или удаленное (OpenAI/Groq/Ollama) распознавание речи, разделение по ролям (L: оператор, R: клиент), суммаризация и оценка качества.",
+    "fr": "Reconnaissance vocale locale ou distante (OpenAI/Groq/Ollama), séparation des rôles (L : opérateur, R : client), synthèse et évaluation de la qualité.",
+    "de": "Lokale oder entfernte (OpenAI/Groq/Ollama) Spracherkennung, Rollentrennung (L: Operator, R: Client), Zusammenfassung und Qualitätsbewertung.",
+    "pt": "Локальное или удаленное (OpenAI/Groq/Ollama) распознавание речи, разделение по ролям (L: оператор, R: клиент), суммаризация и оценка качества.",
+    "ja": "Локальное или удаленное (OpenAI/Groq/Ollama) распознавание речи, разделение по ролям (L: оператор, R: клиент), суммаризация и оценка качества.",
+    "hi": "स्थानीय या दूरस्थ (OpenAI/Groq/Ollama) वाक् पहचान, भूमिका पृथक्करण (L: ऑपरेटर, R: क्लाइंट), सारांश और गुणवत्ता मूल्यांकन।"
+  },
+  "ID: telegram_alerts • Версия: v2.1.0 • Автор: Logic Core Team": {
+    "ru": "ID: telegram_alerts • Версия: v2.1.0 • Автор: Logic Core Team",
+    "en": "ID: telegram_alerts • Version: v2.1.0 • Author: Logic Core Team",
+    "es": "ID: telegram_alerts • Версия: v2.1.0 • Автор: Logic Core Team",
+    "ar": "ID: telegram_alerts • Версия: v2.1.0 • Автор: Logic Core Team",
+    "zh": "ID: telegram_alerts • Версия: v2.1.0 • Автор: Logic Core Team",
+    "fr": "ID : telegram_alerts • Version : v2.1.0 • Auteur : Logic Core Team",
+    "de": "ID: telegram_alerts • Version: v2.1.0 • Autor: Logic Core Team",
+    "pt": "ID: telegram_alerts • Versão: v2.1.0 • Autor: Logic Core Team",
+    "ja": "ID: telegram_alerts • Версия: v2.1.0 • Автор: Logic Core Team",
+    "hi": "आईडी: टेलीग्राम_अलर्ट्स • संस्करण: v2.1.0 • लेखक: लॉजिक कोर टीम"
+  },
+  "Удалить модуль": {
+    "ru": "Удалить модуль",
+    "en": "Remove module",
+    "es": "Удалить модуль",
+    "ar": "Удалить модуль",
+    "zh": "Удалить модуль",
+    "fr": "Удалить модуль",
+    "de": "Modul entfernen",
+    "pt": "Remover módulo",
+    "ja": "Удалить модуль",
+    "hi": "मॉड्यूल निकालें"
+  },
+  "Точка входа звонка от внешнего провайдера связи. Принимает внешний вызов и сразу направляет его в связанное голосовое меню.": {
+    "ru": "Точка входа звонка от внешнего провайдера связи. Принимает внешний вызов и сразу направляет его в связанное голосовое меню.",
+    "en": "Entry point for a call from an external communication provider. Receives an external call and immediately routes it to the associated voice menu.",
+    "es": "Точка входа звонка от внешнего провайдера связи. Принимает внешний вызов и сразу направляет его в связанное голосовое меню.",
+    "ar": "Точка входа звонка от внешнего провайдера связи. Принимает внешний вызов и сразу направляет его в связанное голосовое меню.",
+    "zh": "来自外部通信提供商的调用的入口点。接收外部呼叫并立即将其路由至关联的语音菜单。",
+    "fr": "Point d'entrée pour un appel provenant d'un fournisseur de communication externe. Reçoit un appel externe et l'achemine immédiatement vers le menu vocal associé.",
+    "de": "Einstiegspunkt für einen Anruf von einem externen Kommunikationsanbieter. Empfängt einen externen Anruf und leitet ihn sofort an das zugehörige Sprachmenü weiter.",
+    "pt": "Ponto de entrada para uma chamada de um provedor de comunicação externo. Recebe uma chamada externa e encaminha-a imediatamente para o menu de voz associado.",
+    "ja": "Точка входа звонка от внешнего провайдера связи. Принимает внешний вызов и сразу направляет его в связанное голосовое меню.",
+    "hi": "किसी बाहरी संचार प्रदाता से कॉल के लिए प्रवेश बिंदु। एक बाहरी कॉल प्राप्त करता है और तुरंत इसे संबंधित वॉयस मेनू पर रूट करता है।"
+  },
+  "Сохранить настройки Битрикс24": {
+    "ru": "Сохранить настройки Битрикс24",
+    "en": "Save Bitrix24 settings",
+    "es": "Сохранить настройки Битрикс24",
+    "ar": "Сохранить настройки Битрикс24",
+    "zh": "Сохранить настройки Битрикс24",
+    "fr": "Enregistrer les paramètres Bitrix24",
+    "de": "Bitrix24-Einstellungen speichern",
+    "pt": "Salvar configurações do Bitrix24",
+    "ja": "Сохранить настройки Битрикс24",
+    "hi": "Bitrix24 सेटिंग्स सहेजें"
+  },
+  "VLESS Reality XTLS (Смартфоны & Софтфоны)": {
+    "ru": "VLESS Reality XTLS (Смартфоны & Софтфоны)",
+    "en": "VLESS Reality XTLS (Smartphones & Softphones)",
+    "es": "VLESS Reality XTLS (Смартфоны & Софтфоны)",
+    "ar": "VLESS Reality XTLS (Смартфоны & Софтфоны)",
+    "zh": "VLESS Reality XTLS (Смартфоны & Софтфоны)",
+    "fr": "VLESS Reality XTLS (Смартфоны & Софтфоны)",
+    "de": "VLESS Reality XTLS (Smartphones und Softphones)",
+    "pt": "VLESS Reality XTLS (smartphones e softphones)",
+    "ja": "VLESS Reality XTLS (Смартфоны & Софтфоны)",
+    "hi": "वीएलईएसएस रियलिटी एक्सटीएलएस (स्मार्टफोन और सॉफ्टफोन)"
+  },
+  "(Внешний публичный IP)": {
+    "ru": "(Внешний публичный IP)",
+    "en": "(External public IP)",
+    "es": "(Внешний публичный IP)",
+    "ar": "(Внешний публичный IP)",
+    "zh": "(Внешний публичный IP)",
+    "fr": "(IP publique externe)",
+    "de": "(Externe öffentliche IP)",
+    "pt": "(IP público externo)",
+    "ja": "(Внешний публичный IP)",
+    "hi": "(बाहरी सार्वजनिक आईपी)"
+  },
+  "Модули (Диски & Чанки)": {
+    "ru": "Модули (Диски & Чанки)",
+    "en": "Модули (Диски & Чанки)",
+    "es": "Модули (Диски & Чанки)",
+    "ar": "Модули (Диски & Чанки)",
+    "zh": "Модули (Диски & Чанки)",
+    "fr": "Модули (Диски & Чанки)",
+    "de": "Module (Festplatten und Chunks)",
+    "pt": "Módulos (discos e pedaços)",
+    "ja": "Модули (Диски & Чанки)",
+    "hi": "मॉड्यूल (डिस्क और टुकड़े)"
+  },
+  "Визуальное проектирование голосовых сценариев, прямого донабора (Direct Dial), очередей и расписаний.": {
+    "ru": "Визуальное проектирование голосовых сценариев, прямого донабора (Direct Dial), очередей и расписаний.",
+    "en": "Visual design of voice scripts, Direct Dial, queues and schedules.",
+    "es": "Визуальное проектирование голосовых сценариев, прямого донабора (Direct Dial), очередей и расписаний.",
+    "ar": "Визуальное проектирование голосовых сценариев, прямого донабора (Direct Dial), очередей и расписаний.",
+    "zh": "Визуальное проектирование голосовых сценариев, прямого донабора (Direct Dial), очередей и расписаний.",
+    "fr": "Визуальное проектирование голосовых сценариев, прямого донабора (Direct Dial), очередей и расписаний.",
+    "de": "Visuelle Gestaltung von Sprachskripten, Direktwahl, Warteschlangen und Zeitplänen.",
+    "pt": "Design visual de scripts de voz, Discagem Direta, filas e horários.",
+    "ja": "Визуальное проектирование голосовых сценариев, прямого донабора (Direct Dial), очередей и расписаний.",
+    "hi": "वॉयस स्क्रिप्ट, डायरेक्ट डायल, क्यू और शेड्यूल का विज़ुअल डिज़ाइन।"
+  },
+  "Передавать внутренние звонки между сотрудниками": {
+    "ru": "Передавать внутренние звонки между сотрудниками",
+    "en": "Transfer internal calls between employees",
+    "es": "Передавать внутренние звонки между сотрудниками",
+    "ar": "Передавать внутренние звонки между сотрудниками",
+    "zh": "在员工之间转接内部电话",
+    "fr": "Передавать внутренние звонки между сотрудниками",
+    "de": "Interne Anrufe zwischen Mitarbeitern weiterleiten",
+    "pt": "Transferir chamadas internas entre funcionários",
+    "ja": "Передавать внутренние звонки между сотрудниками",
+    "hi": "कर्मचारियों के बीच आंतरिक कॉल स्थानांतरित करें"
+  },
+  "Источник ссылки на аудио:": {
+    "ru": "Источник ссылки на аудио:",
+    "en": "Источник ссылки на аудио:",
+    "es": "Источник ссылки на аудио:",
+    "ar": "Источник ссылки на аудио:",
+    "zh": "Источник ссылки на аудио:",
+    "fr": "Source du lien audio :",
+    "de": "Quelle des Audio-Links:",
+    "pt": "Fonte do link de áudio:",
+    "ja": "Источник ссылки на аудио:",
+    "hi": "ऑडियो लिंक स्रोत:"
+  },
+  "(Абонент)": {
+    "ru": "(Абонент)",
+    "en": "(Абонент)",
+    "es": "(Абонент)",
+    "ar": "(Абонент)",
+    "zh": "(Абонент)",
+    "fr": "(Abonné)",
+    "de": "(Teilnehmer)",
+    "pt": "(Assinante)",
+    "ja": "(Абонент)",
+    "hi": "(ग्राहक)"
+  },
+  "Субдомен": {
+    "ru": "Субдомен",
+    "en": "Субдомен",
+    "es": "Субдомен",
+    "ar": "Субдомен",
+    "zh": "Субдомен",
+    "fr": "Субдомен",
+    "de": "Subdomain",
+    "pt": "Subdomínio",
+    "ja": "Субдомен",
+    "hi": "उप डोमेन"
+  },
+  "Стандарты связи": {
+    "ru": "Стандарты связи",
+    "en": "Стандарты связи",
+    "es": "Estándares de comunicación",
+    "ar": "Стандарты связи",
+    "zh": "通讯标准",
+    "fr": "Стандарты связи",
+    "de": "Kommunikationsstandards",
+    "pt": "Padrões de comunicação",
+    "ja": "Стандарты связи",
+    "hi": "संचार मानक"
+  },
+  "⚡ Автовыбор (Первое доступное хранилище)": {
+    "ru": "⚡ Автовыбор (Первое доступное хранилище)",
+    "en": "⚡ Автовыбор (Первое доступное хранилище)",
+    "es": "⚡ Автовыбор (Первое доступное хранилище)",
+    "ar": "⚡ التحديد التلقائي (أول مساحة تخزين متاحة)",
+    "zh": "⚡ Автовыбор (Первое доступное хранилище)",
+    "fr": "⚡ Sélection automatique (premier stockage disponible)",
+    "de": "⚡ Автовыбор (Первое доступное хранилище)",
+    "pt": "⚡ Seleção automática (primeiro armazenamento disponível)",
+    "ja": "⚡ Автовыбор (Первое доступное хранилище)",
+    "hi": "⚡ स्वतः चयन (पहला उपलब्ध संग्रहण)"
+  },
+  "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global": {
+    "ru": "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global",
+    "en": "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global",
+    "es": "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global",
+    "ar": "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global",
+    "zh": "ID：gohighlevel • 版本：v2.0.0 • 作者：Logic Core Global",
+    "fr": "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global",
+    "de": "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global",
+    "pt": "ID: gohighlevel • Versão: v2.0.0 • Autor: Logic Core Global",
+    "ja": "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global",
+    "hi": "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global"
+  },
+  "3G HSPA+ (Эмуляция)": {
+    "ru": "3G HSPA+ (Эмуляция)",
+    "en": "3G HSPA+ (Emulation)",
+    "es": "3G HSPA+ (Эмуляция)",
+    "ar": "3G HSPA+ (Эмуляция)",
+    "zh": "3G HSPA+ (Эмуляция)",
+    "fr": "3G HSPA+ (émulation)",
+    "de": "3G HSPA+ (Emulation)",
+    "pt": "3G HSPA+ (Эмуляция)",
+    "ja": "3G HSPA+ (エミュレーション)",
+    "hi": "3G HSPA+ (Эмуляция)"
+  },
+  "Загрузить": {
+    "ru": "Загрузить",
+    "en": "Download",
+    "es": "Загрузить",
+    "ar": "Загрузить",
+    "zh": "Загрузить",
+    "fr": "Télécharger",
+    "de": "Herunterladen",
+    "pt": "Download",
+    "ja": "Загрузить",
+    "hi": "Загрузить"
+  },
+  "Включить авторизацию по логину и паролю": {
+    "ru": "Включить авторизацию по логину и паролю",
+    "en": "Enable login and password authentication",
+    "es": "Включить авторизацию по логину и паролю",
+    "ar": "Включить авторизацию по логину и паролю",
+    "zh": "Включить авторизацию по логину и паролю",
+    "fr": "Activer l'authentification par login et mot de passe",
+    "de": "Aktivieren Sie die Login- und Passwortauthentifizierung",
+    "pt": "Habilitar autenticação de login e senha",
+    "ja": "Включить авторизацию по логину и паролю",
+    "hi": "लॉगिन और पासवर्ड प्रमाणीकरण सक्षम करें"
+  },
+  "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.": {
+    "ru": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
+    "en": "When you click “Apply IVR scheme”, the visual graph is automatically converted into an Asterisk combat context with a dialplan reboot.",
+    "es": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
+    "ar": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
+    "zh": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
+    "fr": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
+    "de": "Wenn Sie auf „IVR-Schema anwenden“ klicken, wird das visuelle Diagramm mit einem Wählplan-Neustart automatisch in einen Asterisk-Kampfkontext umgewandelt.",
+    "pt": "Quando você clica em “Aplicar esquema IVR”, o gráfico visual é automaticamente convertido em um contexto de combate Asterisk com uma reinicialização do dialplan.",
+    "ja": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.",
+    "hi": "जब आप \"आईवीआर योजना लागू करें\" पर क्लिक करते हैं, तो दृश्य ग्राफ स्वचालित रूप से डायलप्लान रीबूट के साथ तारांकन मुकाबला संदर्भ में परिवर्तित हो जाता है।"
+  },
+  "Активация лицензии / плагина": {
+    "ru": "Активация лицензии / плагина",
+    "en": "Активация лицензии / плагина",
+    "es": "Activación de licencia/complemento",
+    "ar": "Активация лицензии / плагина",
+    "zh": "Активация лицензии / плагина",
+    "fr": "Активация лицензии / плагина",
+    "de": "Lizenz-/Plugin-Aktivierung",
+    "pt": "Ativação de licença/plugin",
+    "ja": "ライセンス/プラグインのアクティベーション",
+    "hi": "लाइसेंस/प्लगइन सक्रियण"
+  },
+  "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team": {
+    "ru": "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team",
+    "en": "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team",
+    "es": "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team",
+    "ar": "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team",
+    "zh": "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team",
+    "fr": "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team",
+    "de": "ID: amocrm_pro • Version: v3.2.0 • Autor: Logic Core Team",
+    "pt": "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team",
+    "ja": "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team",
+    "hi": "आईडी: amocrm_pro • संस्करण: v3.2.0 • लेखक: लॉजिक कोर टीम"
+  },
+  "Офисный Yealink SIP-T31P (Абонент 101)": {
+    "ru": "Офисный Yealink SIP-T31P (Абонент 101)",
+    "en": "Офисный Yealink SIP-T31P (Абонент 101)",
+    "es": "Офисный Yealink SIP-T31P (Абонент 101)",
+    "ar": "Офисный Yealink SIP-T31P (Абонент 101)",
+    "zh": "Офисный Yealink SIP-T31P (Абонент 101)",
+    "fr": "Офисный Yealink SIP-T31P (Абонент 101)",
+    "de": "Office Yealink SIP-T31P (Abonnent 101)",
+    "pt": "Офисный Yealink SIP-T31P (Абонент 101)",
+    "ja": "Office Yealink SIP-T31P (サブスクライバー 101)",
+    "hi": "Офисный Yealink SIP-T31P (Абонент 101)"
+  },
+  "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team": {
+    "ru": "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team",
+    "en": "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team",
+    "es": "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team",
+    "ar": "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team",
+    "zh": "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team",
+    "fr": "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team",
+    "de": "ID: yandex_disk • Version: v2.1.0 • Autor: Logic Core Team",
+    "pt": "ID: yandex_disk • Versão: v2.1.0 • Autor: Logic Core Team",
+    "ja": "ID: yandex_disk • バージョン: v2.1.0 • 作成者: Logic Core Team",
+    "hi": "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team"
+  },
+  "Группа": {
+    "ru": "Группа",
+    "en": "Группа",
+    "es": "Группа",
+    "ar": "Группа",
+    "zh": "Группа",
+    "fr": "Группа",
+    "de": "Gruppe",
+    "pt": "Grupo",
+    "ja": "グループ",
+    "hi": "Группа"
+  },
+  "Закрыть": {
+    "ru": "Закрыть",
+    "en": "Закрыть",
+    "es": "Закрыть",
+    "ar": "Закрыть",
+    "zh": "Закрыть",
+    "fr": "Закрыть",
+    "de": "Schließen",
+    "pt": "Fechar",
+    "ja": "Закрыть",
+    "hi": "Закрыть"
+  },
+  "Все источники": {
+    "ru": "Все источники",
+    "en": "Все источники",
+    "es": "Все источники",
+    "ar": "Все источники",
+    "zh": "Все источники",
+    "fr": "Все источники",
+    "de": "Alle Quellen",
+    "pt": "Todas as fontes",
+    "ja": "すべてのソース",
+    "hi": "Все источники"
+  },
+  "SIP Транки & Вызовы": {
+    "ru": "SIP Транки & Вызовы",
+    "en": "SIP Транки & Вызовы",
+    "es": "SIP Транки & Вызовы",
+    "ar": "SIP Транки & Вызовы",
+    "zh": "SIP Транки & Вызовы",
+    "fr": "SIP Транки & Вызовы",
+    "de": "SIP-Trunk und Anrufe",
+    "pt": "Tronco SIP e chamadas",
+    "ja": "SIP Транки & Вызовы",
+    "hi": "एसआईपी ट्रंक और कॉल"
+  },
+  "и полученный токен.": {
+    "ru": "и полученный токен.",
+    "en": "и полученный токен.",
+    "es": "и полученный токен.",
+    "ar": "и полученный токен.",
+    "zh": "и полученный токен.",
+    "fr": "и полученный токен.",
+    "de": "und das resultierende Token.",
+    "pt": "e o token resultante.",
+    "ja": "そして結果として得られるトークン。",
+    "hi": "и полученный токен."
+  },
+  "Редактирование SIP-Транка": {
+    "ru": "Редактирование SIP-Транка",
+    "en": "Редактирование SIP-Транка",
+    "es": "Редактирование SIP-Транка",
+    "ar": "Редактирование SIP-Транка",
+    "zh": "Редактирование SIP-Транка",
+    "fr": "Редактирование SIP-Транка",
+    "de": "Bearbeiten eines SIP-Trunks",
+    "pt": "Editando um tronco SIP",
+    "ja": "Редактирование SIP-Транка",
+    "hi": "Редактирование SIP-Транка"
+  },
+  "Воронка amoCRM": {
+    "ru": "Воронка amoCRM",
+    "en": "Воронка amoCRM",
+    "es": "Воронка amoCRM",
+    "ar": "Воронка amoCRM",
+    "zh": "Воронка amoCRM",
+    "fr": "Воронка amoCRM",
+    "de": "amoCRM-Trichter",
+    "pt": "funil amoCRM",
+    "ja": "Воронка amoCRM",
+    "hi": "Воронка amoCRM"
+  },
+  "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global": {
+    "ru": "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global",
+    "en": "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global",
+    "es": "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global",
+    "ar": "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global",
+    "zh": "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global",
+    "fr": "ID: hubspot • Версия: v3.1.0 • Автор: Logic Core Global",
+    "de": "ID: hubspot • Version: v3.1.0 • Autor: Logic Core Global",
+    "pt": "ID: hubspot • Versão: v3.1.0 • Autor: Logic Core Global",
+    "ja": "ID: Hubspot • バージョン: v3.1.0 • 作者: Logic Core Global",
+    "hi": "आईडी: हबस्पॉट • संस्करण: v3.1.0 • लेखक: लॉजिक कोर ग्लोबल"
+  },
+  "Добавьте триггер": {
+    "ru": "Добавьте триггер",
+    "en": "Добавьте триггер",
+    "es": "Добавьте триггер",
+    "ar": "Добавьте триггер",
+    "zh": "Добавьте триггер",
+    "fr": "Добавьте триггер",
+    "de": "Fügen Sie einen Auslöser hinzu",
+    "pt": "Adicione um gatilho",
+    "ja": "トリガーを追加する",
+    "hi": "Добавьте триггер"
+  },
+  "Подключение SIP Транка": {
+    "ru": "Подключение SIP Транка",
+    "en": "Подключение SIP Транка",
+    "es": "Подключение SIP Транка",
+    "ar": "Подключение SIP Транка",
+    "zh": "Подключение SIP Транка",
+    "fr": "Подключение SIP Транка",
+    "de": "Anschließen eines SIP-Trunks",
+    "pt": "Conectando um tronco SIP",
+    "ja": "Подключение SIP Транка",
+    "hi": "एक एसआईपी ट्रंक कनेक्ट करना"
+  },
+  "Логин: s1921687209": {
+    "ru": "Логин: s1921687209",
+    "en": "Логин: s1921687209",
+    "es": "Логин: s1921687209",
+    "ar": "Логин: s1921687209",
+    "zh": "Логин: s1921687209",
+    "fr": "Логин: s1921687209",
+    "de": "Login: s1921687209",
+    "pt": "Login: s1921687209",
+    "ja": "Логин: s1921687209",
+    "hi": "Логин: s1921687209"
+  },
+  "В момент установления звонка модем потребляет в пике до": {
+    "ru": "В момент установления звонка модем потребляет в пике до",
+    "en": "At the moment the call is established, the modem consumes a peak of up to",
+    "es": "В момент установления звонка модем потребляет в пике до",
+    "ar": "В момент установления звонка модем потребляет в пике до",
+    "zh": "В момент установления звонка модем потребляет в пике до",
+    "fr": "В момент установления звонка модем потребляет в пике до",
+    "de": "Im Moment des Verbindungsaufbaus verbraucht das Modem einen Spitzenwert von bis zu",
+    "pt": "No momento em que a chamada é estabelecida, o modem consome um pico de até",
+    "ja": "通話が確立された瞬間に、モデムは最大​​でピークの電力を消費します。",
+    "hi": "В момент установления звонка модем потребляет в пике до"
+  },
+  "Контекст вызовов": {
+    "ru": "Контекст вызовов",
+    "en": "Контекст вызовов",
+    "es": "Контекст вызовов",
+    "ar": "Контекст вызовов",
+    "zh": "Контекст вызовов",
+    "fr": "Контекст вызовов",
+    "de": "Aufrufkontext",
+    "pt": "Contexto de chamada",
+    "ja": "コールコンテキスト",
+    "hi": "Контекст вызовов"
+  },
+  "TLS (Зашифрованный)": {
+    "ru": "TLS (Зашифрованный)",
+    "en": "TLS (Зашифрованный)",
+    "es": "TLS (Зашифрованный)",
+    "ar": "TLS (Зашифрованный)",
+    "zh": "TLS (Зашифрованный)",
+    "fr": "TLS (Зашифрованный)",
+    "de": "TLS (verschlüsselt)",
+    "pt": "TLS (criptografado)",
+    "ja": "TLS (Зашифрованный)",
+    "hi": "TLS (Зашифрованный)"
+  },
+  "Тест распознавания": {
+    "ru": "Тест распознавания",
+    "en": "Тест распознавания",
+    "es": "Тест распознавания",
+    "ar": "اختبار الاعتراف",
+    "zh": "Тест распознавания",
+    "fr": "Тест распознавания",
+    "de": "Anerkennungstest",
+    "pt": "Teste de reconhecimento",
+    "ja": "Тест распознавания",
+    "hi": "पहचान परीक्षण"
+  },
+  "Новая группа абонентов": {
+    "ru": "Новая группа абонентов",
+    "en": "Новая группа абонентов",
+    "es": "Новая группа абонентов",
+    "ar": "مجموعة جديدة من المشتركين",
+    "zh": "Новая группа абонентов",
+    "fr": "Новая группа абонентов",
+    "de": "Neue Abonnentengruppe",
+    "pt": "Novo grupo de assinantes",
+    "ja": "新しい購読者グループ",
+    "hi": "ग्राहकों का नया समूह"
+  },
+  "Табличный вид": {
+    "ru": "Табличный вид",
+    "en": "Табличный вид",
+    "es": "Табличный вид",
+    "ar": "Табличный вид",
+    "zh": "Табличный вид",
+    "fr": "Табличный вид",
+    "de": "Tabellarische Ansicht",
+    "pt": "Visualização tabular",
+    "ja": "表形式のビュー",
+    "hi": "सारणीबद्ध दृश्य"
+  },
+  "Целевой номер / Ресурс": {
+    "ru": "Целевой номер / Ресурс",
+    "en": "Целевой номер / Ресурс",
+    "es": "Целевой номер / Ресурс",
+    "ar": "الرقم المستهدف/المورد",
+    "zh": "Целевой номер / Ресурс",
+    "fr": "Целевой номер / Ресурс",
+    "de": "Zielnummer/Ressource",
+    "pt": "Número/Recurso Alvo",
+    "ja": "Целевой номер / Ресурс",
+    "hi": "लक्ष्य संख्या/संसाधन"
+  },
+  "Название блока": {
+    "ru": "Название блока",
+    "en": "Название блока",
+    "es": "Название блока",
+    "ar": "Название блока",
+    "zh": "Название блока",
+    "fr": "Название блока",
+    "de": "Blockname",
+    "pt": "Nome do bloco",
+    "ja": "Название блока",
+    "hi": "ब्लॉक का नाम"
+  },
+  ". При подключении более 1–2 модемов к серверу обязательно используйте": {
+    "ru": ". При подключении более 1–2 модемов к серверу обязательно используйте",
+    "en": ". При подключении более 1–2 модемов к серверу обязательно используйте",
+    "es": ". При подключении более 1–2 модемов к серверу обязательно используйте",
+    "ar": ". При подключении более 1–2 модемов к серверу обязательно используйте",
+    "zh": ". При подключении более 1–2 модемов к серверу обязательно используйте",
+    "fr": ". При подключении более 1–2 модемов к серверу обязательно используйте",
+    "de": ". Wenn Sie mehr als 1-2 Modems an den Server anschließen, verwenden Sie unbedingt",
+    "pt": ". Ao conectar mais de 1 ou 2 modems ao servidor, certifique-se de usar",
+    "ja": "。 1 ～ 2 台以上のモデムをサーバーに接続する場合は、必ず",
+    "hi": ". सर्वर से 1-2 से अधिक मॉडेम कनेक्ट करते समय, उपयोग करना सुनिश्चित करें"
+  },
+  "Занято логами:": {
+    "ru": "Занято логами:",
+    "en": "Занято логами:",
+    "es": "Занято логами:",
+    "ar": "Занято логами:",
+    "zh": "Занято логами:",
+    "fr": "Занято логами:",
+    "de": "Mit Protokollen beschäftigt:",
+    "pt": "Ocupado com registros:",
+    "ja": "ログで忙しい:",
+    "hi": "लॉग में व्यस्त:"
+  },
+  "Драйвер в PBX": {
+    "ru": "Драйвер в PBX",
+    "en": "Драйвер в PBX",
+    "es": "Драйвер в PBX",
+    "ar": "Драйвер в PBX",
+    "zh": "Драйвер в PBX",
+    "fr": "Драйвер в PBX",
+    "de": "Treiber in PBX",
+    "pt": "Motorista em PABX",
+    "ja": "PBXのドライバー",
+    "hi": "पीबीएक्स में ड्राइवर"
+  },
+  "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка": {
+    "ru": "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка",
+    "en": "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка",
+    "es": "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка",
+    "ar": "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка",
+    "zh": "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка",
+    "fr": "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка",
+    "de": "3. Hochladen von Audioaufzeichnungen von Gesprächen und dem Player in die Anrufkarte",
+    "pt": "3. Carregando gravações de áudio de conversas e do player no cartão de chamada",
+    "ja": "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка",
+    "hi": "3. बातचीत की ऑडियो रिकॉर्डिंग और कॉल कार्ड में प्लेयर अपलोड करना"
+  },
+  "Длительность бана (Ban Time, сек)": {
+    "ru": "Длительность бана (Ban Time, сек)",
+    "en": "Длительность бана (Ban Time, сек)",
+    "es": "Длительность бана (Ban Time, сек)",
+    "ar": "Длительность бана (Ban Time, сек)",
+    "zh": "Длительность бана (Ban Time, сек)",
+    "fr": "Длительность бана (Ban Time, сек)",
+    "de": "Bannzeit (Sek.)",
+    "pt": "Tempo de banimento (seg)",
+    "ja": "Длительность бана (Ban Time, сек)",
+    "hi": "प्रतिबंध का समय (सेकंड)"
+  },
+  "активный USB-хаб с внешним блоком питания (12V 3-5A)": {
+    "ru": "активный USB-хаб с внешним блоком питания (12V 3-5A)",
+    "en": "активный USB-хаб с внешним блоком питания (12V 3-5A)",
+    "es": "активный USB-хаб с внешним блоком питания (12V 3-5A)",
+    "ar": "активный USB-хаб с внешним блоком питания (12V 3-5A)",
+    "zh": "带外部电源的有源 USB 集线器（12V 3-5A）",
+    "fr": "Hub USB actif avec alimentation externe (12V 3-5A)",
+    "de": "aktiver USB-Hub mit externer Stromversorgung (12V 3-5A)",
+    "pt": "hub USB ativo com fonte de alimentação externa (12V 3-5A)",
+    "ja": "активный USB-хаб с внешним блоком питания (12V 3-5A)",
+    "hi": "बाहरी बिजली आपूर्ति के साथ सक्रिय यूएसबी हब (12वी 3-5ए)"
   },
   "МегаФон (Тестовый)": {
-    "ru": "МегаФон (Тестовый)"
+    "ru": "МегаФон (Тестовый)",
+    "en": "МегаФон (Тестовый)",
+    "es": "МегаФон (Тестовый)",
+    "ar": "МегаФон (Тестовый)",
+    "zh": "МегаФон (Тестовый)",
+    "fr": "MégaFon (Test)",
+    "de": "MegaFon (Test)",
+    "pt": "Megafon (teste)",
+    "ja": "МегаФон (Тестовый)",
+    "hi": "मेगाफोन (परीक्षण)"
   },
-  "Временно отключить выполнение логики модуля": {
-    "ru": "Временно отключить выполнение логики модуля"
+  "(вида": {
+    "ru": "(вида",
+    "en": "(вида",
+    "es": "(вида",
+    "ar": "(вида",
+    "zh": "（类型",
+    "fr": "(вида",
+    "de": "(Typ",
+    "pt": "(tipo",
+    "ja": "(вида",
+    "hi": "(प्रकार"
+  },
+  "Битрикс24 Telephony REST Hub": {
+    "ru": "Битрикс24 Telephony REST Hub",
+    "en": "Bitrix24 Telephony REST Hub",
+    "es": "Битрикс24 Telephony REST Hub",
+    "ar": "Битрикс24 Telephony REST Hub",
+    "zh": "Битрикс24 Telephony REST Hub",
+    "fr": "Hub REST de téléphonie Bitrix24",
+    "de": "Bitrix24 Telefonie REST Hub",
+    "pt": "Hub REST de telefonia Bitrix24",
+    "ja": "Битрикс24 Telephony REST Hub",
+    "hi": "Bitrix24 टेलीफोनी रेस्ट हब"
+  },
+  "Двигать / Редактировать": {
+    "ru": "Двигать / Редактировать",
+    "en": "Двигать / Редактировать",
+    "es": "Двигать / Редактировать",
+    "ar": "Двигать / Редактировать",
+    "zh": "移动/编辑",
+    "fr": "Déplacer / Modifier",
+    "de": "Verschieben / Bearbeiten",
+    "pt": "Mover/Editar",
+    "ja": "Двигать / Редактировать",
+    "hi": "स्थानांतरित/संपादित करें"
+  },
+  "Время сетевой блокировки": {
+    "ru": "Время сетевой блокировки",
+    "en": "Network blocking time",
+    "es": "Время сетевой блокировки",
+    "ar": "Время сетевой блокировки",
+    "zh": "网络阻塞时间",
+    "fr": "Temps de blocage du réseau",
+    "de": "Netzwerkblockierungszeit",
+    "pt": "Tempo de bloqueio de rede",
+    "ja": "ネットワークのブロック時間",
+    "hi": "नेटवर्क अवरोधन समय"
+  },
+  "GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ": {
+    "ru": "GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ",
+    "en": "GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ",
+    "es": "GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ",
+    "ar": "GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ",
+    "zh": "GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ",
+    "fr": "GROUPE 4 : SYSTÈME & SÉCURITÉ",
+    "de": "GRUPPE 4: SYSTEM & SICHERHEIT",
+    "pt": "GRUPO 4: SISTEMA E SEGURANÇA",
+    "ja": "GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ",
+    "hi": "समूह 4: सिस्टम और सुरक्षा"
+  },
+  "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk.": {
+    "ru": "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk.",
+    "en": "Detailed description of node types, interaction ports, and call flow algorithm in the Asterisk dialplan.",
+    "es": "Descripción detallada de tipos de nodos, puertos de interacción y algoritmo de flujo de llamadas.",
+    "ar": "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk.",
+    "zh": "详细描述了Asterisk dialplan中的节点类型、通信端口和呼叫流算法。",
+    "fr": "Une description détaillée des types de nœuds, des ports de communication et de l'algorithme de flux d'appels dans le plan de numérotation Asterisk.",
+    "de": "Eine detaillierte Beschreibung der Knotentypen, Kommunikationsports und Anrufflussalgorithmen im Asterisk-Wählplan.",
+    "pt": "Uma descrição detalhada dos tipos de nós, portas de comunicação e algoritmo de fluxo de chamadas no dialplan do Asterisk.",
+    "ja": "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk.",
+    "hi": "एस्टरिस्क डायलप्लान में नोड्स के प्रकार, संचार पोर्ट और कॉल फ्लो एल्गोरिदम का विस्तृत विवरण।"
+  },
+  "Узел IVR": {
+    "ru": "Узел IVR",
+    "en": "Узел IVR",
+    "es": "Узел IVR",
+    "ar": "Узел IVR",
+    "zh": "IVR节点",
+    "fr": "Nœud SVI",
+    "de": "IVR-Knoten",
+    "pt": "Nó IVR",
+    "ja": "Узел IVR",
+    "hi": "आईवीआर नोड"
+  },
+  "Автоскролл": {
+    "ru": "Автоскролл",
+    "en": "Автоскролл",
+    "es": "Автоскролл",
+    "ar": "التمرير التلقائي",
+    "zh": "自动滚动",
+    "fr": "Défilement automatique",
+    "de": "Autoscroll",
+    "pt": "Rolagem automática",
+    "ja": "Автоскролл",
+    "hi": "स्वतः स्क्रॉल"
+  },
+  "Сохранить Zoho CRM": {
+    "ru": "Сохранить Zoho CRM",
+    "en": "Сохранить Zoho CRM",
+    "es": "Сохранить Zoho CRM",
+    "ar": "Сохранить Zoho CRM",
+    "zh": "保存 Zoho CRM",
+    "fr": "Сохранить Zoho CRM",
+    "de": "Speichern Sie Zoho CRM",
+    "pt": "Salvar Zoho CRM",
+    "ja": "Zoho CRMを保存",
+    "hi": "ज़ोहो सीआरएम सहेजें"
+  },
+  "Введите криптографический ключ, полученный при покупке в Маркетплейсе для Server ID": {
+    "ru": "Введите криптографический ключ, полученный при покупке в Маркетплейсе для Server ID",
+    "en": "Введите криптографический ключ, полученный при покупке в Маркетплейсе для Server ID",
+    "es": "Введите криптографический ключ, полученный при покупке в Маркетплейсе для Server ID",
+    "ar": "Введите криптографический ключ, полученный при покупке в Маркетплейсе для Server ID",
+    "zh": "输入在 Marketplace 中购买时收到的服务器 ID 密钥",
+    "fr": "Saisissez la clé cryptographique reçue lors de l'achat sur la Marketplace pour Server ID",
+    "de": "Geben Sie den kryptografischen Schlüssel ein, den Sie beim Kauf im Marketplace für die Server-ID erhalten haben",
+    "pt": "Insira a chave criptográfica recebida na compra no Marketplace para Server ID",
+    "ja": "Введите криптографический ключ, полученный при покупке в Маркетплейсе для Server ID",
+    "hi": "सर्वर आईडी के लिए मार्केटप्लेस में खरीदारी करते समय प्राप्त क्रिप्टोग्राफ़िक कुंजी दर्ज करें"
+  },
+  "Сохранить пароль панели": {
+    "ru": "Сохранить пароль панели",
+    "en": "Сохранить пароль панели",
+    "es": "Сохранить пароль панели",
+    "ar": "حفظ كلمة مرور اللوحة",
+    "zh": "保存面板密码",
+    "fr": "Enregistrer le mot de passe du panneau",
+    "de": "Panel-Passwort speichern",
+    "pt": "Salvar senha do painel",
+    "ja": "パネルパスワードの保存",
+    "hi": "पैनल पासवर्ड सहेजें"
+  },
+  "Целевой номер / SIP Абонент": {
+    "ru": "Целевой номер / SIP Абонент",
+    "en": "Целевой номер / SIP Абонент",
+    "es": "Целевой номер / SIP Абонент",
+    "ar": "الرقم المستهدف / مشترك SIP",
+    "zh": "目标号码/SIP 用户",
+    "fr": "Numéro cible / Abonné SIP",
+    "de": "Zielrufnummer / SIP-Teilnehmer",
+    "pt": "Número alvo/assinante SIP",
+    "ja": "Целевой номер / SIP Абонент",
+    "hi": "लक्ष्य संख्या / एसआईपी सब्सक्राइबर"
+  },
+  "Редактировать группу": {
+    "ru": "Редактировать группу",
+    "en": "Edit group",
+    "es": "Редактировать группу",
+    "ar": "تحرير المجموعة",
+    "zh": "编辑组",
+    "fr": "Modifier le groupe",
+    "de": "Gruppe bearbeiten",
+    "pt": "Editar grupo",
+    "ja": "グループの編集",
+    "hi": "समूह संपादित करें"
+  },
+  "«Входящий вебхук»": {
+    "ru": "«Входящий вебхук»",
+    "en": "\"Incoming webhook\"",
+    "es": "«Входящий вебхук»",
+    "ar": "\"الرد التلقائي على الويب\"",
+    "zh": "“传入网络钩子”",
+    "fr": "\"Webhook entrant\"",
+    "de": "„Eingehender Webhook“",
+    "pt": "\"Webhook de entrada\"",
+    "ja": "「受信ウェブフック」",
+    "hi": "\"आने वाली वेबहुक\""
+  },
+  "Таблица правил маршрутизации и DTMF веток": {
+    "ru": "Таблица правил маршрутизации и DTMF веток",
+    "en": "Table of routing rules and DTMF branches",
+    "es": "Таблица правил маршрутизации и DTMF веток",
+    "ar": "جدول قواعد التوجيه وفروع DTMF",
+    "zh": "路由规则和DTMF分支表",
+    "fr": "Tableau des règles de routage et branches DTMF",
+    "de": "Tabelle der Routing-Regeln und DTMF-Zweige",
+    "pt": "Tabela de regras de roteamento e ramificações DTMF",
+    "ja": "ルーティング ルールと DTMF ブランチの表",
+    "hi": "रूटिंग नियमों और डीटीएमएफ शाखाओं की तालिका"
+  },
+  "Например: 5 неудачных попыток": {
+    "ru": "Например: 5 неудачных попыток",
+    "en": "Например: 5 неудачных попыток",
+    "es": "Например: 5 неудачных попыток",
+    "ar": "على سبيل المثال: 5 محاولات فاشلة",
+    "zh": "例如：5次失败的尝试",
+    "fr": "Par exemple : 5 tentatives infructueuses",
+    "de": "Beispiel: 5 Fehlversuche",
+    "pt": "Por exemplo: 5 tentativas fracassadas",
+    "ja": "例: 5 回の失敗",
+    "hi": "उदाहरण के लिए: 5 असफल प्रयास"
+  },
+  "Voicemail:ALL — Оставить голосовое сообщение": {
+    "ru": "Voicemail:ALL — Оставить голосовое сообщение"
+  },
+  "Не авторизован": {
+    "ru": "Не авторизован"
+  },
+  "IVR Меню": {
+    "ru": "IVR Меню"
+  },
+  "Применить IVR схему в Asterisk": {
+    "ru": "Применить IVR схему в Asterisk"
+  },
+  "Пароль (Secret)": {
+    "ru": "Пароль (Secret)"
+  },
+  "Количество неудачных попыток до бана": {
+    "ru": "Количество неудачных попыток до бана"
+  },
+  ": при 5 неверных попытках ввода пароля IP-клиента мгновенно блокируется в": {
+    "ru": ": при 5 неверных попытках ввода пароля IP-клиента мгновенно блокируется в"
+  },
+  "Запрещен выход в город на городские/мобильные номера. Звонки только между сотрудниками.": {
+    "ru": "Запрещен выход в город на городские/мобильные номера. Звонки только между сотрудниками."
   },
   "Таймаут (сек)": {
     "ru": "Таймаут (сек)"
   },
-  "Включая прямые международные направления (+1..., +971...), конференц-комнаты и приоритетный перехват.": {
-    "ru": "Включая прямые международные направления (+1..., +971...), конференц-комнаты и приоритетный перехват."
+  "Подробное руководство: назначение каждого поля, безопасность и влияние контекста на маршрутизацию звонков": {
+    "ru": "Подробное руководство: назначение каждого поля, безопасность и влияние контекста на маршрутизацию звонков"
   },
-  "В бане сейчас": {
-    "ru": "В бане сейчас"
-  },
-  "Связь (Стрелка)": {
-    "ru": "Связь (Стрелка)"
-  },
-  "Personal preferences (Профиль)": {
-    "ru": "Personal preferences (Профиль)"
-  },
-  "2. Маршрутизация сделок (Воронки и Этапы через Select2)": {
-    "ru": "2. Маршрутизация сделок (Воронки и Этапы через Select2)"
-  },
-  "Текущая версия: v2.3.0": {
-    "ru": "Текущая версия: v2.3.0"
-  },
-  "Стратегия дозвона:": {
-    "ru": "Стратегия дозвона:"
-  },
-  "Заблокированный IP": {
-    "ru": "Заблокированный IP"
-  },
-  "Выпустить .ovpn профиль": {
-    "ru": "Выпустить .ovpn профиль"
-  },
-  "GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ": {
-    "ru": "GROUP 4: СИСТЕМА & БЕЗОПАСНОСТЬ"
-  },
-  "Ограничение доступа к панели управления при открытом внешнем IP": {
-    "ru": "Ограничение доступа к панели управления при открытом внешнем IP"
-  },
-  "Центрировать": {
-    "ru": "Центрировать"
-  },
-  "0 строк": {
-    "ru": "0 строк"
-  },
-  "не умеют передавать голос": {
-    "ru": "не умеют передавать голос"
-  },
-  "При переходе на панель с внешних IP потребуется ввести пароль": {
-    "ru": "При переходе на панель с внешних IP потребуется ввести пароль"
-  },
-  "⚡ OpenAI Whisper API (Быстрое облако, высокая точность)": {
-    "ru": "⚡ OpenAI Whisper API (Быстрое облако, высокая точность)"
-  },
-  "Таймаут: 30 сек": {
-    "ru": "Таймаут: 30 сек"
-  },
-  "from-internal (По умолчанию)": {
-    "ru": "from-internal (По умолчанию)"
-  },
-  "Выберите участников группы (Абонентов):": {
-    "ru": "Выберите участников группы (Абонентов):"
-  },
-  "Тест распознавания": {
-    "ru": "Тест распознавания"
-  },
-  "Минимальная длина звонка (сек)": {
-    "ru": "Минимальная длина звонка (сек)"
-  },
-  "Источник ссылки на аудио:": {
-    "ru": "Источник ссылки на аудио:"
-  },
-  "Свободно: 9.5 ГБ из 286.0 ГБ": {
-    "ru": "Свободно: 9.5 ГБ из 286.0 ГБ"
-  },
-  "(вида": {
-    "ru": "(вида"
-  },
-  "Встроенный Proxy / Обход блокировок": {
-    "ru": "Встроенный Proxy / Обход блокировок"
-  },
-  "Применить параметры Антифрода": {
-    "ru": "Применить параметры Антифрода"
-  },
-  "куда этот номер имеет право звонить, через какие GSM-модемы или транки выходить в город, и разрешены ли ему международные вызовы.": {
-    "ru": "куда этот номер имеет право звонить, через какие GSM-модемы или транки выходить в город, и разрешены ли ему международные вызовы."
-  },
-  "Изменить DTMF клавишу": {
-    "ru": "Изменить DTMF клавишу"
-  },
-  "Категория": {
-    "ru": "Категория"
-  },
-  "Активировать интеграцию с Битрикс24": {
-    "ru": "Активировать интеграцию с Битрикс24"
-  },
-  "Инициализация потока телеметрии Asterisk Live Logs...": {
-    "ru": "Инициализация потока телеметрии Asterisk Live Logs..."
-  },
-  "Создавать Лид при новом номере": {
-    "ru": "Создавать Лид при новом номере"
-  },
-  "Порт VLESS Reality": {
-    "ru": "Порт VLESS Reality"
-  },
-  "Очистить все логи в 0": {
-    "ru": "Очистить все логи в 0"
-  },
-  "Активировать GoHighLevel Sync": {
-    "ru": "Активировать GoHighLevel Sync"
-  },
-  "В кабинете GHL перейдите в": {
-    "ru": "В кабинете GHL перейдите в"
-  },
-  "50 MB (Рекомендуется)": {
-    "ru": "50 MB (Рекомендуется)"
-  },
-  "Источник:": {
-    "ru": "Источник:"
-  },
-  "🚫 Не прикреплять аудиозапись к звонку": {
-    "ru": "🚫 Не прикреплять аудиозапись к звонку"
-  },
-  "URL вебхука": {
-    "ru": "URL вебхука"
-  },
-  "GROUP 2: ТЕЛЕФОНИЯ & МАРШРУТИЗАЦИЯ": {
-    "ru": "GROUP 2: ТЕЛЕФОНИЯ & МАРШРУТИЗАЦИЯ"
-  },
-  "👤 По принявшему оператору / участнику разговора": {
-    "ru": "👤 По принявшему оператору / участнику разговора"
-  },
-  "Стоимость лицензии": {
-    "ru": "Стоимость лицензии"
-  },
-  "(например,": {
-    "ru": "(например,"
-  },
-  "Воспроизводит аудиоприветствие, ожидает нажатия DTMF клавиши (0-9, *, #) и обрабатывает прямой донабор номера (Direct Dial).": {
-    "ru": "Воспроизводит аудиоприветствие, ожидает нажатия DTMF клавиши (0-9, *, #) и обрабатывает прямой донабор номера (Direct Dial)."
-  },
-  "Количество попыток (Max Retry)": {
-    "ru": "Количество попыток (Max Retry)"
-  },
-  "ID: zoho • Версия: v1.9.0 • Автор: Logic Core Global": {
-    "ru": "ID: zoho • Версия: v1.9.0 • Автор: Logic Core Global"
-  },
-  "в Telegram и отправьте команду": {
-    "ru": "в Telegram и отправьте команду"
-  },
-  "Таблица правил маршрутизации и DTMF веток": {
-    "ru": "Таблица правил маршрутизации и DTMF веток"
-  },
-  "Редактировать параметры": {
-    "ru": "Редактировать параметры"
-  },
-  "Завершение вызова (Hangup)": {
-    "ru": "Завершение вызова (Hangup)"
-  },
-  "Gzip сжатие (-90% места)": {
-    "ru": "Gzip сжатие (-90% места)"
-  },
-  "Создайте группу для алертов (или напишите боту в ЛС) и добавьте бота в чат.": {
-    "ru": "Создайте группу для алертов (или напишите боту в ЛС) и добавьте бота в чат."
-  },
-  "Откройте бота": {
-    "ru": "Откройте бота"
-  },
-  "), в которую попадает абонент при совершении звонка. Он определяет:": {
-    "ru": "), в которую попадает абонент при совершении звонка. Он определяет:"
-  },
-  "Включить автоматическую выгрузку на Google Drive": {
-    "ru": "Включить автоматическую выгрузку на Google Drive"
-  },
-  "🔒 Локальный Faster-Whisper (На сервере, без отправки в облако)": {
-    "ru": "🔒 Локальный Faster-Whisper (На сервере, без отправки в облако)"
-  },
-  "Время сетевой блокировки": {
-    "ru": "Время сетевой блокировки"
-  },
-  "ID: enterprise_vpn • Версия: v1.1.0 • Автор: Logic Core Security": {
-    "ru": "ID: enterprise_vpn • Версия: v1.1.0 • Автор: Logic Core Security"
+  "Редактировать данные абонента": {
+    "ru": "Редактировать данные абонента"
   },
   "Выберите правильный датацентр вашего аккаунта (для Европы —": {
     "ru": "Выберите правильный датацентр вашего аккаунта (для Европы —"
   },
-  "(Абонент)": {
-    "ru": "(Абонент)"
+  "ID: enterprise_vpn • Версия: v1.1.0 • Автор: Logic Core Security": {
+    "ru": "ID: enterprise_vpn • Версия: v1.1.0 • Автор: Logic Core Security"
   },
-  "Активировать модуль Pipedrive": {
-    "ru": "Активировать модуль Pipedrive"
+  "Инициализация потока телеметрии Asterisk Live Logs...": {
+    "ru": "Инициализация потока телеметрии Asterisk Live Logs..."
   },
-  "(начинается с": {
-    "ru": "(начинается с"
-  },
-  "Загрузить": {
-    "ru": "Загрузить"
-  },
-  "МТС Россия (Тестовый)": {
-    "ru": "МТС Россия (Тестовый)"
-  },
-  "Телефония (telephony)": {
-    "ru": "Телефония (telephony)"
-  },
-  "Секретный ключ авторизации для регистрации физического IP-телефона или софтфона. Сервер автоматически защищает этот порт через": {
-    "ru": "Секретный ключ авторизации для регистрации физического IP-телефона или софтфона. Сервер автоматически защищает этот порт через"
-  },
-  "из раздела": {
-    "ru": "из раздела"
-  },
-  "OpenVPN (IP-Телефоны Yealink / Grandstream)": {
-    "ru": "OpenVPN (IP-Телефоны Yealink / Grandstream)"
-  },
-  "1.5–2.0 Ампер": {
-    "ru": "1.5–2.0 Ампер"
-  },
-  "РАСКРЫВАЮЩИЙСЯ БЛОК: РАСШИРЕНИЯ": {
-    "ru": "РАСКРЫВАЮЩИЙСЯ БЛОК: РАСШИРЕНИЯ"
-  },
-  "Создать блок": {
-    "ru": "Создать блок"
-  },
-  "Модель / Чипсет": {
-    "ru": "Модель / Чипсет"
-  },
-  "Входящая линия": {
-    "ru": "Входящая линия"
-  },
-  "Сохранить пароль панели": {
-    "ru": "Сохранить пароль панели"
-  },
-  "Сигнал тревоги при падении уровня сети (CSQ < 10) или отключении физического USB-донгла от сервера.": {
-    "ru": "Сигнал тревоги при падении уровня сети (CSQ < 10) или отключении физического USB-донгла от сервера."
-  },
-  "Двойной клик на блок открывает окно редактирования": {
-    "ru": "Двойной клик на блок открывает окно редактирования"
-  },
-  "Активировать модуль в работу": {
-    "ru": "Активировать модуль в работу"
+  "Выберите воронку и целевой статус amoCRM с живым поиском и автоподгрузкой этапов.": {
+    "ru": "Выберите воронку и целевой статус amoCRM с живым поиском и автоподгрузкой этапов."
   },
   "Создать VLESS ключ": {
     "ru": "Создать VLESS ключ"
   },
-  "Участники группы (1):": {
-    "ru": "Участники группы (1):"
+  "Клиентские профили для аппаратных IP-телефонов": {
+    "ru": "Клиентские профили для аппаратных IP-телефонов"
   },
-  "Поочередно (Hunt)": {
-    "ru": "Поочередно (Hunt)"
+  "Исходящие звонки направляются строго через указанный SIP-транк или конкретный GSM-модем (например, для звонков по РФ).": {
+    "ru": "Исходящие звонки направляются строго через указанный SIP-транк или конкретный GSM-модем (например, для звонков по РФ)."
   },
-  "Включить выгрузку на FTP": {
-    "ru": "Включить выгрузку на FTP"
+  "Протокол сквозного тестирования SHA-256": {
+    "ru": "Протокол сквозного тестирования SHA-256"
   },
-  "Мгновенная карточка в чат с номером клиента, временем звонка и линией/модемом, на которую звонили, чтобы не терять горячие лиды.": {
-    "ru": "Мгновенная карточка в чат с номером клиента, временем звонка и линией/модемом, на которую звонили, чтобы не терять горячие лиды."
+  "Gzip сжатие (-90% места)": {
+    "ru": "Gzip сжатие (-90% места)"
+  },
+  "Пароль (Secret SIP)": {
+    "ru": "Пароль (Secret SIP)"
+  },
+  "Укажите ваш субдомен (например, если адрес": {
+    "ru": "Укажите ваш субдомен (например, если адрес"
+  },
+  "В Zendesk перейдите в": {
+    "ru": "В Zendesk перейдите в"
+  },
+  "), в которую попадает абонент при совершении звонка. Он определяет:": {
+    "ru": "), в которую попадает абонент при совершении звонка. Он определяет:"
   },
   "STATUS 1: ИСПОЛЬЗУЕТСЯ ИЛИ НЕТ": {
     "ru": "STATUS 1: ИСПОЛЬЗУЕТСЯ ИЛИ НЕТ"
+  },
+  "Датацентр Zoho": {
+    "ru": "Датацентр Zoho"
+  },
+  "Тип действия": {
+    "ru": "Тип действия"
   },
   "Разрешить прямой донабор номера (Direct Dial)": {
     "ru": "Разрешить прямой донабор номера (Direct Dial)"
@@ -1699,1225 +2434,1234 @@
   "101 — Сотрудник": {
     "ru": "101 — Сотрудник"
   },
-  "Логин: s1921687209": {
-    "ru": "Логин: s1921687209"
-  },
-  "и скопируйте предоставленный": {
-    "ru": "и скопируйте предоставленный"
-  },
-  "Пароль (Secret SIP)": {
-    "ru": "Пароль (Secret SIP)"
-  },
-  "Например: Отдел продаж / Главное меню": {
-    "ru": "Например: Отдел продаж / Главное меню"
-  },
-  "Прямая доставка сообщений через защищенные HTTPS / MTProto каналы без риска замедления API Telegram.": {
-    "ru": "Прямая доставка сообщений через защищенные HTTPS / MTProto каналы без риска замедления API Telegram."
-  },
-  "================= VIEW 2: TABLE VIEW (ТАБЛИЧНЫЙ ВИД МАРШРУТИЗАЦИИ) =================": {
-    "ru": "================= VIEW 2: TABLE VIEW (ТАБЛИЧНЫЙ ВИД МАРШРУТИЗАЦИИ) ================="
-  },
-  "Отключить модуль": {
-    "ru": "Отключить модуль"
-  },
-  "Сохранить Google Drive": {
-    "ru": "Сохранить Google Drive"
-  },
-  "Сотрудник / Номер": {
-    "ru": "Сотрудник / Номер"
-  },
-  "API Ключ (OpenAI / Groq / Yandex)": {
-    "ru": "API Ключ (OpenAI / Groq / Yandex)"
-  },
-  "OAuth Токен Яндекс.Диска": {
-    "ru": "OAuth Токен Яндекс.Диска"
-  },
-  "Выберите существующий контекст или введите новый прямо в поле.": {
-    "ru": "Выберите существующий контекст или введите новый прямо в поле."
-  },
-  "Потяните за круглый порт справа от блока к любому другому блоку, чтобы задать правило перехода при нажатии клавиши DTMF.": {
-    "ru": "Потяните за круглый порт справа от блока к любому другому блоку, чтобы задать правило перехода при нажатии клавиши DTMF."
-  },
-  "Включите": {
-    "ru": "Включите"
-  },
-  "Используется": {
-    "ru": "Используется"
-  },
-  "Удалить этот блок": {
-    "ru": "Удалить этот блок"
-  },
-  "Автоматическое приведение номеров к международному формату E.164 (+7..., +971..., +1...)": {
-    "ru": "Автоматическое приведение номеров к международному формату E.164 (+7..., +971..., +1...)"
-  },
-  "— это изолированная зона прав и правил диалплана (": {
-    "ru": "— это изолированная зона прав и правил диалплана ("
-  },
-  "🇷🇺 Yandex SpeechKit Pro (Оптимально для RU)": {
-    "ru": "🇷🇺 Yandex SpeechKit Pro (Оптимально для RU)"
-  },
-  "Пароль (Secret)": {
-    "ru": "Пароль (Secret)"
-  },
-  "Обновить список воронок": {
-    "ru": "Обновить список воронок"
-  },
-  "Причина блокировки": {
-    "ru": "Причина блокировки"
-  },
-  "Отправлять расшифровку и резюме в примечание сделки amoCRM": {
-    "ru": "Отправлять расшифровку и резюме в примечание сделки amoCRM"
-  },
-  "Изменение номера, имени и пароля": {
-    "ru": "Изменение номера, имени и пароля"
-  },
-  "Включить обработку нерабочего времени": {
-    "ru": "Включить обработку нерабочего времени"
-  },
-  "Оставьте пустым при использовании локального движка Faster-Whisper.": {
-    "ru": "Оставьте пустым при использовании локального движка Faster-Whisper."
-  },
-  "Автоскролл": {
-    "ru": "Автоскролл"
-  },
-  "SIP Пароль (Secret / Auth Password)": {
-    "ru": "SIP Пароль (Secret / Auth Password)"
-  },
-  "Голосовое меню с DTMF выбором (IVR Root)": {
-    "ru": "Голосовое меню с DTMF выбором (IVR Root)"
-  },
-  "ID: telegram_alerts • Версия: v2.1.0 • Автор: Logic Core Team": {
-    "ru": "ID: telegram_alerts • Версия: v2.1.0 • Автор: Logic Core Team"
-  },
-  "«Разработчикам»": {
-    "ru": "«Разработчикам»"
-  },
-  "Контекст вызовов (Диалплан)": {
-    "ru": "Контекст вызовов (Диалплан)"
-  },
-  "Диск активен": {
-    "ru": "Диск активен"
-  },
-  ") и вставьте в поле ниже.": {
-    "ru": ") и вставьте в поле ниже."
-  },
-  "Выполнить ротацию сейчас": {
-    "ru": "Выполнить ротацию сейчас"
-  },
-  "$\\rightarrow$ вкладка": {
-    "ru": "$\\rightarrow$ вкладка"
-  },
-  "и вставьте в поле ниже.": {
-    "ru": "и вставьте в поле ниже."
-  },
-  "Журнал последних звонков": {
-    "ru": "Журнал последних звонков"
-  },
-  "ВЫПОЛНЕНИЕ...": {
-    "ru": "ВЫПОЛНЕНИЕ..."
-  },
-  "Потоковая телеметрия ядра Asterisk, GSM-модемов, SIP-транков, аудиозаписи и модулей расширений.": {
-    "ru": "Потоковая телеметрия ядра Asterisk, GSM-модемов, SIP-транков, аудиозаписи и модулей расширений."
-  },
-  "Субдомен Zendesk (например: mycompany)": {
-    "ru": "Субдомен Zendesk (например: mycompany)"
-  },
-  "Подробное руководство: назначение каждого поля, безопасность и влияние контекста на маршрутизацию звонков": {
-    "ru": "Подробное руководство: назначение каждого поля, безопасность и влияние контекста на маршрутизацию звонков"
-  },
-  "Включить авторизацию по логину и паролю": {
-    "ru": "Включить авторизацию по логину и паролю"
-  },
-  "🖧 Корпоративный FTP Сервер": {
-    "ru": "🖧 Корпоративный FTP Сервер"
-  },
-  "Условия срабатывания антифрода и белый список": {
-    "ru": "Условия срабатывания антифрода и белый список"
-  },
-  "Сохранить настройки Яндекс.Диска": {
-    "ru": "Сохранить настройки Яндекс.Диска"
-  },
-  "Стерео-диаризация каналов (L: Оператор, R: Клиент)": {
-    "ru": "Стерео-диаризация каналов (L: Оператор, R: Клиент)"
-  },
-  "Тип действия": {
-    "ru": "Тип действия"
-  },
-  "Этап воронки (Статус)": {
-    "ru": "Этап воронки (Статус)"
-  },
-  "«Входящий вебхук»": {
-    "ru": "«Входящий вебхук»"
-  },
-  "Интервал времени для подсчета ошибок": {
-    "ru": "Интервал времени для подсчета ошибок"
-  },
-  "Только внутренняя связь:": {
-    "ru": "Только внутренняя связь:"
-  },
-  "Установлен": {
-    "ru": "Установлен"
-  },
-  "Имя (CallerID) и Внутренний номер (Extension)": {
-    "ru": "Имя (CallerID) и Внутренний номер (Extension)"
-  },
-  "Android (Менеджер 103)": {
-    "ru": "Android (Менеджер 103)"
-  },
-  "Верифицировать & Установить": {
-    "ru": "Верифицировать & Установить"
-  },
-  "Сохранить настройки Pipedrive": {
-    "ru": "Сохранить настройки Pipedrive"
-  },
-  "Применить IVR схему в Asterisk": {
-    "ru": "Применить IVR схему в Asterisk"
-  },
-  "Начало рабочего дня": {
-    "ru": "Начало рабочего дня"
-  },
-  "Сохранить настройки HubSpot": {
-    "ru": "Сохранить настройки HubSpot"
-  },
-  "В Pipedrive откройте": {
-    "ru": "В Pipedrive откройте"
-  },
-  "Инструкция по подключению HubSpot CRM:": {
-    "ru": "Инструкция по подключению HubSpot CRM:"
-  },
-  "Стандарты связи": {
-    "ru": "Стандарты связи"
-  },
-  "Новый SIP Абонент": {
-    "ru": "Новый SIP Абонент"
-  },
-  "Основной Этап воронки": {
-    "ru": "Основной Этап воронки"
-  },
-  "Редактирование SIP-Транка": {
-    "ru": "Редактирование SIP-Транка"
-  },
-  "Сохранить Zendesk": {
-    "ru": "Сохранить Zendesk"
-  },
-  "Удалить эту стрелку": {
-    "ru": "Удалить эту стрелку"
-  },
-  "Устройство / Абонент": {
-    "ru": "Устройство / Абонент"
-  },
-  "Исходящие звонки направляются строго через указанный SIP-транк или конкретный GSM-модем (например, для звонков по РФ).": {
-    "ru": "Исходящие звонки направляются строго через указанный SIP-транк или конкретный GSM-модем (например, для звонков по РФ)."
-  },
-  "Защита от переполнения диска и зависания системы огромными лог-файлами": {
-    "ru": "Защита от переполнения диска и зависания системы огромными лог-файлами"
-  },
-  "Сохранить настройки Битрикс24": {
-    "ru": "Сохранить настройки Битрикс24"
-  },
-  "Все источники": {
-    "ru": "Все источники"
-  },
-  "🌐 Общий сценарий (По умолчанию)": {
-    "ru": "🌐 Общий сценарий (По умолчанию)"
-  },
-  "Протокол проверки подключения amoCRM": {
-    "ru": "Протокол проверки подключения amoCRM"
-  },
-  "VLESS Reality XTLS (Смартфоны & Софтфоны)": {
-    "ru": "VLESS Reality XTLS (Смартфоны & Софтфоны)"
-  },
-  "Телефоны на складе, в переговорных, на ресепшн или у стажеров.": {
-    "ru": "Телефоны на складе, в переговорных, на ресепшн или у стажеров."
-  },
-  "Имя пользователя (Логин)": {
-    "ru": "Имя пользователя (Логин)"
-  },
-  "Ваш текущий IP:": {
-    "ru": "Ваш текущий IP:"
-  },
-  "Фоновые процессы, хуки и выполнение обработчиков приостановлены. Все настройки и учетные данные сохранены.": {
-    "ru": "Фоновые процессы, хуки и выполнение обработчиков приостановлены. Все настройки и учетные данные сохранены."
-  },
-  "Создайте входящий вебхук с правами «Телефония (telephony)» и «CRM (crm)» в кабинете Битрикс24.": {
-    "ru": "Создайте входящий вебхук с правами «Телефония (telephony)» и «CRM (crm)» в кабинете Битрикс24."
-  },
-  "ID: pipedrive • Версия: v2.4.0 • Автор: Logic Core CRM Labs": {
-    "ru": "ID: pipedrive • Версия: v2.4.0 • Автор: Logic Core CRM Labs"
-  },
-  "📱 GSM Модемы и Сим-карты (Пул номеров)": {
-    "ru": "📱 GSM Модемы и Сим-карты (Пул номеров)"
-  },
-  "Подменю установленных плагинов": {
-    "ru": "Подменю установленных плагинов"
-  },
-  "Путь к целевой папке на Диске": {
-    "ru": "Путь к целевой папке на Диске"
-  },
-  "Клавиша DTMF": {
-    "ru": "Клавиша DTMF"
-  },
-  "Введите ваш": {
-    "ru": "Введите ваш"
-  },
-  "Локальное или удаленное (OpenAI/Groq/Ollama) распознавание речи, разделение по ролям (L: оператор, R: клиент), суммаризация и оценка качества.": {
-    "ru": "Локальное или удаленное (OpenAI/Groq/Ollama) распознавание речи, разделение по ролям (L: оператор, R: клиент), суммаризация и оценка качества."
-  },
-  "Включить автоматическую маршрутизацию SIP-трафика внутри VPN туннелей": {
-    "ru": "Включить автоматическую маршрутизацию SIP-трафика внутри VPN туннелей"
-  },
-  "Открыть настройки": {
-    "ru": "Открыть настройки"
-  },
-  "Не авторизован": {
-    "ru": "Не авторизован"
-  },
-  "Безопасность & VPN": {
-    "ru": "Безопасность & VPN"
-  },
-  "Срок действия": {
-    "ru": "Срок действия"
-  },
-  "Выберите воронку и целевой статус amoCRM с живым поиском и автоподгрузкой этапов.": {
-    "ru": "Выберите воронку и целевой статус amoCRM с живым поиском и автоподгрузкой этапов."
-  },
-  "Параметры сетевых портов и маскировки": {
-    "ru": "Параметры сетевых портов и маскировки"
-  },
-  "Группы абонентов (Ring Groups)": {
-    "ru": "Группы абонентов (Ring Groups)"
-  },
-  "Chat ID получателей (через запятую для нескольких чатов)": {
-    "ru": "Chat ID получателей (через запятую для нескольких чатов)"
-  },
-  "Настройте, куда отправлять аудиофайл или из какого хранилища брать прямую ссылку.": {
-    "ru": "Настройте, куда отправлять аудиофайл или из какого хранилища брать прямую ссылку."
-  },
-  "ID папки на Google Диске (Folder ID)": {
-    "ru": "ID папки на Google Диске (Folder ID)"
-  },
-  "Разрешены звонки коллегам на 101–199, в группы, на сервисные номера (*43, 888) и выход на внешние линии через модемы/транки.": {
-    "ru": "Разрешены звонки коллегам на 101–199, в группы, на сервисные номера (*43, 888) и выход на внешние линии через модемы/транки."
-  },
-  "Перейдите в": {
-    "ru": "Перейдите в"
-  },
-  "Субдомен компании": {
-    "ru": "Субдомен компании"
-  },
-  "GROUP 1: МОНИТОРИНГ & АНАЛИТИКА": {
-    "ru": "GROUP 1: МОНИТОРИНГ & АНАЛИТИКА"
-  },
-  "$\\rightarrow$ Нажмите": {
-    "ru": "$\\rightarrow$ Нажмите"
-  },
-  "Аудиофайл приветствия (.wav / .mp3)": {
-    "ru": "Аудиофайл приветствия (.wav / .mp3)"
-  },
-  "уникальный цифровой идентификатор сотрудника (101, 102...). Используется для коротких звонков внутри офиса.": {
-    "ru": "уникальный цифровой идентификатор сотрудника (101, 102...). Используется для коротких звонков внутри офиса."
-  },
-  "1. Авторизация и доступ к аккаунту": {
-    "ru": "1. Авторизация и доступ к аккаунту"
-  },
-  "Имя (CallerID Name):": {
-    "ru": "Имя (CallerID Name):"
-  },
-  "Выберите подписанный .zip пакет расширения": {
-    "ru": "Выберите подписанный .zip пакет расширения"
-  },
-  "Включить модуль в работу": {
-    "ru": "Включить модуль в работу"
-  },
-  "STATUS 2: АВТОРИЗОВАН, НЕТ, ИДЕТ ПОДКЛЮЧЕНИЕ": {
-    "ru": "STATUS 2: АВТОРИЗОВАН, НЕТ, ИДЕТ ПОДКЛЮЧЕНИЕ"
-  },
-  "Александр": {
-    "ru": "Александр"
-  },
-  ". При подключении более 1–2 модемов к серверу обязательно используйте": {
-    "ru": ". При подключении более 1–2 модемов к серверу обязательно используйте"
-  },
-  "Настройка воронок для входящих линий и транков:": {
-    "ru": "Настройка воронок для входящих линий и транков:"
-  },
-  "В правах доступа отметьте галочками:": {
-    "ru": "В правах доступа отметьте галочками:"
-  },
-  "Полный список правил перехода и целевых назначений голосового меню.": {
-    "ru": "Полный список правил перехода и целевых назначений голосового меню."
-  },
-  "🟡 Яндекс.Диск": {
-    "ru": "🟡 Яндекс.Диск"
-  },
-  "Список абонентов": {
-    "ru": "Список абонентов"
-  },
-  "Включить Zendesk Voice Bridge": {
-    "ru": "Включить Zendesk Voice Bridge"
-  },
-  "Входящий Вебхук Битрикс24 (Inbound Webhook URL)": {
-    "ru": "Входящий Вебхук Битрикс24 (Inbound Webhook URL)"
-  },
-  "Стратегия дозвона": {
-    "ru": "Стратегия дозвона"
-  },
-  "Офисный Yealink SIP-T31P (Абонент 101)": {
-    "ru": "Офисный Yealink SIP-T31P (Абонент 101)"
-  },
-  "Сохранить Zoho CRM": {
-    "ru": "Сохранить Zoho CRM"
-  },
-  "Количество неудачных попыток до бана": {
-    "ru": "Количество неудачных попыток до бана"
-  },
-  "Нажмите для переключения": {
-    "ru": "Нажмите для переключения"
-  },
-  "Отключен": {
-    "ru": "Отключен"
-  },
-  "Запрещен выход в город на городские/мобильные номера. Звонки только между сотрудниками.": {
-    "ru": "Запрещен выход в город на городские/мобильные номера. Звонки только между сотрудниками."
-  },
-  "Блок-схема (Canvas)": {
-    "ru": "Блок-схема (Canvas)"
-  },
-  "Рабочие дни недели": {
-    "ru": "Рабочие дни недели"
-  },
-  "Сохранить настройки Telegram": {
-    "ru": "Сохранить настройки Telegram"
-  },
-  "Целевые узлы назначения. Переводят звонок на конкретного сотрудника (101, 102) или запускают параллельный вызов группы операторов.": {
-    "ru": "Целевые узлы назначения. Переводят звонок на конкретного сотрудника (101, 102) или запускают параллельный вызов группы операторов."
-  },
-  "Публичный IP сервера": {
-    "ru": "Публичный IP сервера"
-  },
-  "Основной персонал офиса, менеджеры продаж.": {
-    "ru": "Основной персонал офиса, менеджеры продаж."
-  },
-  "2. Голосовое Меню (IVR)": {
-    "ru": "2. Голосовое Меню (IVR)"
-  },
-  "Активировать сквозную интеграцию amoCRM": {
-    "ru": "Активировать сквозную интеграцию amoCRM"
-  },
-  "Отправка мгновенных хуков о входящих/пропущенных звонках в автоматизации и воронки GHL.": {
-    "ru": "Отправка мгновенных хуков о входящих/пропущенных звонках в автоматизации и воронки GHL."
-  },
-  "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global": {
-    "ru": "ID: gohighlevel • Версия: v2.0.0 • Автор: Logic Core Global"
-  },
-  "Название плагина": {
-    "ru": "Название плагина"
-  },
-  "Телефония & Абоненты": {
-    "ru": "Телефония & Абоненты"
-  },
-  "Оператор 101 ()": {
-    "ru": "Оператор 101 ()"
-  },
-  "ID: gdrive_storage • Версия: v2.2.0 • Автор: Logic Core Team": {
-    "ru": "ID: gdrive_storage • Версия: v2.2.0 • Автор: Logic Core Team"
-  },
-  "Полный доступ:": {
-    "ru": "Полный доступ:"
-  },
-  "срабатывает при ошибочном вводе, а": {
-    "ru": "срабатывает при ошибочном вводе, а"
-  },
-  "Попыток ввода": {
-    "ru": "Попыток ввода"
-  },
-  "1 узлов дерева": {
-    "ru": "1 узлов дерева"
-  },
-  ", для США/ОАЭ —": {
-    "ru": ", для США/ОАЭ —"
-  },
-  "Логин / Авторизация": {
-    "ru": "Логин / Авторизация"
-  },
-  "FTP Сервер / Хост": {
-    "ru": "FTP Сервер / Хост"
-  },
-  "Обычные модемы для 4G-интернета (HiLink / NDIS)": {
-    "ru": "Обычные модемы для 4G-интернета (HiLink / NDIS)"
-  },
-  ", чтобы получить": {
-    "ru": ", чтобы получить"
-  },
-  "Удалить модуль": {
-    "ru": "Удалить модуль"
-  },
-  "💡 Потяните за кружок справа от блока, чтобы протянуть стрелку | Правый клик открывает меню": {
-    "ru": "💡 Потяните за кружок справа от блока, чтобы протянуть стрелку | Правый клик открывает меню"
-  },
-  "📞 По входящему каналу / SIP-транку / GSM модему": {
-    "ru": "📞 По входящему каналу / SIP-транку / GSM модему"
-  },
   "Изменение параметров провайдера связи": {
     "ru": "Изменение параметров провайдера связи"
-  },
-  "Сохранить параметры транка": {
-    "ru": "Сохранить параметры транка"
-  },
-  "Узел IVR": {
-    "ru": "Узел IVR"
-  },
-  "Сохранить настройки GoHighLevel": {
-    "ru": "Сохранить настройки GoHighLevel"
-  },
-  "Voicemail:ALL — Оставить голосовое сообщение": {
-    "ru": "Voicemail:ALL — Оставить голосовое сообщение"
-  },
-  "Маркетплейс расширений": {
-    "ru": "Маркетплейс расширений"
-  },
-  "«Другое»": {
-    "ru": "«Другое»"
-  },
-  "Создайте Private App в HubSpot с разрешениями": {
-    "ru": "Создайте Private App в HubSpot с разрешениями"
-  },
-  "во избежание «отваливания» портов": {
-    "ru": "во избежание «отваливания» портов"
-  },
-  "Название блока": {
-    "ru": "Название блока"
-  },
-  "Статус защиты:": {
-    "ru": "Статус защиты:"
-  },
-  "Автоматически создавать Contact в HubSpot для новых номеров": {
-    "ru": "Автоматически создавать Contact в HubSpot для новых номеров"
-  },
-  "Маршрутизация по нерабочим часам (Time-Condition)": {
-    "ru": "Маршрутизация по нерабочим часам (Time-Condition)"
-  },
-  "Хранить 3 последних архива (.gz)": {
-    "ru": "Хранить 3 последних архива (.gz)"
-  },
-  "Включить автоматическую транскрибацию завершенных вызовов": {
-    "ru": "Включить автоматическую транскрибацию завершенных вызовов"
-  },
-  "Номер:": {
-    "ru": "Номер:"
-  },
-  "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk.": {
-    "ru": "Подробное описание типов узлов, портов взаимодействия и алгоритма прохождения вызова в диалплане Asterisk."
-  },
-  "600 сек = в течение 10 минут": {
-    "ru": "600 сек = в течение 10 минут"
-  },
-  "Контроль времени ожидания:": {
-    "ru": "Контроль времени ожидания:"
-  },
-  "Удалить транк": {
-    "ru": "Удалить транк"
-  },
-  "ID: ftp_storage • Версия: v2.0.1 • Автор: Logic Core Team": {
-    "ru": "ID: ftp_storage • Версия: v2.0.1 • Автор: Logic Core Team"
-  },
-  "3G+ HSPA+ до 21 Мбит/с": {
-    "ru": "3G+ HSPA+ до 21 Мбит/с"
-  },
-  "Редактирование абонента": {
-    "ru": "Редактирование абонента"
-  },
-  "ID Аккаунта:": {
-    "ru": "ID Аккаунта:"
-  },
-  "Включить автоматическую рассылку Telegram алертов": {
-    "ru": "Включить автоматическую рассылку Telegram алертов"
-  },
-  "Белый список IP-адресов (Whitelist / Ignore IP)": {
-    "ru": "Белый список IP-адресов (Whitelist / Ignore IP)"
-  },
-  "Сменить аккаунт": {
-    "ru": "Сменить аккаунт"
-  },
-  "Отдел продаж (Sales)": {
-    "ru": "Отдел продаж (Sales)"
-  },
-  "Свернуть/Развернуть меню": {
-    "ru": "Свернуть/Развернуть меню"
-  },
-  "Окно проверки (Find Time, сек)": {
-    "ru": "Окно проверки (Find Time, сек)"
-  },
-  "Таймаут: 20 сек": {
-    "ru": "Таймаут: 20 сек"
-  },
-  "Редактировать данные абонента": {
-    "ru": "Редактировать данные абонента"
-  },
-  "ID: bitrix24 • Версия: v2.2.0 • Автор: Logic Core CRM Labs": {
-    "ru": "ID: bitrix24 • Версия: v2.2.0 • Автор: Logic Core CRM Labs"
-  },
-  "Скопировать ссылку": {
-    "ru": "Скопировать ссылку"
-  },
-  "Сжатие архивов": {
-    "ru": "Сжатие архивов"
-  },
-  "Новая группа абонентов": {
-    "ru": "Новая группа абонентов"
-  },
-  "Полностью удалить модуль": {
-    "ru": "Полностью удалить модуль"
   },
   "О модуле": {
     "ru": "О модуле"
   },
-  "SIP Абонент (Extension)": {
-    "ru": "SIP Абонент (Extension)"
-  },
-  "Скачайте готовый файл .ovpn со встроенными ключами и загрузите в веб-интерфейс телефона": {
-    "ru": "Скачайте готовый файл .ovpn со встроенными ключами и загрузите в веб-интерфейс телефона"
-  },
-  "🔗 Брать ссылку из облака / FTP (Рекомендуется, экономит диск amoCRM)": {
-    "ru": "🔗 Брать ссылку из облака / FTP (Рекомендуется, экономит диск amoCRM)"
-  },
-  "Режим выгрузки аудио в amoCRM:": {
-    "ru": "Режим выгрузки аудио в amoCRM:"
-  },
-  "Hangup — Завершить вызов": {
-    "ru": "Hangup — Завершить вызов"
-  },
-  "Субдомен": {
-    "ru": "Субдомен"
-  },
-  "Порт OpenVPN": {
-    "ru": "Порт OpenVPN"
-  },
-  "Например: 5 неудачных попыток": {
-    "ru": "Например: 5 неудачных попыток"
-  },
-  "IVR Меню": {
-    "ru": "IVR Меню"
-  },
-  "Отдел телемаркетинга, холодные звонки по выделенным безлимитным тарифам.": {
-    "ru": "Отдел телемаркетинга, холодные звонки по выделенным безлимитным тарифам."
-  },
-  "Аудиосообщение в нерабочее время": {
-    "ru": "Аудиосообщение в нерабочее время"
-  },
-  "Сохранить конфигурацию VPN Hub": {
-    "ru": "Сохранить конфигурацию VPN Hub"
-  },
-  "Датацентр Zoho": {
-    "ru": "Датацентр Zoho"
-  },
-  "86400 сек = блокировка на 24 часа": {
-    "ru": "86400 сек = блокировка на 24 часа"
-  },
-  "Скопируйте полученные": {
-    "ru": "Скопируйте полученные"
-  },
-  "/ 2 польз.": {
-    "ru": "/ 2 польз."
-  },
-  "Совместимость ядра": {
-    "ru": "Совместимость ядра"
-  },
-  "Руководство, генеральный директор.": {
-    "ru": "Руководство, генеральный директор."
-  },
-  "Создать новый блок здесь": {
-    "ru": "Создать новый блок здесь"
-  },
-  "Холст IVR": {
-    "ru": "Холст IVR"
-  },
-  "Описание возможностей плагина.": {
-    "ru": "Описание возможностей плагина."
-  },
-  "Укажите ваш субдомен (например, если адрес": {
-    "ru": "Укажите ваш субдомен (например, если адрес"
-  },
-  "(Внешний публичный IP)": {
-    "ru": "(Внешний публичный IP)"
-  },
-  "В Zendesk перейдите в": {
-    "ru": "В Zendesk перейдите в"
-  },
-  "В момент установления звонка модем потребляет в пике до": {
-    "ru": "В момент установления звонка модем потребляет в пике до"
-  },
-  "Парольная защита веб-интерфейса": {
-    "ru": "Парольная защита веб-интерфейса"
-  },
-  "Точка входа звонка от внешнего провайдера связи. Принимает внешний вызов и сразу направляет его в связанное голосовое меню.": {
-    "ru": "Точка входа звонка от внешнего провайдера связи. Принимает внешний вызов и сразу направляет его в связанное голосовое меню."
-  },
-  "Обновить страницу": {
-    "ru": "Обновить страницу"
-  },
-  "Проверить целостность и хеш": {
-    "ru": "Проверить целостность и хеш"
-  },
-  "— при молчании абонента по таймауту.": {
-    "ru": "— при молчании абонента по таймауту."
-  },
-  "Закрыть": {
-    "ru": "Закрыть"
-  },
-  "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team": {
-    "ru": "ID: amocrm_pro • Версия: v3.2.0 • Автор: Logic Core Team"
-  },
-  "Протокол сквозного тестирования SHA-256": {
-    "ru": "Протокол сквозного тестирования SHA-256"
-  },
-  "Двигать / Редактировать": {
-    "ru": "Двигать / Редактировать"
-  },
-  "🚀 Groq Whisper Large-v3 (Сверхбыстрое распознавание ~0.5 сек)": {
-    "ru": "🚀 Groq Whisper Large-v3 (Сверхбыстрое распознавание ~0.5 сек)"
-  },
-  "Соединить узлы стрелкой: Кликните начальный узел, затем целевой": {
-    "ru": "Соединить узлы стрелкой: Кликните начальный узел, затем целевой"
-  },
-  "Язык интерфейса / Language": {
-    "ru": "Язык интерфейса / Language"
-  },
-  "Подключение SIP Транка": {
-    "ru": "Подключение SIP Транка"
-  },
-  "Модуль «Neural Speech AI (Whisper & LLM)» временно отключен": {
-    "ru": "Модуль «Neural Speech AI (Whisper & LLM)» временно отключен"
-  },
-  "Нейросетевой движок распознавания (STT Engine)": {
-    "ru": "Нейросетевой движок распознавания (STT Engine)"
-  },
-  "LLM Модель для анализа": {
-    "ru": "LLM Модель для анализа"
-  },
-  "Тонкая настройка порогов блокировки неавторизованных SIP-пакетов": {
-    "ru": "Тонкая настройка порогов блокировки неавторизованных SIP-пакетов"
-  },
-  "Откройте ваш портал Битрикс24 $\\rightarrow$ раздел": {
-    "ru": "Откройте ваш портал Битрикс24 $\\rightarrow$ раздел"
-  },
-  "🌐 Единая общая воронка и этап для всех звонков": {
-    "ru": "🌐 Единая общая воронка и этап для всех звонков"
-  },
-  "Справочник параметров абонента и архитектура «Контекстов»": {
-    "ru": "Справочник параметров абонента и архитектура «Контекстов»"
-  },
-  "Группа вызова (Ring Group)": {
-    "ru": "Группа вызова (Ring Group)"
-  },
-  "Руководство по архитектуре блоков и логике маршрутизации": {
-    "ru": "Руководство по архитектуре блоков и логике маршрутизации"
-  },
-  "1. Использование": {
-    "ru": "1. Использование"
-  },
-  "Передавать внутренние звонки между сотрудниками": {
-    "ru": "Передавать внутренние звонки между сотрудниками"
-  },
-  "UDP (Стандарт)": {
-    "ru": "UDP (Стандарт)"
-  },
-  "Занято логами:": {
-    "ru": "Занято логами:"
-  },
-  ", введите": {
-    "ru": ", введите"
-  },
-  "Название группы / Отдела": {
-    "ru": "Название группы / Отдела"
-  },
-  "Добавить ветку": {
-    "ru": "Добавить ветку"
-  },
-  "VLESS Reality Ключи и QR-коды для смартфонов": {
-    "ru": "VLESS Reality Ключи и QR-коды для смартфонов"
-  },
-  "$\\rightarrow$ Создайте Workflow.": {
-    "ru": "$\\rightarrow$ Создайте Workflow."
-  },
-  ") и вставьте ниже.": {
-    "ru": ") и вставьте ниже."
-  },
-  "(Валюта: ₽, Страна: RU)": {
-    "ru": "(Валюта: ₽, Страна: RU)"
-  },
-  "Логи в реальном времени": {
-    "ru": "Логи в реальном времени"
-  },
-  "Удалить блок": {
-    "ru": "Удалить блок"
-  },
-  "Имя сотрудника / Отдел (CallerID)": {
-    "ru": "Имя сотрудника / Отдел (CallerID)"
-  },
-  "amoCRM Синхронизация": {
-    "ru": "amoCRM Синхронизация"
-  },
-  "История входящих и исходящих соединений, длительность и записи разговоров": {
-    "ru": "История входящих и исходящих соединений, длительность и записи разговоров"
-  },
-  "Всего отражено": {
-    "ru": "Всего отражено"
-  },
-  "3. SIP Абоненты и Группы": {
-    "ru": "3. SIP Абоненты и Группы"
-  },
-  "Вставьте ваш": {
-    "ru": "Вставьте ваш"
-  },
-  "Обновить CDR": {
-    "ru": "Обновить CDR"
-  },
-  "Стандартный корпоративный:": {
-    "ru": "Стандартный корпоративный:"
-  },
-  "TLS (Зашифрованный)": {
-    "ru": "TLS (Зашифрованный)"
-  },
-  "Внутренние номера сотрудников, группы одновременного и поочередного вызова.": {
-    "ru": "Внутренние номера сотрудников, группы одновременного и поочередного вызова."
-  },
-  "Автоматическая компиляция:": {
-    "ru": "Автоматическая компиляция:"
-  },
-  "Инструкция по подключению Zendesk:": {
-    "ru": "Инструкция по подключению Zendesk:"
-  },
-  "Приоритет определения целевой воронки:": {
-    "ru": "Приоритет определения целевой воронки:"
-  },
-  "CallerID (Опционально, номер для АОН)": {
-    "ru": "CallerID (Опционально, номер для АОН)"
-  },
-  "Выкл": {
-    "ru": "Выкл"
-  },
-  "Транспорт": {
-    "ru": "Транспорт"
-  },
-  "Синхронизация звонков в модуль Calls, прикрепление аудиозаписей и связка с лидами Zoho.": {
-    "ru": "Синхронизация звонков в модуль Calls, прикрепление аудиозаписей и связка с лидами Zoho."
-  },
-  "Прикреплять запись разговора": {
-    "ru": "Прикреплять запись разговора"
-  },
-  "Промпт для оценки качества и суммаризации": {
-    "ru": "Промпт для оценки качества и суммаризации"
-  },
-  "Техническая поддержка (Support)": {
-    "ru": "Техническая поддержка (Support)"
-  },
-  "Сохранить изменения": {
-    "ru": "Сохранить изменения"
-  },
-  "Редактировать параметры транка": {
-    "ru": "Редактировать параметры транка"
-  },
-  "Важность:": {
-    "ru": "Важность:"
-  },
-  "Звонки в реальном времени фиксируются в базе данных CDR Asterisk и транслируются в подключенные модули интеграции.": {
-    "ru": "Звонки в реальном времени фиксируются в базе данных CDR Asterisk и транслируются в подключенные модули интеграции."
-  },
-  "Квота диска и автоматическая ротация логов": {
-    "ru": "Квота диска и автоматическая ротация логов"
-  },
-  "включите:": {
-    "ru": "включите:"
-  },
-  "Внутренний VPN IP": {
-    "ru": "Внутренний VPN IP"
-  },
-  "DTMF Клавиша перехода (0–9, *, #, i, t)": {
-    "ru": "DTMF Клавиша перехода (0–9, *, #, i, t)"
-  },
-  "в поля ниже.": {
-    "ru": "в поля ниже."
-  },
-  "Активация лицензии / плагина": {
-    "ru": "Активация лицензии / плагина"
-  },
-  "SIP Транки & Вызовы": {
-    "ru": "SIP Транки & Вызовы"
-  },
-  "Имя сотрудника / Отдел (CallerID Name)": {
-    "ru": "Имя сотрудника / Отдел (CallerID Name)"
-  },
-  "Права и логика маршрутизации": {
-    "ru": "Права и логика маршрутизации"
-  },
-  "Войти с аккаунтом Google": {
-    "ru": "Войти с аккаунтом Google"
-  },
-  "Пауза потока": {
-    "ru": "Пауза потока"
-  },
-  "1. Входящий SIP-Транк": {
-    "ru": "1. Входящий SIP-Транк"
-  },
-  "Расписание": {
-    "ru": "Расписание"
-  },
-  "📞 SIP Транк: Test (95.84.198.140)": {
-    "ru": "📞 SIP Транк: Test (95.84.198.140)"
-  },
-  "Сохранить настройки расписания": {
-    "ru": "Сохранить настройки расписания"
-  },
-  "Добавьте триггер": {
-    "ru": "Добавьте триггер"
-  },
-  "АОН / CallerID": {
-    "ru": "АОН / CallerID"
-  },
-  "Администрирование": {
-    "ru": "Администрирование"
-  },
-  "Название ветки / Отдел": {
-    "ru": "Название ветки / Отдел"
-  },
-  "📱 GSM Модемы (Пул сим-карт)": {
-    "ru": "📱 GSM Модемы (Пул сим-карт)"
-  },
-  "Сохранить все параметры amoCRM": {
-    "ru": "Сохранить все параметры amoCRM"
-  },
-  "Оповещение с IP-адресом атакующего бота при попытках сетевого брутфорса и автоматической блокировке в iptables.": {
-    "ru": "Оповещение с IP-адресом атакующего бота при попытках сетевого брутфорса и автоматической блокировке в iptables."
-  },
-  "Модули (Диски & Чанки)": {
-    "ru": "Модули (Диски & Чанки)"
-  },
-  "Субдомен аккаунта amoCRM": {
-    "ru": "Субдомен аккаунта amoCRM"
-  },
-  "Лицензионный ключ": {
-    "ru": "Лицензионный ключ"
-  },
-  "Применить лимиты квоты": {
-    "ru": "Применить лимиты квоты"
-  },
-  "Доверенные IP-адреса офиса и SIP-провайдеров, которые никогда не будут заблокированы (через запятую или пробел).": {
-    "ru": "Доверенные IP-адреса офиса и SIP-провайдеров, которые никогда не будут заблокированы (через запятую или пробел)."
-  },
-  "В сети (Online)": {
-    "ru": "В сети (Online)"
-  },
-  "Внутренний номер": {
-    "ru": "Внутренний номер"
-  },
-  "Создать группу": {
-    "ru": "Создать группу"
-  },
-  "История вызовов активна": {
-    "ru": "История вызовов активна"
-  },
-  "АКТИВНА": {
-    "ru": "АКТИВНА"
-  },
-  "Криптографическая защита OTA": {
-    "ru": "Криптографическая защита OTA"
-  },
-  "Сохранить блок": {
-    "ru": "Сохранить блок"
-  },
-  "и полученный токен.": {
-    "ru": "и полученный токен."
-  },
-  "Яндекс.Диск Облачный Архив": {
-    "ru": "Яндекс.Диск Облачный Архив"
-  },
-  "Запись разговоров": {
-    "ru": "Запись разговоров"
-  },
-  "«Иван Иванов (Отдел продаж)»": {
-    "ru": "«Иван Иванов (Отдел продаж)»"
-  },
-  "Если звонящий не выбрал пункт за указанный таймаут (сек), система повторит меню заданное число раз (Retries) или переведет звонок по ветке [t].": {
-    "ru": "Если звонящий не выбрал пункт за указанный таймаут (сек), система повторит меню заданное число раз (Retries) или переведет звонок по ветке [t]."
-  },
-  "4. Обработчики [i] и [t]": {
-    "ru": "4. Обработчики [i] и [t]"
-  },
-  "Центрировать камеру": {
-    "ru": "Центрировать камеру"
-  },
-  "Пример применения": {
-    "ru": "Пример применения"
-  },
-  "Принудительная линия:": {
-    "ru": "Принудительная линия:"
-  },
-  "(ID групп начинаются с минуса, например:": {
-    "ru": "(ID групп начинаются с минуса, например:"
-  },
-  "Тип блока (Type)": {
-    "ru": "Тип блока (Type)"
-  },
-  "Голосовая почта (Voicemail)": {
-    "ru": "Голосовая почта (Voicemail)"
-  },
-  "Ветки отказоустойчивости: клавиша": {
-    "ru": "Ветки отказоустойчивости: клавиша"
-  },
-  "ID ответственного по умолчанию (User ID)": {
-    "ru": "ID ответственного по умолчанию (User ID)"
-  },
-  "Сохранить FTP": {
-    "ru": "Сохранить FTP"
-  },
-  "Все модули (14)": {
-    "ru": "Все модули (14)"
-  },
-  "Настройка блока IVR": {
-    "ru": "Настройка блока IVR"
-  },
-  "Контекст вызовов": {
-    "ru": "Контекст вызовов"
-  },
-  "Клиентские профили для аппаратных IP-телефонов": {
-    "ru": "Клиентские профили для аппаратных IP-телефонов"
-  },
-  "Офисный Grandstream GXP1625 (Абонент 102)": {
-    "ru": "Офисный Grandstream GXP1625 (Абонент 102)"
-  },
-  "Во вкладке": {
-    "ru": "Во вкладке"
-  },
-  "Включить автоматическую выгрузку на Яндекс.Диск": {
-    "ru": "Включить автоматическую выгрузку на Яндекс.Диск"
-  },
-  "Алерты Антифрода и Банов (Fail2ban)": {
-    "ru": "Алерты Антифрода и Банов (Fail2ban)"
-  },
-  "📤 Выгружать сам файл в amoCRM Drive": {
-    "ru": "📤 Выгружать сам файл в amoCRM Drive"
-  },
-  "Уведомления о пропущенных звонках": {
-    "ru": "Уведомления о пропущенных звонках"
-  },
-  "Установка плагина из архива": {
-    "ru": "Установка плагина из архива"
-  },
-  "📞 Одновременно всем (Ringall)": {
-    "ru": "📞 Одновременно всем (Ringall)"
-  },
-  "Сделай краткое резюме звонка, определи договоренности, настроение клиента и оцени работу оператора от 1 до 100%.": {
-    "ru": "Сделай краткое резюме звонка, определи договоренности, настроение клиента и оцени работу оператора от 1 до 100%."
-  },
-  "2. Статус регистрации": {
-    "ru": "2. Статус регистрации"
-  },
-  "Создать связь (Стрелку)": {
-    "ru": "Создать связь (Стрелку)"
+  "Основной Этап воронки": {
+    "ru": "Основной Этап воронки"
+  },
+  "Отправка мгновенных хуков о входящих/пропущенных звонках в автоматизации и воронки GHL.": {
+    "ru": "Отправка мгновенных хуков о входящих/пропущенных звонках в автоматизации и воронки GHL."
   },
   "Очистить экран": {
     "ru": "Очистить экран"
   },
-  "Инструкция по подключению GoHighLevel (GHL):": {
-    "ru": "Инструкция по подключению GoHighLevel (GHL):"
+  "Сохранить настройки Speech AI": {
+    "ru": "Сохранить настройки Speech AI"
   },
-  "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team": {
-    "ru": "ID: yandex_disk • Версия: v2.1.0 • Автор: Logic Core Team"
-  },
-  "Общая резервная воронка (Fallback по умолчанию):": {
-    "ru": "Общая резервная воронка (Fallback по умолчанию):"
-  },
-  "Инструкция по подключению Pipedrive:": {
-    "ru": "Инструкция по подключению Pipedrive:"
-  },
-  "Целевой номер / SIP Абонент": {
-    "ru": "Целевой номер / SIP Абонент"
-  },
-  "Интерактивный IVR Конструктор": {
-    "ru": "Интерактивный IVR Конструктор"
-  },
-  "Дата создания": {
-    "ru": "Дата создания"
-  },
-  "Рейтинг сообщества": {
-    "ru": "Рейтинг сообщества"
-  },
-  "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана.": {
-    "ru": "При нажатии «Применить IVR схему» визуальный граф автоматически преобразуется в боевой контекст Asterisk с перезагрузкой диалплана."
-  },
-  ": при 5 неверных попытках ввода пароля IP-клиента мгновенно блокируется в": {
-    "ru": ": при 5 неверных попытках ввода пароля IP-клиента мгновенно блокируется в"
-  },
-  "Введите криптографический ключ, полученный при покупке в Маркетплейсе для Server ID": {
-    "ru": "Введите криптографический ключ, полученный при покупке в Маркетплейсе для Server ID"
-  },
-  "ID: zendesk • Версия: v1.5.0 • Автор: Logic Core Global": {
-    "ru": "ID: zendesk • Версия: v1.5.0 • Автор: Logic Core Global"
-  },
-  "Долгосрочный токен (Bearer Token)": {
-    "ru": "Долгосрочный токен (Bearer Token)"
-  },
-  "с активными голосовыми AT-командами и поддержкой аудио-потока PCM 8kHz.": {
-    "ru": "с активными голосовыми AT-командами и поддержкой аудио-потока PCM 8kHz."
-  },
-  "v2.5.0 Активен": {
-    "ru": "v2.5.0 Активен"
-  },
-  "Подключен к API v4": {
-    "ru": "Подключен к API v4"
-  },
-  "Иван Иванов (Отдел продаж)": {
-    "ru": "Иван Иванов (Отдел продаж)"
+  "Создайте входящий вебхук с правами «Телефония (telephony)» и «CRM (crm)» в кабинете Битрикс24.": {
+    "ru": "Создайте входящий вебхук с правами «Телефония (telephony)» и «CRM (crm)» в кабинете Битрикс24."
   },
   "Субдомен: https://mrvasilich.amocrm.ru": {
     "ru": "Субдомен: https://mrvasilich.amocrm.ru"
   },
-  "4G LTE (Эмуляция)": {
-    "ru": "4G LTE (Эмуляция)"
+  "🔒 Локальный Faster-Whisper (На сервере, без отправки в облако)": {
+    "ru": "🔒 Локальный Faster-Whisper (На сервере, без отправки в облако)"
+  },
+  "Рейтинг сообщества": {
+    "ru": "Рейтинг сообщества"
+  },
+  "STATUS 2: АВТОРИЗОВАН, НЕТ, ИДЕТ ПОДКЛЮЧЕНИЕ": {
+    "ru": "STATUS 2: АВТОРИЗОВАН, НЕТ, ИДЕТ ПОДКЛЮЧЕНИЕ"
+  },
+  "Установлен": {
+    "ru": "Установлен"
+  },
+  "Войти с аккаунтом Google": {
+    "ru": "Войти с аккаунтом Google"
+  },
+  "amoCRM & Сделки": {
+    "ru": "amoCRM & Сделки"
+  },
+  "Минимальная длина звонка (сек)": {
+    "ru": "Минимальная длина звонка (сек)"
+  },
+  "Сохранить настройки HubSpot": {
+    "ru": "Сохранить настройки HubSpot"
+  },
+  "Создать группу": {
+    "ru": "Создать группу"
+  },
+  "Интерактивный IVR Конструктор": {
+    "ru": "Интерактивный IVR Конструктор"
+  },
+  "Пример применения": {
+    "ru": "Пример применения"
+  },
+  "Автоматическое приведение номеров к международному формату E.164 (+7..., +971..., +1...)": {
+    "ru": "Автоматическое приведение номеров к международному формату E.164 (+7..., +971..., +1...)"
+  },
+  "Встроенный Proxy / Обход блокировок": {
+    "ru": "Встроенный Proxy / Обход блокировок"
   },
   "Отключить выполнение модуля (сохраняя настройки)": {
     "ru": "Отключить выполнение модуля (сохраняя настройки)"
   },
-  "ALL — Одновременный вызов всех абонентов": {
-    "ru": "ALL — Одновременный вызов всех абонентов"
+  "Таймаут: 30 сек": {
+    "ru": "Таймаут: 30 сек"
   },
-  "При достижении файл архивируется": {
-    "ru": "При достижении файл архивируется"
+  "Настройка воронок для каждого оператора / добавочного номера:": {
+    "ru": "Настройка воронок для каждого оператора / добавочного номера:"
   },
-  "Создание голосовых тикетов службы заботы при входящих обращениях клиентов.": {
-    "ru": "Создание голосовых тикетов службы заботы при входящих обращениях клиентов."
+  "Создайте группу для алертов (или напишите боту в ЛС) и добавьте бота в чат.": {
+    "ru": "Создайте группу для алертов (или напишите боту в ЛС) и добавьте бота в чат."
   },
-  "Сохранить настройки Speech AI": {
-    "ru": "Сохранить настройки Speech AI"
+  "Название группы / Отдела": {
+    "ru": "Название группы / Отдела"
   },
-  "⚡ Автовыбор (Первое доступное хранилище)": {
-    "ru": "⚡ Автовыбор (Первое доступное хранилище)"
+  "Завершение вызова (Hangup)": {
+    "ru": "Завершение вызова (Hangup)"
   },
-  "Сетевой статус": {
-    "ru": "Сетевой статус"
-  },
-  "Основная Воронка": {
-    "ru": "Основная Воронка"
-  },
-  "Логин / CID": {
-    "ru": "Логин / CID"
-  },
-  "Драйвер в PBX": {
-    "ru": "Драйвер в PBX"
-  },
-  "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка": {
-    "ru": "3. Выгрузка аудиозаписей разговоров и плеер в карточке звонка"
-  },
-  "Поиск по тексту лога...": {
-    "ru": "Поиск по тексту лога..."
-  },
-  "Статус поддержки": {
-    "ru": "Статус поддержки"
-  },
-  "Редактировать группу": {
-    "ru": "Редактировать группу"
-  },
-  ", скопируйте полученный": {
-    "ru": ", скопируйте полученный"
-  },
-  "Протянуть стрелку отсюда...": {
-    "ru": "Протянуть стрелку отсюда..."
+  "в поле ниже.": {
+    "ru": "в поле ниже."
   },
   "Скачать .ovpn": {
     "ru": "Скачать .ovpn"
   },
-  "Максимальный размер лог-файла (MB)": {
-    "ru": "Максимальный размер лог-файла (MB)"
+  "Окно проверки (Find Time, сек)": {
+    "ru": "Окно проверки (Find Time, сек)"
   },
-  "Модуль поставляется в подписанном .zip архиве и проверяется по SHA-256 сигнатуре перед инициализацией в Asterisk Core.": {
-    "ru": "Модуль поставляется в подписанном .zip архиве и проверяется по SHA-256 сигнатуре перед инициализацией в Asterisk Core."
+  "Уведомления о пропущенных звонках": {
+    "ru": "Уведомления о пропущенных звонках"
   },
-  "Связывание блоков стрелками:": {
-    "ru": "Связывание блоков стрелками:"
+  "(например,": {
+    "ru": "(например,"
   },
-  "Активировать синхронизацию с HubSpot": {
-    "ru": "Активировать синхронизацию с HubSpot"
+  "Авторизуйтесь через официальный аккаунт Google для архивации звонков.": {
+    "ru": "Авторизуйтесь через официальный аккаунт Google для архивации звонков."
   },
-  "Визуальное проектирование голосовых сценариев, прямого донабора (Direct Dial), очередей и расписаний.": {
-    "ru": "Визуальное проектирование голосовых сценариев, прямого донабора (Direct Dial), очередей и расписаний."
+  "Активировать модуль Pipedrive": {
+    "ru": "Активировать модуль Pipedrive"
   },
-  "Целевой номер / Ресурс": {
-    "ru": "Целевой номер / Ресурс"
+  "Включить обработку нерабочего времени": {
+    "ru": "Включить обработку нерабочего времени"
   },
-  "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет.": {
-    "ru": "Шифрование SIP-трафика и удаленная телефония без проброса открытых портов 5060 в интернет."
+  "Описание возможностей плагина.": {
+    "ru": "Описание возможностей плагина."
   },
-  "Как блоки взаимодействуют между собой (Алгоритм потока звонка)": {
-    "ru": "Как блоки взаимодействуют между собой (Алгоритм потока звонка)"
+  "Как настроить бота и получить Chat ID:": {
+    "ru": "Как настроить бота и получить Chat ID:"
   },
-  "3G HSPA+ (Эмуляция)": {
-    "ru": "3G HSPA+ (Эмуляция)"
+  "Белый список IP-адресов (Whitelist / Ignore IP)": {
+    "ru": "Белый список IP-адресов (Whitelist / Ignore IP)"
   },
-  "активный USB-хаб с внешним блоком питания (12V 3-5A)": {
-    "ru": "активный USB-хаб с внешним блоком питания (12V 3-5A)"
+  "86400 сек = блокировка на 24 часа": {
+    "ru": "86400 сек = блокировка на 24 часа"
+  },
+  "Техническая поддержка (Support)": {
+    "ru": "Техническая поддержка (Support)"
+  },
+  "История вызовов активна": {
+    "ru": "История вызовов активна"
+  },
+  "Редактирование абонента": {
+    "ru": "Редактирование абонента"
+  },
+  "Фоновые процессы, хуки и выполнение обработчиков приостановлены. Все настройки и учетные данные сохранены.": {
+    "ru": "Фоновые процессы, хуки и выполнение обработчиков приостановлены. Все настройки и учетные данные сохранены."
+  },
+  "Категория": {
+    "ru": "Категория"
+  },
+  "Обновить список воронок": {
+    "ru": "Обновить список воронок"
+  },
+  "$\\rightarrow$ Нажмите": {
+    "ru": "$\\rightarrow$ Нажмите"
+  },
+  "Лицензионный ключ": {
+    "ru": "Лицензионный ключ"
+  },
+  "Заблокированный IP": {
+    "ru": "Заблокированный IP"
+  },
+  ", скопируйте полученный": {
+    "ru": ", скопируйте полученный"
+  },
+  "50 MB (Рекомендуется)": {
+    "ru": "50 MB (Рекомендуется)"
+  },
+  "Включить модуль в работу": {
+    "ru": "Включить модуль в работу"
+  },
+  "Внутренние номера сотрудников, группы одновременного и поочередного вызова.": {
+    "ru": "Внутренние номера сотрудников, группы одновременного и поочередного вызова."
+  },
+  "Имя (CallerID Name):": {
+    "ru": "Имя (CallerID Name):"
+  },
+  "Создайте Private App в HubSpot с разрешениями": {
+    "ru": "Создайте Private App в HubSpot с разрешениями"
+  },
+  "Протянуть стрелку отсюда...": {
+    "ru": "Протянуть стрелку отсюда..."
+  },
+  "amoCRM Синхронизация": {
+    "ru": "amoCRM Синхронизация"
+  },
+  "Имя (CallerID) и Внутренний номер (Extension)": {
+    "ru": "Имя (CallerID) и Внутренний номер (Extension)"
+  },
+  "Участники группы (1):": {
+    "ru": "Участники группы (1):"
+  },
+  "Имя сотрудника / Отдел (CallerID)": {
+    "ru": "Имя сотрудника / Отдел (CallerID)"
+  },
+  "Сохранить настройки Telegram": {
+    "ru": "Сохранить настройки Telegram"
+  },
+  "Имя пользователя (Логин)": {
+    "ru": "Имя пользователя (Логин)"
+  },
+  "Активировать GoHighLevel Sync": {
+    "ru": "Активировать GoHighLevel Sync"
+  },
+  "Транспорт": {
+    "ru": "Транспорт"
+  },
+  "срабатывает при ошибочном вводе, а": {
+    "ru": "срабатывает при ошибочном вводе, а"
+  },
+  "Таймаут: 20 сек": {
+    "ru": "Таймаут: 20 сек"
+  },
+  "ID: zendesk • Версия: v1.5.0 • Автор: Logic Core Global": {
+    "ru": "ID: zendesk • Версия: v1.5.0 • Автор: Logic Core Global"
+  },
+  "Выполнить ротацию сейчас": {
+    "ru": "Выполнить ротацию сейчас"
+  },
+  "Сменить аккаунт": {
+    "ru": "Сменить аккаунт"
+  },
+  "Начало рабочего дня": {
+    "ru": "Начало рабочего дня"
+  },
+  "Сохранить группу": {
+    "ru": "Сохранить группу"
+  },
+  "Контекст в Asterisk": {
+    "ru": "Контекст в Asterisk"
+  },
+  "в Telegram и отправьте команду": {
+    "ru": "в Telegram и отправьте команду"
+  },
+  "куда этот номер имеет право звонить, через какие GSM-модемы или транки выходить в город, и разрешены ли ему международные вызовы.": {
+    "ru": "куда этот номер имеет право звонить, через какие GSM-модемы или транки выходить в город, и разрешены ли ему международные вызовы."
+  },
+  "Создание активностей типа Call, выгрузка ссылок на записи в сделки и воронки продаж.": {
+    "ru": "Создание активностей типа Call, выгрузка ссылок на записи в сделки и воронки продаж."
   },
   "Файл автоматически конвертируется и сохраняется в звуковую директорию Asterisk.": {
     "ru": "Файл автоматически конвертируется и сохраняется в звуковую директорию Asterisk."
   },
-  "Настройка голосового сценария для линии:": {
-    "ru": "Настройка голосового сценария для линии:"
+  "Журнал последних звонков": {
+    "ru": "Журнал последних звонков"
   },
-  "Длительность бана (Ban Time, сек)": {
-    "ru": "Длительность бана (Ban Time, сек)"
+  "Алерты Антифрода и Банов (Fail2ban)": {
+    "ru": "Алерты Антифрода и Банов (Fail2ban)"
   },
-  "📞 SIP Транк: Test2 (95.84.198.140)": {
-    "ru": "📞 SIP Транк: Test2 (95.84.198.140)"
+  "Сохранить настройки Яндекс.Диска": {
+    "ru": "Сохранить настройки Яндекс.Диска"
   },
-  "Сделай краткое резюме диалога за 2-3 предложения, выдели ключевые договоренности и оцени качество обслуживания оператора от 1 до 100%.": {
-    "ru": "Сделай краткое резюме диалога за 2-3 предложения, выдели ключевые договоренности и оцени качество обслуживания оператора от 1 до 100%."
+  "Всего отражено": {
+    "ru": "Всего отражено"
   },
-  "в Asterisk. Требуется режим": {
-    "ru": "в Asterisk. Требуется режим"
+  "🚀 Groq Whisper Large-v3 (Сверхбыстрое распознавание ~0.5 сек)": {
+    "ru": "🚀 Groq Whisper Large-v3 (Сверхбыстрое распознавание ~0.5 сек)"
   },
-  "Нажмите": {
-    "ru": "Нажмите"
+  "Статус поддержки": {
+    "ru": "Статус поддержки"
   },
-  "iPhone (Менеджер 101)": {
-    "ru": "iPhone (Менеджер 101)"
+  "🔗 Брать ссылку из облака / FTP (Рекомендуется, экономит диск amoCRM)": {
+    "ru": "🔗 Брать ссылку из облака / FTP (Рекомендуется, экономит диск amoCRM)"
   },
-  "Скопируйте": {
-    "ru": "Скопируйте"
+  "Прямая доставка сообщений через защищенные HTTPS / MTProto каналы без риска замедления API Telegram.": {
+    "ru": "Прямая доставка сообщений через защищенные HTTPS / MTProto каналы без риска замедления API Telegram."
   },
-  "Проверить API соединение": {
-    "ru": "Проверить API соединение"
+  "SIP Абонент (Extension)": {
+    "ru": "SIP Абонент (Extension)"
   },
-  "🔄 Поочередно по списку (Hunt)": {
-    "ru": "🔄 Поочередно по списку (Hunt)"
+  "Сохранить Zendesk": {
+    "ru": "Сохранить Zendesk"
   },
-  "GROUP 3: ЭКОСИСТЕМА & ПЛАГИНЫ": {
-    "ru": "GROUP 3: ЭКОСИСТЕМА & ПЛАГИНЫ"
+  "Выкл": {
+    "ru": "Выкл"
   },
-  "Маскировка под HTTPS трафик (SNI: microsoft.com). Полный обход любых мобильных блокировок.": {
-    "ru": "Маскировка под HTTPS трафик (SNI: microsoft.com). Полный обход любых мобильных блокировок."
+  "Чтобы узнать ID группы/пользователя, перешлите любое сообщение в бота": {
+    "ru": "Чтобы узнать ID группы/пользователя, перешлите любое сообщение в бота"
   },
-  "Settings (Шестеренка)": {
-    "ru": "Settings (Шестеренка)"
+  "ALL — Одновременный вызов всех абонентов": {
+    "ru": "ALL — Одновременный вызов всех абонентов"
   },
-  "Что такое «Контекст вызовов» (Dialplan Context) и на что он влияет?": {
-    "ru": "Что такое «Контекст вызовов» (Dialplan Context) и на что он влияет?"
+  "Входящая линия": {
+    "ru": "Входящая линия"
+  },
+  "Сохранить настройки расписания": {
+    "ru": "Сохранить настройки расписания"
+  },
+  "Иван Иванов (Отдел продаж)": {
+    "ru": "Иван Иванов (Отдел продаж)"
+  },
+  "Группы абонентов (Ring Groups)": {
+    "ru": "Группы абонентов (Ring Groups)"
+  },
+  "АОН / CallerID": {
+    "ru": "АОН / CallerID"
   },
   "Контроль GSM-модемов и баланса": {
     "ru": "Контроль GSM-модемов и баланса"
   },
-  "Количество архивных копий": {
-    "ru": "Количество архивных копий"
+  "Включить Zendesk Voice Bridge": {
+    "ru": "Включить Zendesk Voice Bridge"
   },
-  "Статус шифрования": {
-    "ru": "Статус шифрования"
+  "Субдомен аккаунта amoCRM": {
+    "ru": "Субдомен аккаунта amoCRM"
   },
-  "Битрикс24 Telephony REST Hub": {
-    "ru": "Битрикс24 Telephony REST Hub"
+  "API Ключ (OpenAI / Groq / Yandex)": {
+    "ru": "API Ключ (OpenAI / Groq / Yandex)"
+  },
+  "Парольная защита веб-интерфейса": {
+    "ru": "Парольная защита веб-интерфейса"
+  },
+  "Выпустить .ovpn профиль": {
+    "ru": "Выпустить .ovpn профиль"
+  },
+  "Долгосрочный токен (Bearer Token)": {
+    "ru": "Долгосрочный токен (Bearer Token)"
   },
   "Русский": {
     "ru": "Русский"
   },
-  "Авторизуйтесь через официальный аккаунт Google для архивации звонков.": {
-    "ru": "Авторизуйтесь через официальный аккаунт Google для архивации звонков."
+  "Логи в реальном времени": {
+    "ru": "Логи в реальном времени"
+  },
+  "Целевые узлы назначения. Переводят звонок на конкретного сотрудника (101, 102) или запускают параллельный вызов группы операторов.": {
+    "ru": "Целевые узлы назначения. Переводят звонок на конкретного сотрудника (101, 102) или запускают параллельный вызов группы операторов."
+  },
+  "OpenVPN (IP-Телефоны Yealink / Grandstream)": {
+    "ru": "OpenVPN (IP-Телефоны Yealink / Grandstream)"
+  },
+  "Сигнал тревоги при падении уровня сети (CSQ < 10) или отключении физического USB-донгла от сервера.": {
+    "ru": "Сигнал тревоги при падении уровня сети (CSQ < 10) или отключении физического USB-донгла от сервера."
+  },
+  "Режим выгрузки аудио в amoCRM:": {
+    "ru": "Режим выгрузки аудио в amoCRM:"
+  },
+  "Например: Отдел продаж / Главное меню": {
+    "ru": "Например: Отдел продаж / Главное меню"
+  },
+  "DTMF Клавиша перехода (0–9, *, #, i, t)": {
+    "ru": "DTMF Клавиша перехода (0–9, *, #, i, t)"
+  },
+  "Откройте бота": {
+    "ru": "Откройте бота"
+  },
+  "Введите ваш": {
+    "ru": "Введите ваш"
+  },
+  "📱 GSM Модемы и Сим-карты (Пул номеров)": {
+    "ru": "📱 GSM Модемы и Сим-карты (Пул номеров)"
+  },
+  "Срок действия": {
+    "ru": "Срок действия"
+  },
+  "Рабочие дни недели": {
+    "ru": "Рабочие дни недели"
+  },
+  "Стратегия дозвона": {
+    "ru": "Стратегия дозвона"
+  },
+  "Сохранить блок": {
+    "ru": "Сохранить блок"
+  },
+  "Субдомен Zendesk (например: mycompany)": {
+    "ru": "Субдомен Zendesk (например: mycompany)"
+  },
+  "Внутренний номер": {
+    "ru": "Внутренний номер"
+  },
+  "Chat ID получателей (через запятую для нескольких чатов)": {
+    "ru": "Chat ID получателей (через запятую для нескольких чатов)"
+  },
+  "Применить параметры Антифрода": {
+    "ru": "Применить параметры Антифрода"
+  },
+  "Все модули (14)": {
+    "ru": "Все модули (14)"
+  },
+  "Обычные модемы для 4G-интернета (HiLink / NDIS)": {
+    "ru": "Обычные модемы для 4G-интернета (HiLink / NDIS)"
+  },
+  "Настройка голосового сценария для линии:": {
+    "ru": "Настройка голосового сценария для линии:"
+  },
+  "Включить модуль": {
+    "ru": "Включить модуль"
+  },
+  "$\\rightarrow$ Создайте Workflow.": {
+    "ru": "$\\rightarrow$ Создайте Workflow."
+  },
+  "Потоковая телеметрия ядра Asterisk, GSM-модемов, SIP-транков, аудиозаписи и модулей расширений.": {
+    "ru": "Потоковая телеметрия ядра Asterisk, GSM-модемов, SIP-транков, аудиозаписи и модулей расширений."
+  },
+  "Тип блока (Type)": {
+    "ru": "Тип блока (Type)"
+  },
+  "Основной персонал офиса, менеджеры продаж.": {
+    "ru": "Основной персонал офиса, менеджеры продаж."
+  },
+  "VLESS Reality Ключи и QR-коды для смартфонов": {
+    "ru": "VLESS Reality Ключи и QR-коды для смартфонов"
+  },
+  "Телефоны на складе, в переговорных, на ресепшн или у стажеров.": {
+    "ru": "Телефоны на складе, в переговорных, на ресепшн или у стажеров."
+  },
+  "📤 Выгружать сам файл в amoCRM Drive": {
+    "ru": "📤 Выгружать сам файл в amoCRM Drive"
+  },
+  "Создание голосовых тикетов службы заботы при входящих обращениях клиентов.": {
+    "ru": "Создание голосовых тикетов службы заботы при входящих обращениях клиентов."
+  },
+  "Стандартный корпоративный:": {
+    "ru": "Стандартный корпоративный:"
+  },
+  "2. Маршрутизация сделок (Воронки и Этапы через Select2)": {
+    "ru": "2. Маршрутизация сделок (Воронки и Этапы через Select2)"
+  },
+  "Оповещение с IP-адресом атакующего бота при попытках сетевого брутфорса и автоматической блокировке в iptables.": {
+    "ru": "Оповещение с IP-адресом атакующего бота при попытках сетевого брутфорса и автоматической блокировке в iptables."
+  },
+  "Сделай краткое резюме диалога за 2-3 предложения, выдели ключевые договоренности и оцени качество обслуживания оператора от 1 до 100%.": {
+    "ru": "Сделай краткое резюме диалога за 2-3 предложения, выдели ключевые договоренности и оцени качество обслуживания оператора от 1 до 100%."
+  },
+  "Свободно: 9.5 ГБ из 286.0 ГБ": {
+    "ru": "Свободно: 9.5 ГБ из 286.0 ГБ"
+  },
+  "Центрировать": {
+    "ru": "Центрировать"
+  },
+  "Руководство по архитектуре блоков и логике маршрутизации": {
+    "ru": "Руководство по архитектуре блоков и логике маршрутизации",
+    "en": "Guide to Block Architecture and Routing Logic",
+    "es": "Guía de Arquitectura de Bloques y Lógica de Enrutamiento"
+  },
+  "Отправлять расшифровку и резюме в примечание сделки amoCRM": {
+    "ru": "Отправлять расшифровку и резюме в примечание сделки amoCRM"
+  },
+  "ID: zoho • Версия: v1.9.0 • Автор: Logic Core Global": {
+    "ru": "ID: zoho • Версия: v1.9.0 • Автор: Logic Core Global"
+  },
+  "Оставьте пустым при использовании локального движка Faster-Whisper.": {
+    "ru": "Оставьте пустым при использовании локального движка Faster-Whisper."
+  },
+  "Создавать Лид при новом номере": {
+    "ru": "Создавать Лид при новом номере"
+  },
+  "Руководство, генеральный директор.": {
+    "ru": "Руководство, генеральный директор."
+  },
+  "Сохранить параметры транка": {
+    "ru": "Сохранить параметры транка"
+  },
+  "Отключить модуль": {
+    "ru": "Отключить модуль"
+  },
+  "Параметры сетевых портов и маскировки": {
+    "ru": "Параметры сетевых портов и маскировки"
+  },
+  "(Валюта: ₽, Страна: RU)": {
+    "ru": "(Валюта: ₽, Страна: RU)"
+  },
+  "Порт OpenVPN": {
+    "ru": "Порт OpenVPN"
+  },
+  "Выберите участников группы (Абонентов):": {
+    "ru": "Выберите участников группы (Абонентов):"
+  },
+  "Автоматическая компиляция:": {
+    "ru": "Автоматическая компиляция:",
+    "en": "Automatic compilation:",
+    "es": "Compilación automática:"
+  },
+  "При переходе на панель с внешних IP потребуется ввести пароль": {
+    "ru": "При переходе на панель с внешних IP потребуется ввести пароль"
+  },
+  "Включите": {
+    "ru": "Включите"
+  },
+  "РАСКРЫВАЮЩИЙСЯ БЛОК: РАСШИРЕНИЯ": {
+    "ru": "РАСКРЫВАЮЩИЙСЯ БЛОК: РАСШИРЕНИЯ"
+  },
+  ") и вставьте ниже.": {
+    "ru": ") и вставьте ниже."
+  },
+  "CallerID (Опционально, номер для АОН)": {
+    "ru": "CallerID (Опционально, номер для АОН)"
+  },
+  "Условия срабатывания антифрода и белый список": {
+    "ru": "Условия срабатывания антифрода и белый список"
+  },
+  "Количество попыток (Max Retry)": {
+    "ru": "Количество попыток (Max Retry)"
+  },
+  "Создать связь (Стрелку)": {
+    "ru": "Создать связь (Стрелку)"
+  },
+  "В Pipedrive откройте": {
+    "ru": "В Pipedrive откройте"
+  },
+  "АКТИВНА": {
+    "ru": "АКТИВНА"
+  },
+  "Ваш текущий IP:": {
+    "ru": "Ваш текущий IP:"
+  },
+  "Временно отключить выполнение логики модуля": {
+    "ru": "Временно отключить выполнение логики модуля"
+  },
+  "Сотрудник / Номер": {
+    "ru": "Сотрудник / Номер"
+  },
+  "Автоматическая расшифровка звонков (Speech-to-Text), разделение реплик оператора и клиента (Диаризация L/R) и нейросетевой анализ качества диалога.": {
+    "ru": "Автоматическая расшифровка звонков (Speech-to-Text), разделение реплик оператора и клиента (Диаризация L/R) и нейросетевой анализ качества диалога."
+  },
+  "Ветки отказоустойчивости: клавиша": {
+    "ru": "Ветки отказоустойчивости: клавиша"
+  },
+  "600 сек = в течение 10 минут": {
+    "ru": "600 сек = в течение 10 минут"
+  },
+  "Прикреплять запись разговора": {
+    "ru": "Прикреплять запись разговора"
+  },
+  "ID: pipedrive • Версия: v2.4.0 • Автор: Logic Core CRM Labs": {
+    "ru": "ID: pipedrive • Версия: v2.4.0 • Автор: Logic Core CRM Labs"
+  },
+  "Список абонентов": {
+    "ru": "Список абонентов"
+  },
+  "ID Аккаунта:": {
+    "ru": "ID Аккаунта:"
+  },
+  "Офисный Grandstream GXP1625 (Абонент 102)": {
+    "ru": "Офисный Grandstream GXP1625 (Абонент 102)"
+  },
+  "Если звонящий не выбрал пункт за указанный таймаут (сек), система повторит меню заданное число раз (Retries) или переведет звонок по ветке [t].": {
+    "ru": "Если звонящий не выбрал пункт за указанный таймаут (сек), система повторит меню заданное число раз (Retries) или переведет звонок по ветке [t]."
+  },
+  "Голосовая почта (Voicemail)": {
+    "ru": "Голосовая почта (Voicemail)"
+  },
+  "Изменение номера, имени и пароля": {
+    "ru": "Изменение номера, имени и пароля"
+  },
+  "Администрирование": {
+    "ru": "Администрирование",
+    "en": "Administration",
+    "es": "Administración",
+    "ar": "الإدارة",
+    "zh": "管理"
+  },
+  "История входящих и исходящих соединений, длительность и записи разговоров": {
+    "ru": "История входящих и исходящих соединений, длительность и записи разговоров"
+  },
+  "Звонки в реальном времени фиксируются в базе данных CDR Asterisk и транслируются в подключенные модули интеграции.": {
+    "ru": "Звонки в реальном времени фиксируются в базе данных CDR Asterisk и транслируются в подключенные модули интеграции."
+  },
+  "Логин / SIP ID": {
+    "ru": "Логин / SIP ID"
+  },
+  "Активировать сквозную интеграцию amoCRM": {
+    "ru": "Активировать сквозную интеграцию amoCRM"
+  },
+  "включите:": {
+    "ru": "включите:"
+  },
+  "GROUP 2: ТЕЛЕФОНИЯ & МАРШРУТИЗАЦИЯ": {
+    "ru": "GROUP 2: ТЕЛЕФОНИЯ & МАРШРУТИЗАЦИЯ"
+  },
+  "🚫 Не прикреплять аудиозапись к звонку": {
+    "ru": "🚫 Не прикреплять аудиозапись к звонку"
+  },
+  "Связь (Стрелка)": {
+    "ru": "Связь (Стрелка)"
+  },
+  "Сквозная фиксация вызовов, создание Лидов и Сделок, всплывающая карточка (CTI) и прикрепление аудиозаписи.": {
+    "ru": "Сквозная фиксация вызовов, создание Лидов и Сделок, всплывающая карточка (CTI) и прикрепление аудиозаписи."
+  },
+  "Отдел продаж (Sales)": {
+    "ru": "Отдел продаж (Sales)"
+  },
+  "Активировать интеграцию с Битрикс24": {
+    "ru": "Активировать интеграцию с Битрикс24"
+  },
+  "Новый SIP Абонент": {
+    "ru": "Новый SIP Абонент"
+  },
+  "SIP Пароль (Secret / Auth Password)": {
+    "ru": "SIP Пароль (Secret / Auth Password)"
+  },
+  "Хост / Домен сервера": {
+    "ru": "Хост / Домен сервера"
+  },
+  "2. Голосовое Меню (IVR)": {
+    "ru": "2. Голосовое Меню (IVR)",
+    "en": "2. Voice Menu (IVR)",
+    "es": "2. Menú de Voz (IVR)"
+  },
+  ") и вставьте в поле ниже.": {
+    "ru": ") и вставьте в поле ниже."
+  },
+  "Права и логика маршрутизации": {
+    "ru": "Права и логика маршрутизации"
+  },
+  "🌐 Общий сценарий (По умолчанию)": {
+    "ru": "🌐 Общий сценарий (По умолчанию)"
+  },
+  "1. Входящий SIP-Транк": {
+    "ru": "1. Входящий SIP-Транк",
+    "en": "1. Inbound SIP Trunk",
+    "es": "1. Troncal SIP Entrante"
+  },
+  "Доверенные IP-адреса офиса и SIP-провайдеров, которые никогда не будут заблокированы (через запятую или пробел).": {
+    "ru": "Доверенные IP-адреса офиса и SIP-провайдеров, которые никогда не будут заблокированы (через запятую или пробел)."
+  },
+  "Порт VLESS Reality": {
+    "ru": "Порт VLESS Reality"
+  },
+  "отображается на дисплеях телефонов коллег при звонке и автоматически привязывается к карточке сделки в CRM (например,": {
+    "ru": "отображается на дисплеях телефонов коллег при звонке и автоматически привязывается к карточке сделки в CRM (например,"
+  },
+  "Как блоки взаимодействуют между собой (Алгоритм потока звонка)": {
+    "ru": "Как блоки взаимодействуют между собой (Алгоритм потока звонка)",
+    "en": "How Blocks Interact (Call Flow Algorithm)",
+    "es": "Cómo Interactúan los Bloques (Algoritmo de Flujo de Llamadas)"
+  },
+  "Принудительная линия:": {
+    "ru": "Принудительная линия:"
+  },
+  "Справочник параметров абонента и архитектура «Контекстов»": {
+    "ru": "Справочник параметров абонента и архитектура «Контекстов»"
+  },
+  "GROUP 1: МОНИТОРИНГ & АНАЛИТИКА": {
+    "ru": "GROUP 1: МОНИТОРИНГ & АНАЛИТИКА"
+  },
+  "iPhone (Менеджер 101)": {
+    "ru": "iPhone (Менеджер 101)"
+  },
+  ", введите": {
+    "ru": ", введите"
+  },
+  "Включить автоматическую маршрутизацию SIP-трафика внутри VPN туннелей": {
+    "ru": "Включить автоматическую маршрутизацию SIP-трафика внутри VPN туннелей"
+  },
+  "GROUP 3: ЭКОСИСТЕМА & ПЛАГИНЫ": {
+    "ru": "GROUP 3: ЭКОСИСТЕМА & ПЛАГИНЫ"
+  },
+  "Основная Воронка": {
+    "ru": "Основная Воронка"
+  },
+  "Инструкция по подключению Zendesk:": {
+    "ru": "Инструкция по подключению Zendesk:"
+  },
+  "📞 Одновременно всем (Ringall)": {
+    "ru": "📞 Одновременно всем (Ringall)"
+  },
+  "🔄 Поочередно по списку (Hunt)": {
+    "ru": "🔄 Поочередно по списку (Hunt)"
+  },
+  "МТС Россия (Тестовый)": {
+    "ru": "МТС Россия (Тестовый)"
+  },
+  ", чтобы получить": {
+    "ru": ", чтобы получить"
+  },
+  "Проверить целостность и хеш": {
+    "ru": "Проверить целостность и хеш"
+  },
+  "================= VIEW 2: TABLE VIEW (ТАБЛИЧНЫЙ ВИД МАРШРУТИЗАЦИИ) =================": {
+    "ru": "================= VIEW 2: TABLE VIEW (ТАБЛИЧНЫЙ ВИД МАРШРУТИЗАЦИИ) ================="
+  },
+  "и скопируйте предоставленный": {
+    "ru": "и скопируйте предоставленный"
+  },
+  "Тонкая настройка порогов блокировки неавторизованных SIP-пакетов": {
+    "ru": "Тонкая настройка порогов блокировки неавторизованных SIP-пакетов"
+  },
+  "Свернуть/Развернуть меню": {
+    "ru": "Свернуть/Развернуть меню"
+  },
+  "Settings (Шестеренка)": {
+    "ru": "Settings (Шестеренка)"
+  },
+  "Телефония & Абоненты": {
+    "ru": "Телефония & Абоненты"
+  },
+  "Установка плагина из архива": {
+    "ru": "Установка плагина из архива"
+  },
+  "из раздела": {
+    "ru": "из раздела"
+  },
+  "Отключен": {
+    "ru": "Отключен"
+  },
+  "Сделай краткое резюме звонка, определи договоренности, настроение клиента и оцени работу оператора от 1 до 100%.": {
+    "ru": "Сделай краткое резюме звонка, определи договоренности, настроение клиента и оцени работу оператора от 1 до 100%."
+  },
+  "📱 GSM Модемы (Пул сим-карт)": {
+    "ru": "📱 GSM Модемы (Пул сим-карт)"
+  },
+  "Номер:": {
+    "ru": "Номер:"
+  },
+  "Внутренний VPN IP": {
+    "ru": "Внутренний VPN IP"
+  },
+  "Стерео-диаризация каналов (L: Оператор, R: Клиент)": {
+    "ru": "Стерео-диаризация каналов (L: Оператор, R: Клиент)"
+  },
+  "Только внутренняя связь:": {
+    "ru": "Только внутренняя связь:"
+  },
+  "3. SIP Абоненты и Группы": {
+    "ru": "3. SIP Абоненты и Группы"
+  },
+  "1. Использование": {
+    "ru": "1. Использование"
+  },
+  "GPT-4o Mini (Рекомендуется)": {
+    "ru": "GPT-4o Mini (Рекомендуется)"
+  },
+  "Включить интеграцию с Zoho CRM": {
+    "ru": "Включить интеграцию с Zoho CRM"
+  },
+  "«Иван Иванов (Отдел продаж)»": {
+    "ru": "«Иван Иванов (Отдел продаж)»"
+  },
+  "UDP (Стандарт)": {
+    "ru": "UDP (Стандарт)"
+  },
+  "Hangup — Завершить вызов": {
+    "ru": "Hangup — Завершить вызов"
+  },
+  "Во вкладке": {
+    "ru": "Во вкладке"
+  },
+  "уникальный цифровой идентификатор сотрудника (101, 102...). Используется для коротких звонков внутри офиса.": {
+    "ru": "уникальный цифровой идентификатор сотрудника (101, 102...). Используется для коротких звонков внутри офиса."
+  },
+  "В правах доступа отметьте галочками:": {
+    "ru": "В правах доступа отметьте галочками:"
+  },
+  "ID ответственного по умолчанию (User ID)": {
+    "ru": "ID ответственного по умолчанию (User ID)"
+  },
+  "📞 SIP Транк: Test2 (95.84.198.140)": {
+    "ru": "📞 SIP Транк: Test2 (95.84.198.140)"
+  },
+  "⚡ OpenAI Whisper API (Быстрое облако, высокая точность)": {
+    "ru": "⚡ OpenAI Whisper API (Быстрое облако, высокая точность)"
+  },
+  "Статус защиты:": {
+    "ru": "Статус защиты:"
+  },
+  "Потяните за круглый порт справа от блока к любому другому блоку, чтобы задать правило перехода при нажатии клавиши DTMF.": {
+    "ru": "Потяните за круглый порт справа от блока к любому другому блоку, чтобы задать правило перехода при нажатии клавиши DTMF."
+  },
+  "Модуль «Neural Speech AI (Whisper & LLM)» временно отключен": {
+    "ru": "Модуль «Neural Speech AI (Whisper & LLM)» временно отключен"
+  },
+  "Источник:": {
+    "ru": "Источник:"
+  },
+  "4. Обработчики [i] и [t]": {
+    "ru": "4. Обработчики [i] и [t]",
+    "en": "4. Handlers [i] and [t]",
+    "es": "4. Manejadores [i] y [t]"
+  },
+  "Контекст вызовов (Диалплан)": {
+    "ru": "Контекст вызовов (Диалплан)"
+  },
+  "Настройте, куда отправлять аудиофайл или из какого хранилища брать прямую ссылку.": {
+    "ru": "Настройте, куда отправлять аудиофайл или из какого хранилища брать прямую ссылку."
+  },
+  "Интервал времени для подсчета ошибок": {
+    "ru": "Интервал времени для подсчета ошибок"
+  },
+  "3G+ HSPA+ до 21 Мбит/с": {
+    "ru": "3G+ HSPA+ до 21 Мбит/с"
+  },
+  "OAuth Токен Яндекс.Диска": {
+    "ru": "OAuth Токен Яндекс.Диска"
+  },
+  "1 узлов дерева": {
+    "ru": "1 узлов дерева"
+  },
+  "Обновить страницу": {
+    "ru": "Обновить страницу"
+  },
+  "Сохранить изменения": {
+    "ru": "Сохранить изменения"
+  },
+  "Имя сотрудника / Отдел (CallerID Name)": {
+    "ru": "Имя сотрудника / Отдел (CallerID Name)"
+  },
+  "Статус шифрования": {
+    "ru": "Статус шифрования"
+  },
+  "Логин / Авторизация": {
+    "ru": "Логин / Авторизация"
+  },
+  "и создайте новый": {
+    "ru": "и создайте новый"
+  },
+  "Логирование звонков через Call Objects API v3, встроенный плеер записи и автосвязка с Contacts/Deals.": {
+    "ru": "Логирование звонков через Call Objects API v3, встроенный плеер записи и автосвязка с Contacts/Deals."
+  },
+  "Модуль поставляется в подписанном .zip архиве и проверяется по SHA-256 сигнатуре перед инициализацией в Asterisk Core.": {
+    "ru": "Модуль поставляется в подписанном .zip архиве и проверяется по SHA-256 сигнатуре перед инициализацией в Asterisk Core."
+  },
+  "Текущая версия: v2.3.0": {
+    "ru": "Текущая версия: v2.3.0"
+  },
+  "Оператор 101 ()": {
+    "ru": "Оператор 101 ()"
+  },
+  "🖧 Корпоративный FTP Сервер": {
+    "ru": "🖧 Корпоративный FTP Сервер"
+  },
+  "Инструкция по подключению Pipedrive:": {
+    "ru": "Инструкция по подключению Pipedrive:"
+  },
+  "Редактировать параметры": {
+    "ru": "Редактировать параметры"
+  },
+  "Применить лимиты квоты": {
+    "ru": "Применить лимиты квоты"
+  },
+  "🟡 Яндекс.Диск": {
+    "ru": "🟡 Яндекс.Диск"
+  },
+  "Логин / CID": {
+    "ru": "Логин / CID"
+  },
+  "Настройка блока IVR": {
+    "ru": "Настройка блока IVR"
+  },
+  "from-internal (По умолчанию)": {
+    "ru": "from-internal (По умолчанию)"
+  },
+  "В бане сейчас": {
+    "ru": "В бане сейчас"
+  },
+  "Пароль / Секрет": {
+    "ru": "Пароль / Секрет"
+  },
+  "Стоимость лицензии": {
+    "ru": "Стоимость лицензии"
+  },
+  "ID: ftp_storage • Версия: v2.0.1 • Автор: Logic Core Team": {
+    "ru": "ID: ftp_storage • Версия: v2.0.1 • Автор: Logic Core Team"
+  },
+  "Добавить ветку": {
+    "ru": "Добавить ветку"
+  },
+  "Проверить API соединение": {
+    "ru": "Проверить API соединение"
+  },
+  "Секретный ключ авторизации для регистрации физического IP-телефона или софтфона. Сервер автоматически защищает этот порт через": {
+    "ru": "Секретный ключ авторизации для регистрации физического IP-телефона или софтфона. Сервер автоматически защищает этот порт через"
+  },
+  "Нажмите для переключения": {
+    "ru": "Нажмите для переключения"
+  },
+  "Яндекс.Диск Облачный Архив": {
+    "ru": "Яндекс.Диск Облачный Архив"
+  },
+  "1. Авторизация и доступ к аккаунту": {
+    "ru": "1. Авторизация и доступ к аккаунту"
+  },
+  "Сохранить FTP": {
+    "ru": "Сохранить FTP"
+  },
+  "Публичный IP сервера": {
+    "ru": "Публичный IP сервера"
+  },
+  "$\\rightarrow$ вкладка": {
+    "ru": "$\\rightarrow$ вкладка"
+  },
+  "Удалить группу": {
+    "ru": "Удалить группу"
+  },
+  "🌐 Единая общая воронка и этап для всех звонков": {
+    "ru": "🌐 Единая общая воронка и этап для всех звонков"
+  },
+  "Количество архивных копий": {
+    "ru": "Количество архивных копий"
+  },
+  "Двойной клик на блок открывает окно редактирования": {
+    "ru": "Двойной клик на блок открывает окно редактирования"
+  },
+  "Центрировать камеру": {
+    "ru": "Центрировать камеру"
+  },
+  "Настройка воронок для входящих линий и транков:": {
+    "ru": "Настройка воронок для входящих линий и транков:"
+  },
+  "📞 SIP Транк: Test (95.84.198.140)": {
+    "ru": "📞 SIP Транк: Test (95.84.198.140)"
+  },
+  "Отдел телемаркетинга, холодные звонки по выделенным безлимитным тарифам.": {
+    "ru": "Отдел телемаркетинга, холодные звонки по выделенным безлимитным тарифам."
+  },
+  "Моментальное оповещение руководства и дежурных операторов о событиях телефонии, пропущенных лидах, взломах и системных инцидентах прямо в Telegram-чаты.": {
+    "ru": "Моментальное оповещение руководства и дежурных операторов о событиях телефонии, пропущенных лидах, взломах и системных инцидентах прямо в Telegram-чаты."
+  },
+  "Воспроизводит аудиоприветствие, ожидает нажатия DTMF клавиши (0-9, *, #) и обрабатывает прямой донабор номера (Direct Dial).": {
+    "ru": "Воспроизводит аудиоприветствие, ожидает нажатия DTMF клавиши (0-9, *, #) и обрабатывает прямой донабор номера (Direct Dial)."
+  },
+  "📞 По входящему каналу / SIP-транку / GSM модему": {
+    "ru": "📞 По входящему каналу / SIP-транку / GSM модему"
+  },
+  "Включить автоматическую выгрузку на Яндекс.Диск": {
+    "ru": "Включить автоматическую выгрузку на Яндекс.Диск"
+  },
+  ", для США/ОАЭ —": {
+    "ru": ", для США/ОАЭ —"
+  },
+  "Пауза потока": {
+    "ru": "Пауза потока"
+  },
+  "В сети (Online)": {
+    "ru": "В сети (Online)"
+  },
+  "Приоритет определения целевой воронки:": {
+    "ru": "Приоритет определения целевой воронки:"
+  },
+  "Синхронизация звонков в модуль Calls, прикрепление аудиозаписей и связка с лидами Zoho.": {
+    "ru": "Синхронизация звонков в модуль Calls, прикрепление аудиозаписей и связка с лидами Zoho."
+  },
+  "/ 2 польз.": {
+    "ru": "/ 2 польз."
+  },
+  "Очистить все логи в 0": {
+    "ru": "Очистить все логи в 0"
+  },
+  "Загрузка...": {
+    "ru": "Загрузка..."
+  },
+  "Название ветки / Отдел": {
+    "ru": "Название ветки / Отдел"
+  },
+  "URL вебхука": {
+    "ru": "URL вебхука"
+  },
+  "Криптографическая защита OTA": {
+    "ru": "Криптографическая защита OTA"
+  },
+  "«Разработчикам»": {
+    "ru": "«Разработчикам»"
+  },
+  "Промпт для оценки качества и суммаризации": {
+    "ru": "Промпт для оценки качества и суммаризации"
+  },
+  "Скопируйте": {
+    "ru": "Скопируйте"
+  },
+  "Удалить эту стрелку": {
+    "ru": "Удалить эту стрелку"
+  },
+  "с активными голосовыми AT-командами и поддержкой аудио-потока PCM 8kHz.": {
+    "ru": "с активными голосовыми AT-командами и поддержкой аудио-потока PCM 8kHz."
+  },
+  "Включить автоматическую рассылку Telegram алертов": {
+    "ru": "Включить автоматическую рассылку Telegram алертов"
+  },
+  "Стратегия дозвона:": {
+    "ru": "Стратегия дозвона:"
+  },
+  "во избежание «отваливания» портов": {
+    "ru": "во избежание «отваливания» портов"
+  },
+  "Выберите существующий контекст или введите новый прямо в поле.": {
+    "ru": "Выберите существующий контекст или введите новый прямо в поле."
+  },
+  "Соединить узлы стрелкой: Кликните начальный узел, затем целевой": {
+    "ru": "Соединить узлы стрелкой: Кликните начальный узел, затем целевой"
+  },
+  "10 MB (Для компактных серверов)": {
+    "ru": "10 MB (Для компактных серверов)"
+  },
+  "Personal preferences (Профиль)": {
+    "ru": "Personal preferences (Профиль)"
+  },
+  "Используется": {
+    "ru": "Используется"
+  },
+  "Открыть настройки": {
+    "ru": "Открыть настройки"
+  },
+  "Перейдите в": {
+    "ru": "Перейдите в"
+  },
+  "Маркетплейс расширений": {
+    "ru": "Маркетплейс расширений"
+  },
+  "Александр": {
+    "ru": "Александр"
+  },
+  "Клавиша DTMF": {
+    "ru": "Клавиша DTMF"
+  },
+  "Сохранить настройки GoHighLevel": {
+    "ru": "Сохранить настройки GoHighLevel"
+  },
+  "Поочередно (Hunt)": {
+    "ru": "Поочередно (Hunt)"
+  },
+  "1.5–2.0 Ампер": {
+    "ru": "1.5–2.0 Ампер"
+  },
+  "Ограничение доступа к панели управления при открытом внешнем IP": {
+    "ru": "Ограничение доступа к панели управления при открытом внешнем IP"
+  },
+  "🇷🇺 Yandex SpeechKit Pro (Оптимально для RU)": {
+    "ru": "🇷🇺 Yandex SpeechKit Pro (Оптимально для RU)"
+  },
+  "Полностью удалить модуль": {
+    "ru": "Полностью удалить модуль"
+  },
+  "Полный доступ:": {
+    "ru": "Полный доступ:"
+  },
+  "Аудиосообщение в нерабочее время": {
+    "ru": "Аудиосообщение в нерабочее время"
+  },
+  "Модель / Чипсет": {
+    "ru": "Модель / Чипсет"
+  },
+  "👤 По принявшему оператору / участнику разговора": {
+    "ru": "👤 По принявшему оператору / участнику разговора"
+  },
+  "Аудиофайл приветствия (.wav / .mp3)": {
+    "ru": "Аудиофайл приветствия (.wav / .mp3)"
+  },
+  "0 строк": {
+    "ru": "0 строк"
+  },
+  "Дата создания": {
+    "ru": "Дата создания"
+  },
+  "Конец рабочего дня": {
+    "ru": "Конец рабочего дня"
+  },
+  "Мгновенная карточка в чат с номером клиента, временем звонка и линией/модемом, на которую звонили, чтобы не терять горячие лиды.": {
+    "ru": "Мгновенная карточка в чат с номером клиента, временем звонка и линией/модемом, на которую звонили, чтобы не терять горячие лиды."
+  },
+  "Сохранить настройки Pipedrive": {
+    "ru": "Сохранить настройки Pipedrive"
+  },
+  "4G LTE (Эмуляция)": {
+    "ru": "4G LTE (Эмуляция)"
+  },
+  "Устройство / Абонент": {
+    "ru": "Устройство / Абонент"
+  },
+  "FTP Сервер / Хост": {
+    "ru": "FTP Сервер / Хост"
+  },
+  "Общая резервная воронка (Fallback по умолчанию):": {
+    "ru": "Общая резервная воронка (Fallback по умолчанию):"
+  },
+  "Сетевой статус": {
+    "ru": "Сетевой статус"
+  },
+  "Нажмите": {
+    "ru": "Нажмите"
+  },
+  "При достижении файл архивируется": {
+    "ru": "При достижении файл архивируется"
+  },
+  "Входящий Вебхук Битрикс24 (Inbound Webhook URL)": {
+    "ru": "Входящий Вебхук Битрикс24 (Inbound Webhook URL)"
+  },
+  "— это изолированная зона прав и правил диалплана (": {
+    "ru": "— это изолированная зона прав и правил диалплана ("
+  },
+  "Сжатие архивов": {
+    "ru": "Сжатие архивов"
+  },
+  "Создать новый блок здесь": {
+    "ru": "Создать новый блок здесь"
+  },
+  "Безопасность & VPN": {
+    "ru": "Безопасность & VPN"
+  },
+  "Голосовое меню с DTMF выбором (IVR Root)": {
+    "ru": "Голосовое меню с DTMF выбором (IVR Root)"
+  },
+  "В HubSpot перейдите в": {
+    "ru": "В HubSpot перейдите в"
+  },
+  "Разрешены звонки коллегам на 101–199, в группы, на сервисные номера (*43, 888) и выход на внешние линии через модемы/транки.": {
+    "ru": "Разрешены звонки коллегам на 101–199, в группы, на сервисные номера (*43, 888) и выход на внешние линии через модемы/транки."
+  },
+  "«Другое»": {
+    "ru": "«Другое»"
+  },
+  "ID папки на Google Диске (Folder ID)": {
+    "ru": "ID папки на Google Диске (Folder ID)"
+  },
+  "Активировать синхронизацию с HubSpot": {
+    "ru": "Активировать синхронизацию с HubSpot"
+  },
+  "(ID групп начинаются с минуса, например:": {
+    "ru": "(ID групп начинаются с минуса, например:"
+  },
+  "Путь к целевой папке на Диске": {
+    "ru": "Путь к целевой папке на Диске"
+  },
+  "ID: bitrix24 • Версия: v2.2.0 • Автор: Logic Core CRM Labs": {
+    "ru": "ID: bitrix24 • Версия: v2.2.0 • Автор: Logic Core CRM Labs"
+  },
+  "Группа вызова (Ring Group)": {
+    "ru": "Группа вызова (Ring Group)"
+  },
+  "Сохранить Google Drive": {
+    "ru": "Сохранить Google Drive"
+  },
+  "Удалить транк": {
+    "ru": "Удалить транк"
+  },
+  "Редактировать параметры транка": {
+    "ru": "Редактировать параметры транка"
+  },
+  "Блок-схема (Canvas)": {
+    "ru": "Блок-схема (Canvas)"
+  },
+  "Инструкция по подключению GoHighLevel (GHL):": {
+    "ru": "Инструкция по подключению GoHighLevel (GHL):"
+  },
+  "Изменить DTMF клавишу": {
+    "ru": "Изменить DTMF клавишу"
+  },
+  "Важность:": {
+    "ru": "Важность:"
+  },
+  "Причина блокировки": {
+    "ru": "Причина блокировки"
+  },
+  "Совместимость ядра": {
+    "ru": "Совместимость ядра"
+  },
+  "Хост / IP": {
+    "ru": "Хост / IP"
+  },
+  "LLM Модель для анализа": {
+    "ru": "LLM Модель для анализа"
+  },
+  "Этап воронки (Статус)": {
+    "ru": "Этап воронки (Статус)"
+  },
+  "Обновить CDR": {
+    "ru": "Обновить CDR"
+  },
+  "Максимальный размер лог-файла (MB)": {
+    "ru": "Максимальный размер лог-файла (MB)"
+  },
+  "Квота диска и автоматическая ротация логов": {
+    "ru": "Квота диска и автоматическая ротация логов"
+  },
+  "В кабинете GHL перейдите в": {
+    "ru": "В кабинете GHL перейдите в"
+  },
+  "Активировать": {
+    "ru": "Активировать"
+  },
+  "💡 Потяните за кружок справа от блока, чтобы протянуть стрелку | Правый клик открывает меню": {
+    "ru": "💡 Потяните за кружок справа от блока, чтобы протянуть стрелку | Правый клик открывает меню"
+  },
+  "Активировать модуль в работу": {
+    "ru": "Активировать модуль в работу"
+  },
+  "v2.5.0 Активен": {
+    "ru": "v2.5.0 Активен"
+  },
+  "Включить автоматическую выгрузку на Google Drive": {
+    "ru": "Включить автоматическую выгрузку на Google Drive"
+  },
+  "Язык интерфейса / Language": {
+    "ru": "Язык интерфейса / Language"
+  },
+  "Удалить блок": {
+    "ru": "Удалить блок"
+  },
+  "Создать блок": {
+    "ru": "Создать блок"
+  },
+  "и вставьте в поле ниже.": {
+    "ru": "и вставьте в поле ниже."
+  },
+  "2. Статус регистрации": {
+    "ru": "2. Статус регистрации"
+  },
+  "Скопируйте полученные": {
+    "ru": "Скопируйте полученные"
+  },
+  "Включить автоматическую транскрибацию завершенных вызовов": {
+    "ru": "Включить автоматическую транскрибацию завершенных вызовов"
+  },
+  "Маскировка под HTTPS трафик (SNI: microsoft.com). Полный обход любых мобильных блокировок.": {
+    "ru": "Маскировка под HTTPS трафик (SNI: microsoft.com). Полный обход любых мобильных блокировок."
+  },
+  "Сохранить все параметры amoCRM": {
+    "ru": "Сохранить все параметры amoCRM"
+  },
+  "Диск активен": {
+    "ru": "Диск активен"
+  },
+  "Маршрутизация по нерабочим часам (Time-Condition)": {
+    "ru": "Маршрутизация по нерабочим часам (Time-Condition)"
+  },
+  "Подменю установленных плагинов": {
+    "ru": "Подменю установленных плагинов"
+  },
+  "Включить выгрузку на FTP": {
+    "ru": "Включить выгрузку на FTP"
+  },
+  "Полный список правил перехода и целевых назначений голосового меню.": {
+    "ru": "Полный список правил перехода и целевых назначений голосового меню."
+  },
+  "Защита от переполнения диска и зависания системы огромными лог-файлами": {
+    "ru": "Защита от переполнения диска и зависания системы огромными лог-файлами"
+  },
+  "ID: gdrive_storage • Версия: v2.2.0 • Автор: Logic Core Team": {
+    "ru": "ID: gdrive_storage • Версия: v2.2.0 • Автор: Logic Core Team"
+  },
+  "ВЫПОЛНЕНИЕ...": {
+    "ru": "ВЫПОЛНЕНИЕ..."
+  },
+  "Инструкция по подключению Битрикс24 за 3 шага:": {
+    "ru": "Инструкция по подключению Битрикс24 за 3 шага:"
+  },
+  "Хранить 3 последних архива (.gz)": {
+    "ru": "Хранить 3 последних архива (.gz)"
+  },
+  "Название плагина": {
+    "ru": "Название плагина"
+  },
+  "Инструкция по подключению Zoho CRM:": {
+    "ru": "Инструкция по подключению Zoho CRM:"
+  },
+  "3. SIP Extensions и Группы": {
+    "ru": "3. SIP Extensions и Группы",
+    "en": "3. SIP Extensions and Groups",
+    "es": "3. Extensiones SIP y Grupos"
   }
 }
