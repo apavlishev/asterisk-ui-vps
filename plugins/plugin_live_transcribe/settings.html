@@ -79,48 +79,48 @@
 </div>
 
 <script>
-setTimeout(() => {
     const box = document.getElementById('live-transcribe-box');
-    if(!box) return;
-    box.innerHTML = '';
-    
-    const dialogue = [
-        {speaker: 'operator', text: 'Алло, добрый день! Это компания Asterisk Logic.'},
-        {speaker: 'client', text: 'Здравствуйте. Я по поводу установки АТС.'},
-        {speaker: 'operator', text: 'Да, конечно. Подскажите, сколько у вас сотрудников?'},
-        {speaker: 'client', text: 'Около 15 человек, нужен автосекретарь и запись звонков.'},
-        {speaker: 'operator', text: 'Понял вас. Сейчас сформирую коммерческое предложение.'}
-    ];
-    
-    let i = 0;
-    const interval = setInterval(() => {
-        if(i >= dialogue.length) {
-            clearInterval(interval);
-            const hookMsg = document.createElement('div');
-            hookMsg.className = 'text-center mt-4';
-            hookMsg.innerHTML = '<span class="px-3 py-1 bg-success/20 text-success text-[10px] rounded-full border border-success/30 font-sans">WEBHOOK SENT (200 OK)</span>';
-            box.appendChild(hookMsg);
-            return;
-        }
+    const wsUrl = 'ws://' + window.location.hostname + ':8889';
+    let ws = null;
+
+    function connect() {
+        ws = new WebSocket(wsUrl);
         
-        const msg = dialogue[i];
-        const el = document.createElement('div');
-        el.className = 'flex flex-col ' + (msg.speaker === 'operator' ? 'items-end' : 'items-start');
+        ws.onopen = function() {
+            console.log('Connected to Live Transcribe Daemon');
+            box.innerHTML = '<div class="flex justify-center"><span class="text-xs text-success bg-success/10 px-3 py-1 rounded-full tg-translate border border-success/30">WebSocket Connected. Ожидание вызовов...</span></div>';
+        };
         
-        const name = document.createElement('div');
-        name.className = 'text-[10px] font-bold mb-1 font-sans ' + (msg.speaker === 'operator' ? 'text-primary' : 'text-secondary');
-        name.innerText = msg.speaker === 'operator' ? '[Оператор]' : '[Клиент]';
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if(data.type === 'transcription') {
+                const el = document.createElement('div');
+                el.className = 'flex flex-col ' + (data.speaker === 'operator' ? 'items-end' : 'items-start');
+                
+                const name = document.createElement('div');
+                name.className = 'text-[10px] font-bold mb-1 font-sans ' + (data.speaker === 'operator' ? 'text-primary' : 'text-slate-400');
+                name.innerText = data.speaker === 'operator' ? '[Оператор]' : '[Клиент]';
+                
+                const bubble = document.createElement('div');
+                bubble.className = 'max-w-[75%] px-4 py-2 rounded-2xl text-sm font-sans ' + (data.speaker === 'operator' ? 'bg-primary/20 text-blue-100 rounded-br-none' : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none');
+                bubble.innerText = data.text;
+                
+                el.appendChild(name);
+                el.appendChild(bubble);
+                box.appendChild(el);
+                box.scrollTop = box.scrollHeight;
+            }
+        };
         
-        const bubble = document.createElement('div');
-        bubble.className = 'max-w-[75%] px-4 py-2 rounded-2xl ' + (msg.speaker === 'operator' ? 'bg-primary/20 text-blue-100 rounded-br-none' : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none');
-        bubble.innerText = msg.text;
+        ws.onclose = function() {
+            console.log('Disconnected. Reconnecting in 3s...');
+            setTimeout(connect, 3000);
+        };
         
-        el.appendChild(name);
-        el.appendChild(bubble);
-        box.appendChild(el);
-        box.scrollTop = box.scrollHeight;
-        
-        i++;
-    }, 2500);
-}, 2000);
+        ws.onerror = function() {
+            ws.close();
+        };
+    }
+
+    connect();
 </script>
