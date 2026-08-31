@@ -1,0 +1,16 @@
+{
+    "Настройки Telegram Trunk (Telethon)": "Telegram Trunk Settings (Telethon)",
+    "Авторизация аккаунта для приема звонков и отправки сообщений.": "Account authorization for receiving calls and sending messages.",
+    "1. Авторизация": "1. Authorization",
+    "Номер телефона (с кодом страны)": "Phone Number (with country code)",
+    "Отправить код": "Send Code",
+    "Код из Telegram": "Code from Telegram",
+    "Облачный пароль (2FA)": "Cloud Password (2FA)",
+    "Войти в аккаунт": "Login to Account",
+    "2. Профиль и Маршрутизация": "2. Profile & Routing",
+    "Имя профиля (First Name)": "Profile Name (First Name)",
+    "Локальный SIP-порт для WebRTC моста": "Local SIP port for WebRTC bridge",
+    "Через этот порт tg2sip будет связываться с ядром Asterisk.": "Via this port tg2sip will communicate with the Asterisk core.",
+    "Отмена": "Cancel",
+    "Сохранить настройки": "Save Settings"
+}
