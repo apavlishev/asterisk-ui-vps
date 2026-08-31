@@ -5214,7 +5214,7 @@ def index():
     auth_enabled = auth_cfg.get('enabled', False)
     prompt_dismissed = auth_cfg.get('prompt_dismissed', False)
     show_security_prompt = (not is_client_local) and (not auth_enabled) and (not prompt_dismissed)
-    return render_template(
+    resp = make_response(render_template(
         'index.html',
         client_ip=client_ip,
         is_client_local=is_client_local,
@@ -5248,7 +5248,11 @@ def index():
         antifraud=get_antifraud_status(),
         log_quota=get_log_quota_status(),
         sip_groups=get_sip_groups()
-    )
+    ))
+    resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    resp.headers['Pragma'] = 'no-cache'
+    resp.headers['Expires'] = '0'
+    return resp
 
 
 @app.route('/api/ivr/get-tree', methods=['GET'])
