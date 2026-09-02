@@ -5919,6 +5919,25 @@ def restart_dongle():
 
 
 
+
+@app.route('/api/calls/<filename>/transcripts', methods=['GET'])
+def get_call_transcripts(filename):
+    call_id = os.path.basename(filename).replace('.wav', '')
+    transcript_path = os.path.join(RECORD_DIR, f"{call_id}.jsonl")
+    
+    if not os.path.exists(transcript_path):
+        return jsonify({"status": "no_data", "transcripts": []})
+        
+    lines = []
+    try:
+        with open(transcript_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.strip():
+                    lines.append(json.loads(line))
+        return jsonify({"status": "ok", "transcripts": lines})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
 @app.route('/api/amocrm/pipelines', methods=['GET'])
 def api_amocrm_pipelines():
     """Fetches pipelines and statuses from amoCRM API or returns saved/cached ones."""
