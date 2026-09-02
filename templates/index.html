@@ -2997,9 +2997,9 @@
                                         </td>
                                         <td class="px-4 py-3 text-right">
                                             {% if call.filename %}
-                                                <a href="/recordings/{{ call.filename }}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-on-primary transition-colors" title="{{ call.file_size_fmt }}">
+                                                <button onclick="openCallDetails('{{ call.filename }}', '{{ call.src }}', '{{ call.dst }}', '{{ call.date }}')" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-on-primary transition-colors" title="{{ call.file_size_fmt }}">
                                                     <span class="material-symbols-outlined text-[18px]">play_arrow</span>
-                                                </a>
+                                                </button>
                                             {% else %}
                                                 <span class="text-on-surface-variant/50 text-xs">-</span>
                                             {% endif %}
@@ -7433,5 +7433,195 @@
         setInterval(() => translateDOM(), 250);
     </script>
 
+
+
+<!-- CALL DETAILS MODAL -->
+<div id="callDetailsModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center opacity-0 transition-opacity duration-300">
+    <div class="bg-surface-container-low rounded-3xl border border-outline/20 w-full max-w-3xl overflow-hidden shadow-2xl scale-95 transition-transform duration-300" id="callDetailsModalInner">
+        
+        <div class="px-6 py-5 border-b border-outline/10 flex items-center justify-between bg-surface-container/50">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined">support_agent</span>
+                </div>
+                <div>
+                    <h3 class="font-bold text-on-surface text-lg">Детали вызова</h3>
+                    <p class="text-xs text-on-surface-variant" id="cd_date">Загрузка...</p>
+                </div>
+            </div>
+            <button onclick="closeCallDetails()" class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+        </div>
+
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-6 bg-surface-container-lowest p-4 rounded-2xl border border-outline/10">
+                <div class="text-center flex-1">
+                    <div class="text-[10px] uppercase font-bold tracking-wider text-on-surface-variant mb-1">От кого</div>
+                    <div class="font-semibold text-on-surface text-lg" id="cd_src">-</div>
+                </div>
+                <div class="px-4 text-on-surface-variant/30">
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </div>
+                <div class="text-center flex-1">
+                    <div class="text-[10px] uppercase font-bold tracking-wider text-on-surface-variant mb-1">Кому</div>
+                    <div class="font-semibold text-on-surface text-lg" id="cd_dst">-</div>
+                </div>
+            </div>
+
+            <!-- Beautiful Audio Player -->
+            <div class="mb-6 p-4 rounded-2xl bg-surface-container border border-outline/10 shadow-inner">
+                <div class="flex items-center gap-4">
+                    <button id="cd_play_btn" class="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center hover:bg-primary/90 shadow-md transition-all">
+                        <span class="material-symbols-outlined text-[24px]">play_arrow</span>
+                    </button>
+                    <div class="flex-1">
+                        <div class="flex justify-between text-xs text-on-surface-variant font-medium mb-1.5">
+                            <span id="cd_time_current">00:00</span>
+                            <span id="cd_time_total">00:00</span>
+                        </div>
+                        <div class="h-2 rounded-full bg-surface-container-highest cursor-pointer relative" id="cd_progress_bar">
+                            <div class="absolute left-0 top-0 h-full bg-primary rounded-full transition-all duration-100 w-0" id="cd_progress"></div>
+                        </div>
+                    </div>
+                </div>
+                <audio id="cd_audio_elem" class="hidden"></audio>
+            </div>
+
+            <!-- Transcription Box -->
+            <h4 class="text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px] text-primary">chat_bubble</span>
+                Транскрибация ИИ
+            </h4>
+            <div class="bg-surface-container-lowest rounded-2xl border border-outline/10 p-5 h-64 overflow-y-auto space-y-4" id="cd_transcription">
+                <div class="flex items-center justify-center h-full text-on-surface-variant text-sm gap-2">
+                    <span class="material-symbols-outlined animate-spin">refresh</span> Загрузка...
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const audio = document.getElementById('cd_audio_elem');
+    const playBtn = document.getElementById('cd_play_btn');
+    const progressBar = document.getElementById('cd_progress_bar');
+    const progress = document.getElementById('cd_progress');
+    const timeCurrent = document.getElementById('cd_time_current');
+    const timeTotal = document.getElementById('cd_time_total');
+    let isPlaying = false;
+
+    function formatTime(seconds) {
+        if (isNaN(seconds)) return "00:00";
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    audio.addEventListener('loadedmetadata', () => {
+        timeTotal.textContent = formatTime(audio.duration);
+    });
+
+    audio.addEventListener('timeupdate', () => {
+        timeCurrent.textContent = formatTime(audio.currentTime);
+        if (audio.duration) {
+            const percent = (audio.currentTime / audio.duration) * 100;
+            progress.style.width = percent + '%';
+        }
+    });
+
+    audio.addEventListener('ended', () => {
+        isPlaying = false;
+        playBtn.innerHTML = '<span class="material-symbols-outlined text-[24px]">play_arrow</span>';
+        progress.style.width = '0%';
+    });
+
+    playBtn.addEventListener('click', () => {
+        if (isPlaying) {
+            audio.pause();
+            playBtn.innerHTML = '<span class="material-symbols-outlined text-[24px]">play_arrow</span>';
+        } else {
+            audio.play();
+            playBtn.innerHTML = '<span class="material-symbols-outlined text-[24px]">pause</span>';
+        }
+        isPlaying = !isPlaying;
+    });
+
+    progressBar.addEventListener('click', (e) => {
+        const rect = progressBar.getBoundingClientRect();
+        const pos = (e.clientX - rect.left) / rect.width;
+        audio.currentTime = pos * audio.duration;
+    });
+
+    function openCallDetails(filename, src, dst, date) {
+        document.getElementById('cd_src').textContent = src || 'Неизвестно';
+        document.getElementById('cd_dst').textContent = dst || 'Неизвестно';
+        document.getElementById('cd_date').textContent = date;
+        
+        // Reset Audio
+        audio.src = '/recordings/' + filename;
+        audio.load();
+        isPlaying = false;
+        playBtn.innerHTML = '<span class="material-symbols-outlined text-[24px]">play_arrow</span>';
+        progress.style.width = '0%';
+        timeCurrent.textContent = '00:00';
+        timeTotal.textContent = '00:00';
+
+        // Fetch Transcription
+        const transBox = document.getElementById('cd_transcription');
+        transBox.innerHTML = '<div class="flex items-center justify-center h-full text-on-surface-variant text-sm gap-2"><span class="material-symbols-outlined animate-spin">refresh</span> Загрузка...</div>';
+        
+        fetch('/api/calls/' + filename + '/transcripts')
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'no_data' || !data.transcripts || data.transcripts.length === 0) {
+                    transBox.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-on-surface-variant/50 text-sm gap-2"><span class="material-symbols-outlined text-4xl">speaker_notes_off</span>Транскрибация отсутствует</div>';
+                    return;
+                }
+                
+                transBox.innerHTML = '';
+                data.transcripts.forEach(msg => {
+                    const isClient = msg.speaker === 'client';
+                    const color = isClient ? 'bg-primary/10 text-primary' : 'bg-surface-container-high text-on-surface';
+                    const align = isClient ? 'items-start' : 'items-end';
+                    const name = isClient ? 'Клиент' : 'Оператор';
+                    
+                    const bubble = document.createElement('div');
+                    bubble.className = `flex flex-col ${align} w-full`;
+                    bubble.innerHTML = `
+                        <span class="text-[10px] font-bold uppercase text-on-surface-variant mb-1 ml-1 mr-1">${name}</span>
+                        <div class="px-4 py-2.5 rounded-2xl ${color} max-w-[80%] text-sm font-medium leading-relaxed">
+                            ${msg.text}
+                        </div>
+                    `;
+                    transBox.appendChild(bubble);
+                });
+            })
+            .catch(err => {
+                transBox.innerHTML = '<div class="text-red-500 text-sm text-center mt-10">Ошибка загрузки</div>';
+            });
+
+        // Show Modal
+        const modal = document.getElementById('callDetailsModal');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            document.getElementById('callDetailsModalInner').classList.remove('scale-95');
+        }, 10);
+    }
+
+    function closeCallDetails() {
+        audio.pause();
+        const modal = document.getElementById('callDetailsModal');
+        modal.classList.add('opacity-0');
+        document.getElementById('callDetailsModalInner').classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+</script>
+
 </body>
+
 </html>
