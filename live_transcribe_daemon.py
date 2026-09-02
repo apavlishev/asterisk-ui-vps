@@ -3,6 +3,8 @@ import os
 import json
 import time
 import glob
+import io
+import wave
 import logging
 from google import genai
 from google.genai import types
@@ -20,102 +22,143 @@ def get_api_key():
         with open(CONFIG_PATH, 'r') as f:
             cfg = json.load(f)
             return cfg.get('live_transcribe', {}).get('api_key', '')
-    except:
+    except Exception:
         return ''
 
+def make_wav_bytes(pcm_data, sample_rate=8000, channels=1, sampwidth=2):
+    buf = io.BytesIO()
+    with wave.open(buf, 'wb') as w:
+        w.setnchannels(channels)
+        w.setsampwidth(sampwidth)
+        w.setframerate(sample_rate)
+        w.writeframes(pcm_data)
+    return buf.getvalue()
+
 async def broadcast(message):
+    msg = json.dumps(message, ensure_ascii=False)
+    try:
+        call_id = message.get('call_id')
+        if call_id:
+            jsonl_path = os.path.join(MONITOR_DIR, f"{call_id}.wav.jsonl")
+            with open(jsonl_path, 'a', encoding='utf-8') as f:
+                f.write(msg + chr(10))
+    except Exception as e:
+        logger.error(f"Failed to save JSONL: {e}")
+
     if not clients: return
-    msg = json.dumps(message)
-    # create a copy of the set to avoid RuntimeError: Set changed size during iteration
     for client in list(clients):
         try:
             await client.send(msg)
         except Exception:
             clients.discard(client)
 
-async def stream_channel_to_gemini(call_id, wav_path, speaker):
+async def stream_channel_worker(call_id, wav_path, speaker):
     api_key = get_api_key()
-    if not api_key: return
+    if not api_key:
+        logger.warning("No Gemini API key configured")
+        return
 
     client = genai.Client(api_key=api_key)
-    
-    # 8kHz PCM 16-bit mono
-    config = types.LiveConnectConfig(
-        response_modalities=[types.LiveModality.TEXT],
-        speech_config=types.SpeechConfig(
-            voice_config=types.VoiceConfig(
-                prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name="Aoede")
-            )
-        )
-    )
+    logger.info(f"[{speaker.upper()}] Starting stream worker for {wav_path}")
+
+    # Wait for file creation
+    waited = 0
+    while not os.path.exists(wav_path) and waited < 10:
+        await asyncio.sleep(0.5)
+        waited += 0.5
+
+    if not os.path.exists(wav_path):
+        logger.warning(f"File {wav_path} not found after 10s")
+        return
+
+    # Buffer & state
+    last_size = 0
+    idle_count = 0
+    chunk_buffer = bytearray()
+    CHUNK_THRESHOLD = 32000  # ~2 seconds of 8kHz 16-bit mono audio (16000 bytes/sec)
 
     try:
-        async with client.aio.live.connect(model="gemini-3.5-transcribe-live", config=config) as session:
-            
-            async def send_loop():
-                # Wait for file to exist
-                while not os.path.exists(wav_path):
-                    await asyncio.sleep(0.5)
-                
-                with open(wav_path, "rb") as f:
-                    # stream indefinitely while the file is growing
-                    while True:
-                        chunk = f.read(4096)
-                        if not chunk:
-                            # if Asterisk is still writing, wait
-                            await asyncio.sleep(0.5)
-                            continue
-                        
-                        await session.send(
-                            input=types.LiveClientRealtimeInput(
-                                media_chunks=[types.Blob(data=chunk, mime_type="audio/pcm;rate=8000")]
-                            )
-                        )
-                        await asyncio.sleep(0.25)
-            
-            async def receive_loop():
-                async for response in session.receive():
-                    if response.text:
-                        msg = {
-                            "type": "transcription",
-                            "call_id": call_id,
-                            "speaker": speaker,
-                            "text": response.text,
-                            "timestamp": time.time()
-                        }
-                        await broadcast(msg)
-                        
-                        try:
-                            transcript_path = os.path.join(MONITOR_DIR, f"{call_id}.jsonl")
-                            with open(transcript_path, "a", encoding="utf-8") as tf:
-                                tf.write(json.dumps(msg, ensure_ascii=False) + "\n")
-                        except Exception as e:
-                            logger.error(f"Failed to write transcript: {e}")
+        with open(wav_path, "rb") as f:
+            f.seek(44)  # Skip standard 44-byte WAV header
 
-            await asyncio.gather(send_loop(), receive_loop())
+            while True:
+                new_data = f.read(4096)
+                if new_data:
+                    chunk_buffer.extend(new_data)
+                    idle_count = 0
+                else:
+                    idle_count += 1
+                    await asyncio.sleep(0.5)
+
+                # Process chunk if buffer reaches threshold or call has stopped growing
+                if len(chunk_buffer) >= CHUNK_THRESHOLD or (idle_count >= 3 and len(chunk_buffer) >= 16000):
+                    raw_pcm = bytes(chunk_buffer)
+                    chunk_buffer.clear()
+                    
+                    try:
+                        wav_payload = make_wav_bytes(raw_pcm)
+                        resp = await client.aio.models.generate_content(
+                            model='gemini-2.5-flash',
+                            contents=[
+                                types.Part.from_bytes(data=wav_payload, mime_type='audio/wav'),
+                                'Транскрибируй короткую фразу телефонного разговора на русском языке. Напиши только распознанный текст без комментариев. Если звука нет или неразборчивый шум, напиши [тишина].'
+                            ]
+                        )
+                        text = resp.text.strip() if resp and resp.text else ''
+                        if text and '[тишина]' not in text.lower():
+                            logger.info(f"[{speaker.upper()}] Live text: {text}")
+                            await broadcast({
+                                "type": "transcription",
+                                "call_id": call_id,
+                                "speaker": speaker,
+                                "text": text,
+                                "timestamp": time.time()
+                            })
+                    except Exception as ge:
+                        logger.error(f"Gemini transcribe error ({speaker}): {ge}")
+
+                # If file hasn't grown for 3 seconds, call is finished
+                if idle_count >= 6:
+                    break
+
+        # Final flush for any remaining audio (at least 0.5s)
+        if len(chunk_buffer) >= 8000:
+            try:
+                wav_payload = make_wav_bytes(bytes(chunk_buffer))
+                resp = await client.aio.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=[
+                        types.Part.from_bytes(data=wav_payload, mime_type='audio/wav'),
+                        'Транскрибируй короткую фразу разговора на русском языке. Напиши только распознанный текст. Если звука нет, напиши [тишина].'
+                    ]
+                )
+                text = resp.text.strip() if resp and resp.text else ''
+                if text and '[тишина]' not in text.lower():
+                    await broadcast({
+                        "type": "transcription",
+                        "call_id": call_id,
+                        "speaker": speaker,
+                        "text": text,
+                        "timestamp": time.time()
+                    })
+            except Exception as ge:
+                logger.error(f"Final flush error: {ge}")
+
+        logger.info(f"[{speaker.upper()}] Worker finished for {call_id}")
 
     except Exception as e:
-        err_msg = f"Gemini API Error ({speaker}): {str(e)}"
-        logger.error(err_msg)
-        await broadcast({
-            "type": "error",
-            "call_id": call_id,
-            "message": err_msg,
-            "timestamp": time.time()
-        })
-
+        logger.error(f"Worker exception ({speaker}): {e}")
 
 async def watch_for_new_calls():
     seen_files = set()
     
-    # Pre-populate seen files so we don't transcribe old ones
     if os.path.exists(MONITOR_DIR):
         seen_files.update(glob.glob(os.path.join(MONITOR_DIR, "*_rx.wav")))
 
     while True:
         try:
             if not os.path.exists(MONITOR_DIR):
-                await asyncio.sleep(2)
+                await asyncio.sleep(1)
                 continue
                 
             rx_wavs = glob.glob(os.path.join(MONITOR_DIR, "*_rx.wav"))
@@ -126,16 +169,15 @@ async def watch_for_new_calls():
                     tx = rx.replace("_rx.wav", "_tx.wav")
                     call_id = os.path.basename(rx).replace("_rx.wav", "")
                     
-                    logger.info(f"New stereo call detected: {call_id}.wav. Spawning Gemini streams.")
+                    logger.info(f"New active call detected: {call_id}.wav. Starting live transcription streams.")
                     
-                    # Spawn both legs concurrently without blocking the watcher
-                    asyncio.create_task(stream_channel_to_gemini(call_id, rx, "client"))
-                    asyncio.create_task(stream_channel_to_gemini(call_id, tx, "operator"))
+                    asyncio.create_task(stream_channel_worker(call_id, rx, "client"))
+                    asyncio.create_task(stream_channel_worker(call_id, tx, "operator"))
                     
         except Exception as e:
             logger.error(f"Watcher error: {e}")
             
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)
 
 async def ws_handler(websocket):
     clients.add(websocket)
@@ -145,11 +187,9 @@ async def ws_handler(websocket):
         clients.discard(websocket)
 
 async def main():
-    logger.info("Starting Live Transcribe Daemon on ws://0.0.0.0:8889")
-    
+    logger.info("Starting Live Transcribe Streaming Daemon on ws://0.0.0.0:8889")
     server = await websockets.serve(ws_handler, "0.0.0.0", 8889)
     watcher = asyncio.create_task(watch_for_new_calls())
-    
     await asyncio.gather(server.wait_closed(), watcher)
 
 if __name__ == "__main__":
