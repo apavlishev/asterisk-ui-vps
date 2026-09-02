@@ -3925,6 +3925,9 @@ def get_recent_calls():
     if os.path.exists(RECORD_DIR):
         for f in glob.glob(os.path.join(RECORD_DIR, '*.wav')):
             fn = os.path.basename(f)
+            # Skip separate channel split files (_rx/_tx) to ensure main combined audio is matched
+            if '_rx.wav' in fn or '_tx.wav' in fn:
+                continue
             sz = os.path.getsize(f)
             mtime = os.path.getmtime(f)
             time_part = fn.split('_')[0]
@@ -5983,13 +5986,17 @@ def serve_recording(filename):
 
 @app.route('/api/calls/<filename>/transcripts', methods=['GET'])
 def get_call_transcripts(filename):
-    base = os.path.basename(filename).replace('.wav', '')
+    clean = os.path.basename(filename)
+    for s in ['_rx.wav', '_tx.wav', '.wav_rx.wav', '.wav_tx.wav', '_rx', '_tx', '.wav']:
+        clean = clean.replace(s, '')
+        
     candidates = [
-        os.path.join(RECORD_DIR, f"{base}.jsonl"),
-        os.path.join(RECORD_DIR, f"{base}.wav.jsonl"),
-        os.path.join(RECORD_DIR, f"{base}.wav.wav.jsonl"),
+        os.path.join(RECORD_DIR, f"{clean}.wav.jsonl"),
+        os.path.join(RECORD_DIR, f"{clean}.jsonl"),
+        os.path.join(RECORD_DIR, f"{clean}.wav.wav.jsonl"),
         os.path.join(RECORD_DIR, f"{filename}.jsonl"),
         os.path.join(RECORD_DIR, f"{filename}.wav.jsonl"),
+        os.path.join(RECORD_DIR, f"{filename}"),
     ]
     
     transcript_path = None
