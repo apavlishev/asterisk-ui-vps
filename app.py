@@ -496,7 +496,7 @@ logpath  = /var/log/asterisk/messages
 maxretry = {maxretry}
 findtime = {findtime}
 bantime  = {bantime}
-action   = iptables-allports[name=ASTERISK-ANTIFRAUD, protocol=all]
+action   = iptables-ipset-proto4[name=ASTERISK-ANTIFRAUD, port="5060,5061", protocol=all]
 """
     try:
         with open('/etc/fail2ban/jail.local', 'w') as jf:
@@ -5667,7 +5667,25 @@ def sip_save():
         flash(f'Новый абонент {exten} («{name}») успешно создан!')
 
     # Write clean PJSIP configuration
-    out = ["[transport-udp]", "type=transport", "protocol=udp", "bind=0.0.0.0:5060", "local_net=192.168.0.0/16", ""]
+    out = [
+        "[global]",
+        "type=global",
+        "user_agent=PBX",
+        "allow_unauthenticated_options=no",
+        "endpoint_identifier_order=ip,username",
+        "default_outbound_endpoint=default_outbound_endpoint",
+        "",
+        "[system]",
+        "type=system",
+        "disable_tcp_switch=yes",
+        "",
+        "[transport-udp]", 
+        "type=transport", 
+        "protocol=udp", 
+        "bind=0.0.0.0:5060", 
+        "local_net=192.168.0.0/16", 
+        ""
+    ]
     for acc in accounts:
         ext = acc['exten']
         pwd = acc['password']
