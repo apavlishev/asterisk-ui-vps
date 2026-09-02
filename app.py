@@ -5920,6 +5920,12 @@ def restart_dongle():
 
 
 
+@app.route('/recordings/<path:filename>')
+def serve_recording(filename):
+    if not is_authenticated():
+        return redirect(url_for('login'))
+    return send_from_directory(RECORD_DIR, filename)
+
 @app.route('/api/calls/<filename>/transcripts', methods=['GET'])
 def get_call_transcripts(filename):
     call_id = os.path.basename(filename).replace('.wav', '')
