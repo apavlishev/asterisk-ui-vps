@@ -2949,17 +2949,80 @@
                         </button>
                     </div>
 
-                    <div class="p-8 rounded-2xl bg-surface-container-low/40 border border-outline/20 text-center space-y-3">
-                        <div class="w-12 h-12 rounded-2xl bg-primary/10 text-primary mx-auto flex items-center justify-center">
-                            <span class="material-symbols-outlined text-2xl">call_log</span>
+                    
+                    <div class="bg-surface rounded-2xl border border-outline/20 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-surface-container-low/50 text-on-surface-variant text-[11px] uppercase tracking-wider">
+                                        <th class="px-4 py-3 font-semibold">{{ t.tip or 'Тип' }}</th>
+                                        <th class="px-4 py-3 font-semibold">{{ t.data_i_vremya or 'Дата и время' }}</th>
+                                        <th class="px-4 py-3 font-semibold">{{ t.ot_kogo or 'От кого' }}</th>
+                                        <th class="px-4 py-3 font-semibold">{{ t.komu or 'Кому' }}</th>
+                                        <th class="px-4 py-3 font-semibold">{{ t.dlitel_nost or 'Длительность' }}</th>
+                                        <th class="px-4 py-3 font-semibold">{{ t.status or 'Статус' }}</th>
+                                        <th class="px-4 py-3 font-semibold text-right">{{ t.zapis or 'Запись' }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-outline/10 text-sm">
+                                    {% for call in calls %}
+                                    <tr class="hover:bg-surface-container-low/30 transition-colors group">
+                                        <td class="px-4 py-3">
+                                            <div class="flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-[18px] text-on-surface-variant" title="{{ call.dir_label }}">{{ call.dir_icon.split(' ')[0] }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3 text-on-surface-variant whitespace-nowrap">{{ call.date }}</td>
+                                        <td class="px-4 py-3 font-medium text-on-surface">{{ call.src }}</td>
+                                        <td class="px-4 py-3 font-medium text-on-surface">{{ call.dst }}</td>
+                                        <td class="px-4 py-3 text-on-surface-variant">
+                                            {% if call.billsec|int > 0 %}
+                                                <span class="text-on-surface">{{ call.duration_fmt }}</span>
+                                            {% else %}
+                                                {{ call.total_duration_fmt }}
+                                            {% endif %}
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            {% if call.disposition == 'ANSWERED' %}
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-green-500/10 text-green-600 text-[10px] font-bold tracking-wide">ОТВЕЧЕН</span>
+                                            {% elif call.disposition == 'NO ANSWER' %}
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-red-500/10 text-red-600 text-[10px] font-bold tracking-wide">НЕ ОТВЕЧЕН</span>
+                                            {% elif call.disposition == 'BUSY' %}
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-orange-500/10 text-orange-600 text-[10px] font-bold tracking-wide">ЗАНЯТ</span>
+                                            {% elif call.disposition == 'FAILED' %}
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-red-500/10 text-red-600 text-[10px] font-bold tracking-wide">ОШИБКА</span>
+                                            {% else %}
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-[10px] font-bold tracking-wide">{{ call.disposition }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="px-4 py-3 text-right">
+                                            {% if call.filename %}
+                                                <a href="/recordings/{{ call.filename }}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-on-primary transition-colors" title="{{ call.file_size_fmt }}">
+                                                    <span class="material-symbols-outlined text-[18px]">play_arrow</span>
+                                                </a>
+                                            {% else %}
+                                                <span class="text-on-surface-variant/50 text-xs">-</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="7" class="px-4 py-12 text-center">
+                                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-surface-container-high/50 text-on-surface-variant mb-3">
+                                                <span class="material-symbols-outlined text-[24px]">search_off</span>
+                                            </div>
+                                            <div class="text-sm font-semibold text-on-surface">Нет записей вызовов</div>
+                                            <div class="text-xs text-on-surface-variant mt-1">История звонков пуста. Совершите первый звонок.</div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="text-sm font-bold text-on-surface">{{ t.istoria_vyzovov_aktivna }}</div>
-                        <p class="text-xs text-on-surface-variant max-w-md mx-auto">
-                            {{ t.zvonki_v_real_nom_vremeni_fiks }}
-                        </p>
                     </div>
                 </div>
             </div>
+
 
         
             <!-- // ================= TAB: SECURITY CENTER & ANTIFRAUD // ================= -->
