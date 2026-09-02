@@ -13,7 +13,7 @@ fi
 echo "1. Обновление системы и установка системных пакетов..."
 apt-get update
 apt-get install -y python3 python3-pip python3-venv ffmpeg sox curl wget git sudo lsof fail2ban iptables net-tools || true
-apt-get install -y asterisk asterisk-modules asterisk-pjsip || true
+DEBIAN_FRONTEND=noninteractive apt-get install -y asterisk asterisk-modules tzdata || true
 
 # Настройка безопасных директорий Git
 git config --global --add safe.directory /opt/asterisk-gui || true
