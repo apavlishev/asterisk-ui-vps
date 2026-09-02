@@ -3113,25 +3113,29 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-surface-container">
-                            {% if antifraud and antifraud.banned_ips %}
-                            {% for ip in antifraud.banned_ips %}
+                            {% if antifraud and (antifraud.banned_items or antifraud.banned_ips) %}
+                            {% set items = antifraud.banned_items if antifraud.banned_items else antifraud.banned_ips %}
+                            {% for item in items %}
+                            {% set ip = item.ip if item is mapping else item %}
+                            {% set reason = item.reason if item is mapping else (t.sip_registration_scanning_fail or 'SIP-сканирование / Подбор') %}
+                            {% set duration = item.duration if item is mapping else (t.k_24_casa_iptables_drop or '24 часа (iptables drop)') %}
                             <tr class="hover:bg-surface-container-low/40 transition-colors">
                                 <td class="px-6 py-3.5 font-mono font-bold text-error flex items-center gap-2.5">
                                     <span class="w-2.5 h-2.5 rounded-full bg-error"></span>
                                     <span>{{ ip }}</span>
                                 </td>
-                                <td class="px-6 py-3.5 text-xs text-on-surface-variant">
-                                    <span>{{ t.sip_registration_scanning_fail }}</span>
+                                <td class="px-6 py-3.5 text-xs text-on-surface font-medium">
+                                    <span>{{ reason }}</span>
                                 </td>
                                 <td class="px-6 py-3.5 text-xs font-mono text-on-surface-variant">
-                                    <span>{{ t.k_24_casa_iptables_drop }}</span>
+                                    <span>{{ duration }}</span>
                                 </td>
                                 <td class="px-6 py-3.5 text-right">
                                     <form action="/api/security/antifraud/unban" method="POST" class="inline" onsubmit="return confirm('Разблокировать IP {{ ip }}?');">
                                         <input type="hidden" name="ip" value="{{ ip }}">
                                         <button type="submit" class="px-3.5 py-1.5 rounded-lg bg-surface-container-high hover:bg-success/10 hover:text-success text-xs font-semibold text-on-surface transition-all border border-outline/30 flex items-center gap-1 ml-auto">
                                             <span class="material-symbols-outlined text-[14px]">lock_open</span>
-                                            <span>{{ t.razblokirovat_unban }}</span>
+                                            <span>{{ t.razblokirovat_unban or 'Разблокировать' }}</span>
                                         </button>
                                     </form>
                                 </td>

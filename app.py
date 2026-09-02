@@ -382,40 +382,56 @@ def get_antifraud_status():
         'currently_banned': 0,
         'total_banned': 0,
         'banned_ips': [],
-        'maxretry': 5,
-        'findtime': 600,
+        'banned_items': [],
+        'maxretry': 2,
+        'findtime': 86400,
         'bantime': 86400,
-        'whitelist': []
+        'whitelist': ['127.0.0.1/8', '::1', '91.226.93.233']
     }
     
     try:
-        # Check fail2ban-client status
-        res = subprocess.run(['fail2ban-client', 'status', 'asterisk-antifraud'], capture_output=True, text=True, timeout=3)
-        if res.returncode == 0:
-            status_data['running'] = True
-            out = res.stdout
-            
-            m_cur_f = re.search(r'Currently failed:\s*([0-9]+)', out)
-            m_tot_f = re.search(r'Total failed:\s*([0-9]+)', out)
-            m_cur_b = re.search(r'Currently banned:\s*([0-9]+)', out)
-            m_tot_b = re.search(r'Total banned:\s*([0-9]+)', out)
-            m_ips = re.search(r'Banned IP list:\s*(.*)', out)
-            
-            if m_cur_f: status_data['currently_failed'] = int(m_cur_f.group(1))
-            if m_tot_f: status_data['total_failed'] = int(m_tot_f.group(1))
-            if m_cur_b: status_data['currently_banned'] = int(m_cur_b.group(1))
-            if m_tot_b: status_data['total_banned'] = int(m_tot_b.group(1))
-            if m_ips and m_ips.group(1).strip():
-                raw_ips = m_ips.group(1).strip().split()
-                status_data['banned_ips'] = raw_ips
+        jails_to_check = [
+            ('asterisk-antifraud', 'SIP-сканер / Подбор портов'),
+            ('sshd', 'SSH Брутфорс / Подбор паролей')
+        ]
+        
+        seen_ips = set()
+        for jail_name, reason in jails_to_check:
+            res = subprocess.run(['fail2ban-client', 'status', jail_name], capture_output=True, text=True, timeout=3)
+            if res.returncode == 0:
+                status_data['running'] = True
+                out = res.stdout
+                
+                m_cur_f = re.search(r'Currently failed:\s*([0-9]+)', out)
+                m_tot_f = re.search(r'Total failed:\s*([0-9]+)', out)
+                m_cur_b = re.search(r'Currently banned:\s*([0-9]+)', out)
+                m_tot_b = re.search(r'Total banned:\s*([0-9]+)', out)
+                m_ips = re.search(r'Banned IP list:\s*(.*)', out)
+                
+                if m_cur_f: status_data['currently_failed'] += int(m_cur_f.group(1))
+                if m_tot_f: status_data['total_failed'] += int(m_tot_f.group(1))
+                if m_cur_b: status_data['currently_banned'] += int(m_cur_b.group(1))
+                if m_tot_b: status_data['total_banned'] += int(m_tot_b.group(1))
+                
+                if m_ips and m_ips.group(1).strip():
+                    for ip in m_ips.group(1).strip().split():
+                        if ip not in seen_ips:
+                            seen_ips.add(ip)
+                            status_data['banned_ips'].append(ip)
+                            status_data['banned_items'].append({
+                                'ip': ip,
+                                'reason': reason,
+                                'jail': jail_name,
+                                'duration': '24 часа (iptables drop)'
+                            })
 
-        # Read config params
+        # Read config params if present
         cfg = load_integrations()
         sec_cfg = cfg.get('antifraud', {})
-        status_data['maxretry'] = sec_cfg.get('maxretry', 5)
-        status_data['findtime'] = sec_cfg.get('findtime', 600)
-        status_data['bantime'] = sec_cfg.get('bantime', 86400)
-        status_data['whitelist'] = sec_cfg.get('whitelist', ['127.0.0.1/8', '::1'])
+        if 'maxretry' in sec_cfg: status_data['maxretry'] = sec_cfg.get('maxretry')
+        if 'findtime' in sec_cfg: status_data['findtime'] = sec_cfg.get('findtime')
+        if 'bantime' in sec_cfg: status_data['bantime'] = sec_cfg.get('bantime')
+        if 'whitelist' in sec_cfg: status_data['whitelist'] = sec_cfg.get('whitelist')
         
     except Exception as e:
         print(f"[Antifraud Error]: {e}")
@@ -434,15 +450,27 @@ def api_security_antifraud_unban():
         return jsonify({'status': 'error', 'message': 'IP-адрес не указан'})
         
     try:
-        res = subprocess.run(['fail2ban-client', 'set', 'asterisk-antifraud', 'unbanip', ip], capture_output=True, text=True, timeout=5)
-        if res.returncode == 0 or '1' in res.stdout or '0' in res.stdout:
-            flash(f"IP-адрес {ip} успешно разблокирован!")
-            return jsonify({'status': 'ok', 'message': f'IP {ip} разблокирован'})
-        return jsonify({'status': 'error', 'message': res.stderr or res.stdout})
+        subprocess.run(['fail2ban-client', 'set', 'asterisk-antifraud', 'unbanip', ip], capture_output=True, text=True, timeout=5)
+        subprocess.run(['fail2ban-client', 'set', 'sshd', 'unbanip', ip], capture_output=True, text=True, timeout=5)
+        flash(f"IP-адрес {ip} успешно разблокирован во всех фильтрах!")
+        return jsonify({'status': 'ok', 'message': f'IP {ip} разблокирован'})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)})
 
 @app.route('/api/security/antifraud/ban', methods=['POST'])
+def api_security_antifraud_ban():
+    data = request.get_json() or {}
+    ip = data.get('ip') or request.form.get('ip', '').strip()
+    if not ip:
+        return jsonify({'status': 'error', 'message': 'IP-адрес не указан'})
+        
+    try:
+        subprocess.run(['fail2ban-client', 'set', 'asterisk-antifraud', 'banip', ip], capture_output=True, text=True, timeout=5)
+        subprocess.run(['fail2ban-client', 'set', 'sshd', 'banip', ip], capture_output=True, text=True, timeout=5)
+        flash(f"IP-адрес {ip} успешно заблокирован в iptables!")
+        return jsonify({'status': 'ok', 'message': f'IP {ip} заблокирован'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
 def api_security_antifraud_ban_manual():
     data = request.get_json() or {}
     ip = data.get('ip') or request.form.get('ip', '').strip()
