@@ -76,13 +76,21 @@ async def stream_channel_to_gemini(call_id, wav_path, speaker):
             async def receive_loop():
                 async for response in session.receive():
                     if response.text:
-                        await broadcast({
+                        msg = {
                             "type": "transcription",
                             "call_id": call_id,
                             "speaker": speaker,
                             "text": response.text,
                             "timestamp": time.time()
-                        })
+                        }
+                        await broadcast(msg)
+                        
+                        try:
+                            transcript_path = os.path.join(MONITOR_DIR, f"{call_id}.jsonl")
+                            with open(transcript_path, "a", encoding="utf-8") as tf:
+                                tf.write(json.dumps(msg, ensure_ascii=False) + "\n")
+                        except Exception as e:
+                            logger.error(f"Failed to write transcript: {e}")
 
             await asyncio.gather(send_loop(), receive_loop())
 
