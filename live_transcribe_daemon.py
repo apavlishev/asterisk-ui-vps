@@ -44,7 +44,9 @@ async def broadcast(message):
     msg = json.dumps(message, ensure_ascii=False)
     try:
         call_id = message.get('call_id')
-        if call_id:
+        is_final = message.get('is_final', True)
+        # Only persist final phrases to JSONL to prevent duplicate growing interim lines
+        if call_id and is_final:
             clean_id = get_clean_id(call_id)
             jsonl_path = os.path.join(MONITOR_DIR, f"{clean_id}.wav.jsonl")
             with open(jsonl_path, 'a', encoding='utf-8') as f:
@@ -193,26 +195,35 @@ async def stream_channel_to_gemini_live(call_id, wav_path, speaker):
                             break
 
             async def receive_loop():
+                current_turn = 0
                 last_text = ""
                 async for response in session.receive():
                     text = None
+                    is_final = False
                     if response.server_content:
                         sc = response.server_content
                         if getattr(sc, 'input_transcription', None) and getattr(sc.input_transcription, 'text', None):
                             text = sc.input_transcription.text.strip()
+                            is_final = True
                         elif getattr(sc, 'interim_input_transcription', None) and getattr(sc.interim_input_transcription, 'text', None):
                             text = sc.interim_input_transcription.text.strip()
+                            is_final = False
 
                     if text and text != last_text:
                         last_text = text
-                        logger.info(f"[{speaker.upper()} LIVE] {text}")
+                        logger.info(f"[{speaker.upper()} {'FINAL' if is_final else 'INTERIM'}] {text}")
                         await broadcast({
                             "type": "transcription",
                             "call_id": call_id,
                             "speaker": speaker,
                             "text": text,
+                            "turn_id": current_turn,
+                            "is_final": is_final,
                             "timestamp": time.time()
                         })
+                        if is_final:
+                            current_turn += 1
+                            last_text = ""
 
             await asyncio.gather(send_loop(), receive_loop())
 

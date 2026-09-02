@@ -151,6 +151,7 @@
     const box = document.getElementById('live-transcribe-box');
     const wsUrl = 'ws://' + window.location.hostname + ':8889';
     let ws = null;
+    const currentTurnBubbles = {};
 
     function connect() {
         ws = new WebSocket(wsUrl);
@@ -162,27 +163,52 @@
         
         ws.onmessage = function(event) {
             const data = JSON.parse(event.data);
-            if(data.type === 'error') {
+            if (data.type === 'error') {
                 const el = document.createElement('div');
                 el.className = 'flex flex-col items-center mt-2 mb-2 w-full';
                 el.innerHTML = `<div class="bg-error/20 text-error border border-error/40 px-4 py-2 rounded-xl text-xs font-mono max-w-[80%] break-words shadow-sm flex items-start gap-2"><span class="material-symbols-outlined text-[14px]">warning</span><span>${data.message}</span></div>`;
                 box.appendChild(el);
                 box.scrollTop = box.scrollHeight;
-            } else if(data.type === 'transcription') {
-                const el = document.createElement('div');
-                el.className = 'flex flex-col ' + (data.speaker === 'operator' ? 'items-end' : 'items-start');
+            } else if (data.type === 'transcription') {
+                const isOperator = data.speaker === 'operator';
+                const turnId = data.turn_id !== undefined ? data.turn_id : 0;
+                const turnKey = (data.call_id || 'call') + '_' + data.speaker + '_' + turnId;
                 
-                const name = document.createElement('div');
-                name.className = 'text-[10px] font-bold mb-1 font-sans ' + (data.speaker === 'operator' ? 'text-primary' : 'text-slate-400');
-                name.innerText = data.speaker === 'operator' ? '[Оператор]' : '[Клиент]';
+                let bubbleObj = currentTurnBubbles[turnKey];
+
+                if (!bubbleObj || !document.body.contains(bubbleObj.bubble)) {
+                    const el = document.createElement('div');
+                    el.className = 'flex flex-col ' + (isOperator ? 'items-end' : 'items-start') + ' transition-all duration-200';
+                    el.id = 'bubble-' + turnKey;
+                    
+                    const name = document.createElement('div');
+                    name.className = 'text-[10px] font-bold mb-1 font-sans ' + (isOperator ? 'text-primary' : 'text-slate-400');
+                    name.innerText = isOperator ? '[Оператор]' : '[Клиент]';
+                    
+                    const bubble = document.createElement('div');
+                    bubble.className = 'max-w-[75%] px-4 py-2.5 rounded-2xl text-sm font-sans leading-relaxed shadow-sm transition-all ' + 
+                        (isOperator ? 'bg-primary/20 text-blue-100 rounded-br-none border border-primary/30' : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none');
+                    
+                    if (!data.is_final) {
+                        bubble.classList.add('opacity-90');
+                    }
+                    bubble.innerText = data.text;
+                    
+                    el.appendChild(name);
+                    el.appendChild(bubble);
+                    box.appendChild(el);
+                    
+                    bubbleObj = { el: el, bubble: bubble };
+                    currentTurnBubbles[turnKey] = bubbleObj;
+                } else {
+                    // Update the existing speech bubble in real-time
+                    bubbleObj.bubble.innerText = data.text;
+                    if (data.is_final) {
+                        bubbleObj.bubble.classList.remove('opacity-90');
+                        delete currentTurnBubbles[turnKey];
+                    }
+                }
                 
-                const bubble = document.createElement('div');
-                bubble.className = 'max-w-[75%] px-4 py-2 rounded-2xl text-sm font-sans ' + (data.speaker === 'operator' ? 'bg-primary/20 text-blue-100 rounded-br-none' : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none');
-                bubble.innerText = data.text;
-                
-                el.appendChild(name);
-                el.appendChild(bubble);
-                box.appendChild(el);
                 box.scrollTop = box.scrollHeight;
             }
         };
