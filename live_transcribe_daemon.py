@@ -52,34 +52,93 @@ async def broadcast(message):
         except Exception:
             clients.discard(client)
 
+def run_gemini_interactions_transcribe(call_id, full_wav_path):
+    api_key = get_api_key()
+    if not api_key: return
+    try:
+        client = genai.Client(api_key=api_key)
+        audio_file = client.files.upload(file=full_wav_path)
+        interaction = client.interactions.create(
+            model="gemini-3.5-transcribe",
+            input=[{
+                "type": "audio",
+                "uri": audio_file.uri,
+                "mime_type": audio_file.mime_type,
+            }],
+            generation_config={
+                "transcription_config": {
+                    "language_codes": ["ru-RU"],
+                    "mode": {
+                        "type": "verbatim",
+                        "diarization_mode": "speaker",
+                        "timestamp_granularities": ["word"],
+                    }
+                }
+            }
+        )
+        
+        # Parse diarized segments
+        messages = []
+        current_speaker = None
+        current_words = []
+        for step in interaction.steps:
+            if getattr(step, 'content', None):
+                for content in step.content:
+                    if getattr(content, 'annotations', None):
+                        for ann in content.annotations:
+                            spk = 'client' if getattr(ann, 'speaker', '') == 'spk:0' else 'operator'
+                            if spk != current_speaker:
+                                if current_words:
+                                    messages.append({
+                                        "type": "transcription",
+                                        "call_id": call_id,
+                                        "speaker": current_speaker,
+                                        "text": ' '.join(current_words),
+                                        "timestamp": time.time()
+                                    })
+                                    current_words = []
+                                current_speaker = spk
+                            current_words.append(getattr(ann, 'text', ''))
+                        if current_words:
+                            messages.append({
+                                "type": "transcription",
+                                "call_id": call_id,
+                                "speaker": current_speaker,
+                                "text": ' '.join(current_words),
+                                "timestamp": time.time()
+                            })
+
+        if messages:
+            jsonl_path = os.path.join(MONITOR_DIR, f"{call_id}.wav.jsonl")
+            with open(jsonl_path, 'w', encoding='utf-8') as f:
+                for m in messages:
+                    f.write(json.dumps(m, ensure_ascii=False) + chr(10))
+            logger.info(f"Saved official Gemini 3.5 Transcribe diarization for {call_id} ({len(messages)} turns)")
+    except Exception as e:
+        logger.error(f"Gemini 3.5 Transcribe error: {e}")
+
 async def stream_channel_worker(call_id, wav_path, speaker):
     api_key = get_api_key()
-    if not api_key:
-        logger.warning("No Gemini API key configured")
-        return
+    if not api_key: return
 
     client = genai.Client(api_key=api_key)
     logger.info(f"[{speaker.upper()}] Starting stream worker for {wav_path}")
 
-    # Wait for file creation
     waited = 0
     while not os.path.exists(wav_path) and waited < 10:
         await asyncio.sleep(0.5)
         waited += 0.5
 
     if not os.path.exists(wav_path):
-        logger.warning(f"File {wav_path} not found after 10s")
         return
 
-    # Buffer & state
-    last_size = 0
     idle_count = 0
     chunk_buffer = bytearray()
-    CHUNK_THRESHOLD = 32000  # ~2 seconds of 8kHz 16-bit mono audio (16000 bytes/sec)
+    CHUNK_THRESHOLD = 32000  # ~2 seconds
 
     try:
         with open(wav_path, "rb") as f:
-            f.seek(44)  # Skip standard 44-byte WAV header
+            f.seek(44)
 
             while True:
                 new_data = f.read(4096)
@@ -90,7 +149,6 @@ async def stream_channel_worker(call_id, wav_path, speaker):
                     idle_count += 1
                     await asyncio.sleep(0.5)
 
-                # Process chunk if buffer reaches threshold or call has stopped growing
                 if len(chunk_buffer) >= CHUNK_THRESHOLD or (idle_count >= 3 and len(chunk_buffer) >= 16000):
                     raw_pcm = bytes(chunk_buffer)
                     chunk_buffer.clear()
@@ -101,12 +159,12 @@ async def stream_channel_worker(call_id, wav_path, speaker):
                             model='gemini-2.5-flash',
                             contents=[
                                 types.Part.from_bytes(data=wav_payload, mime_type='audio/wav'),
-                                'Транскрибируй короткую фразу телефонного разговора на русском языке. Напиши только распознанный текст без комментариев. Если звука нет или неразборчивый шум, напиши [тишина].'
+                                'Транскрибируй короткую фразу на русском языке. Верни только распознанный текст без лишних слов. Если звука нет, верни пустоту.'
                             ]
                         )
                         text = resp.text.strip() if resp and resp.text else ''
                         if text and '[тишина]' not in text.lower():
-                            logger.info(f"[{speaker.upper()}] Live text: {text}")
+                            logger.info(f"[{speaker.upper()}] Live: {text}")
                             await broadcast({
                                 "type": "transcription",
                                 "call_id": call_id,
@@ -115,13 +173,11 @@ async def stream_channel_worker(call_id, wav_path, speaker):
                                 "timestamp": time.time()
                             })
                     except Exception as ge:
-                        logger.error(f"Gemini transcribe error ({speaker}): {ge}")
+                        logger.error(f"Gemini stream error ({speaker}): {ge}")
 
-                # If file hasn't grown for 3 seconds, call is finished
                 if idle_count >= 6:
                     break
 
-        # Final flush for any remaining audio (at least 0.5s)
         if len(chunk_buffer) >= 8000:
             try:
                 wav_payload = make_wav_bytes(bytes(chunk_buffer))
@@ -129,7 +185,7 @@ async def stream_channel_worker(call_id, wav_path, speaker):
                     model='gemini-2.5-flash',
                     contents=[
                         types.Part.from_bytes(data=wav_payload, mime_type='audio/wav'),
-                        'Транскрибируй короткую фразу разговора на русском языке. Напиши только распознанный текст. Если звука нет, напиши [тишина].'
+                        'Транскрибируй фразу на русском языке.'
                     ]
                 )
                 text = resp.text.strip() if resp and resp.text else ''
@@ -142,12 +198,12 @@ async def stream_channel_worker(call_id, wav_path, speaker):
                         "timestamp": time.time()
                     })
             except Exception as ge:
-                logger.error(f"Final flush error: {ge}")
+                pass
 
         logger.info(f"[{speaker.upper()}] Worker finished for {call_id}")
 
     except Exception as e:
-        logger.error(f"Worker exception ({speaker}): {e}")
+        logger.error(f"Worker error ({speaker}): {e}")
 
 async def watch_for_new_calls():
     seen_files = set()
@@ -168,11 +224,23 @@ async def watch_for_new_calls():
                     
                     tx = rx.replace("_rx.wav", "_tx.wav")
                     call_id = os.path.basename(rx).replace("_rx.wav", "")
+                    full_wav = rx.replace("_rx.wav", "")
                     
-                    logger.info(f"New active call detected: {call_id}.wav. Starting live transcription streams.")
+                    logger.info(f"New active call detected: {call_id}.wav")
                     
-                    asyncio.create_task(stream_channel_worker(call_id, rx, "client"))
-                    asyncio.create_task(stream_channel_worker(call_id, tx, "operator"))
+                    # Launch live real-time workers for both legs
+                    t1 = asyncio.create_task(stream_channel_worker(call_id, rx, "client"))
+                    t2 = asyncio.create_task(stream_channel_worker(call_id, tx, "operator"))
+
+                    # When call finishes, execute Gemini 3.5 Transcribe with Diarization
+                    async def post_call_diarize(cid, f_wav, task1, task2):
+                        await asyncio.gather(task1, task2)
+                        await asyncio.sleep(1)
+                        if os.path.exists(f_wav):
+                            logger.info(f"Running Gemini 3.5 Transcribe Diarization for {cid}")
+                            await asyncio.to_thread(run_gemini_interactions_transcribe, cid, f_wav)
+
+                    asyncio.create_task(post_call_diarize(call_id, full_wav, t1, t2))
                     
         except Exception as e:
             logger.error(f"Watcher error: {e}")
