@@ -312,11 +312,6 @@ def save_sip_groups(groups):
     cfg['sip_groups'] = groups
     save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
     generate_dialplan_from_tree()
 
 @app.route('/api/sip/groups', methods=['GET'])
@@ -484,11 +479,6 @@ def save_security_antifraud_settings():
     }
     save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
     
     # Apply to fail2ban jail.local configuration
     ignore_str = " ".join(whitelist)
@@ -518,6 +508,11 @@ action   = iptables-ipset-proto4[name=ASTERISK-ANTIFRAUD, port="5060,5061", prot
         print(f"[Apply Fail2ban Error]: {e}")
         
     flash('Настройки Антифрода Fail2ban успешно сохранены и применены!')
+    
+    try:
+        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
+    except:
+        pass
     return redirect(url_for('index'))
 
 
@@ -537,11 +532,6 @@ def save_live_transcribe():
         cfg['live_transcribe']['webhook_url'] = webhook_url
         
     save_integrations(cfg)
-
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
 
     return redirect(request.referrer or url_for('index'))
 
@@ -565,11 +555,6 @@ def save_security_auth():
         cfg['security_auth']['prompt_dismissed'] = True
 
     save_integrations(cfg)
-
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
 
     
     if enabled:
@@ -4432,11 +4417,6 @@ def set_language(lang_code):
     cfg['system_lang'] = lang_code
     save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
     
     resp = redirect(request.referrer or url_for('index'))
     resp.set_cookie('app_lang', lang_code, max_age=60*60*24*365) # 1 year
@@ -5148,11 +5128,6 @@ def toggle_plugin(plugin_id):
     cfg['plugins_disabled'] = disabled
     save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
     return redirect(request.referrer or url_for('index'))
 
 
@@ -5510,11 +5485,6 @@ def api_ivr_save_canvas():
 
         save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
         generate_dialplan_from_tree()
         generate_pjsip_conf()
         
@@ -5547,11 +5517,6 @@ def save_ftp():
     }
     save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
     flash('Настройки FTP-хранилища и HTTP-ссылок успешно сохранены!')
     return redirect(url_for('index'))
 
@@ -5566,11 +5531,6 @@ def save_yandex_disk():
     cfg['yandex_disk']['path'] = request.form.get('path', 'app:/records').strip()
     save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
     flash('Настройки Яндекс.Диска сохранены!')
     return redirect(url_for('index'))
 
@@ -5582,11 +5542,6 @@ def save_gdrive():
     folder_id = request.form.get('folder_id', '').strip()
     cfg['gdrive'] = {'enabled': enabled, 'token': token, 'folder_id': folder_id}
     save_integrations(cfg)
-
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
 
     flash('Настройки Google Drive сохранены!')
     return redirect(url_for('index'))
@@ -5606,11 +5561,6 @@ def api_save_bitrix24():
     cfg['bitrix24'] = b24
     save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
     flash('Настройки Битрикс24 Telephony сохранены!')
     return redirect(request.referrer or url_for('index'))
 
@@ -5625,11 +5575,6 @@ def api_save_hubspot():
     cfg['hubspot'] = hs
     save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
     flash('Настройки HubSpot CRM сохранены!')
     return redirect(request.referrer or url_for('index'))
 
@@ -5642,11 +5587,6 @@ def api_save_pipedrive():
     pipe['subdomain'] = request.form.get('subdomain', '').strip()
     cfg['pipedrive'] = pipe
     save_integrations(cfg)
-
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
 
     flash('Настройки Pipedrive сохранены!')
     return redirect(request.referrer or url_for('index'))
@@ -5662,11 +5602,6 @@ def api_save_zoho():
     cfg['zoho'] = zh
     save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
     flash('Настройки Zoho CRM сохранены!')
     return redirect(request.referrer or url_for('index'))
 
@@ -5679,11 +5614,6 @@ def api_save_gohighlevel():
     ghl['api_key'] = request.form.get('api_key', '').strip()
     cfg['gohighlevel'] = ghl
     save_integrations(cfg)
-
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
 
     flash('Настройки GoHighLevel (GHL) сохранены!')
     return redirect(request.referrer or url_for('index'))
@@ -5699,11 +5629,6 @@ def api_save_zendesk():
     cfg['zendesk'] = zd
     save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
     flash('Настройки Zendesk Talk сохранены!')
     return redirect(request.referrer or url_for('index'))
 
@@ -5716,11 +5641,6 @@ def save_telegram():
     chat_id = request.form.get('chat_id', '').strip()
     cfg['telegram'] = {'enabled': enabled, 'token': token, 'chat_id': chat_id}
     save_integrations(cfg)
-
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
 
     flash('Настройки Telegram сохранены!')
     return redirect(url_for('index'))
@@ -5928,11 +5848,6 @@ def api_save_sip_trunk():
     cfg['sip_trunks'] = trunks
     save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
     
     # Re-generate PJSIP & Dialplan
     try:
@@ -5958,11 +5873,6 @@ def api_toggle_sip_trunk(trunk_id):
     save_integrations(cfg)
 
     try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
-    try:
         generate_pjsip_conf()
         generate_dialplan_from_tree()
         subprocess.run(['asterisk', '-rx', 'pjsip reload'], capture_output=True)
@@ -5976,11 +5886,6 @@ def api_delete_sip_trunk(trunk_id):
     trunks = cfg.get('sip_trunks', [])
     cfg['sip_trunks'] = [t for t in trunks if t['id'] != trunk_id]
     save_integrations(cfg)
-
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
 
     try:
         generate_pjsip_conf()
@@ -6288,11 +6193,6 @@ def save_enterprise_vpn_config(vpn_cfg):
     cfg['enterprise_vpn'] = vpn_cfg
     save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
 
 @app.route('/settings/enterprise-vpn', methods=['POST'])
 def api_save_enterprise_vpn():
@@ -6525,11 +6425,6 @@ def api_save_log_quota():
     }
     save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
     apply_system_logrotate(max_size, rotate_count, auto_compress)
     
     if request.form.get('action') == 'force_rotate':
@@ -6606,11 +6501,6 @@ def tg_send_code():
             cfg['telegram_trunk']['phone'] = phone
             save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
             
             client.disconnect()
             return jsonify({"success": True, "already_authorized": True, "account": account_info})
@@ -6668,11 +6558,6 @@ def tg_login():
         cfg['telegram_trunk']['phone'] = phone
         save_integrations(cfg)
 
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
-
         
         client.disconnect()
         return jsonify({"success": True, "account": account_info})
@@ -6698,11 +6583,6 @@ def tg_start_tg2sip():
     cfg['telegram_trunk']['phone'] = phone
     
     save_integrations(cfg)
-
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
 
     
     # Mocking the docker run command for tg2sip
@@ -6740,11 +6620,6 @@ def toggle_modems_test_mode():
     enabled = request.form.get('enabled') == 'on'
     cfg['modems_test_mode'] = enabled
     save_integrations(cfg)
-
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
 
     return redirect(request.referrer or url_for('index'))
 
