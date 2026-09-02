@@ -5954,12 +5954,22 @@ def serve_recording(filename):
 
 @app.route('/api/calls/<filename>/transcripts', methods=['GET'])
 def get_call_transcripts(filename):
-    call_id = os.path.basename(filename).replace('.wav', '')
-    transcript_path = os.path.join(RECORD_DIR, f"{call_id}.jsonl")
-    if not os.path.exists(transcript_path):
-        transcript_path = os.path.join(RECORD_DIR, f"{filename}.jsonl")
+    base = os.path.basename(filename).replace('.wav', '')
+    candidates = [
+        os.path.join(RECORD_DIR, f"{base}.jsonl"),
+        os.path.join(RECORD_DIR, f"{base}.wav.jsonl"),
+        os.path.join(RECORD_DIR, f"{base}.wav.wav.jsonl"),
+        os.path.join(RECORD_DIR, f"{filename}.jsonl"),
+        os.path.join(RECORD_DIR, f"{filename}.wav.jsonl"),
+    ]
     
-    if not os.path.exists(transcript_path):
+    transcript_path = None
+    for p in candidates:
+        if os.path.exists(p) and os.path.getsize(p) > 0:
+            transcript_path = p
+            break
+            
+    if not transcript_path:
         return jsonify({"status": "no_data", "transcripts": []})
         
     lines = []

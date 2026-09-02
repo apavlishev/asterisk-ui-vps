@@ -23,12 +23,19 @@ def get_api_key():
     except Exception:
         return ''
 
+def get_clean_id(filename):
+    name = os.path.basename(filename)
+    for ext in ['_rx.wav', '_tx.wav', '.wav']:
+        name = name.replace(ext, '')
+    return name
+
 async def broadcast(message):
     msg = json.dumps(message, ensure_ascii=False)
     try:
         call_id = message.get('call_id')
         if call_id:
-            jsonl_path = os.path.join(MONITOR_DIR, f"{call_id}.wav.jsonl")
+            clean_id = get_clean_id(call_id)
+            jsonl_path = os.path.join(MONITOR_DIR, f"{clean_id}.wav.jsonl")
             with open(jsonl_path, 'a', encoding='utf-8') as f:
                 f.write(msg + chr(10))
     except Exception as e:
@@ -41,25 +48,98 @@ async def broadcast(message):
         except Exception:
             clients.discard(client)
 
+def run_post_call_diarize(call_id, full_wav_path):
+    api_key = get_api_key()
+    if not api_key: return
+    try:
+        if not os.path.exists(full_wav_path) or os.path.getsize(full_wav_path) < 1000:
+            return
+
+        client = genai.Client(api_key=api_key)
+        audio_file = client.files.upload(file=full_wav_path)
+        interaction = client.interactions.create(
+            model="gemini-3.5-transcribe",
+            input=[{
+                "type": "audio",
+                "uri": audio_file.uri,
+                "mime_type": audio_file.mime_type,
+            }],
+            generation_config={
+                "transcription_config": {
+                    "language_codes": ["ru-RU"],
+                    "mode": {
+                        "type": "verbatim",
+                        "diarization_mode": "speaker",
+                        "timestamp_granularities": ["word"],
+                    }
+                }
+            }
+        )
+        
+        messages = []
+        current_speaker = None
+        current_words = []
+        for step in interaction.steps:
+            if getattr(step, 'content', None):
+                for content in step.content:
+                    if getattr(content, 'annotations', None):
+                        for ann in content.annotations:
+                            spk = 'client' if getattr(ann, 'speaker', '') == 'spk:0' else 'operator'
+                            if spk != current_speaker:
+                                if current_words:
+                                    messages.append({
+                                        "type": "transcription",
+                                        "call_id": call_id,
+                                        "speaker": current_speaker,
+                                        "text": ' '.join(current_words),
+                                        "timestamp": time.time()
+                                    })
+                                    current_words = []
+                                current_speaker = spk
+                            current_words.append(getattr(ann, 'text', ''))
+                        if current_words:
+                            messages.append({
+                                "type": "transcription",
+                                "call_id": call_id,
+                                "speaker": current_speaker,
+                                "text": ' '.join(current_words),
+                                "timestamp": time.time()
+                            })
+
+        if messages:
+            clean_id = get_clean_id(call_id)
+            jsonl_path = os.path.join(MONITOR_DIR, f"{clean_id}.wav.jsonl")
+            with open(jsonl_path, 'w', encoding='utf-8') as f:
+                for m in messages:
+                    f.write(json.dumps(m, ensure_ascii=False) + chr(10))
+            logger.info(f"Saved final Russian diarization for {clean_id} ({len(messages)} phrases)")
+    except Exception as e:
+        logger.error(f"Post-call diarization error for {call_id}: {e}")
+
 async def stream_channel_to_gemini_live(call_id, wav_path, speaker):
     api_key = get_api_key()
     if not api_key: return
 
     client = genai.Client(api_key=api_key)
-    config = {"response_modalities": ["TEXT"]}
+    config = {
+        "response_modalities": ["TEXT"],
+        "system_instruction": {
+            "parts": [{"text": "You are a real-time speech transcriber for phone conversations. Accurately transcribe Russian speech into Russian Cyrillic text with punctuation. Never translate into other languages."}]
+        }
+    }
 
-    logger.info(f"[{speaker.upper()}] Connecting to Gemini 3.5 Transcribe Live for {call_id}...")
+    logger.info(f"[{speaker.upper()}] Starting Gemini 3.5 Live for {call_id}")
 
     try:
         async with client.aio.live.connect(model="gemini-3.5-transcribe-live", config=config) as session:
-            logger.info(f"[{speaker.upper()}] Live connected to gemini-3.5-transcribe-live")
+            logger.info(f"[{speaker.upper()}] Live connected for {call_id}")
 
             async def send_loop():
                 while not os.path.exists(wav_path):
                     await asyncio.sleep(0.5)
 
                 with open(wav_path, "rb") as f:
-                    f.seek(44)  # Skip 44-byte WAV header
+                    f.seek(44)
                     idle_count = 0
 
                     while True:
@@ -125,12 +205,21 @@ async def watch_for_new_calls():
                     seen_files.add(rx)
                     
                     tx = rx.replace("_rx.wav", "_tx.wav")
-                    call_id = os.path.basename(rx).replace("_rx.wav", "")
+                    call_id = get_clean_id(rx)
+                    full_wav = rx.replace("_rx.wav", "")
                     
-                    logger.info(f"New active call: {call_id}. Spawning Gemini 3.5 Transcribe Live.")
+                    logger.info(f"New active call detected: {call_id}.wav")
                     
-                    asyncio.create_task(stream_channel_to_gemini_live(call_id, rx, "client"))
-                    asyncio.create_task(stream_channel_to_gemini_live(call_id, tx, "operator"))
+                    t1 = asyncio.create_task(stream_channel_to_gemini_live(call_id, rx, "client"))
+                    t2 = asyncio.create_task(stream_channel_to_gemini_live(call_id, tx, "operator"))
+
+                    async def handle_post_call(cid, f_wav, task1, task2):
+                        await asyncio.gather(task1, task2)
+                        await asyncio.sleep(1)
+                        if os.path.exists(f_wav):
+                            await asyncio.to_thread(run_post_call_diarize, cid, f_wav)
+
+                    asyncio.create_task(handle_post_call(call_id, full_wav, t1, t2))
                     
         except Exception as e:
             logger.error(f"Watcher error: {e}")
