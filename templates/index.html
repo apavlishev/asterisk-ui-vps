@@ -7572,7 +7572,7 @@
         const transBox = document.getElementById('cd_transcription');
         transBox.innerHTML = '<div class="flex items-center justify-center h-full text-on-surface-variant text-sm gap-2"><span class="material-symbols-outlined animate-spin">refresh</span> Загрузка...</div>';
         
-        fetch('/api/calls/' + filename + '/transcripts')
+        fetch('/api/calls/' + filename + '/transcripts?t=' + new Date().getTime())
             .then(r => r.json())
             .then(data => {
                 if (data.status === 'no_data' || !data.transcripts || data.transcripts.length === 0) {
