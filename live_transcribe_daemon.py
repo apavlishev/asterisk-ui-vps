@@ -16,12 +16,23 @@ CONFIG_PATH = "/opt/integrations_config.json"
 clients = set()
 
 def get_api_key():
+    api_key, _, _, _ = get_transcribe_config()
+    return api_key
+
+def get_transcribe_config():
     try:
         with open(CONFIG_PATH, 'r') as f:
             cfg = json.load(f)
-            return cfg.get('live_transcribe', {}).get('api_key', '')
+            lt = cfg.get('live_transcribe', {})
+            api_key = lt.get('api_key', '')
+            langs = lt.get('language_codes', [])
+            vocab = lt.get('custom_vocabulary', [])
+            prim = lt.get('primary_language', 'ru-RU')
+            if not langs:
+                langs = ['ru-RU']
+            return api_key, prim, langs, vocab
     except Exception:
-        return ''
+        return '', 'ru-RU', ['ru-RU'], []
 
 def get_clean_id(filename):
     name = os.path.basename(filename)
@@ -49,7 +60,7 @@ async def broadcast(message):
             clients.discard(client)
 
 def run_post_call_diarize(call_id, full_wav_path):
-    api_key = get_api_key()
+    api_key, prim_lang, langs, vocab = get_transcribe_config()
     if not api_key: return
     try:
         if not os.path.exists(full_wav_path) or os.path.getsize(full_wav_path) < 1000:
@@ -57,6 +68,18 @@ def run_post_call_diarize(call_id, full_wav_path):
 
         client = genai.Client(api_key=api_key)
         audio_file = client.files.upload(file=full_wav_path)
+        
+        trans_config = {
+            "language_codes": langs,
+            "mode": {
+                "type": "verbatim",
+                "diarization_mode": "speaker",
+                "timestamp_granularities": ["word"],
+            }
+        }
+        if vocab:
+            trans_config["custom_vocabulary"] = vocab
+
         interaction = client.interactions.create(
             model="gemini-3.5-transcribe",
             input=[{
@@ -65,14 +88,7 @@ def run_post_call_diarize(call_id, full_wav_path):
                 "mime_type": audio_file.mime_type,
             }],
             generation_config={
-                "transcription_config": {
-                    "language_codes": ["ru-RU"],
-                    "mode": {
-                        "type": "verbatim",
-                        "diarization_mode": "speaker",
-                        "timestamp_granularities": ["word"],
-                    }
-                }
+                "transcription_config": trans_config
             }
         )
         
@@ -112,23 +128,39 @@ def run_post_call_diarize(call_id, full_wav_path):
             with open(jsonl_path, 'w', encoding='utf-8') as f:
                 for m in messages:
                     f.write(json.dumps(m, ensure_ascii=False) + chr(10))
-            logger.info(f"Saved final Russian diarization for {clean_id} ({len(messages)} phrases)")
+            logger.info(f"Saved final diarization for {clean_id} with languages {langs} ({len(messages)} phrases)")
     except Exception as e:
         logger.error(f"Post-call diarization error for {call_id}: {e}")
 
 async def stream_channel_to_gemini_live(call_id, wav_path, speaker):
-    api_key = get_api_key()
+    api_key, prim_lang, langs, vocab = get_transcribe_config()
     if not api_key: return
 
     client = genai.Client(api_key=api_key)
+    
+    lang_name_map = {
+        'ru-RU': 'Russian (русский)',
+        'en-US': 'English (английский)',
+        'ar-SA': 'Arabic (العربية)',
+        'es-ES': 'Spanish (español)',
+        'zh-CN': 'Chinese (中文)',
+        'de-DE': 'German (Deutsch)',
+        'tr-TR': 'Turkish (Türkçe)'
+    }
+    
+    target_lang_desc = ", ".join([lang_name_map.get(l, l) for l in langs])
+    sys_prompt = f"You are a real-time speech-to-text transcriber for phone conversations. Accurately transcribe speech in the following priority languages: {target_lang_desc}. Write strictly in the exact native script of the spoken words with correct punctuation. Never translate into other languages."
+    if vocab:
+        sys_prompt += f" Important vocabulary/names to recognize accurately: {', '.join(vocab)}."
+
     config = {
         "response_modalities": ["TEXT"],
         "system_instruction": {
-            "parts": [{"text": "You are a real-time speech transcriber for phone conversations. Accurately transcribe Russian speech into Russian Cyrillic text with punctuation. Never translate into other languages."}]
+            "parts": [{"text": sys_prompt}]
         }
     }
 
-    logger.info(f"[{speaker.upper()}] Starting Gemini 3.5 Live for {call_id}")
+    logger.info(f"[{speaker.upper()}] Starting Gemini 3.5 Live for {call_id} (Languages: {langs})")
 
     try:
         async with client.aio.live.connect(model="gemini-3.5-transcribe-live", config=config) as session:

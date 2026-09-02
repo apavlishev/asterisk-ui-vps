@@ -37,7 +37,7 @@
             {% endif %}
         </div>
         
-        <form action="/settings/live_transcribe" method="POST" class="space-y-4 max-w-2xl">
+        <form action="/settings/live_transcribe" method="POST" class="space-y-5 max-w-3xl">
             <div>
                 <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">API Ключ провайдера (Gemini / Google)</label>
                 <div class="relative">
@@ -48,11 +48,80 @@
                 </div>
                 <p class="text-[10px] text-on-surface-variant mt-1 tg-translate">Ключ надежно зашифрован в базе. Оставьте пустым, если не хотите менять.</p>
             </div>
+
+            <!-- Language Priority & Selection -->
+            {% set active_langs = integrations.get('live_transcribe', {}).get('language_codes', ['ru-RU']) %}
+            {% set prim_lang = integrations.get('live_transcribe', {}).get('primary_language', 'ru-RU') %}
+            
+            <div class="p-4 rounded-2xl bg-surface-container-low border border-outline/20 space-y-4">
+                <div class="flex items-center gap-2 text-xs font-bold text-on-surface">
+                    <span class="material-symbols-outlined text-primary text-[18px]">translate</span>
+                    <span class="tg-translate">Приоритет языков распознавания разговоров</span>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-semibold text-on-surface-variant mb-1.5 tg-translate">Основной язык разговора</label>
+                    <select name="primary_language" class="w-full sm:w-80 px-3.5 py-2 rounded-xl bg-surface border border-outline/30 text-xs font-medium text-on-surface focus:border-primary outline-none">
+                        <option value="ru-RU" {% if prim_lang == 'ru-RU' %}selected{% endif %}>🇷🇺 Русский (ru-RU) - Рекомендуется</option>
+                        <option value="en-US" {% if prim_lang == 'en-US' %}selected{% endif %}>🇬🇧 English / Английский (en-US)</option>
+                        <option value="ar-SA" {% if prim_lang == 'ar-SA' %}selected{% endif %}>🇸🇦 العربية / Арабский (ar-SA)</option>
+                        <option value="es-ES" {% if prim_lang == 'es-ES' %}selected{% endif %}>🇪🇸 Español / Испанский (es-ES)</option>
+                        <option value="zh-CN" {% if prim_lang == 'zh-CN' %}selected{% endif %}>🇨🇳 中文 / Китайский (zh-CN)</option>
+                        <option value="auto" {% if prim_lang == 'auto' %}selected{% endif %}>🌐 Авто (по языку текущего интерфейса)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-semibold text-on-surface-variant mb-2 tg-translate">Поддерживаемые языки разговоров (подсказка для нейросети):</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                        <label class="flex items-center gap-2 p-2 rounded-xl bg-surface border border-outline/20 cursor-pointer hover:border-primary/50 transition-all">
+                            <input type="checkbox" name="language_codes" value="ru-RU" {% if 'ru-RU' in active_langs %}checked{% endif %} class="rounded border-outline text-primary focus:ring-0">
+                            <span class="font-medium text-on-surface">🇷🇺 Русский</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-xl bg-surface border border-outline/20 cursor-pointer hover:border-primary/50 transition-all">
+                            <input type="checkbox" name="language_codes" value="en-US" {% if 'en-US' in active_langs %}checked{% endif %} class="rounded border-outline text-primary focus:ring-0">
+                            <span class="font-medium text-on-surface">🇬🇧 Английский</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-xl bg-surface border border-outline/20 cursor-pointer hover:border-primary/50 transition-all">
+                            <input type="checkbox" name="language_codes" value="ar-SA" {% if 'ar-SA' in active_langs %}checked{% endif %} class="rounded border-outline text-primary focus:ring-0">
+                            <span class="font-medium text-on-surface">🇸🇦 Арабский</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-xl bg-surface border border-outline/20 cursor-pointer hover:border-primary/50 transition-all">
+                            <input type="checkbox" name="language_codes" value="es-ES" {% if 'es-ES' in active_langs %}checked{% endif %} class="rounded border-outline text-primary focus:ring-0">
+                            <span class="font-medium text-on-surface">🇪🇸 Испанский</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-xl bg-surface border border-outline/20 cursor-pointer hover:border-primary/50 transition-all">
+                            <input type="checkbox" name="language_codes" value="zh-CN" {% if 'zh-CN' in active_langs %}checked{% endif %} class="rounded border-outline text-primary focus:ring-0">
+                            <span class="font-medium text-on-surface">🇨🇳 Китайский</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-xl bg-surface border border-outline/20 cursor-pointer hover:border-primary/50 transition-all">
+                            <input type="checkbox" name="language_codes" value="de-DE" {% if 'de-DE' in active_langs %}checked{% endif %} class="rounded border-outline text-primary focus:ring-0">
+                            <span class="font-medium text-on-surface">🇩🇪 Немецкий</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-xl bg-surface border border-outline/20 cursor-pointer hover:border-primary/50 transition-all">
+                            <input type="checkbox" name="language_codes" value="tr-TR" {% if 'tr-TR' in active_langs %}checked{% endif %} class="rounded border-outline text-primary focus:ring-0">
+                            <span class="font-medium text-on-surface">🇹🇷 Турецкий</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-semibold text-on-surface-variant mb-1 tg-translate">Пользовательский словарь терминов и имен (Custom Vocabulary):</label>
+                    {% set saved_vocab = integrations.get('live_transcribe', {}).get('custom_vocabulary', []) %}
+                    <input type="text" name="custom_vocabulary" placeholder="Например: Астериск, Пятов, Сбербанк, CRM, ВАТС" value="{{ saved_vocab|join(', ') if saved_vocab else '' }}" class="w-full px-3.5 py-2 rounded-xl bg-surface border border-outline/30 text-xs text-on-surface focus:border-primary outline-none font-mono">
+                    <p class="text-[10px] text-on-surface-variant mt-1 tg-translate">Слова или бренды через запятую, которые нейросеть должна распознавать безошибочно.</p>
+                </div>
+            </div>
+
             <div>
                 <label class="block text-xs font-semibold text-on-surface-variant mb-1.5 tg-translate">Webhook для отправки текстов</label>
                 <input type="url" name="webhook_url" placeholder="https://hook.make.com/..." value="{{ integrations.get('live_transcribe', {}).get('webhook_url', '') }}" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-sm text-on-surface focus:border-primary outline-none transition-all">
             </div>
-            <button type="submit" class="px-5 py-2.5 bg-primary text-on-primary rounded-xl font-bold text-xs hover:shadow-lg transition-all tg-translate">Сохранить настройки</button>
+            
+            <button type="submit" class="px-5 py-2.5 bg-primary text-on-primary rounded-xl font-bold text-xs hover:shadow-lg transition-all tg-translate flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">save</span>
+                <span>Сохранить настройки</span>
+            </button>
         </form>
     </div>
 

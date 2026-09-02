@@ -553,14 +553,43 @@ def save_live_transcribe():
         
     api_key = request.form.get('api_key', '').strip()
     webhook_url = request.form.get('webhook_url', '').strip()
+    primary_lang = request.form.get('primary_language', 'ru-RU').strip()
+    selected_langs = request.form.getlist('language_codes')
+    custom_vocab = request.form.get('custom_vocabulary', '').strip()
     
     if api_key:
         cfg['live_transcribe']['api_key'] = api_key
-    if webhook_url:
-        cfg['live_transcribe']['webhook_url'] = webhook_url
+    cfg['live_transcribe']['webhook_url'] = webhook_url
+    cfg['live_transcribe']['primary_language'] = primary_lang
+    
+    # If auto selected or no checkboxes, determine based on primary or current UI lang
+    if not selected_langs:
+        if primary_lang != 'auto':
+            selected_langs = [primary_lang]
+        else:
+            cur_lang = get_current_language()
+            lang_map = {'ru': 'ru-RU', 'en': 'en-US', 'ar': 'ar-SA', 'es': 'es-ES', 'zh': 'zh-CN'}
+            selected_langs = [lang_map.get(cur_lang, 'ru-RU')]
+    elif primary_lang != 'auto' and primary_lang not in selected_langs:
+        selected_langs.insert(0, primary_lang)
+        
+    cfg['live_transcribe']['language_codes'] = selected_langs
+    
+    if custom_vocab:
+        vocab_list = [w.strip() for w in custom_vocab.split(',') if w.strip()]
+        cfg['live_transcribe']['custom_vocabulary'] = vocab_list
+    else:
+        cfg['live_transcribe']['custom_vocabulary'] = []
         
     save_integrations(cfg)
+    
+    # Restart daemon to apply new language priorities
+    try:
+        subprocess.run(['systemctl', 'restart', 'live-transcribe'], capture_output=True, timeout=5)
+    except Exception:
+        pass
 
+    flash("Настройки транскрибации и языковых приоритетов успешно сохранены!")
     return redirect(request.referrer or url_for('index'))
 
 @app.route('/settings/security/auth', methods=['POST'])
