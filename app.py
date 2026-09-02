@@ -5928,6 +5928,8 @@ def serve_recording(filename):
 def get_call_transcripts(filename):
     call_id = os.path.basename(filename).replace('.wav', '')
     transcript_path = os.path.join(RECORD_DIR, f"{call_id}.jsonl")
+    if not os.path.exists(transcript_path):
+        transcript_path = os.path.join(RECORD_DIR, f"{filename}.jsonl")
     
     if not os.path.exists(transcript_path):
         return jsonify({"status": "no_data", "transcripts": []})
