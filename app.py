@@ -5227,6 +5227,7 @@ def index():
     show_security_prompt = (not is_client_local) and (not auth_enabled) and (not prompt_dismissed)
     resp = make_response(render_template(
         'index.html',
+        calls=get_cdrs(),
         client_ip=client_ip,
         is_client_local=is_client_local,
         auth_enabled=auth_enabled,
