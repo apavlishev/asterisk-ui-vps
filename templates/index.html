@@ -442,6 +442,241 @@
                     </div>
                 </div>
 
+                <!-- // ================= SYSTEM MONITORING & TELEMETRY WIDGETS ================= -->
+                <div class="space-y-4">
+                    <!-- 1. TOP ROW: 4 STATS CARDS WITH SPARKLINES (CPU, RAM, SWAP, DISK) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                        <!-- CPU CARD -->
+                        <div class="bg-surface rounded-2xl p-5 border border-outline/30 shadow-sm flex flex-col justify-between hover:border-primary/40 transition-all relative overflow-hidden group">
+                            <div>
+                                <div class="flex items-center gap-2 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                                    <span class="material-symbols-outlined text-[18px] text-primary">speed</span>
+                                    <span>ЦП</span>
+                                </div>
+                                <div class="mt-3 flex items-baseline gap-1">
+                                    <span id="metric-cpu-val" class="text-3xl font-extrabold text-on-surface tracking-tight">{{ server_metrics.cpu.percent if server_metrics else '0.0' }}</span>
+                                    <span class="text-xs font-bold text-on-surface-variant">%</span>
+                                </div>
+                                <div id="metric-cpu-cores" class="text-[11px] font-medium text-on-surface-variant/80 mt-0.5 truncate">{{ server_metrics.cpu.cores if server_metrics else '1 Core / 1T' }}</div>
+                            </div>
+                            
+                            <div class="my-3">
+                                <canvas id="sparkline-cpu" class="w-full h-10"></canvas>
+                            </div>
+
+                            <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/70 pt-2 border-t border-outline/10">
+                                <span>СРЕДНЕЕ <b id="metric-cpu-avg" class="text-on-surface">{{ server_metrics.cpu.avg if server_metrics else '0' }}%</b></span>
+                                <span>ПИК <b id="metric-cpu-peak" class="text-on-surface">{{ server_metrics.cpu.peak if server_metrics else '0' }}%</b></span>
+                            </div>
+                        </div>
+
+                        <!-- RAM CARD -->
+                        <div class="bg-surface rounded-2xl p-5 border border-outline/30 shadow-sm flex flex-col justify-between hover:border-primary/40 transition-all relative overflow-hidden group">
+                            <div>
+                                <div class="flex items-center gap-2 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                                    <span class="material-symbols-outlined text-[18px] text-primary">memory</span>
+                                    <span>ПАМЯТЬ</span>
+                                </div>
+                                <div class="mt-3 flex items-baseline gap-1">
+                                    <span id="metric-mem-val" class="text-3xl font-extrabold text-on-surface tracking-tight">{{ server_metrics.memory.percent if server_metrics else '0.0' }}</span>
+                                    <span class="text-xs font-bold text-on-surface-variant">%</span>
+                                </div>
+                                <div id="metric-mem-detail" class="text-[11px] font-medium text-on-surface-variant/80 mt-0.5 truncate">{{ server_metrics.memory.used_mb if server_metrics else '0' }} MB / {{ server_metrics.memory.total_mb if server_metrics else '0' }} MB</div>
+                            </div>
+                            
+                            <div class="my-3">
+                                <canvas id="sparkline-mem" class="w-full h-10"></canvas>
+                            </div>
+
+                            <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/70 pt-2 border-t border-outline/10">
+                                <span>СРЕДНЕЕ <b id="metric-mem-avg" class="text-on-surface">{{ server_metrics.memory.avg if server_metrics else '0' }}%</b></span>
+                                <span>ПИК <b id="metric-mem-peak" class="text-on-surface">{{ server_metrics.memory.peak if server_metrics else '0' }}%</b></span>
+                            </div>
+                        </div>
+
+                        <!-- SWAP CARD -->
+                        <div class="bg-surface rounded-2xl p-5 border border-outline/30 shadow-sm flex flex-col justify-between hover:border-primary/40 transition-all relative overflow-hidden group">
+                            <div>
+                                <div class="flex items-center gap-2 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                                    <span class="material-symbols-outlined text-[18px] text-primary">swap_horiz</span>
+                                    <span>ПОДКАЧКА</span>
+                                </div>
+                                <div class="mt-3 flex items-baseline gap-1">
+                                    <span id="metric-swap-val" class="text-3xl font-extrabold text-on-surface tracking-tight">{{ server_metrics.swap.percent if server_metrics else '0.0' }}</span>
+                                    <span class="text-xs font-bold text-on-surface-variant">%</span>
+                                </div>
+                                <div id="metric-swap-detail" class="text-[11px] font-medium text-on-surface-variant/80 mt-0.5 truncate">{{ server_metrics.swap.used_mb if server_metrics else '0' }} MB / {{ server_metrics.swap.total_mb if server_metrics else '0' }} MB</div>
+                            </div>
+                            
+                            <div class="my-3">
+                                <canvas id="sparkline-swap" class="w-full h-10"></canvas>
+                            </div>
+
+                            <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/70 pt-2 border-t border-outline/10">
+                                <span>СРЕДНЕЕ <b id="metric-swap-avg" class="text-on-surface">{{ server_metrics.swap.avg if server_metrics else '0' }}%</b></span>
+                                <span>ПИК <b id="metric-swap-peak" class="text-on-surface">{{ server_metrics.swap.peak if server_metrics else '0' }}%</b></span>
+                            </div>
+                        </div>
+
+                        <!-- DISK CARD -->
+                        <div class="bg-surface rounded-2xl p-5 border border-outline/30 shadow-sm flex flex-col justify-between hover:border-primary/40 transition-all relative overflow-hidden group">
+                            <div>
+                                <div class="flex items-center gap-2 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                                    <span class="material-symbols-outlined text-[18px] text-primary">hard_drive</span>
+                                    <span>ДИСК</span>
+                                </div>
+                                <div class="mt-3 flex items-baseline gap-1">
+                                    <span id="metric-disk-val" class="text-3xl font-extrabold text-on-surface tracking-tight">{{ server_metrics.disk.percent if server_metrics else '0.0' }}</span>
+                                    <span class="text-xs font-bold text-on-surface-variant">%</span>
+                                </div>
+                                <div id="metric-disk-detail" class="text-[11px] font-medium text-on-surface-variant/80 mt-0.5 truncate">{{ server_metrics.disk.used_gb if server_metrics else '0' }} GB / {{ server_metrics.disk.total_gb if server_metrics else '0' }} GB</div>
+                            </div>
+                            
+                            <div class="my-3">
+                                <canvas id="sparkline-disk" class="w-full h-10"></canvas>
+                            </div>
+
+                            <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/70 pt-2 border-t border-outline/10">
+                                <span>СВОБОДНО <b id="metric-disk-free" class="text-on-surface">{{ server_metrics.disk.free_gb if server_metrics else '0' }} GB</b></span>
+                                <span>СРЕДНЕЕ <b id="metric-disk-avg" class="text-on-surface">{{ server_metrics.disk.avg if server_metrics else '0' }}%</b></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. MIDDLE ROW: NETWORK TRAFFIC & ACTIVE SOCKETS -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                        <!-- NETWORK TRAFFIC CHART (COL-SPAN 8) -->
+                        <div class="lg:col-span-8 bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm flex flex-col justify-between">
+                            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 pb-4 border-b border-outline/10">
+                                <div>
+                                    <h3 class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">ОБЩАЯ СКОРОСТЬ ПЕРЕДАЧИ ТРАФИКА</h3>
+                                    <p class="text-[11px] text-on-surface-variant/70 mt-0.5">Всего по интерфейсу · пик <span id="metric-net-peak" class="font-semibold text-on-surface">{{ server_metrics.network.peak_speed if server_metrics else '0 KB/s' }}</span></p>
+                                </div>
+                                <div class="flex items-center gap-4 text-xs font-mono">
+                                    <span class="flex items-center gap-1.5 text-sky-400 font-semibold">
+                                        <span class="text-sm">↑</span> Загрузка <b id="metric-net-up" class="text-on-surface">{{ server_metrics.network.upload_speed if server_metrics else '0 B/s' }}</b>
+                                    </span>
+                                    <span class="flex items-center gap-1.5 text-blue-400 font-semibold">
+                                        <span class="text-sm">↓</span> Скачать <b id="metric-net-down" class="text-on-surface">{{ server_metrics.network.download_speed if server_metrics else '0 B/s' }}</b>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- GRAPH CANVAS -->
+                            <div class="my-4 relative h-48 sm:h-56 w-full">
+                                <canvas id="chart-network" class="w-full h-full"></canvas>
+                            </div>
+
+                            <!-- NETWORK FOOTER STATS -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-outline/10">
+                                <div>
+                                    <div class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/70">ОТПРАВЛЕНО</div>
+                                    <div id="metric-net-sent" class="text-lg font-bold text-on-surface font-mono mt-0.5">{{ server_metrics.network.sent_total if server_metrics else '0 B' }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/70">ПОЛУЧЕНО</div>
+                                    <div id="metric-net-recv" class="text-lg font-bold text-on-surface font-mono mt-0.5">{{ server_metrics.network.recv_total if server_metrics else '0 B' }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/70">СРЕДНЕЕ ЗА ПЕРИОД</div>
+                                    <div id="metric-net-avg" class="text-xs font-bold text-on-surface font-mono mt-1">↑ {{ server_metrics.network.avg_up if server_metrics else '0 B/s' }} ↓ {{ server_metrics.network.avg_down if server_metrics else '0 B/s' }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SOCKETS / CONNECTIONS CHART (COL-SPAN 4) -->
+                        <div class="lg:col-span-4 bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm flex flex-col justify-between">
+                            <div class="flex justify-between items-start pb-4 border-b border-outline/10">
+                                <div>
+                                    <h3 class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">КОЛИЧЕСТВО СОЕДИНЕНИЙ</h3>
+                                    <div class="mt-2 flex items-baseline gap-2">
+                                        <span id="metric-sock-total" class="text-3xl font-extrabold text-on-surface tracking-tight">{{ server_metrics.sockets.total if server_metrics else 0 }}</span>
+                                        <span class="text-xs text-on-surface-variant font-medium">открытых сокетов</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end gap-1 text-[11px] font-mono">
+                                    <span class="inline-flex items-center gap-1.5 text-blue-400">
+                                        <span class="w-2 h-0.5 bg-blue-500 rounded-full"></span> TCP <b id="metric-sock-tcp" class="text-on-surface">{{ server_metrics.sockets.tcp if server_metrics else 0 }}</b>
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5 text-slate-300">
+                                        <span class="w-2 h-0.5 bg-slate-300 rounded-full"></span> UDP <b id="metric-sock-udp" class="text-on-surface">{{ server_metrics.sockets.udp if server_metrics else 0 }}</b>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- GRAPH CANVAS -->
+                            <div class="my-4 relative h-48 sm:h-56 w-full">
+                                <canvas id="chart-sockets" class="w-full h-full"></canvas>
+                            </div>
+
+                            <div class="text-[10px] font-medium text-on-surface-variant/70 pt-3 border-t border-outline/10 flex justify-between items-center">
+                                <span>Сетевой стек Linux / PJSIP</span>
+                                <span class="text-success font-bold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-success animate-ping"></span> Realtime</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. BOTTOM ROW: SYSTEM INFO BAR (UPTIME, PANEL PROCESS, SERVER IPS) -->
+                    <div class="bg-surface rounded-2xl p-5 border border-outline/30 shadow-sm">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-outline/10">
+                            <!-- UPTIME -->
+                            <div class="pt-3 md:pt-0">
+                                <div class="flex items-center gap-2 text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2.5">
+                                    <span class="material-symbols-outlined text-[16px] text-primary">schedule</span>
+                                    <span>ВРЕМЯ РАБОТЫ</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <div class="text-[10px] font-bold text-on-surface-variant/70 uppercase">ASTERISK</div>
+                                        <div id="metric-uptime-ast" class="text-lg font-bold text-on-surface mt-0.5 font-mono">{{ server_metrics.uptime.asterisk if server_metrics else '1d 0h' }}</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] font-bold text-on-surface-variant/70 uppercase">OS</div>
+                                        <div id="metric-uptime-os" class="text-lg font-bold text-on-surface mt-0.5 font-mono">{{ server_metrics.uptime.os if server_metrics else '1d 0h' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PANEL PROCESS -->
+                            <div class="pt-4 md:pt-0 md:pl-6">
+                                <div class="flex items-center gap-2 text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2.5">
+                                    <span class="material-symbols-outlined text-[16px] text-primary">developer_board</span>
+                                    <span>ПАНЕЛЬ</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <div class="text-[10px] font-bold text-on-surface-variant/70 uppercase">ПАМЯТЬ</div>
+                                        <div id="metric-panel-mem" class="text-lg font-bold text-on-surface mt-0.5 font-mono">{{ server_metrics.panel.memory if server_metrics else '0 MB' }}</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] font-bold text-on-surface-variant/70 uppercase">ПОТОКИ</div>
+                                        <div id="metric-panel-threads" class="text-lg font-bold text-on-surface mt-0.5 font-mono">{{ server_metrics.panel.threads if server_metrics else '1' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SERVER IPS -->
+                            <div class="pt-4 md:pt-0 md:pl-6">
+                                <div class="flex justify-between items-center mb-2.5">
+                                    <div class="flex items-center gap-2 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                                        <span class="material-symbols-outlined text-[16px] text-primary">public</span>
+                                        <span>IP-АДРЕСА СЕРВЕРА</span>
+                                    </div>
+                                    <button type="button" onclick="toggleServerIpVisibility()" class="text-on-surface-variant hover:text-on-surface transition-colors p-1" title="Скрыть / Показать IP">
+                                        <span id="ip-visibility-icon" class="material-symbols-outlined text-[18px]">visibility</span>
+                                    </button>
+                                </div>
+                                <div>
+                                    <div id="server-ip-v4" class="font-mono text-sm font-bold text-on-surface" data-ip="{{ server_metrics.server_ips.ipv4 if server_metrics else '127.0.0.1' }}">{{ server_metrics.server_ips.ipv4 if server_metrics else '127.0.0.1' }}</div>
+                                    {% if server_metrics and server_metrics.server_ips.ipv6 %}
+                                    <div id="server-ip-v6" class="font-mono text-[11px] text-on-surface-variant/80 truncate mt-0.5" data-ip="{{ server_metrics.server_ips.ipv6 }}">{{ server_metrics.server_ips.ipv6 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- METRIC CARDS -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm flex flex-col justify-between hover:-translate-y-0.5 transition-transform">
@@ -7729,6 +7964,291 @@
             modal.classList.add('hidden');
         }, 300);
     }
+
+    // ================= SYSTEM TELEMETRY & LIVE CHARTS =================
+    let isIpMasked = false;
+    function toggleServerIpVisibility() {
+        isIpMasked = !isIpMasked;
+        const icon = document.getElementById('ip-visibility-icon');
+        const v4El = document.getElementById('server-ip-v4');
+        const v6El = document.getElementById('server-ip-v6');
+        
+        if (icon) icon.textContent = isIpMasked ? 'visibility_off' : 'visibility';
+        if (v4El) {
+            const raw = v4El.getAttribute('data-ip') || '127.0.0.1';
+            v4El.textContent = isIpMasked ? '•••.•••.•••.•••' : raw;
+        }
+        if (v6El) {
+            const raw = v6El.getAttribute('data-ip') || '';
+            v6El.textContent = isIpMasked ? '••••:••••:••••:••••' : raw;
+        }
+    }
+
+    function setupCanvas(canvas) {
+        if (!canvas) return null;
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return null;
+        
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return { ctx, width: rect.width, height: rect.height };
+    }
+
+    function drawSparkline(canvasId, data, strokeColor, gradStart, gradEnd) {
+        const canvas = document.getElementById(canvasId);
+        const setup = setupCanvas(canvas);
+        if (!setup) return;
+        const { ctx, width, height } = setup;
+        
+        ctx.clearRect(0, 0, width, height);
+        if (!data || data.length === 0) return;
+        
+        // Ensure at least 15 points
+        let pts = data.slice();
+        while (pts.length < 15) pts.unshift(pts[0] || 0);
+
+        const minVal = 0;
+        const maxVal = Math.max(100, Math.max(...pts) * 1.15);
+        const stepX = width / (pts.length - 1);
+
+        // Draw dotted baseline
+        ctx.beginPath();
+        ctx.setLineDash([3, 4]);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 1;
+        ctx.moveTo(0, height - 2);
+        ctx.lineTo(width, height - 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Path
+        ctx.beginPath();
+        pts.forEach((v, i) => {
+            const x = i * stepX;
+            const y = height - ((v - minVal) / (maxVal - minVal)) * (height - 6) - 3;
+            if (i === 0) ctx.moveTo(x, y);
+            else {
+                const prevX = (i - 1) * stepX;
+                const prevY = height - ((pts[i - 1] - minVal) / (maxVal - minVal)) * (height - 6) - 3;
+                const cx = (prevX + x) / 2;
+                ctx.quadraticCurveTo(prevX, prevY, cx, (prevY + y) / 2);
+            }
+        });
+        const lastX = (pts.length - 1) * stepX;
+        const lastY = height - ((pts[pts.length - 1] - minVal) / (maxVal - minVal)) * (height - 6) - 3;
+        ctx.lineTo(lastX, lastY);
+
+        // Stroke line
+        ctx.strokeStyle = strokeColor || '#38bdf8';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Gradient Area Fill
+        ctx.lineTo(width, height);
+        ctx.lineTo(0, height);
+        ctx.closePath();
+        const grad = ctx.createLinearGradient(0, 0, 0, height);
+        grad.addColorStop(0, gradStart || 'rgba(56, 189, 248, 0.35)');
+        grad.addColorStop(1, gradEnd || 'rgba(56, 189, 248, 0.0)');
+        ctx.fillStyle = grad;
+        ctx.fill();
+    }
+
+    function drawMultiAreaChart(canvasId, seriesList) {
+        const canvas = document.getElementById(canvasId);
+        const setup = setupCanvas(canvas);
+        if (!setup) return;
+        const { ctx, width, height } = setup;
+        
+        ctx.clearRect(0, 0, width, height);
+
+        // Find max
+        let allVals = [];
+        seriesList.forEach(s => { if (s.data) allVals = allVals.concat(s.data); });
+        const maxVal = Math.max(10, Math.max(...(allVals.length ? allVals : [10])) * 1.25);
+        const padTop = 15;
+        const padBottom = 20;
+        const chartH = height - padTop - padBottom;
+
+        // Draw 3 horizontal dotted gridlines
+        ctx.setLineDash([3, 4]);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 2; i++) {
+            const y = padTop + (chartH / 2) * i;
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(width, y);
+            ctx.stroke();
+        }
+        ctx.setLineDash([]);
+
+        seriesList.forEach(series => {
+            let pts = series.data.slice();
+            while (pts.length < 20) pts.unshift(pts[0] || 0);
+            const stepX = width / (pts.length - 1);
+
+            ctx.beginPath();
+            pts.forEach((v, i) => {
+                const x = i * stepX;
+                const y = padTop + chartH - (v / maxVal) * chartH;
+                if (i === 0) ctx.moveTo(x, y);
+                else {
+                    const prevX = (i - 1) * stepX;
+                    const prevY = padTop + chartH - (pts[i - 1] / maxVal) * chartH;
+                    const cx = (prevX + x) / 2;
+                    ctx.quadraticCurveTo(prevX, prevY, cx, (prevY + y) / 2);
+                }
+            });
+            const lastX = (pts.length - 1) * stepX;
+            const lastY = padTop + chartH - (pts[pts.length - 1] / maxVal) * chartH;
+            ctx.lineTo(lastX, lastY);
+
+            // Stroke line
+            ctx.strokeStyle = series.color;
+            ctx.lineWidth = 2.2;
+            ctx.stroke();
+
+            // Fill
+            ctx.lineTo(width, height - padBottom);
+            ctx.lineTo(0, height - padBottom);
+            ctx.closePath();
+            const grad = ctx.createLinearGradient(0, padTop, 0, height - padBottom);
+            grad.addColorStop(0, series.fillStart || 'rgba(59, 130, 246, 0.35)');
+            grad.addColorStop(1, series.fillEnd || 'rgba(59, 130, 246, 0.0)');
+            ctx.fillStyle = grad;
+            ctx.fill();
+        });
+    }
+
+    let lastMetricsData = null;
+
+    function renderAllCharts(data) {
+        if (!data) return;
+        lastMetricsData = data;
+
+        // Sparklines
+        drawSparkline('sparkline-cpu', data.cpu.history, '#38bdf8', 'rgba(56, 189, 248, 0.4)', 'rgba(56, 189, 248, 0.0)');
+        drawSparkline('sparkline-mem', data.memory.history, '#3b82f6', 'rgba(59, 130, 246, 0.4)', 'rgba(59, 130, 246, 0.0)');
+        drawSparkline('sparkline-swap', data.swap.history, '#60a5fa', 'rgba(96, 165, 250, 0.3)', 'rgba(96, 165, 250, 0.0)');
+        drawSparkline('sparkline-disk', data.disk.history, '#2563eb', 'rgba(37, 99, 235, 0.4)', 'rgba(37, 99, 235, 0.0)');
+
+        // Middle charts
+        drawMultiAreaChart('chart-network', [
+            { data: data.network.history_up || [], color: '#38bdf8', fillStart: 'rgba(56, 189, 248, 0.35)', fillEnd: 'rgba(56, 189, 248, 0.0)' },
+            { data: data.network.history_down || [], color: '#3b82f6', fillStart: 'rgba(59, 130, 246, 0.25)', fillEnd: 'rgba(59, 130, 246, 0.0)' }
+        ]);
+
+        drawMultiAreaChart('chart-sockets', [
+            { data: data.sockets.history_tcp || [], color: '#3b82f6', fillStart: 'rgba(59, 130, 246, 0.35)', fillEnd: 'rgba(59, 130, 246, 0.0)' },
+            { data: data.sockets.history_udp || [], color: '#cbd5e1', fillStart: 'rgba(203, 213, 225, 0.15)', fillEnd: 'rgba(203, 213, 225, 0.0)' }
+        ]);
+    }
+
+    async function fetchSystemMetrics() {
+        try {
+            const res = await fetch('/api/system/metrics?t=' + Date.now());
+            if (!res.ok) return;
+            const d = await res.json();
+            
+            // Update Top Row Texts
+            const cpuVal = document.getElementById('metric-cpu-val');
+            if (cpuVal) cpuVal.textContent = d.cpu.percent.toFixed(1);
+            const cpuCores = document.getElementById('metric-cpu-cores');
+            if (cpuCores) cpuCores.textContent = d.cpu.cores;
+            const cpuAvg = document.getElementById('metric-cpu-avg');
+            if (cpuAvg) cpuAvg.textContent = d.cpu.avg + '%';
+            const cpuPeak = document.getElementById('metric-cpu-peak');
+            if (cpuPeak) cpuPeak.textContent = d.cpu.peak + '%';
+
+            const memVal = document.getElementById('metric-mem-val');
+            if (memVal) memVal.textContent = d.memory.percent.toFixed(1);
+            const memDetail = document.getElementById('metric-mem-detail');
+            if (memDetail) memDetail.textContent = `${d.memory.used_mb} MB / ${d.memory.total_mb} MB`;
+            const memAvg = document.getElementById('metric-mem-avg');
+            if (memAvg) memAvg.textContent = d.memory.avg + '%';
+            const memPeak = document.getElementById('metric-mem-peak');
+            if (memPeak) memPeak.textContent = d.memory.peak + '%';
+
+            const swapVal = document.getElementById('metric-swap-val');
+            if (swapVal) swapVal.textContent = d.swap.percent.toFixed(1);
+            const swapDetail = document.getElementById('metric-swap-detail');
+            if (swapDetail) swapDetail.textContent = `${d.swap.used_mb} MB / ${d.swap.total_mb} MB`;
+            const swapAvg = document.getElementById('metric-swap-avg');
+            if (swapAvg) swapAvg.textContent = d.swap.avg + '%';
+            const swapPeak = document.getElementById('metric-swap-peak');
+            if (swapPeak) swapPeak.textContent = d.swap.peak + '%';
+
+            const diskVal = document.getElementById('metric-disk-val');
+            if (diskVal) diskVal.textContent = d.disk.percent.toFixed(1);
+            const diskDetail = document.getElementById('metric-disk-detail');
+            if (diskDetail) diskDetail.textContent = `${d.disk.used_gb} GB / ${d.disk.total_gb} GB`;
+            const diskFree = document.getElementById('metric-disk-free');
+            if (diskFree) diskFree.textContent = `${d.disk.free_gb} GB`;
+            const diskAvg = document.getElementById('metric-disk-avg');
+            if (diskAvg) diskAvg.textContent = d.disk.avg + '%';
+
+            // Middle Row Texts
+            const netPeak = document.getElementById('metric-net-peak');
+            if (netPeak) netPeak.textContent = d.network.peak_speed;
+            const netUp = document.getElementById('metric-net-up');
+            if (netUp) netUp.textContent = d.network.upload_speed;
+            const netDown = document.getElementById('metric-net-down');
+            if (netDown) netDown.textContent = d.network.download_speed;
+            const netSent = document.getElementById('metric-net-sent');
+            if (netSent) netSent.textContent = d.network.sent_total;
+            const netRecv = document.getElementById('metric-net-recv');
+            if (netRecv) netRecv.textContent = d.network.recv_total;
+            const netAvg = document.getElementById('metric-net-avg');
+            if (netAvg) netAvg.textContent = `↑ ${d.network.avg_up} ↓ ${d.network.avg_down}`;
+
+            const sockTotal = document.getElementById('metric-sock-total');
+            if (sockTotal) sockTotal.textContent = d.sockets.total;
+            const sockTcp = document.getElementById('metric-sock-tcp');
+            if (sockTcp) sockTcp.textContent = d.sockets.tcp;
+            const sockUdp = document.getElementById('metric-sock-udp');
+            if (sockUdp) sockUdp.textContent = d.sockets.udp;
+
+            // Bottom Row Texts
+            const upAst = document.getElementById('metric-uptime-ast');
+            if (upAst) upAst.textContent = d.uptime.asterisk;
+            const upOs = document.getElementById('metric-uptime-os');
+            if (upOs) upOs.textContent = d.uptime.os;
+
+            const pMem = document.getElementById('metric-panel-mem');
+            if (pMem) pMem.textContent = d.panel.memory;
+            const pThr = document.getElementById('metric-panel-threads');
+            if (pThr) pThr.textContent = d.panel.threads;
+
+            const ipV4 = document.getElementById('server-ip-v4');
+            if (ipV4) {
+                ipV4.setAttribute('data-ip', d.server_ips.ipv4);
+                if (!isIpMasked) ipV4.textContent = d.server_ips.ipv4;
+            }
+            const ipV6 = document.getElementById('server-ip-v6');
+            if (ipV6 && d.server_ips.ipv6) {
+                ipV6.setAttribute('data-ip', d.server_ips.ipv6);
+                if (!isIpMasked) ipV6.textContent = d.server_ips.ipv6;
+            }
+
+            renderAllCharts(d);
+        } catch(e) {
+            console.error("Failed to fetch system telemetry:", e);
+        }
+    }
+
+    // Initial render & poll loop
+    window.addEventListener('DOMContentLoaded', () => {
+        fetchSystemMetrics();
+        setInterval(fetchSystemMetrics, 2000);
+    });
+
+    window.addEventListener('resize', () => {
+        if (lastMetricsData) renderAllCharts(lastMetricsData);
+    });
 </script>
 
 </body>

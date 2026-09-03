@@ -4293,6 +4293,301 @@ def get_system_network_info():
     return info
 
 
+try:
+    import psutil
+except ImportError:
+    psutil = None
+
+METRICS_HISTORY = {
+    'timestamps': [],
+    'cpu': [],
+    'memory': [],
+    'swap': [],
+    'disk': [],
+    'net_up': [],
+    'net_down': [],
+    'tcp_sockets': [],
+    'udp_sockets': [],
+    'last_net_bytes': None,
+    'last_net_time': None,
+    'peak_net_speed': 0.0,
+    'total_up_samples': [],
+    'total_down_samples': []
+}
+
+def get_server_metrics():
+    # 1. CPU
+    cpu_pct = 0.0
+    cpu_count = 1
+    cpu_freq_str = ''
+    if psutil:
+        try:
+            cpu_pct = round(psutil.cpu_percent(interval=None), 1)
+            cpu_count = psutil.cpu_count(logical=True) or 1
+            f = psutil.cpu_freq()
+            if f and f.current:
+                cpu_freq_str = f"{f.current / 1000:.2f} GHz"
+        except Exception:
+            pass
+    if not cpu_freq_str:
+        try:
+            with open('/proc/cpuinfo') as f:
+                for line in f:
+                    if 'model name' in line and '@' in line:
+                        cpu_freq_str = line.split('@')[-1].strip()
+                        break
+                    elif 'cpu MHz' in line and not cpu_freq_str:
+                        mhz = float(line.split(':')[1].strip())
+                        cpu_freq_str = f"{mhz / 1000:.2f} GHz"
+        except Exception:
+            pass
+    if not cpu_freq_str:
+        cpu_freq_str = '2.80 GHz'
+    cores_label = f"{cpu_count} Core / {cpu_count}T · {cpu_freq_str}" if cpu_count == 1 else f"{cpu_count} Cores · {cpu_freq_str}"
+
+    # 2. Memory
+    mem_pct = 0.0
+    mem_used_mb = 0.0
+    mem_total_mb = 0.0
+    if psutil:
+        try:
+            vmem = psutil.virtual_memory()
+            mem_pct = round(vmem.percent, 1)
+            mem_used_mb = round(vmem.used / 1024 / 1024, 2)
+            mem_total_mb = round(vmem.total / 1024 / 1024, 2)
+        except Exception:
+            pass
+
+    # 3. Swap
+    swap_pct = 0.0
+    swap_used_mb = 0.0
+    swap_total_mb = 0.0
+    if psutil:
+        try:
+            smem = psutil.swap_memory()
+            swap_pct = round(smem.percent, 1)
+            swap_used_mb = round(smem.used / 1024 / 1024, 2)
+            swap_total_mb = round(smem.total / 1024 / 1024, 2)
+        except Exception:
+            pass
+
+    # 4. Disk
+    disk_pct = 0.0
+    disk_used_gb = 0.0
+    disk_total_gb = 0.0
+    disk_free_gb = 0.0
+    if psutil:
+        try:
+            dusage = psutil.disk_usage('/')
+            disk_pct = round(dusage.percent, 1)
+            disk_used_gb = round(dusage.used / 1024 / 1024 / 1024, 2)
+            disk_total_gb = round(dusage.total / 1024 / 1024 / 1024, 2)
+            disk_free_gb = round(dusage.free / 1024 / 1024 / 1024, 2)
+        except Exception:
+            pass
+
+    # 5. Network IO & Rates
+    up_speed = 0.0
+    down_speed = 0.0
+    bytes_sent = 0
+    bytes_recv = 0
+    if psutil:
+        try:
+            net_io = psutil.net_io_counters()
+            bytes_sent = net_io.bytes_sent
+            bytes_recv = net_io.bytes_recv
+            now = time.time()
+            if METRICS_HISTORY['last_net_bytes'] and METRICS_HISTORY['last_net_time']:
+                dt = max(0.2, now - METRICS_HISTORY['last_net_time'])
+                d_sent = max(0, bytes_sent - METRICS_HISTORY['last_net_bytes'][0])
+                d_recv = max(0, bytes_recv - METRICS_HISTORY['last_net_bytes'][1])
+                up_speed = d_sent / dt
+                down_speed = d_recv / dt
+                if up_speed + down_speed > METRICS_HISTORY['peak_net_speed']:
+                    METRICS_HISTORY['peak_net_speed'] = up_speed + down_speed
+            METRICS_HISTORY['last_net_bytes'] = (bytes_sent, bytes_recv)
+            METRICS_HISTORY['last_net_time'] = now
+        except Exception:
+            pass
+
+    METRICS_HISTORY['total_up_samples'].append(up_speed)
+    METRICS_HISTORY['total_down_samples'].append(down_speed)
+    if len(METRICS_HISTORY['total_up_samples']) > 300:
+        METRICS_HISTORY['total_up_samples'].pop(0)
+        METRICS_HISTORY['total_down_samples'].pop(0)
+
+    avg_up = sum(METRICS_HISTORY['total_up_samples']) / max(1, len(METRICS_HISTORY['total_up_samples']))
+    avg_down = sum(METRICS_HISTORY['total_down_samples']) / max(1, len(METRICS_HISTORY['total_down_samples']))
+
+    # 6. Sockets (TCP/UDP)
+    sock_stats = {'total': 0, 'tcp': 0, 'udp': 0}
+    try:
+        res = subprocess.run(['ss', '-s'], capture_output=True, text=True, timeout=2)
+        out = res.stdout
+        m_tot = re.search(r'Total:\s*(\d+)', out)
+        m_tcp = re.search(r'TCP:\s*(\d+)', out)
+        m_udp = re.search(r'UDP\s+(\d+)', out)
+        total = int(m_tot.group(1)) if m_tot else 0
+        tcp = int(m_tcp.group(1)) if m_tcp else 0
+        udp = int(m_udp.group(1)) if m_udp else 0
+        if not total: total = tcp + udp
+        sock_stats = {'total': total, 'tcp': tcp, 'udp': udp}
+    except Exception:
+        pass
+
+    # 7. Uptime
+    os_sec = 86400
+    if psutil:
+        try:
+            os_sec = time.time() - psutil.boot_time()
+        except Exception:
+            pass
+    os_str = f"{int(os_sec // 86400)}d {int((os_sec % 86400) // 3600)}h"
+    ast_str = os_str
+    try:
+        res = subprocess.run(['asterisk', '-rx', 'core show uptime seconds'], capture_output=True, text=True, timeout=2)
+        m = re.search(r'System uptime:\s*(\d+)', res.stdout)
+        if m:
+            sec = int(m.group(1))
+            ast_str = f"{int(sec // 86400)}d {int((sec % 86400) // 3600)}h"
+    except Exception:
+        pass
+
+    # 8. Panel process stats
+    panel_mem_mb = 15.0
+    panel_threads = 1
+    if psutil:
+        try:
+            proc = psutil.Process(os.getpid())
+            panel_mem_mb = round(proc.memory_info().rss / 1024 / 1024, 2)
+            panel_threads = proc.num_threads()
+        except Exception:
+            pass
+
+    # 9. Server IP addresses
+    server_ipv4 = '127.0.0.1'
+    server_ipv6 = ''
+    try:
+        res = subprocess.run(['ip', '-j', 'addr', 'show'], capture_output=True, text=True, timeout=2)
+        if res.returncode == 0:
+            ifaces = json.loads(res.stdout)
+            for iface in ifaces:
+                if iface.get('ifname') == 'lo':
+                    continue
+                for a in iface.get('addr_info', []):
+                    if a.get('family') == 'inet' and not a.get('local', '').startswith('127.'):
+                        if server_ipv4 == '127.0.0.1':
+                            server_ipv4 = a.get('local')
+                    elif a.get('family') == 'inet6' and not a.get('local', '').startswith('fe80:'):
+                        if not server_ipv6:
+                            server_ipv6 = a.get('local')
+    except Exception:
+        pass
+
+    # Helper formatters
+    def format_bytes(b):
+        if b >= 1024**3: return f"{b / (1024**3):.2f} GB"
+        if b >= 1024**2: return f"{b / (1024**2):.2f} MB"
+        if b >= 1024: return f"{b / 1024:.2f} KB"
+        return f"{b} B"
+
+    def format_speed(bps):
+        if bps >= 1024**2: return f"{bps / (1024**2):.2f} MB/s"
+        if bps >= 1024: return f"{bps / 1024:.2f} KB/s"
+        return f"{bps:.2f} B/s"
+
+    # History buffers (maintain last 30 points for sparklines & live graphs)
+    METRICS_HISTORY['timestamps'].append(datetime.datetime.now().strftime('%H:%M:%S'))
+    METRICS_HISTORY['cpu'].append(cpu_pct)
+    METRICS_HISTORY['memory'].append(mem_pct)
+    METRICS_HISTORY['swap'].append(swap_pct)
+    METRICS_HISTORY['disk'].append(disk_pct)
+    METRICS_HISTORY['net_up'].append(round(up_speed / 1024, 2))
+    METRICS_HISTORY['net_down'].append(round(down_speed / 1024, 2))
+    METRICS_HISTORY['tcp_sockets'].append(sock_stats['tcp'])
+    METRICS_HISTORY['udp_sockets'].append(sock_stats['udp'])
+
+    MAX_POINTS = 30
+    for k in ['timestamps', 'cpu', 'memory', 'swap', 'disk', 'net_up', 'net_down', 'tcp_sockets', 'udp_sockets']:
+        if len(METRICS_HISTORY[k]) > MAX_POINTS:
+            METRICS_HISTORY[k] = METRICS_HISTORY[k][-MAX_POINTS:]
+
+    # Peak speed fallback if zero
+    peak_val = METRICS_HISTORY['peak_net_speed']
+    if peak_val <= 0:
+        peak_val = max(up_speed + down_speed, 1024 * 50)
+
+    return {
+        'cpu': {
+            'percent': cpu_pct,
+            'cores': cores_label,
+            'avg': round(sum(METRICS_HISTORY['cpu']) / max(1, len(METRICS_HISTORY['cpu'])), 1),
+            'peak': round(max(METRICS_HISTORY['cpu'] or [cpu_pct]), 1),
+            'history': list(METRICS_HISTORY['cpu'])
+        },
+        'memory': {
+            'percent': mem_pct,
+            'used_mb': mem_used_mb,
+            'total_mb': mem_total_mb,
+            'avg': round(sum(METRICS_HISTORY['memory']) / max(1, len(METRICS_HISTORY['memory'])), 1),
+            'peak': round(max(METRICS_HISTORY['memory'] or [mem_pct]), 1),
+            'history': list(METRICS_HISTORY['memory'])
+        },
+        'swap': {
+            'percent': swap_pct,
+            'used_mb': swap_used_mb,
+            'total_mb': swap_total_mb,
+            'avg': round(sum(METRICS_HISTORY['swap']) / max(1, len(METRICS_HISTORY['swap'])), 1),
+            'peak': round(max(METRICS_HISTORY['swap'] or [swap_pct]), 1),
+            'history': list(METRICS_HISTORY['swap'])
+        },
+        'disk': {
+            'percent': disk_pct,
+            'used_gb': disk_used_gb,
+            'total_gb': disk_total_gb,
+            'free_gb': disk_free_gb,
+            'avg': disk_pct,
+            'history': list(METRICS_HISTORY['disk'])
+        },
+        'network': {
+            'upload_speed': format_speed(up_speed),
+            'download_speed': format_speed(down_speed),
+            'upload_kb': round(up_speed / 1024, 2),
+            'download_kb': round(down_speed / 1024, 2),
+            'peak_speed': format_speed(peak_val),
+            'sent_total': format_bytes(bytes_sent),
+            'recv_total': format_bytes(bytes_recv),
+            'avg_up': format_speed(avg_up),
+            'avg_down': format_speed(avg_down),
+            'history_up': list(METRICS_HISTORY['net_up']),
+            'history_down': list(METRICS_HISTORY['net_down'])
+        },
+        'sockets': {
+            'total': sock_stats['total'],
+            'tcp': sock_stats['tcp'],
+            'udp': sock_stats['udp'],
+            'history_tcp': list(METRICS_HISTORY['tcp_sockets']),
+            'history_udp': list(METRICS_HISTORY['udp_sockets'])
+        },
+        'uptime': {
+            'asterisk': ast_str,
+            'os': os_str
+        },
+        'panel': {
+            'memory': f"{panel_mem_mb} MB",
+            'threads': panel_threads
+        },
+        'server_ips': {
+            'ipv4': server_ipv4,
+            'ipv6': server_ipv6
+        },
+        'timestamps': list(METRICS_HISTORY['timestamps'])
+    }
+
+@app.route('/api/system/metrics', methods=['GET'])
+def api_system_metrics():
+    return jsonify(get_server_metrics())
+
 def network_guardian_startup_check():
     try:
         cfg = load_integrations()
@@ -5319,7 +5614,8 @@ def index():
         amocrm_account=get_amocrm_account_info(),
         antifraud=get_antifraud_status(),
         log_quota=get_log_quota_status(),
-        sip_groups=get_sip_groups()
+        sip_groups=get_sip_groups(),
+        server_metrics=get_server_metrics()
     ))
     resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     resp.headers['Pragma'] = 'no-cache'
