@@ -5,3 +5,6 @@ __pycache__/
 .env
 *.log
 call_sync_locks/
+.idea/
+.gigaide/
+*.session

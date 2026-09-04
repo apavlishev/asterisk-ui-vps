@@ -5803,6 +5803,37 @@ def api_storage_test_integrity():
                 logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ ОШИБКА ЦЕЛОСТНОСТИ: Контрольные суммы не совпали.")
                 return jsonify({'success': False, 'logs': logs})
 
+        elif provider in ['amocrm', 'amocrm_pro']:
+            subdomain = (data.get('subdomain') or cfg.get('amocrm', {}).get('subdomain', '')).strip()
+            token = (data.get('token') or cfg.get('amocrm', {}).get('token', '')).strip()
+            if not subdomain or not token:
+                logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ Ошибка: Не указан субдомен или Bearer токен amoCRM.")
+                return jsonify({'success': False, 'logs': logs})
+
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 🌐 Подключение к amoCRM API v4 (https://{subdomain}.amocrm.ru)...")
+            headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
+            r_acc = requests.get(f"https://{subdomain}.amocrm.ru/api/v4/account", headers=headers, timeout=5)
+            if r_acc.status_code != 200:
+                logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ Ошибка авторизации в amoCRM (HTTP {r_acc.status_code}): {r_acc.text[:200]}")
+                return jsonify({'success': False, 'logs': logs})
+
+            acc_data = r_acc.json()
+            acc_id = acc_data.get('id')
+            acc_name = acc_data.get('name')
+            currency = acc_data.get('currency_symbol', '₽')
+            logs.append(f"[{time.strftime('%H:%M:%S')}] ✅ Авторизация успешна! Аккаунт: «{acc_name}» (ID: {acc_id}, Валюта: {currency})")
+
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 🔍 Проверка доступа к воронкам продаж (leads/pipelines)...")
+            r_pipe = requests.get(f"https://{subdomain}.amocrm.ru/api/v4/leads/pipelines", headers=headers, timeout=5)
+            if r_pipe.status_code == 200:
+                pipes = r_pipe.json().get('_embedded', {}).get('pipelines', [])
+                logs.append(f"[{time.strftime('%H:%M:%S')}] ✅ Доступ к воронкам подтвержден! Найдено активных воронок: {len(pipes)}")
+            else:
+                logs.append(f"[{time.strftime('%H:%M:%S')}] ⚠️ Предупреждение при чтении воронок: HTTP {r_pipe.status_code}")
+
+            logs.append(f"[{time.strftime('%H:%M:%S')}] 🏆 ВЕРИФИКАЦИЯ УСПЕШНА: Интеграция с amoCRM API v4 полностью работоспособна!")
+            return jsonify({'success': True, 'logs': logs})
+
     except Exception as e:
         logs.append(f"[{time.strftime('%H:%M:%S')}] ❌ Критическая ошибка выполнения теста: {str(e)}")
         return jsonify({'success': False, 'logs': logs})
@@ -5853,6 +5884,7 @@ def api_ivr_save_canvas():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/settings/ftp', methods=['POST'])
 def save_ftp():
     cfg = load_integrations()
     enabled = True if request.form.get('enabled') else False
@@ -5876,6 +5908,94 @@ def save_ftp():
 
     flash('Настройки FTP-хранилища и HTTP-ссылок успешно сохранены!')
     return redirect(url_for('index'))
+
+
+@app.route('/settings/amocrm', methods=['GET', 'POST'])
+def save_amocrm():
+    if request.method == 'GET':
+        return redirect(url_for('index') + '?tab=plugin-amocrm_pro')
+
+    cfg = load_integrations()
+    amo = cfg.get('amocrm', {})
+
+    amo['enabled'] = True if request.form.get('enabled') else False
+    amo['send_internal'] = True if request.form.get('send_internal') else False
+    amo['subdomain'] = request.form.get('subdomain', '').strip()
+    amo['token'] = request.form.get('token', '').strip()
+
+    if 'routing_mode' in request.form:
+        amo['routing_mode'] = request.form.get('routing_mode', 'default').strip()
+    if 'pipeline_id' in request.form:
+        amo['pipeline_id'] = request.form.get('pipeline_id', '').strip()
+    if 'status_id' in request.form:
+        amo['status_id'] = request.form.get('status_id', '').strip()
+
+    if 'audio_mode' in request.form:
+        amo['audio_mode'] = request.form.get('audio_mode', 'cloud_link').strip()
+    if 'cloud_provider' in request.form:
+        amo['cloud_provider'] = request.form.get('cloud_provider', 'auto').strip()
+
+    # Channel mappings (GSM pool, SIP trunks)
+    if 'channel_mapping' not in amo:
+        amo['channel_mapping'] = {}
+    for key, val in request.form.items():
+        if key.startswith('chan_pipeline_'):
+            chan_id = key[len('chan_pipeline_'):]
+            stat_val = request.form.get(f'chan_status_{chan_id}', '').strip()
+            amo['channel_mapping'][chan_id] = {
+                'pipeline_id': val.strip(),
+                'status_id': stat_val
+            }
+
+    # Operator mappings
+    if 'operator_pipeline_mapping' not in amo:
+        amo['operator_pipeline_mapping'] = {}
+    for key, val in request.form.items():
+        if key.startswith('op_pipeline_'):
+            op_ext = key[len('op_pipeline_'):]
+            stat_val = request.form.get(f'op_status_{op_ext}', '').strip()
+            amo['operator_pipeline_mapping'][op_ext] = {
+                'pipeline_id': val.strip(),
+                'status_id': stat_val
+            }
+
+    cfg['amocrm'] = amo
+    save_integrations(cfg)
+
+    flash('Настройки amoCRM успешно сохранены!')
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.is_json:
+        return jsonify({'status': 'ok', 'message': 'Настройки amoCRM успешно сохранены!'})
+    return redirect(request.referrer or (url_for('index') + '?tab=plugin-amocrm_pro'))
+
+
+@app.route('/settings/amocrm-seats', methods=['POST'])
+def save_amocrm_seats():
+    cfg = load_integrations()
+    if 'amocrm' not in cfg:
+        cfg['amocrm'] = {}
+    if 'user_mapping' not in cfg['amocrm']:
+        cfg['amocrm']['user_mapping'] = {}
+
+    for key, val in request.form.items():
+        if key.startswith('seat_'):
+            ext = key[len('seat_'):]
+            cfg['amocrm']['user_mapping'][ext] = val.strip()
+
+    save_integrations(cfg)
+    flash('Посадочные места amoCRM успешно сохранены!')
+    return redirect(request.referrer or (url_for('index') + '?tab=plugin-amocrm_pro'))
+
+
+@app.route('/action/clear-amocrm-log', methods=['POST'])
+def action_clear_amocrm_log():
+    try:
+        if os.path.exists(AMOCRM_LOG):
+            with open(AMOCRM_LOG, 'w', encoding='utf-8') as f:
+                f.write('')
+        flash('Лог amoCRM успешно очищен!')
+    except Exception as e:
+        flash(f'Ошибка очистки лога amoCRM: {e}')
+    return redirect(request.referrer or (url_for('index') + '?tab=plugin-amocrm_pro'))
 
 
 @app.route('/settings/yandex-disk', methods=['POST'])
@@ -6355,6 +6475,41 @@ def api_amocrm_pipelines():
             return jsonify({'status': 'error', 'message': f'amoCRM API HTTP {resp.status_code}', 'pipelines': []})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e), 'pipelines': []})
+
+
+@app.route('/api/amocrm/users', methods=['GET'])
+def api_amocrm_users():
+    """Fetches users / managers from amoCRM API."""
+    cfg = load_integrations()
+    amo = cfg.get('amocrm', {})
+    subdomain = amo.get('subdomain', '').strip()
+    token = amo.get('token', '').strip()
+
+    if not subdomain or not token:
+        return jsonify({'status': 'error', 'message': 'amoCRM не настроен или отсутствует токен', 'users': []})
+
+    url = f"https://{subdomain}.amocrm.ru/api/v4/users"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+    try:
+        resp = requests.get(url, headers=headers, timeout=5)
+        if resp.status_code == 200:
+            data = resp.json()
+            raw_users = data.get('_embedded', {}).get('users', [])
+            users = []
+            for u in raw_users:
+                users.append({
+                    'id': u.get('id'),
+                    'name': u.get('name'),
+                    'email': u.get('email', '')
+                })
+            return jsonify({'status': 'ok', 'users': users})
+        else:
+            return jsonify({'status': 'error', 'message': f'amoCRM API HTTP {resp.status_code}', 'users': []})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e), 'users': []})
 
 
 @app.route('/api/amocrm/push-call', methods=['POST'])

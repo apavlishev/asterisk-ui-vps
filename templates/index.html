@@ -5670,7 +5670,13 @@
         // Restore active tab
         document.addEventListener('DOMContentLoaded', () => {
             initSelect2DestinationPicker();
-            const saved = localStorage.getItem('active_tab_vps') || 'dashboard';
+            const urlParams = new URLSearchParams(window.location.search);
+            let urlTab = urlParams.get('tab');
+            if (!urlTab && window.location.hash) {
+                const h = window.location.hash.replace('#tab-', '').replace('#', '');
+                if (h) urlTab = h;
+            }
+            const saved = urlTab || localStorage.getItem('active_tab_vps') || 'dashboard';
             switchTab(saved);
         });
     </script>
