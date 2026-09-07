@@ -6429,7 +6429,35 @@ def get_call_transcripts(filename):
         with open(transcript_path, 'r', encoding='utf-8') as f:
             for line in f:
                 if line.strip():
-                    lines.append(json.loads(line))
+                    try:
+                        lines.append(json.loads(line))
+                    except Exception:
+                        pass
+                        
+        first_ts = None
+        for msg in lines:
+            ts = msg.get('timestamp')
+            if ts is not None and first_ts is None:
+                try:
+                    first_ts = float(ts)
+                except Exception:
+                    pass
+            
+            if 'offset_sec' not in msg or msg['offset_sec'] is None:
+                if ts is not None and first_ts is not None:
+                    try:
+                        msg['offset_sec'] = round(max(0.0, float(ts) - first_ts), 1)
+                    except Exception:
+                        msg['offset_sec'] = 0.0
+                else:
+                    msg['offset_sec'] = 0.0
+
+            if 'start_time' not in msg or not msg['start_time']:
+                sec = float(msg.get('offset_sec', 0.0))
+                m = int(sec) // 60
+                s = int(sec) % 60
+                msg['start_time'] = f"{m:02d}:{s:02d}"
+
         return jsonify({"status": "ok", "transcripts": lines})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})

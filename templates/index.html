@@ -7774,11 +7774,14 @@
 
             <!-- Transcription Box -->
             <div>
-                <h4 class="text-sm font-bold text-on-surface mb-2.5 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[18px] text-primary">chat_bubble</span>
-                    Транскрибация ИИ
+                <h4 class="text-sm font-bold text-on-surface mb-2.5 flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px] text-primary">chat_bubble</span>
+                        <span>Транскрибация ИИ</span>
+                    </span>
+                    <span class="text-[11px] text-on-surface-variant font-normal">Нажмите на таймкод фразы для перемотки аудио</span>
                 </h4>
-                <div class="bg-surface-container-lowest rounded-2xl border border-outline/10 p-4 min-h-[140px] max-h-64 overflow-y-auto space-y-3" id="cd_transcription">
+                <div class="bg-surface-container-lowest rounded-2xl border border-outline/10 p-5 min-h-[160px] max-h-[420px] overflow-y-auto space-y-4 shadow-inner" id="cd_transcription">
                     <div class="flex items-center justify-center h-28 text-on-surface-variant text-sm gap-2">
                         <span class="material-symbols-outlined animate-spin">refresh</span> Загрузка...
                     </div>
@@ -7927,17 +7930,42 @@
                 }
                 
                 transBox.innerHTML = '';
+                const clientNumber = escapeHtml(call.src || 'Клиент');
+                const operatorNumber = escapeHtml(call.dst || 'Оператор');
+
                 data.transcripts.forEach(msg => {
                     const isClient = msg.speaker === 'client';
-                    const color = isClient ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-surface-container-high text-on-surface border border-outline/10';
-                    const align = isClient ? 'items-start' : 'items-end';
-                    const name = isClient ? 'Клиент (RX)' : 'Оператор (TX)';
+                    const offset = msg.offset_sec !== undefined ? parseFloat(msg.offset_sec) : 0;
+                    const startTime = msg.start_time || '00:00';
+                    const phoneNum = isClient ? clientNumber : operatorNumber;
+                    const roleLabel = isClient ? 'Клиент' : 'Оператор';
+                    const channelLabel = isClient ? 'RX' : 'TX';
                     
                     const bubble = document.createElement('div');
-                    bubble.className = `flex flex-col ${align} w-full`;
+                    bubble.className = `flex flex-col ${isClient ? 'items-start' : 'items-end'} w-full group/msg`;
+
+                    const headerColor = isClient ? 'text-primary' : 'text-slate-300';
+                    const timeBadge = `
+                        <button type="button" onclick="seekAudio(${offset})" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-high hover:bg-primary/20 hover:text-primary text-[11px] font-mono text-on-surface-variant border border-outline/20 transition-all cursor-pointer shadow-2xs" title="Перейти к ${startTime} и воспроизвести">
+                            <span class="material-symbols-outlined text-[13px]">play_circle</span>
+                            <span>${startTime}</span>
+                        </button>
+                    `;
+
+                    const bubbleColor = isClient 
+                        ? 'bg-primary/10 text-on-surface border border-primary/20 rounded-2xl rounded-tl-sm' 
+                        : 'bg-surface-container-high text-on-surface border border-outline/10 rounded-2xl rounded-tr-sm';
+
                     bubble.innerHTML = `
-                        <span class="text-[10px] font-bold uppercase text-on-surface-variant mb-1 ml-1 mr-1">${name}</span>
-                        <div class="px-4 py-2.5 rounded-2xl ${color} max-w-[85%] text-sm font-medium leading-relaxed shadow-sm whitespace-pre-wrap">
+                        <div class="flex items-center gap-2 mb-1.5 px-1 text-xs">
+                            <span class="inline-flex items-center gap-1 font-mono font-bold ${headerColor}">
+                                <span class="material-symbols-outlined text-[15px]">${isClient ? 'person' : 'support_agent'}</span>
+                                <span>${phoneNum}</span>
+                            </span>
+                            <span class="text-[10px] uppercase font-bold text-on-surface-variant/70 tracking-wider">(${roleLabel} · ${channelLabel})</span>
+                            ${timeBadge}
+                        </div>
+                        <div class="px-5 py-3 ${bubbleColor} max-w-[85%] text-sm font-medium leading-relaxed shadow-sm whitespace-pre-wrap selection:bg-primary selection:text-white">
                             ${escapeHtml(msg.text)}
                         </div>
                     `;
@@ -7950,6 +7978,17 @@
 
         // Show Modal
         showModal();
+    }
+
+    function seekAudio(sec) {
+        if (!audio || !audio.src) return;
+        audio.currentTime = parseFloat(sec) || 0;
+        if (audio.paused) {
+            audio.play().then(() => {
+                isPlaying = true;
+                playBtn.innerHTML = '<span class="material-symbols-outlined text-[24px]">pause</span>';
+            }).catch(e => console.log(e));
+        }
     }
 
     function showModal() {

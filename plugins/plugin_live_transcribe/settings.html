@@ -173,28 +173,49 @@
                 const isOperator = data.speaker === 'operator';
                 const turnId = data.turn_id !== undefined ? data.turn_id : 0;
                 const turnKey = (data.call_id || 'call') + '_' + data.speaker + '_' + turnId;
+                const startTime = data.start_time || '00:00';
+
+                // Extract numbers from call_id if available (YYYYMMDD-HHMMSS_src_dst)
+                let clientNum = 'Клиент';
+                let operNum = 'Оператор';
+                if (data.call_id && data.call_id.includes('_')) {
+                    const parts = data.call_id.split('_');
+                    if (parts.length >= 3) {
+                        clientNum = parts[1];
+                        operNum = parts[2].replace('.wav', '').replace('.jsonl', '');
+                    }
+                }
+                const phoneNum = isOperator ? operNum : clientNum;
+                const roleLabel = isOperator ? 'Оператор (TX)' : 'Клиент (RX)';
                 
                 let bubbleObj = currentTurnBubbles[turnKey];
 
                 if (!bubbleObj || !document.body.contains(bubbleObj.bubble)) {
                     const el = document.createElement('div');
-                    el.className = 'flex flex-col ' + (isOperator ? 'items-end' : 'items-start') + ' transition-all duration-200';
+                    el.className = 'flex flex-col ' + (isOperator ? 'items-end' : 'items-start') + ' transition-all duration-200 w-full mb-3';
                     el.id = 'bubble-' + turnKey;
                     
-                    const name = document.createElement('div');
-                    name.className = 'text-[10px] font-bold mb-1 font-sans ' + (isOperator ? 'text-primary' : 'text-slate-400');
-                    name.innerText = isOperator ? '[Оператор]' : '[Клиент]';
+                    const header = document.createElement('div');
+                    header.className = 'flex items-center gap-2 mb-1.5 px-1 text-xs ' + (isOperator ? 'text-primary' : 'text-slate-300');
+                    header.innerHTML = `
+                        <span class="inline-flex items-center gap-1 font-mono font-bold">
+                            <span class="material-symbols-outlined text-[14px]">${isOperator ? 'support_agent' : 'person'}</span>
+                            <span>${escapeHtml(phoneNum)}</span>
+                        </span>
+                        <span class="text-[10px] text-slate-400">(${roleLabel})</span>
+                        <span class="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] font-mono text-slate-300 border border-slate-700">${startTime}</span>
+                    `;
                     
                     const bubble = document.createElement('div');
-                    bubble.className = 'max-w-[75%] px-4 py-2.5 rounded-2xl text-sm font-sans leading-relaxed shadow-sm transition-all ' + 
-                        (isOperator ? 'bg-primary/20 text-blue-100 rounded-br-none border border-primary/30' : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none');
+                    bubble.className = 'max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm transition-all whitespace-pre-wrap ' + 
+                        (isOperator ? 'bg-primary/20 text-blue-100 rounded-tr-sm border border-primary/30' : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-tl-sm');
                     
                     if (!data.is_final) {
                         bubble.classList.add('opacity-90');
                     }
                     bubble.innerText = data.text;
                     
-                    el.appendChild(name);
+                    el.appendChild(header);
                     el.appendChild(bubble);
                     box.appendChild(el);
                     

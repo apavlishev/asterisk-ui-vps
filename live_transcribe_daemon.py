@@ -97,12 +97,31 @@ def run_post_call_diarize(call_id, full_wav_path):
         messages = []
         current_speaker = None
         current_words = []
+        current_start_offset = 0.0
+
+        def parse_offset(offset_val):
+            if offset_val is None:
+                return 0.0
+            if isinstance(offset_val, (int, float)):
+                return float(offset_val)
+            s = str(offset_val).rstrip('s')
+            try:
+                return float(s)
+            except Exception:
+                return 0.0
+
+        def fmt_sec(sec):
+            m = int(sec) // 60
+            s = int(sec) % 60
+            return f"{m:02d}:{s:02d}"
+
         for step in interaction.steps:
             if getattr(step, 'content', None):
                 for content in step.content:
                     if getattr(content, 'annotations', None):
                         for ann in content.annotations:
                             spk = 'client' if getattr(ann, 'speaker', '') == 'spk:0' else 'operator'
+                            st_off = parse_offset(getattr(ann, 'start_offset', None))
                             if spk != current_speaker:
                                 if current_words:
                                     messages.append({
@@ -110,10 +129,13 @@ def run_post_call_diarize(call_id, full_wav_path):
                                         "call_id": call_id,
                                         "speaker": current_speaker,
                                         "text": ' '.join(current_words),
+                                        "offset_sec": current_start_offset,
+                                        "start_time": fmt_sec(current_start_offset),
                                         "timestamp": time.time()
                                     })
                                     current_words = []
                                 current_speaker = spk
+                                current_start_offset = round(st_off, 1)
                             current_words.append(getattr(ann, 'text', ''))
                         if current_words:
                             messages.append({
@@ -121,8 +143,11 @@ def run_post_call_diarize(call_id, full_wav_path):
                                 "call_id": call_id,
                                 "speaker": current_speaker,
                                 "text": ' '.join(current_words),
+                                "offset_sec": current_start_offset,
+                                "start_time": fmt_sec(current_start_offset),
                                 "timestamp": time.time()
                             })
+                            current_words = []
 
         if messages:
             clean_id = get_clean_id(call_id)
@@ -138,35 +163,23 @@ async def stream_channel_to_gemini_live(call_id, wav_path, speaker):
     api_key, prim_lang, langs, vocab = get_transcribe_config()
     if not api_key: return
 
-    client = genai.Client(api_key=api_key)
-    
-    lang_name_map = {
-        'ru-RU': 'Russian (русский)',
-        'en-US': 'English (английский)',
-        'ar-SA': 'Arabic (العربية)',
-        'es-ES': 'Spanish (español)',
-        'zh-CN': 'Chinese (中文)',
-        'de-DE': 'German (Deutsch)',
-        'tr-TR': 'Turkish (Türkçe)'
-    }
-    
-    target_lang_desc = ", ".join([lang_name_map.get(l, l) for l in langs])
-    sys_prompt = f"You are a real-time speech-to-text transcriber for phone conversations. Accurately transcribe speech in the following priority languages: {target_lang_desc}. Write strictly in the exact native script of the spoken words with correct punctuation. Never translate into other languages."
-    if vocab:
-        sys_prompt += f" Important vocabulary/names to recognize accurately: {', '.join(vocab)}."
-
-    config = {
-        "response_modalities": ["TEXT"],
-        "system_instruction": {
-            "parts": [{"text": sys_prompt}]
-        }
-    }
-
-    logger.info(f"[{speaker.upper()}] Starting Gemini 3.5 Live for {call_id} (Languages: {langs})")
-
     try:
-        async with client.aio.live.connect(model="gemini-3.5-transcribe-live", config=config) as session:
-            logger.info(f"[{speaker.upper()}] Live connected for {call_id}")
+        client = genai.Client(api_key=api_key)
+        
+        realtime_config = types.LiveConnectConfig(
+            response_modalities=[types.LiveServerContentModality.TEXT],
+            transcription_config=types.LiveClientRealtimeTranscriptionConfig(
+                language_codes=langs
+            )
+        )
+        if vocab:
+            realtime_config.custom_vocabulary = vocab
+
+        async with client.aio.live.connect(
+            model="gemini-3.5-transcribe-live",
+            config=realtime_config
+        ) as session:
+            logger.info(f"Connected to Gemini 3.5 Live for {speaker} in {call_id} (Languages: {langs})")
 
             async def send_loop():
                 while not os.path.exists(wav_path):
@@ -194,6 +207,8 @@ async def stream_channel_to_gemini_live(call_id, wav_path, speaker):
                         if idle_count >= 8:
                             break
 
+            call_start_time = time.time()
+
             async def receive_loop():
                 current_turn = 0
                 last_text = ""
@@ -211,6 +226,10 @@ async def stream_channel_to_gemini_live(call_id, wav_path, speaker):
 
                     if text and text != last_text:
                         last_text = text
+                        elapsed = max(0.0, time.time() - call_start_time)
+                        m = int(elapsed) // 60
+                        s = int(elapsed) % 60
+                        st_time = f"{m:02d}:{s:02d}"
                         logger.info(f"[{speaker.upper()} {'FINAL' if is_final else 'INTERIM'}] {text}")
                         await broadcast({
                             "type": "transcription",
@@ -218,6 +237,8 @@ async def stream_channel_to_gemini_live(call_id, wav_path, speaker):
                             "speaker": speaker,
                             "text": text,
                             "turn_id": current_turn,
+                            "offset_sec": round(elapsed, 1),
+                            "start_time": st_time,
                             "is_final": is_final,
                             "timestamp": time.time()
                         })
