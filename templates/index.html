@@ -329,6 +329,7 @@
                 <button onclick="switchTab('licensing')" id="nav-licensing" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="{{ t.lizenzia_ota }}">
                     <span class="material-symbols-outlined mr-3.5 text-success text-[22px]">verified_user</span>
                     <span class="text-xs font-semibold sidebar-text">{{ t.nav_license or "Лицензия & OTA" }}</span>
+                    <span id="nav-licensing-badge" class="hidden ml-auto text-[9px] px-1.5 py-0.5 rounded-full bg-error text-on-primary font-bold uppercase sidebar-badge">{{ t.update_badge or "New" }}</span>
                 </button>
             </div>
 
@@ -391,6 +392,11 @@
 
                 <button onclick="location.reload()" title="{{ t.obnovit_stranizu }}" class="p-2 rounded-full hover:bg-surface-container text-on-surface-variant transition-colors">
                     <span class="material-symbols-outlined text-[20px]">refresh</span>
+                </button>
+                <!-- UPDATE NOTIFICATION BELL -->
+                <button type="button" id="update-bell" onclick="switchTab('licensing')" title="{{ t.update_check_now or 'Проверить обновления' }}" class="relative p-2 rounded-full hover:bg-surface-container text-on-surface-variant transition-colors hidden">
+                    <span class="material-symbols-outlined text-[20px]">system_update_alt</span>
+                    <span id="update-bell-dot" class="hidden absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-error animate-pulse"></span>
                 </button>
                 <div class="h-6 w-[1px] bg-surface-container"></div>
                 <div class="text-xs text-right hidden sm:block">
@@ -1316,15 +1322,40 @@
                             <span class="material-symbols-outlined text-primary text-2xl">system_update</span>
                             <div>
                                 <h2 class="text-lg font-bold text-on-surface">{{ t.ota_obnovlenie_po }}</h2>
-                                <p class="text-xs text-on-surface-variant">Текущая версия: v{{ current_version }}</p>
+                                <p class="text-xs text-on-surface-variant">{{ t.current_version_label or 'Текущая версия' }}: v<span id="ota-current-version">{{ current_version }}</span></p>
                             </div>
                         </div>
-                        <form action="/action/do-update" method="POST" onsubmit="return confirm('{{ t.zapustit_onlajn_obnovlenie_sis }}');">
-                            <button type="submit" class="px-6 py-2.5 rounded-xl bg-success text-on-primary text-sm font-semibold hover:bg-success/90 transition-all shadow-sm flex items-center gap-2">
-                                <span class="material-symbols-outlined text-[18px]">cloud_download</span>
-                                {{ t.ustanovit_obnovlenie }}
+                        <div class="flex items-center gap-2">
+                            <button type="button" id="ota-check-btn" onclick="checkForUpdates(true)" class="px-4 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-xs font-semibold text-on-surface border border-outline/30 flex items-center gap-2 transition-all">
+                                <span class="material-symbols-outlined text-[16px]">sync</span>
+                                <span>{{ t.update_check_now or 'Проверить обновления' }}</span>
                             </button>
-                        </form>
+                            <form action="/action/do-update" method="POST" onsubmit="return confirm('{{ t.zapustit_onlajn_obnovlenie_sis }}');">
+                                <button type="submit" class="px-6 py-2.5 rounded-xl bg-success text-on-primary text-sm font-semibold hover:bg-success/90 transition-all shadow-sm flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[18px]">cloud_download</span>
+                                    {{ t.ustanovit_obnovlenie }}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- UPDATE STATUS -->
+                    <div id="ota-status-box" class="p-4 rounded-xl bg-surface-container-low border border-outline/20 text-xs text-on-surface-variant flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
+                        <span>{{ t.update_checking or 'Проверка обновлений...' }}</span>
+                    </div>
+
+                    <!-- NEW VERSION + CHANGELOG -->
+                    <div id="ota-update-panel" class="hidden mt-4 p-5 rounded-2xl bg-success/5 border border-success/30 space-y-3">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-success">new_releases</span>
+                                <span id="ota-new-version-title" class="text-sm font-bold text-on-surface"></span>
+                            </div>
+                            <span id="ota-release-date" class="text-[10px] font-mono text-on-surface-variant"></span>
+                        </div>
+                        <div class="text-[11px] font-semibold text-on-surface-variant uppercase tracking-wider">{{ t.whats_new or 'Что нового' }}</div>
+                        <pre id="ota-changelog" class="whitespace-pre-wrap font-sans text-xs text-on-surface leading-relaxed bg-surface rounded-xl p-3.5 border border-outline/20 max-h-72 overflow-y-auto m-0"></pre>
                     </div>
                 </div>
             </div>
@@ -1465,7 +1496,7 @@
                                 <span>{{ t.gsm_guide_1_title or "1. Поддержка передачи голоса (Voice-прошивка)" }}</span>
                             </div>
                             <p class="text-on-surface-variant leading-relaxed">
-                                {{ t.gsm_guide_1_text|safe if t.gsm_guide_1_text else "Обычные модемы для 4G-интернета (HiLink / NDIS) <b>{{ t.ne_umeut_peredavat_golos }}</b> {{ t.v_asterisk_trebuetsa_rejim }} <b>Stick (Serial/Modem)</b> с активными голосовыми AT-командами и поддержкой аудио-потока PCM 8kHz."|safe }}
+                                {% if t.gsm_guide_1_text %}{{ t.gsm_guide_1_text|safe }}{% else %}Обычные модемы для 4G-интернета (HiLink / NDIS) <b>{{ t.ne_umeut_peredavat_golos }}</b> {{ t.v_asterisk_trebuetsa_rejim }} <b>Stick (Serial/Modem)</b> с активными голосовыми AT-командами и поддержкой аудио-потока PCM 8kHz.{% endif %}
                             </p>
                         </div>
 
@@ -1476,7 +1507,7 @@
                                 <span>{{ t.gsm_guide_2_title or "2. Питание USB-хаба (Active USB 2.0 Hub)" }}</span>
                             </div>
                             <p class="text-on-surface-variant leading-relaxed">
-                                {{ t.gsm_guide_2_text|safe if t.gsm_guide_2_text else "В момент установления звонка модем потребляет в пике до <b>{{ t.k_1_5_2_0_amper }}</b>{{ t.pri_podklucenii_bolee_1_2_mode }} <b>{{ t.aktivnyj_usb_hab_s_vnesnim_blo }}</b> {{ t.vo_izbejanie_otvalivania_porto }} <code>/dev/ttyUSB*</code>."|safe }}
+                                {% if t.gsm_guide_2_text %}{{ t.gsm_guide_2_text|safe }}{% else %}В момент установления звонка модем потребляет в пике до <b>{{ t.k_1_5_2_0_amper }}</b>{{ t.pri_podklucenii_bolee_1_2_mode }} <b>{{ t.aktivnyj_usb_hab_s_vnesnim_blo }}</b> {{ t.vo_izbejanie_otvalivania_porto }} <code>/dev/ttyUSB*</code>.{% endif %}
                             </p>
                         </div>
                     </div>
@@ -1555,38 +1586,38 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-surface-container">
-                            {% for t in sip_trunks %}
+                            {% for trk in sip_trunks %}
                             <tr class="hover:bg-surface-container-low/40 transition-colors">
                                 <td class="px-6 py-4">
-                                    <div class="font-bold text-on-surface text-sm">{{ t.name }}</div>
-                                    <div class="text-[10px] font-mono text-on-surface-variant">{{ t.id }}</div>
+                                    <div class="font-bold text-on-surface text-sm">{{ trk.name }}</div>
+                                    <div class="text-[10px] font-mono text-on-surface-variant">{{ trk.id }}</div>
                                 </td>
-                                <td class="px-6 py-4 font-mono text-on-surface text-xs font-semibold">{{ t.host }}:{{ t.port }}</td>
+                                <td class="px-6 py-4 font-mono text-on-surface text-xs font-semibold">{{ trk.host }}:{{ trk.port }}</td>
                                 <td class="px-6 py-4 font-mono text-on-surface-variant text-xs">
-                                    <div>{{ t.username }}</div>
-                                    {% if t.callerid %}<div class="text-[10px] text-primary">CID: {{ t.callerid }}</div>{% endif %}
+                                    <div>{{ trk.username }}</div>
+                                    {% if trk.callerid %}<div class="text-[10px] text-primary">CID: {{ trk.callerid }}</div>{% endif %}
                                 </td>
                                 
                                 <!-- STATUS 1: ИСПОЛЬЗУЕТСЯ ИЛИ НЕТ -->
                                 <td class="px-6 py-4">
-                                    <form action="/settings/sip-trunks/toggle/{{ t.id }}" method="POST" class="inline">
-                                        <button type="submit" class="px-3 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 {{ 'bg-success/10 text-success border border-success/20 hover:bg-success/20' if t.get('enabled', True) else 'bg-surface-container-high text-on-surface-variant border border-outline/30 hover:bg-surface-container' }}" title="{{ t.najmite_dla_pereklucenia }}">
-                                            <span class="w-2 h-2 rounded-full {{ 'bg-success' if t.get('enabled', True) else 'bg-gray-400' }}"></span>
-                                            <span>{{ 'Используется' if t.get('enabled', True) else 'Отключен' }}</span>
+                                    <form action="/settings/sip-trunks/toggle/{{ trk.id }}" method="POST" class="inline">
+                                        <button type="submit" class="px-3 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 {{ 'bg-success/10 text-success border border-success/20 hover:bg-success/20' if trk.get('enabled', True) else 'bg-surface-container-high text-on-surface-variant border border-outline/30 hover:bg-surface-container' }}" title="{{ t.najmite_dla_pereklucenia }}">
+                                            <span class="w-2 h-2 rounded-full {{ 'bg-success' if trk.get('enabled', True) else 'bg-gray-400' }}"></span>
+                                            <span>{{ 'Используется' if trk.get('enabled', True) else 'Отключен' }}</span>
                                         </button>
                                     </form>
                                 </td>
 
                                 <!-- STATUS 2: АВТОРИЗОВАН, НЕТ, ИДЕТ ПОДКЛЮЧЕНИЕ -->
                                 <td class="px-6 py-4">
-                                    {% if not t.get('enabled', True) %}
+                                    {% if not trk.get('enabled', True) %}
                                     <span class="text-xs px-2.5 py-1 rounded-lg bg-surface-container text-on-surface-variant font-mono">{{ t.vyklucen }}</span>
-                                    {% elif t.network_status.status_type == 'registered' %}
+                                    {% elif trk.network_status.status_type == 'registered' %}
                                     <span class="text-xs px-2.5 py-1 rounded-lg bg-success/10 text-success font-semibold border border-success/20 flex items-center gap-1.5 w-fit">
                                         <span class="material-symbols-outlined text-[15px]">verified</span>
-                                        <span>{{ t.network_status.status_text }}</span>
+                                        <span>{{ trk.network_status.status_text }}</span>
                                     </span>
-                                    {% elif t.network_status.status_type == 'connecting' %}
+                                    {% elif trk.network_status.status_type == 'connecting' %}
                                     <span class="text-xs px-2.5 py-1 rounded-lg bg-warning/10 text-warning font-semibold border border-warning/20 flex items-center gap-1.5 w-fit animate-pulse">
                                         <span class="material-symbols-outlined text-[15px] animate-spin">sync</span>
                                         <span>{{ t.idet_podklucenie }}</span>
@@ -1594,16 +1625,16 @@
                                     {% else %}
                                     <span class="text-xs px-2.5 py-1 rounded-lg bg-error/10 text-error font-semibold border border-error/20 flex items-center gap-1.5 w-fit">
                                         <span class="material-symbols-outlined text-[15px]">error</span>
-                                        <span>{{ t.network_status.status_text }}</span>
+                                        <span>{{ trk.network_status.status_text }}</span>
                                     </span>
                                     {% endif %}
                                 </td>
 
                                 <td class="px-6 py-4 text-right space-x-1">
-                                    <button type="button" onclick="openEditTrunkModal('{{ t.id }}', '{{ t.name }}', '{{ t.host }}', '{{ t.port or 5060 }}', '{{ t.username }}', '{{ t.password }}', '{{ t.callerid or '' }}', '{{ t.transport or 'udp' }}', '{{ t.context or '' }}')" class="p-2 rounded-lg text-primary hover:bg-primary/10 transition-colors" title="{{ t.redaktirovat_parametry_tranka }}">
+                                    <button type="button" onclick="openEditTrunkModal('{{ trk.id }}', '{{ trk.name }}', '{{ trk.host }}', '{{ trk.port or 5060 }}', '{{ trk.username }}', '{{ trk.password }}', '{{ trk.callerid or '' }}', '{{ trk.transport or 'udp' }}', '{{ trk.context or '' }}')" class="p-2 rounded-lg text-primary hover:bg-primary/10 transition-colors" title="{{ t.redaktirovat_parametry_tranka }}">
                                         <span class="material-symbols-outlined text-[18px]">edit</span>
                                     </button>
-                                    <form action="/settings/sip-trunks/delete/{{ t.id }}" method="POST" onsubmit="return confirm('Удалить транк {{ t.name }}?');" class="inline">
+                                    <form action="/settings/sip-trunks/delete/{{ trk.id }}" method="POST" onsubmit="return confirm('Удалить транк {{ trk.name }}?');" class="inline">
                                         <button type="submit" class="p-2 rounded-lg text-error hover:bg-error/10 transition-colors" title="{{ t.udalit_trank }}">
                                             <span class="material-symbols-outlined text-[18px]">delete</span>
                                         </button>
@@ -1699,8 +1730,8 @@
                             <select id="ivr-trunk-selector" onchange="switchIvrTrunkRoute(this.value)" class="px-3.5 py-1.5 rounded-xl bg-surface border border-outline text-xs font-bold text-primary cursor-pointer shadow-sm min-w-[260px]">
                                 <option value="default">🌐 {{ t.ivr_opt_default or "Общий сценарий (По умолчанию)" }}</option>
                                 <option value="gsm_pool">{{ t.gsm_modemy_pul_sim_kart }}</option>
-                                {% for t in sip_trunks %}
-                                <option value="{{ t.id }}">📞 SIP Транк: {{ t.name }} ({{ t.host }})</option>
+                                {% for trk in sip_trunks %}
+                                <option value="{{ trk.id }}">📞 SIP Транк: {{ trk.name }} ({{ trk.host }})</option>
                                 {% endfor %}
                             </select>
                             <span id="trunk-route-badge" class="text-[10px] font-mono px-2.5 py-1 rounded-lg bg-surface border border-outline/30 text-on-surface-variant font-bold">default</span>
@@ -2137,23 +2168,23 @@
                                 </div>
 
                                 <!-- EACH CONFIGURED SIP TRUNK -->
-                                {% for t in sip_trunks %}
+                                {% for trk in sip_trunks %}
                                 <div class="p-4 rounded-xl bg-surface border border-outline/30 space-y-3">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2">
                                             <span class="material-symbols-outlined text-primary text-[18px]">call</span>
-                                            <span class="text-xs font-bold text-on-surface">📞 SIP Транк: {{ t.name }} ({{ t.host }})</span>
+                                            <span class="text-xs font-bold text-on-surface">📞 SIP Транк: {{ trk.name }} ({{ trk.host }})</span>
                                         </div>
-                                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-bold">{{ t.id }}</span>
+                                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-bold">{{ trk.id }}</span>
                                     </div>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
                                             <label class="block text-[11px] font-semibold text-on-surface-variant mb-1">{{ t.voronka_amocrm }}</label>
-                                            <select name="chan_pipeline_{{ t.id }}" id="sel_pipe_{{ t.id }}" data-saved="{{ integrations.get('amocrm', {}).get('channel_mapping', {}).get(t.id, {}).get('pipeline_id', '') }}" onchange="handlePipelineChange('{{ t.id }}')" class="amo-pipeline-select w-full"></select>
+                                            <select name="chan_pipeline_{{ trk.id }}" id="sel_pipe_{{ trk.id }}" data-saved="{{ integrations.get('amocrm', {}).get('channel_mapping', {}).get(trk.id, {}).get('pipeline_id', '') }}" onchange="handlePipelineChange('{{ trk.id }}')" class="amo-pipeline-select w-full"></select>
                                         </div>
                                         <div>
                                             <label class="block text-[11px] font-semibold text-on-surface-variant mb-1">{{ t.etap_voronki_status }}</label>
-                                            <select name="chan_status_{{ t.id }}" id="sel_status_{{ t.id }}" data-saved="{{ integrations.get('amocrm', {}).get('channel_mapping', {}).get(t.id, {}).get('status_id', '') }}" class="amo-status-select w-full"></select>
+                                            <select name="chan_status_{{ trk.id }}" id="sel_status_{{ trk.id }}" data-saved="{{ integrations.get('amocrm', {}).get('channel_mapping', {}).get(trk.id, {}).get('status_id', '') }}" class="amo-status-select w-full"></select>
                                         </div>
                                     </div>
                                 </div>
@@ -5678,7 +5709,76 @@
             }
             const saved = urlTab || localStorage.getItem('active_tab_vps') || 'dashboard';
             switchTab(saved);
+            checkForUpdates(false);
         });
+
+        // ================= OTA UPDATE INDICATOR =================
+        let lastUpdateInfo = null;
+        function setUpdateIndicators(hasUpdate) {
+            const bell = document.getElementById('update-bell');
+            const dot = document.getElementById('update-bell-dot');
+            const navBadge = document.getElementById('nav-licensing-badge');
+            if (!bell) return;
+            if (hasUpdate) {
+                bell.classList.remove('hidden');
+                if (dot) dot.classList.remove('hidden');
+                if (navBadge) navBadge.classList.remove('hidden');
+            } else {
+                if (dot) dot.classList.add('hidden');
+                if (navBadge) navBadge.classList.add('hidden');
+            }
+        }
+
+        async function checkForUpdates(manual) {
+            const statusBox = document.getElementById('ota-status-box');
+            const panel = document.getElementById('ota-update-panel');
+            const icon = statusBox ? statusBox.querySelector('.material-symbols-outlined') : null;
+            if (statusBox) {
+                statusBox.classList.remove('hidden');
+                if (icon) { icon.textContent = 'progress_activity'; icon.classList.add('animate-spin'); }
+                statusBox.querySelector('span:last-child').textContent = '{{ t.update_checking or "Проверка обновлений..." }}';
+            }
+            try {
+                const res = await fetch('/api/check-update', { cache: 'no-store' });
+                const data = await res.json();
+                lastUpdateInfo = data;
+
+                if (data && data.has_update) {
+                    if (statusBox) {
+                        statusBox.classList.remove('bg-surface-container-low', 'border-outline/20');
+                        statusBox.classList.add('bg-success/10', 'border-success/30', 'text-success');
+                        if (icon) { icon.textContent = 'new_releases'; icon.classList.remove('animate-spin'); }
+                        statusBox.querySelector('span:last-child').innerHTML =
+                            '{{ t.update_available or "Доступна новая версия" }}: <b>v' + data.latest_version + '</b>';
+                    }
+                    if (panel) panel.classList.remove('hidden');
+                    const tEl = document.getElementById('ota-new-version-title');
+                    if (tEl) tEl.textContent = '{{ t.update_available or "Доступна новая версия" }} v' + data.latest_version;
+                    const dEl = document.getElementById('ota-release-date');
+                    if (dEl) dEl.textContent = data.released_at ? ('{{ t.released_at or "Дата релиза" }}: ' + data.released_at) : '';
+                    const cEl = document.getElementById('ota-changelog');
+                    if (cEl) cEl.textContent = data.changelog || '{{ t.no_changelog or "Описание изменений не указано." }}';
+                    setUpdateIndicators(true);
+                } else {
+                    if (panel) panel.classList.add('hidden');
+                    if (statusBox) {
+                        statusBox.classList.remove('bg-success/10', 'border-success/30', 'text-success');
+                        statusBox.classList.add('bg-surface-container-low', 'border-outline/20', 'text-on-surface-variant');
+                        if (icon) { icon.textContent = 'verified'; icon.classList.remove('animate-spin'); }
+                        statusBox.querySelector('span:last-child').innerHTML = data && data.error
+                            ? data.error
+                            : ('{{ t.update_latest or "Установлена последняя версия" }} (v' + (data.current_version || '') + ')');
+                    }
+                    setUpdateIndicators(false);
+                }
+            } catch (e) {
+                if (statusBox) {
+                    if (icon) { icon.textContent = 'error'; icon.classList.remove('animate-spin'); }
+                    statusBox.querySelector('span:last-child').textContent = '{{ t.update_check_failed or "Не удалось проверить обновления" }}';
+                }
+                setUpdateIndicators(false);
+            }
+        }
     </script>
 
     <!-- MODAL: PROMPT SET PASSWORD (NON-LOCAL IP DETECTED) -->
@@ -7119,26 +7219,26 @@
     "zh": "安装新插件",
     "ru": "Установить плагин"
   },
-  "{{ t.gsm_guide_1_title or "1. Поддержка передачи голоса (Voice-прошивка)" }}": {
+  "1. Поддержка передачи голоса (Voice-прошивка)": {
     "en": "1. Voice Calls Support (Voice-Enabled Firmware)",
     "es": "1. Soporte de Llamadas de Voz (Firmware Habilitado)",
     "ar": "1. دعم المكالمات الصوتية (برامج ثابتة تدعم الصوت)",
     "zh": "1. 语音传输支持 (Voice-Enabled 固件)",
-    "ru": "{{ t.gsm_guide_1_title or "1. Поддержка передачи голоса (Voice-прошивка)" }}"
+    "ru": "1. Поддержка передачи голоса (Voice-прошивка)"
   },
-  "{{ t.gsm_guide_2_title or "2. Питание USB-хаба (Active USB 2.0 Hub)" }}": {
+  "2. Питание USB-хаба (Active USB 2.0 Hub)": {
     "en": "2. Powered USB Hub (Active USB 2.0 Hub)",
     "es": "2. Concentrador USB con Alimentación (Hub USB 2.0 Activo)",
     "ar": "2. موزع USB نشط مزود بالطاقة (Active USB 2.0 Hub)",
     "zh": "2. 独立供电 USB 集线器 (Active USB 2.0 Hub)",
-    "ru": "{{ t.gsm_guide_2_title or "2. Питание USB-хаба (Active USB 2.0 Hub)" }}"
+    "ru": "2. Питание USB-хаба (Active USB 2.0 Hub)"
   },
-  "{{ t.gsm_guide_3_title or "Проверенные модели 3G / 4G модемов и модулей для Asterisk" }}": {
+  "Проверенные модели 3G / 4G модемов и модулей для Asterisk": {
     "en": "Verified 3G / 4G Modems and Voice Cellular Modules for Asterisk",
     "es": "Modelos probados de módems 3G / 4G y módulos celulares para Asterisk",
     "ar": "طرازات أجهزة المودم 3G / 4G المعتمدة ووحدات الصوت لـ Asterisk",
     "zh": "经过验证的 Asterisk 3G / 4G 语音调制解调器及工业模组",
-    "ru": "{{ t.gsm_guide_3_title or "Проверенные модели 3G / 4G модемов и модулей для Asterisk" }}"
+    "ru": "Проверенные модели 3G / 4G модемов и модулей для Asterisk"
   },
   "100% Эталон (Voice активен)": {
     "en": "100% Benchmark (Voice Active)",

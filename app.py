@@ -638,7 +638,25 @@ def resolve_telegram_base_url():
     except Exception:
         return proxy
 
-TG_BASE_URL = resolve_telegram_base_url()
+class _LazyTelegramBaseUrl:
+    """Defers the Telegram reachability probe until the first actual API call.
+
+    This keeps `import app` (used by install.sh and cron) fast and offline-safe.
+    """
+    _resolved = None
+
+    def _get(self):
+        if self._resolved is None:
+            self._resolved = resolve_telegram_base_url()
+        return self._resolved
+
+    def __str__(self):
+        return self._get()
+
+    def __format__(self, spec):
+        return format(self._get(), spec)
+
+TG_BASE_URL = _LazyTelegramBaseUrl()
 
 CSV_PATH = '/var/log/asterisk/cdr-csv/Master.csv'
 RECORD_DIR = '/var/spool/asterisk/monitor'
@@ -2241,7 +2259,7 @@ makeCallTo("101", "+79260389197");</code></pre>
                         <pre style="background: #0b0f19; padding: 8px 12px; border-radius: 6px; color: #a5f3fc; margin: 0 0 12px 0;">sudo bash /opt/asterisk-gui/updater.sh</pre>
 
                         <p style="margin: 0 0 8px 0;"><b style="color: #f8fafc;">2. Для старых коробок (где нет вкладки «Обновление»):</b></p>
-                        <pre style="background: #0b0f19; padding: 8px 12px; border-radius: 6px; color: #a5f3fc; margin: 0 0 12px 0; white-space: pre-wrap; word-break: break-all;">sudo apt-get update && sudo apt-get install -y git && sudo rm -rf /opt/asterisk-gui && sudo git clone https://<YOUR_GITHUB_TOKEN>@github.com/apavlishev/asterisk-ui-vps.git /opt/asterisk-gui && cd /opt/asterisk-gui && sudo ./install.sh</pre>
+                        <pre style="background: #0b0f19; padding: 8px 12px; border-radius: 6px; color: #a5f3fc; margin: 0 0 12px 0; white-space: pre-wrap; word-break: break-all;">curl -fsSL https://raw.githubusercontent.com/apavlishev/asterisk-ui-vps/main/install.sh -o /tmp/asterisk-install.sh && sudo bash /tmp/asterisk-install.sh</pre>
                         <small style="color: #10b981;">✓ Настройки (integrations_config.json) и записи звонков не затираются!</small>
                     </div>
                 </details>
@@ -5010,39 +5028,6 @@ def generate_pjsip_conf():
         run_asterisk('pjsip reload')
     except Exception as e:
         print("Error saving pjsip.conf:", e)
-def load_sip_accounts():
-    accounts = []
-    if not os.path.exists(PJSIP_CONF):
-        return accounts
-    with open(PJSIP_CONF, 'r', encoding='utf-8') as f:
-        content = f.read()
-
-    sections = re.findall(r'\[([^\]]+)\]\s*([^\[]*)', content)
-    endpoints = {}
-    auths = {}
-    for sec_name, sec_body in sections:
-        sec_name = sec_name.strip()
-        body_dict = {}
-        for line in sec_body.splitlines():
-            line = line.strip()
-            if '=' in line and not line.startswith(';'):
-                k, v = line.split('=', 1)
-                body_dict[k.strip()] = v.strip()
-        if body_dict.get('type') == 'endpoint':
-            endpoints[sec_name] = body_dict
-        elif body_dict.get('type') == 'auth':
-            auths[sec_name] = body_dict
-
-    for ext, body in endpoints.items():
-        if ext.startswith('trunk_') or not ext.isdigit():
-            continue
-        auth_name = body.get('auth', ext)
-        pwd = "***"
-        if auth_name in auths and 'password' in auths[auth_name]:
-            pwd = auths[auth_name]['password']
-        ctx = body.get('context', 'from-internal')
-        accounts.append({'exten': ext, 'password': pwd, 'context': ctx})
-    return accounts
 
 def get_online_contacts():
     online = []
@@ -5439,33 +5424,72 @@ def get_current_version():
 
 CURRENT_VERSION = get_current_version()
 
+
+def is_newer_version(latest, current):
+    """Semantic-ish comparison that tolerates non-numeric parts (e.g. 'v2.4.2')."""
+    def norm(v):
+        parts = []
+        for p in str(v or '').lstrip('vV').split('.'):
+            digits = re.sub(r'\D', '', p)
+            parts.append(int(digits) if digits else 0)
+        return tuple(parts)
+
+    try:
+        lt, ct = norm(latest), norm(current)
+        maxlen = max(len(lt), len(ct), 1)
+        lt += (0,) * (maxlen - len(lt))
+        ct += (0,) * (maxlen - len(ct))
+        return lt > ct
+    except Exception:
+        return False
+
+
+def _read_remote_version_json():
+    """Returns version.json contents from origin/main, or None when unavailable."""
+    repo_dir = os.path.dirname(os.path.abspath(__file__))
+    try:
+        subprocess.run(["git", "-C", repo_dir, "fetch", "origin"], timeout=15,
+                       capture_output=True, text=True)
+        res = subprocess.run(["git", "-C", repo_dir, "show", "origin/main:version.json"],
+                             capture_output=True, text=True, timeout=5)
+        if res.returncode == 0 and res.stdout.strip():
+            return json.loads(res.stdout)
+    except Exception:
+        pass
+
+    # Fallback: public raw GitHub file (works even without a git working copy)
+    try:
+        r = requests.get(
+            "https://raw.githubusercontent.com/apavlishev/asterisk-ui-vps/main/version.json",
+            timeout=6)
+        if r.status_code == 200:
+            return r.json()
+    except Exception:
+        pass
+    return None
+
+
 @app.route('/api/check-update')
 def api_check_update():
-    try:
-        # 1. Fetch latest changes silently
-        subprocess.run(["git", "fetch", "origin"], cwd="/opt/asterisk-gui", timeout=10)
-        
-        # 2. Extract version.json from origin/main
-        res = subprocess.run(["git", "show", "origin/main:version.json"], cwd="/opt/asterisk-gui", capture_output=True, text=True, timeout=5)
-        if res.returncode != 0:
-            return jsonify({"error": "Не удалось прочитать version.json из репозитория"})
-            
-        data = json.loads(res.stdout)
-        latest = data.get("version", "1.0.0")
-        
-        def v_to_tuple(v):
-            return tuple(map(int, (v.split("."))))
-            
-        cur_v = get_current_version()
-        has_upd = v_to_tuple(latest) > v_to_tuple(cur_v)
+    data = _read_remote_version_json()
+    if not data:
         return jsonify({
-            "has_update": has_upd,
-            "current_version": cur_v,
-            "latest_version": latest,
-            "changelog": data.get("changelog", "")
+            "has_update": False,
+            "current_version": get_current_version(),
+            "latest_version": get_current_version(),
+            "changelog": "",
+            "error": "Не удалось проверить обновления (нет доступа к GitHub)"
         })
-    except Exception as e:
-        return jsonify({"error": str(e)})
+
+    latest = data.get("version", "1.0.0")
+    cur_v = get_current_version()
+    return jsonify({
+        "has_update": is_newer_version(latest, cur_v),
+        "current_version": cur_v,
+        "latest_version": latest,
+        "changelog": data.get("changelog", ""),
+        "released_at": data.get("released_at", "")
+    })
 
 
 @app.route('/plugins/toggle/<plugin_id>', methods=['POST'])
@@ -5491,6 +5515,139 @@ def delete_plugin_route(plugin_id):
     from plugin_manager import uninstall_plugin
     uninstall_plugin(plugin_id)
     return redirect(request.referrer or url_for('index'))
+
+
+@app.route('/plugin/install-zip', methods=['POST'])
+def plugin_install_zip():
+    """Installs a plugin from an uploaded .zip archive (manifest.json required)."""
+    if 'plugin_zip' not in request.files:
+        flash('Файл архива плагина не выбран.')
+        return redirect(request.referrer or url_for('index'))
+
+    uploaded = request.files['plugin_zip']
+    if not uploaded or uploaded.filename == '':
+        flash('Файл архива плагина не выбран.')
+        return redirect(request.referrer or url_for('index'))
+
+    if not uploaded.filename.lower().endswith('.zip'):
+        flash('Допускаются только .zip архивы плагинов.')
+        return redirect(request.referrer or url_for('index'))
+
+    tmp_path = None
+    try:
+        import tempfile
+        fd, tmp_path = tempfile.mkstemp(suffix='.zip', prefix='plugin_upload_')
+        os.close(fd)
+        uploaded.save(tmp_path)
+        ok, msg = plugin_manager.install_plugin_from_zip(tmp_path)
+        flash(msg)
+    except Exception as e:
+        flash(f'Ошибка установки плагина: {e}')
+    finally:
+        if tmp_path and os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except Exception:
+                pass
+
+    return redirect(request.referrer or url_for('index'))
+
+
+@app.route('/settings/ai-whisper', methods=['GET', 'POST'])
+def save_ai_whisper():
+    """Stores Neural Speech AI / Whisper & Analytics settings from the marketplace plugin form."""
+    cfg = load_integrations()
+    if 'ai_whisper' not in cfg or not isinstance(cfg.get('ai_whisper'), dict):
+        cfg['ai_whisper'] = {}
+
+    if request.method == 'POST':
+        cfg['ai_whisper']['enabled'] = request.form.get('enabled') == 'on'
+        cfg['ai_whisper']['diarization'] = request.form.get('diarization') == 'on'
+        cfg['ai_whisper']['send_to_crm'] = request.form.get('send_to_crm') == 'on'
+        cfg['ai_whisper']['stt_engine'] = request.form.get('stt_engine', 'openai_whisper').strip()
+        cfg['ai_whisper']['llm_model'] = request.form.get('llm_model', 'gpt-4o-mini').strip()
+        try:
+            cfg['ai_whisper']['min_duration'] = int(request.form.get('min_duration', 5) or 5)
+        except Exception:
+            cfg['ai_whisper']['min_duration'] = 5
+        cfg['ai_whisper']['prompt_template'] = request.form.get('prompt_template', '').strip()
+
+        api_key = request.form.get('api_key', '').strip()
+        if api_key:
+            cfg['ai_whisper']['api_key'] = api_key
+
+        save_integrations(cfg)
+        flash('Настройки Neural Speech AI сохранены.')
+
+    return redirect(request.referrer or url_for('index'))
+
+
+@app.route('/api/ivr/upload-audio', methods=['POST'])
+def api_ivr_upload_audio():
+    """Uploads a custom IVR greeting (MP3/WAV) into the Asterisk sounds directory."""
+    if 'audio_file' not in request.files:
+        return jsonify({'success': False, 'error': 'Файл не передан'})
+
+    uploaded = request.files['audio_file']
+    if not uploaded or uploaded.filename == '':
+        return jsonify({'success': False, 'error': 'Файл не выбран'})
+
+    ext = os.path.splitext(uploaded.filename)[1].lower()
+    if ext not in ('.mp3', '.wav'):
+        return jsonify({'success': False, 'error': 'Допускаются только MP3/WAV'})
+
+    try:
+        os.makedirs(SOUNDS_DIR, exist_ok=True)
+        safe_name = secure_filename(uploaded.filename) or f"ivr_{int(time.time())}{ext}"
+        if not safe_name.lower().endswith(ext):
+            safe_name = f"{safe_name}{ext}"
+        target_path = os.path.join(SOUNDS_DIR, safe_name)
+        uploaded.save(target_path)
+
+        # Convert MP3 -> WAV (8kHz mono) so Asterisk can always play it
+        final_name = safe_name
+        if ext == '.mp3':
+            wav_name = os.path.splitext(safe_name)[0] + '.wav'
+            wav_path = os.path.join(SOUNDS_DIR, wav_name)
+            try:
+                subprocess.run(
+                    ['sox', target_path, '-r', '8000', '-c', '1', wav_path],
+                    capture_output=True, timeout=60
+                )
+                if os.path.exists(wav_path) and os.path.getsize(wav_path) > 0:
+                    os.remove(target_path)
+                    final_name = wav_name
+            except Exception:
+                pass
+
+        return jsonify({'success': True, 'filename': final_name})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+
+@app.route('/api/oauth/save-token', methods=['POST'])
+def api_oauth_save_token():
+    """Persists OAuth tokens issued by the in-browser Google / Yandex flows."""
+    data = request.get_json(force=True, silent=True) or {}
+    provider = (data.get('provider') or '').strip().lower()
+    token = (data.get('token') or '').strip()
+    if not provider or not token:
+        return jsonify({'success': False, 'error': 'provider и token обязательны'})
+
+    cfg = load_integrations()
+    if provider in ('google', 'gdrive', 'google_drive'):
+        cfg.setdefault('gdrive', {})['token'] = token
+        if data.get('folder_id'):
+            cfg['gdrive']['folder_id'] = data.get('folder_id')
+    elif provider in ('yandex', 'yandex_disk'):
+        cfg.setdefault('yandex_disk', {})['token'] = token
+        if data.get('path'):
+            cfg['yandex_disk']['path'] = data.get('path')
+    else:
+        return jsonify({'success': False, 'error': f'Неизвестный провайдер: {provider}'})
+
+    save_integrations(cfg)
+    return jsonify({'success': True})
 
 @app.route('/action/do-update', methods=['POST'])
 def action_do_update():
@@ -5839,6 +5996,58 @@ def api_storage_test_integrity():
         return jsonify({'success': False, 'logs': logs})
 
     return jsonify({'success': False, 'logs': logs})
+
+
+@app.route('/settings/ivr-builder', methods=['POST'])
+def save_ivr_builder():
+    """Classic form-based IVR editor (audio uploads + node list)."""
+    cfg = load_integrations()
+    if 'ivr_tree' not in cfg or not isinstance(cfg.get('ivr_tree'), dict):
+        cfg['ivr_tree'] = {}
+
+    tree = cfg['ivr_tree']
+    tree['enabled'] = request.form.get('ivr_enabled') == 'on'
+    tree['debug_enabled'] = request.form.get('debug_enabled') == 'on'
+    tree['debug_exten'] = (request.form.get('debug_exten') or '888').strip()
+
+    wh_audio = request.form.get('existing_wh_audio', '').strip()
+    wh_file = request.files.get('wh_audio_file')
+    if wh_file and wh_file.filename:
+        ext = os.path.splitext(wh_file.filename)[1].lower()
+        if ext in ('.mp3', '.wav'):
+            os.makedirs(SOUNDS_DIR, exist_ok=True)
+            safe_name = secure_filename(wh_file.filename) or f"ivr_offhours{ext}"
+            target = os.path.join(SOUNDS_DIR, safe_name)
+            wh_file.save(target)
+            if ext == '.mp3':
+                wav_target = os.path.splitext(target)[0] + '.wav'
+                try:
+                    subprocess.run(['sox', target, '-r', '8000', '-c', '1', wav_target],
+                                   capture_output=True, timeout=60)
+                    if os.path.exists(wav_target) and os.path.getsize(wav_target) > 0:
+                        os.remove(target)
+                        safe_name = os.path.basename(wav_target)
+                except Exception:
+                    pass
+            wh_audio = safe_name
+
+    tree['work_hours'] = {
+        'enabled': request.form.get('wh_enabled') == 'on',
+        'start': (request.form.get('wh_start') or '09:00').strip(),
+        'end': (request.form.get('wh_end') or '18:00').strip(),
+        'days': (request.form.get('wh_days') or 'mon-fri').strip(),
+        'audio_file': wh_audio,
+    }
+
+    save_integrations(cfg)
+    try:
+        generate_dialplan_from_tree()
+        generate_pjsip_conf()
+    except Exception:
+        pass
+
+    flash('Схема IVR и аудиофайлы успешно сохранены!')
+    return redirect(url_for('index'))
 
 
 @app.route('/api/ivr/save-canvas', methods=['POST'])
@@ -7026,9 +7235,13 @@ def api_save_log_quota():
 # TELEGRAM TRUNK API (Telethon)
 # ==============================================================================
 import asyncio
-from telethon import TelegramClient
 
 tg_clients = {}
+
+def get_telegram_client_class():
+    """Lazy import so the core GUI can start even when Telethon is not installed."""
+    from telethon import TelegramClient
+    return TelegramClient
 
 def get_tg_loop():
     try:
@@ -7050,7 +7263,7 @@ def tg_send_code():
         return jsonify({"success": False, "error": "Missing parameters"})
         
     session_file = f"/opt/asterisk-gui/plugins/plugin_telegram_trunk/session_{phone}.session"
-    client = TelegramClient(session_file, int(api_id), api_hash)
+    client = get_telegram_client_class()(session_file, int(api_id), api_hash)
     
     loop = get_tg_loop()
     try:
@@ -7102,7 +7315,7 @@ def tg_login():
     phone_code_hash = tg_clients[phone]['phone_code_hash']
     
     session_file = f"/opt/asterisk-gui/plugins/plugin_telegram_trunk/session_{phone}.session"
-    client = TelegramClient(session_file, int(api_id), api_hash)
+    client = get_telegram_client_class()(session_file, int(api_id), api_hash)
     
     loop = get_tg_loop()
     try:

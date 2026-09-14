@@ -46,21 +46,29 @@
 
 ## 🚀 Установка (на чистую систему)
 
-Для установки на Raspberry Pi OS, Debian 11/12 или Ubuntu выполните команду:
+Для установки на Raspberry Pi OS, Debian 11/12 или Ubuntu выполните **одну команду**:
 ```bash
-sudo apt-get update && sudo apt-get install -y git && sudo rm -rf /opt/asterisk-gui && sudo git clone https://github.com/apavlishev/asterisk-ui-vps.git /opt/asterisk-gui && cd /opt/asterisk-gui && sudo ./install.sh
+curl -fsSL https://raw.githubusercontent.com/apavlishev/asterisk-ui-vps/main/install.sh -o /tmp/asterisk-install.sh && sudo bash /tmp/asterisk-install.sh
 ```
 
-Панель управления будет доступна по адресу: `http://<IP_АДРЕС_АТС>:8080`
+Скрипт сам скачает / обновит исходники в `/opt/asterisk-gui`, установит все зависимости
+(Flask, Telethon, Google GenAI, WebSockets, Google Drive/FTP и др.), настроит Asterisk,
+PJSIP, fail2ban и systemd-сервисы (`asterisk-gui`, `tg-bot`, `live-transcribe`).
+
+Панель управления будет доступна по адресу: `http://<IP_АДРЕС_АТС>:8888`
 
 ---
 
 ## 🔄 Способы обновления системы
 
 ### Способ 1: Через веб-интерфейс (в 1 клик)
-1. Откройте панель управления (`http://<ip-адрес>:8080`).
+1. Откройте панель управления (`http://<ip-адрес>:8888`).
 2. Перейдите во вкладку **«Обновление»**.
 3. Нажмите кнопку **«🚀 Установить обновление»**.
+
+Кнопка запускает `updater.sh` в изолированном systemd-юните: он подтягивает свежий код,
+доустанавливает новые Python-зависимости, создаёт недостающие сервисы и перезапускает всё
+без потери настроек (`/opt/integrations_config.json`) и установленных плагинов.
 
 ---
 

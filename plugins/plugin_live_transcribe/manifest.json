@@ -5,5 +5,7 @@
   "version": "1.0.0",
   "author": "Asterisk Logic Core",
   "description": "Расширяет интерфейс активных вызовов: потоковое распознавание речи (Стерео) через Gemini/Whisper, разделение диалога на Оператора и Клиента, сохранение и отправка Webhook.",
+  "category": "ai",
+  "category_name": "AI & Аналитика",
   "icon": "record_voice_over"
 }

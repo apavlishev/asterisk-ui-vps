@@ -2,6 +2,10 @@
 # Инициализация и автоматическая установка Asterisk PBX GUI & Integrations
 set -e
 
+GIT_REPO="${ASTERISK_GUI_REPO:-https://github.com/apavlishev/asterisk-ui-vps.git}"
+INSTALL_DIR="/opt/asterisk-gui"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 echo "=== Начало установки Asterisk PBX GUI & Core Security ==="
 
 # Проверка на root
@@ -16,31 +20,27 @@ apt-get install -y python3 python3-pip python3-venv ffmpeg sox curl wget git sud
 DEBIAN_FRONTEND=noninteractive apt-get install -y asterisk asterisk-modules tzdata || true
 
 # Настройка безопасных директорий Git
-git config --global --add safe.directory /opt/asterisk-gui || true
+git config --global --add safe.directory "$INSTALL_DIR" || true
 git config --global --add safe.directory /opt/asterisk-gui-repo || true
 
-echo "2. Установка Python зависимостей..."
-pip3 install flask requests paramiko werkzeug google-api-python-client google-auth-httplib2 google-auth-oauthlib pydrive --break-system-packages 2>/dev/null || pip3 install flask requests paramiko werkzeug google-api-python-client google-auth-httplib2 google-auth-oauthlib pydrive || true
-
-echo "3. Создание структуры директорий и прав..."
-# 3.1 DNS Fallback для Telegram прокси
+echo "2. Создание структуры директорий и прав..."
+# 2.1 DNS Fallback для Telegram прокси
 if ! grep -q "telegram.dentaldate.ae" /etc/hosts; then
     echo "185.243.76.230 telegram.dentaldate.ae" >> /etc/hosts
 fi
 
-mkdir -p /opt/asterisk-gui
-mkdir -p /opt/plugins
+mkdir -p "$INSTALL_DIR"
 mkdir -p /var/log/asterisk/cdr-csv
 mkdir -p /var/spool/asterisk/monitor
 mkdir -p /var/lib/asterisk/sounds/custom
 mkdir -p /var/run/asterisk
-chmod 777 /var/spool/asterisk/monitor
 chown -R asterisk:asterisk /var/log/asterisk
 chown -R asterisk:asterisk /var/spool/asterisk
 chown -R asterisk:asterisk /var/lib/asterisk/sounds/custom
 chown -R asterisk:asterisk /var/run/asterisk 2>/dev/null || true
+chmod 2770 /var/spool/asterisk/monitor 2>/dev/null || chmod 777 /var/spool/asterisk/monitor
 
-# Настройка беспарольного sudo для asterisk и user
+# Настройка беспарольного sudo для asterisk и user (нужно для netplan/iptables/fail2ban)
 cat << 'SUDORULES' > /etc/sudoers.d/asterisk-gui
 asterisk ALL=(ALL) NOPASSWD: ALL
 user ALL=(ALL) NOPASSWD: ALL
@@ -48,7 +48,7 @@ SUDORULES
 chmod 0440 /etc/sudoers.d/asterisk-gui
 
 # Настройка Fail2ban для защиты Asterisk
-echo "3.1 Настройка Fail2ban & Антифрод-фильтра..."
+echo "2.1 Настройка Fail2ban & Антифрод-фильтра..."
 mkdir -p /etc/fail2ban/filter.d
 cat << 'EOF_FILTER' > /etc/fail2ban/filter.d/asterisk-antifraud.conf
 [Definition]
@@ -85,18 +85,50 @@ EOF_JAIL
 
 systemctl restart fail2ban 2>/dev/null || true
 
-# Клонирование / копирование исходного кода
-echo "4. Развертывание исходного кода..."
-if [ -d "/opt/asterisk-gui/.git" ]; then
-    cd /opt/asterisk-gui && git pull || true
+# Развертывание исходного кода (self-bootstrap: работает и из клона, и из curl | bash)
+echo "3. Развертывание исходного кода..."
+if [ -d "$INSTALL_DIR/.git" ]; then
+    echo "   Обновление существующей установки через git..."
+    git -C "$INSTALL_DIR" fetch origin || true
+    git -C "$INSTALL_DIR" reset --hard origin/main || true
+elif [ -d "$SCRIPT_DIR/.git" ]; then
+    echo "   Клонирование из локальной копии $SCRIPT_DIR..."
+    rm -rf "$INSTALL_DIR"
+    git clone "$SCRIPT_DIR" "$INSTALL_DIR" || cp -r "$SCRIPT_DIR" "$INSTALL_DIR"
 else
-    cp -r * /opt/asterisk-gui/ 2>/dev/null || true
-    cp /opt/asterisk-gui/crm-yandex-uploader.py /opt/ 2>/dev/null || true
-    cp /opt/asterisk-gui/tg-bot-daemon.py /opt/ 2>/dev/null || true
+    echo "   Клонирование из $GIT_REPO..."
+    rm -rf "$INSTALL_DIR"
+    git clone "$GIT_REPO" "$INSTALL_DIR"
 fi
 
-chmod +x /opt/asterisk-gui/*.py /opt/asterisk-gui/*.sh 2>/dev/null || true
+chmod +x "$INSTALL_DIR"/*.py "$INSTALL_DIR"/*.sh 2>/dev/null || true
+
+# 3.1 Каталог плагинов, который ожидает crm-yandex-uploader.py при запуске из /opt
+if [ -d /opt/plugins ] && [ ! -L /opt/plugins ]; then
+    rm -rf /opt/plugins
+fi
+ln -sfn "$INSTALL_DIR/plugins" /opt/plugins
+
+# Копируем демоны в /opt (обратная совместимость: диалплан вызывает /opt/crm-yandex-uploader.py)
+cp "$INSTALL_DIR/crm-yandex-uploader.py" /opt/ 2>/dev/null || true
+cp "$INSTALL_DIR/tg-bot-daemon.py" /opt/ 2>/dev/null || true
+cp "$INSTALL_DIR/live_transcribe_daemon.py" /opt/ 2>/dev/null || true
 chmod +x /opt/*.py 2>/dev/null || true
+
+# Установка Python зависимостей (после деплоя, т.к. requirements.txt в репозитории)
+echo "4. Установка Python зависимостей..."
+if [ -f "$INSTALL_DIR/requirements.txt" ]; then
+    pip3 install -r "$INSTALL_DIR/requirements.txt" --break-system-packages 2>/dev/null \
+        || pip3 install -r "$INSTALL_DIR/requirements.txt" 2>/dev/null \
+        || echo "   [!] Не все Python-зависимости установились автоматически. Проверьте pip вручную."
+else
+    pip3 install flask requests paramiko werkzeug telethon google-genai websockets \
+        google-api-python-client google-auth-httplib2 google-auth-oauthlib pydrive \
+        --break-system-packages 2>/dev/null \
+        || pip3 install flask requests paramiko werkzeug telethon google-genai websockets \
+            google-api-python-client google-auth-httplib2 google-auth-oauthlib pydrive 2>/dev/null \
+        || true
+fi
 
 # Базовый конфиг integrations_config.json
 if [ ! -f /opt/integrations_config.json ]; then
@@ -105,10 +137,13 @@ if [ ! -f /opt/integrations_config.json ]; then
     chown asterisk:asterisk /opt/integrations_config.json
 fi
 
-# 5.1 Стандартный PJSIP шаблон
+# 5.1 Стандартный PJSIP шаблон (со случайными паролями при первой установке)
 echo "5.1 Настройка PJSIP..."
 if [ ! -f /etc/asterisk/pjsip.conf ] || ! grep -q "auth_type=userpass" /etc/asterisk/pjsip.conf; then
-cat << 'PJSIPCONF' > /etc/asterisk/pjsip.conf
+GEN_PW_100="$(python3 -c "import secrets;print(secrets.token_urlsafe(12))")"
+GEN_PW_101="$(python3 -c "import secrets;print(secrets.token_urlsafe(12))")"
+GEN_PW_102="$(python3 -c "import secrets;print(secrets.token_urlsafe(12))")"
+cat << PJSIPCONF > /etc/asterisk/pjsip.conf
 [transport-udp]
 type=transport
 protocol=udp
@@ -124,7 +159,7 @@ remove_existing=yes
 type=auth
 auth_type=userpass
 username=100
-password=SecretPassword100!
+password=${GEN_PW_100}
 
 [100]
 type=endpoint
@@ -151,7 +186,7 @@ remove_existing=yes
 type=auth
 auth_type=userpass
 username=101
-password=101
+password=${GEN_PW_101}
 
 [101]
 type=endpoint
@@ -166,6 +201,7 @@ rtp_symmetric=yes
 force_rport=yes
 rewrite_contact=yes
 auth=101
+outbound_auth=101
 aors=101
 
 [102]
@@ -177,7 +213,7 @@ remove_existing=yes
 type=auth
 auth_type=userpass
 username=102
-password=102
+password=${GEN_PW_102}
 
 [102]
 type=endpoint
@@ -192,10 +228,15 @@ rtp_symmetric=yes
 force_rport=yes
 rewrite_contact=yes
 auth=102
+outbound_auth=102
 aors=102
 PJSIPCONF
 chown asterisk:asterisk /etc/asterisk/pjsip.conf
 chmod 644 /etc/asterisk/pjsip.conf
+echo "    Сгенерированы SIP-аккаунты (сохраните пароли!):"
+echo "      100 -> ${GEN_PW_100}"
+echo "      101 -> ${GEN_PW_101}"
+echo "      102 -> ${GEN_PW_102}"
 fi
 
 # Udev правила для горячего подключения модемов (Hot-plug)
@@ -211,7 +252,7 @@ udevadm trigger 2>/dev/null || true
 
 # 5.3 Автоматическая генерация эталонного диалплана
 echo "5.3 Генерация эталонного диалплана..."
-python3 -c "import sys; sys.path.insert(0, '/opt/asterisk-gui'); import app; app.generate_dialplan_from_tree(); app.generate_pjsip_conf()" 2>/dev/null || true
+cd "$INSTALL_DIR" && python3 -c "import sys; sys.path.insert(0, '$INSTALL_DIR'); import app; app.generate_dialplan_from_tree(); app.generate_pjsip_conf()" 2>/dev/null || echo "   [!] Автогенерация диалплана будет выполнена при первом сохранении настроек в UI."
 
 echo "6. Настройка Systemd сервисов..."
 cat << 'SERVICE' > /etc/systemd/system/asterisk-gui.service
@@ -248,11 +289,59 @@ RestartSec=10
 WantedBy=multi-user.target
 SERVICE2
 
+cat << 'SERVICE3' > /etc/systemd/system/live-transcribe.service
+[Unit]
+Description=Live Speech Transcription Daemon (Gemini/Whisper)
+After=network.target asterisk.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/asterisk-gui
+ExecStart=/usr/bin/python3 /opt/live_transcribe_daemon.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+SERVICE3
+
 systemctl daemon-reload
 systemctl enable asterisk-gui.service
 systemctl enable tg-bot.service 2>/dev/null || true
+systemctl enable live-transcribe.service 2>/dev/null || true
 systemctl restart asterisk-gui.service
+systemctl restart tg-bot.service 2>/dev/null || true
+systemctl restart live-transcribe.service 2>/dev/null || true
 systemctl restart asterisk.service 2>/dev/null || true
 
-echo "=== Установка успешно завершена! ==="
+# 7. Проверка работоспособности
+echo "7. Проверка работоспособности..."
+sleep 3
+GUI_OK=1
+if ! systemctl is-active --quiet asterisk-gui.service; then
+    GUI_OK=0
+    echo "   [!] Сервис asterisk-gui.service не запустился. Логи:"
+    journalctl -u asterisk-gui.service -n 20 --no-pager 2>/dev/null || true
+fi
+if [ "$GUI_OK" = "1" ]; then
+    for i in 1 2 3 4 5; do
+        if curl -fsS "http://127.0.0.1:8888/login" >/dev/null 2>&1; then
+            break
+        fi
+        sleep 2
+    done
+    if ! curl -fsS "http://127.0.0.1:8888/login" >/dev/null 2>&1; then
+        GUI_OK=0
+        echo "   [!] Веб-панель не отвечает на порту 8888. Логи:"
+        journalctl -u asterisk-gui.service -n 20 --no-pager 2>/dev/null || true
+    fi
+fi
+
+echo "=== Установка завершена! ==="
 echo "Панель управления доступна по адресу: http://<IP_СЕРВЕРА>:8888"
+
+if [ "$GUI_OK" != "1" ]; then
+    echo "=== [!] Есть проблемы с запуском. См. сообщения выше. ==="
+    exit 1
+fi

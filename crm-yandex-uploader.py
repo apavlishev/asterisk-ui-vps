@@ -7,7 +7,12 @@ import re
 import requests
 
 # Add plugins path to sys.path
-PLUGINS_PATH = os.path.join(os.path.dirname(__file__), 'plugins')
+GUI_PATH = os.environ.get("ASTERISK_GUI_DIR", "/opt/asterisk-gui")
+if os.path.isdir(GUI_PATH) and GUI_PATH not in sys.path:
+    sys.path.insert(0, GUI_PATH)
+PLUGINS_PATH = os.path.join(GUI_PATH, 'plugins')
+if not os.path.isdir(PLUGINS_PATH):
+    PLUGINS_PATH = os.path.join(os.path.dirname(__file__), 'plugins')
 if PLUGINS_PATH not in sys.path:
     sys.path.insert(0, PLUGINS_PATH)
 
@@ -457,6 +462,34 @@ def sync_amocrm(cfg, call_id, src, dst, direction, disposition, billsec, rec_pat
     log_debug(f"=== amoCRM SYNC COMPLETE ===")
 
 
+def invoke_plugin_hooks(call_id, src, dst, direction, disposition, billsec, rec_path, playback_url=None, cfg=None):
+    """Dispatches the post-call hook to every installed & enabled plugin.
+
+    `cfg` here is the Asterisk integration config; plugin_manager expects it as
+    its second argument, so it is passed through directly.
+    """
+    if cfg is None:
+        cfg = load_config()
+    call_info = {
+        "call_id": call_id,
+        "src": src,
+        "dst": dst,
+        "direction": direction,
+        "disposition": disposition,
+        "duration": billsec,
+        "recording_url": playback_url or "",
+        "recording_path": rec_path,
+        "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
+    }
+    try:
+        import plugin_manager
+        results = plugin_manager.invoke_post_call_hooks(call_info, cfg)
+        if results:
+            log_debug(f"[Plugins] post-call hooks: {results}")
+    except Exception as e:
+        log_debug(f"[Plugins] invoke_post_call_hooks exception: {e}")
+
+
 def send_telegram_notification(cfg, call_id, src, dst, direction, disposition, billsec, rec_path, playback_url=None):
     tg = cfg.get("telegram", {})
     if not tg.get("enabled"): return
@@ -558,6 +591,9 @@ def main():
 
     # 4. Отправка в Telegram (после создания карточки amoCRM со ссылкой)
     send_telegram_notification(cfg, call_id, src, dst, direction, disposition, billsec, rec_path, playback_url=(ftp_url or gdrive_url))
+
+    # 5. Вызов post-call хуков плагинов (Bitrix24, HubSpot, Pipedrive, Zoho, GHL, Zendesk, ...)
+    invoke_plugin_hooks(call_id, src, dst, direction, disposition, billsec, rec_path, playback_url=(ftp_url or gdrive_url), cfg=cfg)
 
 if __name__ == "__main__":
     main()

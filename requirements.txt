@@ -1,0 +1,12 @@
+flask
+requests
+paramiko
+werkzeug
+jinja2
+telethon
+google-genai
+websockets
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+pydrive
