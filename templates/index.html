@@ -297,6 +297,11 @@
                     <span class="text-xs font-semibold sidebar-text">{{ t.nav_sounds or "Аудио и промпты" }}</span>
                 </button>
 
+                <button onclick="switchTab('schedule')" id="nav-schedule" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="{{ t.nav_schedule or 'Расписания и праздники' }}">
+                    <span class="material-symbols-outlined mr-3.5 text-blue-500 text-[22px]">event_available</span>
+                    <span class="text-xs font-semibold sidebar-text">{{ t.nav_schedule or "Расписания" }}</span>
+                </button>
+
                 <button onclick="switchTab('modems')" id="nav-modems" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="{{ t.gsm_modemy }}">                    <span class="material-symbols-outlined mr-3.5 text-amber-500 text-[22px]">sim_card</span>
                     <span class="text-xs font-semibold sidebar-text">{{ t.nav_modems or "GSM Модемы" }}</span>
                     <span class="ml-auto text-[11px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 font-mono sidebar-badge">{{ modems_list|length }}</span>
@@ -2124,6 +2129,141 @@
                     <div class="pt-2 flex justify-end gap-3">
                         <button type="button" onclick="closeConference()" class="px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:bg-surface-container">{{ t.otmena or 'Отмена' }}</button>
                         <button type="button" onclick="saveConference()" class="px-6 py-2 rounded-xl bg-orange-500 text-white text-xs font-semibold hover:bg-orange-600 transition-all">{{ t.sohranit or 'Сохранить' }}</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- // ================= TAB: SCHEDULES & HOLIDAYS ================= -->
+            <div id="tab-schedule" class="tab-pane space-y-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-on-surface">{{ t.nav_schedule or 'Расписания и праздники' }}</h1>
+                        <p class="text-on-surface-variant text-sm">{{ t.sched_desc or 'Рабочие часы, выходные и праздники. Входящие вне расписания уходят на другой номер или проигрывают сообщение.' }}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="loadSchedule()" class="px-3 py-2.5 rounded-xl bg-surface border border-outline/30 text-on-surface-variant text-xs font-semibold hover:bg-surface-container transition-all flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[16px]">refresh</span>
+                            <span>{{ t.obnovit or 'Обновить' }}</span>
+                        </button>
+                        <button type="button" onclick="openSchedule()" class="px-4 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-all flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[16px]">add</span>
+                            <span>{{ t.sched_add or 'Добавить расписание' }}</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="sched-today" class="hidden p-4 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-blue-700 text-xs font-semibold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">event</span>
+                    <span id="sched-today-text"></span>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-bold text-on-surface mb-3">{{ t.sched_items or 'Расписания' }}</h3>
+                    <div id="sched-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-bold text-on-surface">{{ t.sched_holidays or 'Праздники и нерабочие дни' }}</h3>
+                        <button type="button" onclick="openHoliday()" class="px-3 py-2 rounded-xl bg-surface border border-outline/30 text-on-surface-variant text-xs font-semibold hover:bg-surface-container transition-all flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[16px]">add</span>
+                            <span>{{ t.sched_add_holiday or 'Добавить праздник' }}</span>
+                        </button>
+                    </div>
+                    <div id="holiday-list" class="bg-surface rounded-2xl border border-outline/30 shadow-sm overflow-hidden">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="bg-surface-container-low border-b border-surface-container text-on-surface-variant font-semibold text-xs uppercase tracking-wider">
+                                    <th class="px-5 py-3">{{ t.nazvanie or 'Название' }}</th>
+                                    <th class="px-5 py-3">{{ t.sched_date or 'Дата' }}</th>
+                                    <th class="px-5 py-3">{{ t.sched_yearly or 'Ежегодно' }}</th>
+                                    <th class="px-5 py-3 text-right">{{ t.dejstvia or 'Действия' }}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="holiday-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="modal-schedule" class="hidden fixed inset-0 bg-on-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-surface rounded-2xl max-w-md w-full p-6 border border-outline/30 shadow-xl space-y-4">
+                    <div class="flex justify-between items-center pb-2 border-b border-surface-container">
+                        <h3 class="text-lg font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-blue-600">event_available</span>
+                            <span id="sched-modal-title">{{ t.sched_add or 'Добавить расписание' }}</span>
+                        </h3>
+                        <button type="button" onclick="closeSchedule()" class="text-on-surface-variant hover:text-on-surface p-1 rounded-lg">
+                            <span class="material-symbols-outlined text-xl">close</span>
+                        </button>
+                    </div>
+                    <div class="space-y-3">
+                        <input type="hidden" id="sched-id">
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.nazvanie or 'Название' }}</label>
+                            <input type="text" id="sched-name" placeholder="Рабочие часы" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.sched_start or 'Начало' }}</label>
+                                <input type="time" id="sched-start" value="09:00" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.sched_end or 'Конец' }}</label>
+                                <input type="time" id="sched-end" value="18:00" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.sched_days or 'Дни недели' }}</label>
+                            <select id="sched-days" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs font-semibold">
+                                <option value="mon-fri">Mon-Fri</option>
+                                <option value="mon-sat">Mon-Sat</option>
+                                <option value="sat-sun">Sat-Sun</option>
+                                <option value="mon-sun">Mon-Sun</option>
+                                <option value="mon">Mon</option>
+                                <option value="tue">Tue</option>
+                                <option value="wed">Wed</option>
+                                <option value="thu">Thu</option>
+                                <option value="fri">Fri</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="pt-2 flex justify-end gap-3">
+                        <button type="button" onclick="closeSchedule()" class="px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:bg-surface-container">{{ t.otmena or 'Отмена' }}</button>
+                        <button type="button" onclick="saveSchedule()" class="px-6 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all">{{ t.sohranit or 'Сохранить' }}</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="modal-holiday" class="hidden fixed inset-0 bg-on-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-surface rounded-2xl max-w-md w-full p-6 border border-outline/30 shadow-xl space-y-4">
+                    <div class="flex justify-between items-center pb-2 border-b border-surface-container">
+                        <h3 class="text-lg font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-blue-600">celebration</span>
+                            <span id="holiday-modal-title">{{ t.sched_add_holiday or 'Добавить праздник' }}</span>
+                        </h3>
+                        <button type="button" onclick="closeHoliday()" class="text-on-surface-variant hover:text-on-surface p-1 rounded-lg">
+                            <span class="material-symbols-outlined text-xl">close</span>
+                        </button>
+                    </div>
+                    <div class="space-y-3">
+                        <input type="hidden" id="holiday-id">
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.nazvanie or 'Название' }}</label>
+                            <input type="text" id="holiday-name" placeholder="Новый год" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.sched_date or 'Дата' }}</label>
+                            <input type="date" id="holiday-date" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                        </div>
+                        <label class="flex items-center gap-2 text-xs font-semibold text-on-surface cursor-pointer">
+                            <input type="checkbox" id="holiday-yearly" class="rounded text-blue-600 w-4 h-4">
+                            <span>{{ t.sched_yearly or 'Ежегодно' }}</span>
+                        </label>
+                    </div>
+                    <div class="pt-2 flex justify-end gap-3">
+                        <button type="button" onclick="closeHoliday()" class="px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:bg-surface-container">{{ t.otmena or 'Отмена' }}</button>
+                        <button type="button" onclick="saveHoliday()" class="px-6 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all">{{ t.sohranit or 'Сохранить' }}</button>
                     </div>
                 </div>
             </div>
@@ -7363,6 +7503,9 @@
             if (tabId === 'sounds' && typeof loadSounds === 'function') {
                 setTimeout(loadSounds, 50);
             }
+            if (tabId === 'schedule' && typeof loadSchedule === 'function') {
+                setTimeout(loadSchedule, 50);
+            }
         }
 
         // Restore active tab
@@ -9651,6 +9794,138 @@
             const data = await res.json();
             if (data.status === 'ok') { loadTlsSettings(); alert('{{ t.tls_gen_done or "Сертификат сгенерирован." }}'); }
             else alert(data.message || 'Ошибка');
+        }
+
+        // ================= SCHEDULES & HOLIDAYS =================
+        let schedData = [];
+
+        async function loadSchedule() {
+            try {
+                const res = await fetch('/api/schedules', { cache: 'no-store' });
+                const data = await res.json();
+                if (data.status !== 'ok') return;
+                schedData = data.schedules || [];
+                renderSchedules();
+                renderHolidays(data.holidays || []);
+                const box = document.getElementById('sched-today');
+                const txt = document.getElementById('sched-today-text');
+                if (box && txt && data.today_is_holiday) {
+                    box.classList.remove('hidden');
+                    txt.textContent = '{{ t.sched_today_holiday or "Сегодня праздник: " }}' + (data.today_holiday || '');
+                } else if (box) { box.classList.add('hidden'); }
+            } catch (e) { console.error('[schedule] load', e); }
+        }
+
+        function renderSchedules() {
+            const box = document.getElementById('sched-list');
+            if (!box) return;
+            if (!schedData.length) {
+                box.innerHTML = '<div class="col-span-full p-8 rounded-2xl bg-surface border border-dashed border-outline/40 text-center text-on-surface-variant text-sm">'
+                    + '<span class="material-symbols-outlined text-4xl block mb-2">event_busy</span>'
+                    + '{{ t.sched_none or "Расписаний пока нет" }}</div>';
+                return;
+            }
+            box.innerHTML = schedData.map(s => `<div class="p-5 rounded-2xl bg-surface border border-outline/30 shadow-sm space-y-2">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined">schedule</span>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-on-surface">${(s.name || '').replace(/[<>]/g, '')}</h3>
+                            <div class="text-[11px] text-on-surface-variant font-mono">${s.days} · ${s.start}–${s.end}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="editSchedule('${s.id}')" class="p-2 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+                        <button onclick="deleteSchedule('${s.id}')" class="p-2 rounded-xl text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+                    </div>
+                </div>
+            </div>`).join('');
+        }
+
+        function renderHolidays(items) {
+            const body = document.getElementById('holiday-tbody');
+            if (!body) return;
+            if (!items.length) {
+                body.innerHTML = '<tr><td colspan="4" class="px-5 py-8 text-center text-on-surface-variant text-sm">{{ t.sched_no_holidays or "Праздники не заданы" }}</td></tr>';
+                return;
+            }
+            body.innerHTML = items.map(h => `<tr class="border-b border-surface-container/50">
+                <td class="px-5 py-3 font-semibold text-on-surface">${(h.name || '').replace(/[<>]/g, '')}</td>
+                <td class="px-5 py-3 font-mono text-on-surface-variant">${h.date}</td>
+                <td class="px-5 py-3">${h.yearly ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 font-bold">{{ t.sched_yes or "Да" }}</span>' : '—'}</td>
+                <td class="px-5 py-3 text-right">
+                    <button onclick="deleteHoliday('${h.id}')" class="p-2 rounded-xl text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+                </td>
+            </tr>`).join('');
+        }
+
+        function openSchedule() {
+            ['sched-id','sched-name'].forEach(x => { const e = document.getElementById(x); if (e) e.value = ''; });
+            const st = document.getElementById('sched-start'); if (st) st.value = '09:00';
+            const en = document.getElementById('sched-end'); if (en) en.value = '18:00';
+            const d = document.getElementById('sched-days'); if (d) d.value = 'mon-fri';
+            const mt = document.getElementById('sched-modal-title'); if (mt) mt.textContent = '{{ t.sched_add or "Добавить расписание" }}';
+            document.getElementById('modal-schedule').classList.remove('hidden');
+        }
+        function closeSchedule() { document.getElementById('modal-schedule').classList.add('hidden'); }
+
+        function editSchedule(id) {
+            const s = schedData.find(x => String(x.id) === String(id));
+            if (!s) return;
+            const g = (eid, v) => { const e = document.getElementById(eid); if (e) e.value = v || ''; };
+            g('sched-id', s.id); g('sched-name', s.name); g('sched-start', s.start); g('sched-end', s.end); g('sched-days', s.days);
+            const mt = document.getElementById('sched-modal-title'); if (mt) mt.textContent = '{{ t.redaktirovat or "Редактировать" }}';
+            document.getElementById('modal-schedule').classList.remove('hidden');
+        }
+
+        async function saveSchedule() {
+            const payload = {
+                id: document.getElementById('sched-id').value,
+                name: document.getElementById('sched-name').value.trim(),
+                start: document.getElementById('sched-start').value,
+                end: document.getElementById('sched-end').value,
+                days: document.getElementById('sched-days').value
+            };
+            if (!payload.name) { alert('{{ t.sched_name_required or "Укажите название" }}'); return; }
+            const res = await fetch('/api/schedules/save', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+            const data = await res.json();
+            if (data.status === 'ok') { closeSchedule(); loadSchedule(); } else alert(data.message || 'Ошибка');
+        }
+
+        async function deleteSchedule(id) {
+            if (!confirm('{{ t.sched_delete_confirm or "Удалить расписание?" }}')) return;
+            await fetch('/api/schedules/delete', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ id }) });
+            loadSchedule();
+        }
+
+        function openHoliday() {
+            ['holiday-id','holiday-name','holiday-date'].forEach(x => { const e = document.getElementById(x); if (e) e.value = ''; });
+            const y = document.getElementById('holiday-yearly'); if (y) y.checked = true;
+            const mt = document.getElementById('holiday-modal-title'); if (mt) mt.textContent = '{{ t.sched_add_holiday or "Добавить праздник" }}';
+            document.getElementById('modal-holiday').classList.remove('hidden');
+        }
+        function closeHoliday() { document.getElementById('modal-holiday').classList.add('hidden'); }
+
+        async function saveHoliday() {
+            const payload = {
+                id: document.getElementById('holiday-id').value,
+                name: document.getElementById('holiday-name').value.trim(),
+                date: document.getElementById('holiday-date').value,
+                yearly: document.getElementById('holiday-yearly').checked,
+                action: 'closed'
+            };
+            if (!payload.name || !payload.date) { alert('{{ t.sched_name_date_required or "Укажите название и дату" }}'); return; }
+            const res = await fetch('/api/holidays/save', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+            const data = await res.json();
+            if (data.status === 'ok') { closeHoliday(); loadSchedule(); } else alert(data.message || 'Ошибка');
+        }
+
+        async function deleteHoliday(id) {
+            if (!confirm('{{ t.sched_delete_confirm or "Удалить?" }}')) return;
+            await fetch('/api/holidays/delete', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ id }) });
+            loadSchedule();
         }
     </script>
 

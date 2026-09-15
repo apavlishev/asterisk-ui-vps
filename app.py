@@ -7264,6 +7264,168 @@ def api_tls_generate_cert():
     })
 
 
+# ================= SCHEDULES & HOLIDAYS =================
+def get_schedules():
+    cfg = load_integrations()
+    return cfg.get('schedules', [])
+
+
+def save_schedules(items):
+    cfg = load_integrations()
+    cfg['schedules'] = items
+    save_integrations(cfg)
+    generate_dialplan_from_tree()
+
+
+def get_holidays():
+    cfg = load_integrations()
+    return cfg.get('holidays', [])
+
+
+def save_holidays(items):
+    cfg = load_integrations()
+    cfg['holidays'] = items
+    save_integrations(cfg)
+    generate_dialplan_from_tree()
+
+
+def _holiday_today():
+    """Returns the holiday dict if today matches any configured holiday."""
+    today = datetime.datetime.now()
+    today_str = today.strftime('%Y-%m-%d')
+    md = today.strftime('%m-%d')
+    for h in get_holidays():
+        date = str(h.get('date') or '')
+        if not date:
+            continue
+        if h.get('yearly'):
+            if date[5:] == md:
+                return h
+        elif date == today_str:
+            return h
+    return None
+
+
+def build_schedule_dialplan():
+    """Emits a subroutine returning 'open' or 'closed' plus holiday contexts."""
+    lines = ["; --- Расписания и праздники (авто-генерация) ---"]
+    lines.append("[sub-in-business-hours]")
+    lines.append("exten => s,1,NoOp(Проверка рабочего времени)")
+    # Holidays first: if today is a holiday -> closed
+    for h in get_holidays():
+        date = str(h.get('date') or '')
+        if not date:
+            continue
+        if h.get('yearly'):
+            cond = f'$[{{STRFTIME(${{EPOCH}},,%m-%d)}} = "{date[5:]}"]'
+        else:
+            cond = f'$[{{STRFTIME(${{EPOCH}},,%Y-%m-%d)}} = "{date}"]'
+        lines.append(f" same => n,GotoIf({cond}?closed,1)")
+    for sched in get_schedules():
+        start_t = sched.get('start', '09:00')
+        end_t = sched.get('end', '18:00')
+        days = sched.get('days', 'mon-fri')
+        lines.append(f" same => n,GotoIfTime({start_t}-{end_t},{days},*,*?open,1)")
+    lines.append(" same => n,Goto(closed,1)")
+    lines.append("")
+    lines.append("exten => open,1,Return(open)")
+    lines.append("exten => closed,1,Return(closed)")
+    return "\n".join(lines)
+
+
+def _safe_id(value):
+    return re.sub(r'[^0-9a-zA-Z]', '_', str(value))
+
+
+@app.route('/api/schedules', methods=['GET'])
+def api_schedules_list():
+    return jsonify({
+        'status': 'ok',
+        'schedules': get_schedules(),
+        'holidays': get_holidays(),
+        'today_is_holiday': bool(_holiday_today()),
+        'today_holiday': (_holiday_today() or {}).get('name') if _holiday_today() else '',
+    })
+
+
+@app.route('/api/schedules/save', methods=['POST'])
+def api_schedules_save():
+    data = request.get_json() or {}
+    sid = str(data.get('id') or '').strip() or f"sched_{int(time.time())}"
+    name = str(data.get('name') or '').strip()
+    if not name:
+        return jsonify({'status': 'error', 'message': 'Укажите название расписания'})
+    entry = {
+        'id': sid,
+        'name': name,
+        'start': str(data.get('start') or '09:00'),
+        'end': str(data.get('end') or '18:00'),
+        'days': str(data.get('days') or 'mon-fri'),
+        'target_open': str(data.get('target_open') or 'ALL'),
+        'target_closed': str(data.get('target_closed') or ''),
+        'audio_closed': str(data.get('audio_closed') or ''),
+    }
+    items = get_schedules()
+    updated = False
+    for i, it in enumerate(items):
+        if it.get('id') == sid:
+            items[i] = entry
+            updated = True
+            break
+    if not updated:
+        items.append(entry)
+    save_schedules(items)
+    auth_mgr.audit(session.get('username'), 'schedule_save', name)
+    return jsonify({'status': 'ok', 'schedules': items})
+
+
+@app.route('/api/schedules/delete', methods=['POST'])
+def api_schedules_delete():
+    data = request.get_json() or {}
+    sid = str(data.get('id') or '')
+    items = [s for s in get_schedules() if s.get('id') != sid]
+    save_schedules(items)
+    return jsonify({'status': 'ok', 'schedules': items})
+
+
+@app.route('/api/holidays/save', methods=['POST'])
+def api_holidays_save():
+    data = request.get_json() or {}
+    hid = str(data.get('id') or '').strip() or f"hol_{int(time.time())}"
+    name = str(data.get('name') or '').strip()
+    date = str(data.get('date') or '').strip()
+    if not name or not date:
+        return jsonify({'status': 'error', 'message': 'Укажите название и дату'})
+    entry = {
+        'id': hid,
+        'name': name,
+        'date': date,
+        'yearly': bool(data.get('yearly')),
+        'action': data.get('action') if data.get('action') in ('closed', 'open') else 'closed',
+    }
+    items = get_holidays()
+    updated = False
+    for i, it in enumerate(items):
+        if it.get('id') == hid:
+            items[i] = entry
+            updated = True
+            break
+    if not updated:
+        items.append(entry)
+    save_holidays(items)
+    auth_mgr.audit(session.get('username'), 'holiday_save', f'{name} {date}')
+    return jsonify({'status': 'ok', 'holidays': items})
+
+
+@app.route('/api/holidays/delete', methods=['POST'])
+def api_holidays_delete():
+    data = request.get_json() or {}
+    hid = str(data.get('id') or '')
+    items = [h for h in get_holidays() if h.get('id') != hid]
+    save_holidays(items)
+    return jsonify({'status': 'ok', 'holidays': items})
+
+
 # ================= MULTILINGUAL (I18N) ENGINE (TOP 10 WORLD LANGUAGES) =================
 LOCALES_DIR = os.path.join(os.path.dirname(__file__), 'locales')
 def get_available_languages():
@@ -8111,6 +8273,7 @@ exten => i,1,NoOp({trunk_title} IVR {n_id}: Неверный ввод клави
 
     ivr_sections = "\n\n".join(all_ivr_contexts)
     number_filter_block = build_number_filter_dialplan()
+    schedule_block = build_schedule_dialplan()
 
     dialplan = f"""[general]
 static=yes
@@ -8125,6 +8288,8 @@ exten => s,1,NoOp(=== POST-CALL SYNC TRIGGERED: ${{CALL_ID}}, ${{CALL_SRC}} -> $
  same => n,Return()
 
 {number_filter_block}
+
+{schedule_block}
 
 [from-internal]
 ; 1. Тест эхо (777)
