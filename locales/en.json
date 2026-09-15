@@ -869,5 +869,13 @@
   "confirm_delete_user": "Delete user?",
   "audit_log": "Audit log",
   "audit_log_desc": "Who did what and when in the control panel.",
-  "no_audit": "Log is empty"
+  "no_audit": "Log is empty",
+  "sohranit": "Save",
+  "acd_ocheredi": "ACD Queues",
+  "acd_ocheredi_desc": "Real Asterisk queues: call distribution, agent pause/unpause, statistics and music on hold.",
+  "dobavit_ochered": "Add Queue",
+  "agenty": "Agents",
+  "ocheredi_ne_sozdany": "No queues yet",
+  "ocheredi_desc_empty": "Create an ACD queue, add agents and distribute the workload.",
+  "vyberite_agenta": "Select at least one agent!"
 }

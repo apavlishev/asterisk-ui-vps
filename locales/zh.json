@@ -869,5 +869,13 @@
   "confirm_delete_user": "删除用户？",
   "audit_log": "审计日志",
   "audit_log_desc": "谁在何时做了什么。",
-  "no_audit": "日志为空"
+  "no_audit": "日志为空",
+  "sohranit": "保存",
+  "acd_ocheredi": "ACD队列",
+  "acd_ocheredi_desc": "真正的Asterisk队列：呼叫分配、坐席暂停/恢复、统计和等待音乐。",
+  "dobavit_ochered": "添加队列",
+  "agenty": "坐席",
+  "ocheredi_ne_sozdany": "尚无队列",
+  "ocheredi_desc_empty": "创建ACD队列，添加坐席并分配负载。",
+  "vyberite_agenta": "请至少选择一名坐席！"
 }

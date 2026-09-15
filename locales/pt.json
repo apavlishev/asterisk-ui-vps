@@ -869,5 +869,13 @@
   "confirm_delete_user": "Excluir usuário?",
   "audit_log": "Registro de auditoria",
   "audit_log_desc": "Quem fez o quê e quando no painel.",
-  "no_audit": "O registro está vazio"
+  "no_audit": "O registro está vazio",
+  "sohranit": "Salvar",
+  "acd_ocheredi": "Filas ACD",
+  "acd_ocheredi_desc": "Filas reais do Asterisk: distribuição de chamadas, pausa/retomada de agentes, estatísticas e música de espera.",
+  "dobavit_ochered": "Adicionar fila",
+  "agenty": "Agentes",
+  "ocheredi_ne_sozdany": "Ainda não há filas",
+  "ocheredi_desc_empty": "Crie uma fila ACD, adicione agentes e distribua a carga.",
+  "vyberite_agenta": "Selecione pelo menos um agente!"
 }

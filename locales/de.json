@@ -869,5 +869,13 @@
   "confirm_delete_user": "Benutzer löschen?",
   "audit_log": "Audit-Protokoll",
   "audit_log_desc": "Wer hat wann was im Panel getan.",
-  "no_audit": "Protokoll ist leer"
+  "no_audit": "Protokoll ist leer",
+  "sohranit": "Speichern",
+  "acd_ocheredi": "ACD-Warteschlangen",
+  "acd_ocheredi_desc": "Echte Asterisk-Warteschlangen: Anrufverteilung, Pause/Aktivierung von Agenten, Statistiken und Wartemusik.",
+  "dobavit_ochered": "Warteschlange hinzufügen",
+  "agenty": "Agenten",
+  "ocheredi_ne_sozdany": "Noch keine Warteschlangen",
+  "ocheredi_desc_empty": "Erstellen Sie eine ACD-Warteschlange, fügen Sie Agenten hinzu und verteilen Sie die Last.",
+  "vyberite_agenta": "Wählen Sie mindestens einen Agenten!"
 }

@@ -869,5 +869,13 @@
   "confirm_delete_user": "ユーザーを削除しますか？",
   "audit_log": "監査ログ",
   "audit_log_desc": "誰がいつ何をしたかの記録。",
-  "no_audit": "ログは空です"
+  "no_audit": "ログは空です",
+  "sohranit": "保存",
+  "acd_ocheredi": "ACDキュー",
+  "acd_ocheredi_desc": "本物のAsteriskキュー: 呼の分配、エージェントの一時停止/再開、統計、保留音楽。",
+  "dobavit_ochered": "キューを追加",
+  "agenty": "エージェント",
+  "ocheredi_ne_sozdany": "キューはまだありません",
+  "ocheredi_desc_empty": "ACDキューを作成し、エージェントを追加して負荷を分散します。",
+  "vyberite_agenta": "少なくとも1人のエージェントを選択してください！"
 }

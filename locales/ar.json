@@ -869,5 +869,13 @@
   "confirm_delete_user": "حذف المستخدم؟",
   "audit_log": "سجل التدقيق",
   "audit_log_desc": "من فعل ماذا ومتى في لوحة التحكم.",
-  "no_audit": "السجل فارغ"
+  "no_audit": "السجل فارغ",
+  "sohranit": "حفظ",
+  "acd_ocheredi": "طوابير ACD",
+  "acd_ocheredi_desc": "طوابير Asterisk الحقيقية: توزيع المكالمات وإيقاف/تفعيل الوكلاء والإحصائيات وموسيقى الانتظار.",
+  "dobavit_ochered": "إضافة طابور",
+  "agenty": "الوكلاء",
+  "ocheredi_ne_sozdany": "لا توجد طوابير بعد",
+  "ocheredi_desc_empty": "أنشئ طابور ACD وأضف وكلاء ووزّع الحمل.",
+  "vyberite_agenta": "اختر وكيلاً واحداً على الأقل!"
 }

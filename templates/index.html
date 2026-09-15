@@ -966,6 +966,11 @@
                         <span>{{ t.gruppy_abonentov_ring_groups }}</span>
                         <span class="px-2 py-0.5 rounded-full bg-secondary/10 text-secondary text-[10px] font-mono font-bold">{{ sip_groups|length if sip_groups else 0 }}</span>
                     </button>
+                    <button type="button" onclick="switchAccountsSubTab('subtab-queues', this)" class="subtab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-surface text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2 border border-outline/30">
+                        <span class="material-symbols-outlined text-[18px] text-tertiary">support_agent</span>
+                        <span>{{ t.acd_ocheredi or 'ACD-очереди' }}</span>
+                        <span class="px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary text-[10px] font-mono font-bold">{{ queues|length if queues else 0 }}</span>
+                    </button>
                 </div>
 
                 <!-- SUBTAB 1: USERS LIST -->
@@ -1198,6 +1203,79 @@
                             <button onclick="openAddGroupModal()" class="px-4 py-2 rounded-xl bg-secondary text-on-primary text-xs font-bold hover:bg-secondary/90 transition-all">
                                 {{ t.sozdat_pervuu_gruppu }}
                             </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- SUBTAB 3: ACD QUEUES (REAL ASTERISK QUEUES) -->
+                <div id="subtab-queues" class="hidden space-y-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 p-5 rounded-2xl bg-tertiary/5 border border-tertiary/20">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-tertiary text-2xl">support_agent</span>
+                            <div>
+                                <h3 class="text-sm font-bold text-on-surface">{{ t.acd_ocheredi or 'ACD-очереди' }}</h3>
+                                <p class="text-xs text-on-surface-variant">{{ t.acd_ocheredi_desc or 'Настоящие очереди Asterisk: распределение вызовов, пауза/снятие агентов, статистика и музыка на удержании.' }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="loadQueueStatus()" class="px-3 py-2 rounded-xl bg-surface border border-outline/30 text-on-surface-variant text-xs font-semibold hover:bg-surface-container transition-all flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">refresh</span>
+                                <span>{{ t.obnovit or 'Обновить' }}</span>
+                            </button>
+                            <button type="button" onclick="openQueueModal()" class="px-4 py-2 rounded-xl bg-tertiary text-on-primary text-xs font-bold hover:bg-tertiary/90 transition-all flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">add</span>
+                                <span>{{ t.dobavit_ochered or 'Добавить очередь' }}</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="queue-list" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {% if queues %}
+                        {% for q in queues %}
+                        <div class="p-5 rounded-2xl bg-surface border border-outline/30 shadow-sm space-y-4">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-tertiary/10 text-tertiary flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-2xl">headset_mic</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-base font-bold text-on-surface">{{ q.name }}</h3>
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            <span class="text-xs font-mono font-bold text-tertiary px-2 py-0.5 rounded bg-tertiary/10">№ {{ q.exten }}</span>
+                                            <span class="text-[11px] text-on-surface-variant">{{ q.strategy }} · {{ q.timeout }}s</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <button type="button" onclick='editQueue({{ q|tojson|safe }})' class="p-2 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors" title="{{ t.redaktirovat or 'Редактировать' }}">
+                                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                                    </button>
+                                    <button type="button" onclick="deleteQueue('{{ q.id }}', '{{ q.name }}')" class="p-2 rounded-xl text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors" title="{{ t.udalit_gruppu }}">
+                                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="text-xs">
+                                <div class="text-on-surface-variant font-semibold mb-1.5">{{ t.agenty or 'Агенты' }}</div>
+                                <div class="flex flex-wrap gap-1.5">
+                                    {% for m in q.members %}
+                                    {% set mext = m.exten if m is mapping else m %}
+                                    <span class="inline-flex items-center gap-1 font-mono text-[11px] font-bold px-2 py-1 rounded-lg bg-surface-container border border-outline/20 queue-agent-chip" data-queue="{{ q.exten }}" data-member="{{ mext }}">
+                                        <span class="queue-agent-dot w-2 h-2 rounded-full bg-outline"></span>
+                                        {{ mext }}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="col-span-full p-10 rounded-2xl bg-surface border border-dashed border-outline/40 text-center space-y-3">
+                            <span class="material-symbols-outlined text-4xl text-on-surface-variant">support_agent</span>
+                            <h3 class="text-sm font-bold text-on-surface">{{ t.ocheredi_ne_sozdany or 'Очереди ещё не созданы' }}</h3>
+                            <p class="text-xs text-on-surface-variant max-w-sm mx-auto">{{ t.ocheredi_desc_empty or 'Создайте ACD-очередь, добавьте агентов и распределите нагрузку.' }}</p>
+                            <button onclick="openQueueModal()" class="px-4 py-2 rounded-xl bg-tertiary text-on-primary text-xs font-bold hover:bg-tertiary/90 transition-all">{{ t.dobavit_ochered or 'Добавить очередь' }}</button>
                         </div>
                         {% endif %}
                     </div>
@@ -7246,8 +7324,96 @@
         </div>
     </div>
 
+    <div id="modal-queue" class="hidden fixed inset-0 bg-on-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-surface rounded-2xl max-w-lg w-full p-6 border border-outline/30 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center pb-2 border-b border-surface-container">
+                <h3 class="text-lg font-bold text-on-surface flex items-center gap-2" id="modal-queue-title">
+                    <span class="material-symbols-outlined text-tertiary">support_agent</span>
+                    <span>{{ t.dobavit_ochered or 'Добавить очередь' }}</span>
+                </h3>
+                <button type="button" onclick="closeQueueModal()" class="text-on-surface-variant hover:text-on-surface p-1 rounded-lg">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+            </div>
+
+            <form id="form-queue" onsubmit="handleSaveQueue(event)" class="space-y-4">
+                <input type="hidden" id="queue-id" value="">
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.nazvanie_gruppy_otdela or 'Название' }}</label>
+                        <input type="text" id="queue-name" required placeholder="Поддержка" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.vnutrennij_nomer or 'Номер' }}</label>
+                        <input type="text" id="queue-exten" required placeholder="700" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.strategia_dozvona or 'Стратегия' }}</label>
+                        <select id="queue-strategy" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs font-semibold text-on-surface">
+                            <option value="ringall">ringall</option>
+                            <option value="leastrecent">leastrecent</option>
+                            <option value="fewestcalls">fewestcalls</option>
+                            <option value="random">random</option>
+                            <option value="rrmemory">rrmemory</option>
+                            <option value="linear">linear</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.tajmaut_sek or 'Таймаут (сек)' }}</label>
+                        <input type="number" id="queue-timeout" value="20" min="5" max="120" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Retry</label>
+                        <input type="number" id="queue-retry" value="5" min="1" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Maxlen</label>
+                        <input type="number" id="queue-maxlen" value="0" min="0" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">MoH</label>
+                        <select id="queue-moh" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs font-semibold text-on-surface">
+                            <option value="default">default</option>
+                            <option value="jazz">jazz</option>
+                            <option value="rock">rock</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-2">{{ t.vyberite_ucastnikov_gruppy_abo or 'Агенты очереди' }}</label>
+                    <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 rounded-xl bg-surface-container-low border border-outline/20">
+                        {% for acc in accounts %}
+                        <label class="flex items-center gap-2 text-xs font-medium text-on-surface cursor-pointer select-none">
+                            <input type="checkbox" value="{{ acc.exten }}" class="queue-agent-checkbox rounded text-tertiary w-4 h-4">
+                            <span class="font-mono font-bold">{{ acc.exten }}</span>
+                            <span class="text-on-surface-variant text-[11px]">({{ acc.name or 'Абонент' }})</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-3">
+                    <button type="button" onclick="closeQueueModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:bg-surface-container">
+                        {{ t.otmena or 'Отмена' }}
+                    </button>
+                    <button type="submit" class="px-6 py-2 rounded-xl bg-tertiary text-on-primary text-xs font-semibold hover:bg-tertiary/90 transition-all shadow-sm">
+                        {{ t.sohranit or 'Сохранить' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        
+
         function switchSecuritySubTab(subtabId, btn) {
             document.getElementById('sec-antifraud').classList.add('hidden');
             document.getElementById('sec-auth').classList.add('hidden');
@@ -7399,6 +7565,8 @@
         function switchAccountsSubTab(subtabId, btn) {
             document.getElementById('subtab-users').classList.add('hidden');
             document.getElementById('subtab-groups').classList.add('hidden');
+            const qtab = document.getElementById('subtab-queues');
+            if (qtab) qtab.classList.add('hidden');
             document.getElementById(subtabId).classList.remove('hidden');
 
             document.querySelectorAll('.subtab-btn').forEach(b => {
@@ -7488,6 +7656,124 @@
                 alert("Ошибка удаления: " + err);
             }
         }
+
+        // ================= ACD QUEUES =================
+        function openQueueModal() {
+            document.getElementById('modal-queue-title').innerHTML = '<span class="material-symbols-outlined text-tertiary">support_agent</span><span>{{ t.dobavit_ochered or "Добавить очередь" }}</span>';
+            document.getElementById('queue-id').value = '';
+            document.getElementById('queue-name').value = '';
+            document.getElementById('queue-exten').value = '';
+            document.getElementById('queue-strategy').value = 'ringall';
+            document.getElementById('queue-timeout').value = '20';
+            document.getElementById('queue-retry').value = '5';
+            document.getElementById('queue-maxlen').value = '0';
+            document.getElementById('queue-moh').value = 'default';
+            document.querySelectorAll('.queue-agent-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('modal-queue').classList.remove('hidden');
+        }
+
+        function editQueue(q) {
+            document.getElementById('modal-queue-title').innerHTML = '<span class="material-symbols-outlined text-tertiary">support_agent</span><span>{{ t.redaktirovat or "Редактировать" }}</span>';
+            document.getElementById('queue-id').value = q.id || '';
+            document.getElementById('queue-name').value = q.name || '';
+            document.getElementById('queue-exten').value = q.exten || '';
+            document.getElementById('queue-strategy').value = q.strategy || 'ringall';
+            document.getElementById('queue-timeout').value = q.timeout || '20';
+            document.getElementById('queue-retry').value = q.retry || '5';
+            document.getElementById('queue-maxlen').value = q.maxlen || '0';
+            document.getElementById('queue-moh').value = q.music_on_hold || 'default';
+            const members = (q.members || []).map(m => (m && m.exten) ? String(m.exten) : String(m));
+            document.querySelectorAll('.queue-agent-checkbox').forEach(cb => {
+                cb.checked = members.includes(cb.value);
+            });
+            document.getElementById('modal-queue').classList.remove('hidden');
+        }
+
+        function closeQueueModal() {
+            document.getElementById('modal-queue').classList.add('hidden');
+        }
+
+        async function handleSaveQueue(e) {
+            e.preventDefault();
+            const id = document.getElementById('queue-id').value;
+            const name = document.getElementById('queue-name').value.trim();
+            const exten = document.getElementById('queue-exten').value.trim();
+            const strategy = document.getElementById('queue-strategy').value;
+            const timeout = parseInt(document.getElementById('queue-timeout').value) || 20;
+            const retry = parseInt(document.getElementById('queue-retry').value) || 5;
+            const maxlen = parseInt(document.getElementById('queue-maxlen').value) || 0;
+            const music_on_hold = document.getElementById('queue-moh').value;
+            const members = [];
+            document.querySelectorAll('.queue-agent-checkbox:checked').forEach(cb => members.push(cb.value));
+            if (members.length === 0) {
+                alert("{{ t.vyberite_agenta or 'Выберите хотя бы одного агента!' }}");
+                return;
+            }
+            try {
+                const res = await fetch('/api/queues/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, name, exten, strategy, timeout, retry, maxlen, music_on_hold, members })
+                });
+                const data = await res.json();
+                if (data.status === 'ok') location.reload();
+                else alert("Ошибка: " + data.message);
+            } catch (err) {
+                alert("Ошибка сохранения: " + err);
+            }
+        }
+
+        async function deleteQueue(id, name) {
+            if (!confirm(`Удалить очередь «${name}»?`)) return;
+            try {
+                const res = await fetch('/api/queues/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                const data = await res.json();
+                if (data.status === 'ok') location.reload();
+            } catch (err) {
+                alert("Ошибка удаления: " + err);
+            }
+        }
+
+        async function loadQueueStatus() {
+            try {
+                const res = await fetch('/api/queues/status');
+                const data = await res.json();
+                if (data.status !== 'ok') return;
+                data.queues.forEach(q => {
+                    document.querySelectorAll(`.queue-agent-chip[data-queue="${q.exten}"]`).forEach(chip => {
+                        const member = chip.getAttribute('data-member');
+                        const dot = chip.querySelector('.queue-agent-dot');
+                        const agent = (q.agents || []).find(a => a.member === member || a.member === 'PJSIP/' + member);
+                        if (!dot) return;
+                        if (!agent) { dot.className = 'queue-agent-dot w-2 h-2 rounded-full bg-outline'; return; }
+                        if (agent.paused) dot.className = 'queue-agent-dot w-2 h-2 rounded-full bg-amber-500';
+                        else if (/unavailable|not in use|busy/i.test(agent.status)) dot.className = 'queue-agent-dot w-2 h-2 rounded-full bg-outline';
+                        else dot.className = 'queue-agent-dot w-2 h-2 rounded-full bg-green-500';
+                        chip.title = `${agent.status} · ${agent.calls_taken} calls`;
+                        chip.style.cursor = 'pointer';
+                        chip.onclick = () => toggleQueueAgent(q.exten, member, agent.paused);
+                    });
+                });
+            } catch (err) { console.log('[queues] status error', err); }
+        }
+
+        async function toggleQueueAgent(queue, member, paused) {
+            await fetch('/api/queues/agent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: paused ? 'unpause' : 'pause', queue, member })
+            });
+            loadQueueStatus();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const qtab = document.getElementById('subtab-queues');
+            if (qtab) { loadQueueStatus(); setInterval(loadQueueStatus, 15000); }
+        });
     </script>
 
 

@@ -268,7 +268,7 @@ udevadm trigger 2>/dev/null || true
 
 # 5.3 Автоматическая генерация эталонного диалплана
 echo "5.3 Генерация эталонного диалплана..."
-cd "$INSTALL_DIR" && python3 -c "import sys; sys.path.insert(0, '$INSTALL_DIR'); import app; app.generate_dialplan_from_tree(); app.generate_pjsip_conf()" 2>/dev/null || echo "   [!] Автогенерация диалплана будет выполнена при первом сохранении настроек в UI."
+cd "$INSTALL_DIR" && python3 -c "import sys; sys.path.insert(0, '$INSTALL_DIR'); import app; app.generate_dialplan_from_tree(); app.generate_pjsip_conf(); app.generate_queues_conf()" 2>/dev/null || echo "   [!] Автогенерация диалплана будет выполнена при первом сохранении настроек в UI."
 
 # 5.4 AMI (Asterisk Manager Interface) для live-контроля вызовов
 echo "5.4 Настройка AMI (управление вызовами)..."

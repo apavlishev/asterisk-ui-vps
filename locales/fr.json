@@ -869,5 +869,13 @@
   "confirm_delete_user": "Supprimer l'utilisateur ?",
   "audit_log": "Journal d'audit",
   "audit_log_desc": "Qui a fait quoi et quand dans le panneau.",
-  "no_audit": "Le journal est vide"
+  "no_audit": "Le journal est vide",
+  "sohranit": "Enregistrer",
+  "acd_ocheredi": "Files d'attente ACD",
+  "acd_ocheredi_desc": "Files d'attente Asterisk réelles : distribution des appels, pause/reprise des agents, statistiques et musique d'attente.",
+  "dobavit_ochered": "Ajouter une file",
+  "agenty": "Agents",
+  "ocheredi_ne_sozdany": "Aucune file pour l'instant",
+  "ocheredi_desc_empty": "Créez une file ACD, ajoutez des agents et répartissez la charge.",
+  "vyberite_agenta": "Sélectionnez au moins un agent !"
 }

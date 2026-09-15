@@ -869,5 +869,13 @@
   "confirm_delete_user": "¿Eliminar usuario?",
   "audit_log": "Registro de auditoría",
   "audit_log_desc": "Quién hizo qué y cuándo en el panel.",
-  "no_audit": "El registro está vacío"
+  "no_audit": "El registro está vacío",
+  "sohranit": "Guardar",
+  "acd_ocheredi": "Colas ACD",
+  "acd_ocheredi_desc": "Colas reales de Asterisk: distribución de llamadas, pausa/activación de agentes, estadísticas y música en espera.",
+  "dobavit_ochered": "Añadir cola",
+  "agenty": "Agentes",
+  "ocheredi_ne_sozdany": "Aún no hay colas",
+  "ocheredi_desc_empty": "Cree una cola ACD, añada agentes y distribuya la carga.",
+  "vyberite_agenta": "¡Seleccione al menos un agente!"
 }

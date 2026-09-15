@@ -869,5 +869,13 @@
   "confirm_delete_user": "उपयोगकर्ता हटाएँ?",
   "audit_log": "ऑडिट लॉग",
   "audit_log_desc": "पैनल में किसने क्या और कब किया।",
-  "no_audit": "लॉग खाली है"
+  "no_audit": "लॉग खाली है",
+  "sohranit": "सहेजें",
+  "acd_ocheredi": "ACD कतारें",
+  "acd_ocheredi_desc": "वास्तविक Asterisk कतारें: कॉल वितरण, एजेंट पॉज़/अनपॉज़, आंकड़े और होल्ड संगीत।",
+  "dobavit_ochered": "कतार जोड़ें",
+  "agenty": "एजेंट",
+  "ocheredi_ne_sozdany": "अभी कोई कतार नहीं",
+  "ocheredi_desc_empty": "एक ACD कतार बनाएं, एजेंट जोड़ें और कार्यभार वितरित करें।",
+  "vyberite_agenta": "कम से कम एक एजेंट चुनें!"
 }
