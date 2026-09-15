@@ -38,6 +38,7 @@ DEFAULT_RULES = [
     {"id": "sip_tls", "name": "SIP TLS (защищённый)", "port": "5061", "proto": "tcp", "action": "allow", "source": "any", "builtin": False},
     {"id": "rtp", "name": "RTP (голос, медиапоток)", "port": "10000-20000", "proto": "udp", "action": "allow", "source": "any", "builtin": True},
     {"id": "sip_extra", "name": "Доп. SIP порт", "port": "5160", "proto": "udp", "action": "allow", "source": "any", "builtin": False},
+    {"id": "webrtc_wss", "name": "WebRTC софтфон (SIP over WSS)", "port": "8089", "proto": "tcp", "action": "allow", "source": "any", "builtin": False},
 ]
 
 BACKEND_LABELS = {

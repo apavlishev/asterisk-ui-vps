@@ -3919,6 +3919,215 @@ AMI_PORT = 5038
 AMI_USER = 'asterisk-gui'
 AMI_SECRET = None
 
+WEBRTC_CERT_DIR = '/etc/asterisk/keys'
+WEBRTC_HTTP_CONF = '/etc/asterisk/http.conf'
+WEBRTC_WS_PORT = 8089
+_webrtc_cert_cache = {'fingerprint': None, 'path': None, 'mtime': 0}
+
+
+def webrtc_ws_enabled():
+    cfg = load_integrations()
+    return bool(cfg.get('webrtc', {}).get('enabled', True))
+
+
+def get_webrtc_cert_fingerprint():
+    """SHA-256 fingerprint of the self-signed TLS cert used for WSS SIP."""
+    path = os.path.join(WEBRTC_CERT_DIR, 'asterisk.pem')
+    if not os.path.exists(path):
+        return None
+    if _webrtc_cert_cache['fingerprint'] and _webrtc_cert_cache['path'] == path:
+        try:
+            if os.path.getmtime(path) <= _webrtc_cert_cache['mtime']:
+                return _webrtc_cert_cache['fingerprint']
+        except Exception:
+            pass
+    try:
+        import hashlib
+        import ssl
+        der = ssl.PEM_cert_to_DER_cert(open(path, 'r', encoding='utf-8').read())
+        fp = hashlib.sha256(der).hexdigest().upper()
+        fp = ':'.join(fp[i:i + 2] for i in range(0, len(fp), 2))
+        _webrtc_cert_cache.update({'fingerprint': fp, 'path': path, 'mtime': os.path.getmtime(path)})
+        return fp
+    except Exception:
+        return None
+
+
+# ================= WEBRTC SOFT-PHONE =================
+def get_webrtc_extensions():
+    """Map of exten -> {'password': ..., 'enabled': bool} for browser soft-phone accounts."""
+    cfg = load_integrations()
+    return cfg.get('webrtc_extensions', {})
+
+
+def save_webrtc_extension(exten, password=None, enabled=True):
+    cfg = load_integrations()
+    store = cfg.get('webrtc_extensions', {})
+    entry = store.get(str(exten), {})
+    if password:
+        entry['password'] = password
+    elif 'password' not in entry:
+        entry['password'] = secrets.token_urlsafe(15)
+    entry['enabled'] = bool(enabled)
+    store[str(exten)] = entry
+    cfg['webrtc_extensions'] = store
+    save_integrations(cfg)
+    generate_pjsip_conf()
+    return entry
+
+
+def _webrtc_ws_url(host):
+    return f"wss://{host}:{WEBRTC_WS_PORT}/ws"
+
+
+def ensure_webrtc_http_conf(host=None, force=False):
+    """Provisions http.conf + self-signed TLS cert so SIP-over-WSS works out of the box."""
+    keys_dir = WEBRTC_CERT_DIR
+    cert = os.path.join(keys_dir, 'asterisk.pem')
+    key = os.path.join(keys_dir, 'asterisk.key')
+    try:
+        os.makedirs(keys_dir, exist_ok=True)
+    except Exception:
+        pass
+
+    if not os.path.exists(cert) or not os.path.exists(key):
+        host_arg = host or 'localhost'
+        try:
+            subprocess.run([
+                'openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes',
+                '-keyout', key, '-out', cert, '-days', '3650',
+                '-subj', f'/CN={host_arg}',
+                '-addext', f'subjectAltName=DNS:{host_arg},DNS:localhost,IP:127.0.0.1',
+            ], capture_output=True, timeout=30)
+        except Exception as e:
+            print(f"[webrtc] openssl cert generation failed: {e}")
+
+    if not os.path.exists(cert) or not os.path.exists(key):
+        return False
+
+    http_conf = WEBRTC_HTTP_CONF
+    desired = [
+        '[general]',
+        'enabled=yes',
+        f'bindaddr=0.0.0.0',
+        f'bindport={WEBRTC_WS_PORT}',
+        'tlsenable=yes',
+        f'tlsbindaddr=0.0.0.0:{WEBRTC_WS_PORT}',
+        f'tlscertfile={cert}',
+        f'tlsprivatekey={key}',
+        '',
+    ]
+    try:
+        if not os.path.exists(http_conf) or force:
+            with open(http_conf, 'w', encoding='utf-8') as f:
+                f.write('\n'.join(desired))
+        else:
+            with open(http_conf, 'r', encoding='utf-8') as f:
+                content = f.read()
+            changed = False
+            for line in desired[1:5]:
+                k = line.split('=')[0]
+                if not re.search(rf'^\s*{re.escape(k)}\s*=', content, re.MULTILINE):
+                    content = content.rstrip() + '\n' + line + '\n'
+                    changed = True
+            if 'tlscertfile' not in content:
+                content = content.rstrip() + f'\ntlscertfile={cert}\ntlsprivatekey={key}\n'
+                changed = True
+            if changed:
+                with open(http_conf, 'w', encoding='utf-8') as f:
+                    f.write(content)
+        return True
+    except Exception as e:
+        print(f"[webrtc] http.conf setup failed: {e}")
+        return False
+
+
+@app.route('/api/webrtc/info', methods=['GET'])
+def api_webrtc_info():
+    accounts = load_sip_accounts()
+    webrtc = get_webrtc_extensions()
+    host = request.host.split(':')[0]
+    payload = {
+        'enabled': webrtc_ws_enabled() and get_webrtc_cert_fingerprint() is not None,
+        'ws_url': _webrtc_ws_url(host),
+        'ws_port': WEBRTC_WS_PORT,
+        'fingerprint': get_webrtc_cert_fingerprint(),
+        'extensions': [
+            {'exten': a['exten'], 'name': a.get('name', ''), 'webrtc': str(a['exten']) in webrtc}
+            for a in accounts
+        ],
+        'ice_servers': [{'urls': 'stun:stun.l.google.com:19302'}],
+    }
+    return jsonify({'status': 'ok', **payload})
+
+
+@app.route('/api/webrtc/setup', methods=['POST'])
+def api_webrtc_setup():
+    """One-click provisioning of TLS cert + http.conf and a reload of Asterisk HTTP/WS."""
+    host = request.host.split(':')[0]
+    ok = ensure_webrtc_http_conf(host=host)
+    if ok:
+        run_asterisk('http reload')
+        run_asterisk('module reload res_http_websocket.so')
+    auth_mgr.audit(session.get('username'), 'webrtc_setup', 'ok' if ok else 'failed')
+    return jsonify({
+        'status': 'ok' if ok else 'error',
+        'message': 'WebRTC-сервер настроен.' if ok else 'Не удалось создать сертификат или http.conf',
+        'ws_url': _webrtc_ws_url(host),
+        'fingerprint': get_webrtc_cert_fingerprint(),
+    })
+
+
+@app.route('/api/webrtc/token', methods=['POST'])
+def api_webrtc_token():
+    """Mints/rotates credentials for the browser soft-phone of one extension."""
+    data = request.get_json() or {}
+    exten = str(data.get('exten') or '').strip()
+    if not exten:
+        return jsonify({'status': 'error', 'message': 'Не указан номер (exten)'})
+
+    accounts = {a['exten']: a for a in load_sip_accounts()}
+    if exten not in accounts:
+        return jsonify({'status': 'error', 'message': f'Абонент {exten} не найден'})
+
+    rotate = bool(data.get('rotate'))
+    entry = get_webrtc_extensions().get(exten, {})
+    password = None
+    if rotate or not entry.get('password'):
+        password = secrets.token_urlsafe(15)
+    entry = save_webrtc_extension(exten, password=password, enabled=True)
+
+    auth_mgr.audit(session.get('username'), 'webrtc_token', exten)
+    host = request.host.split(':')[0]
+    return jsonify({
+        'status': 'ok',
+        'exten': exten,
+        'username': exten,
+        'password': entry['password'],
+        'ws_url': _webrtc_ws_url(host),
+        'fingerprint': get_webrtc_cert_fingerprint(),
+        'ice_servers': [{'urls': 'stun:stun.l.google.com:19302'}],
+    })
+
+
+@app.route('/api/webrtc/disable', methods=['POST'])
+def api_webrtc_disable():
+    data = request.get_json() or {}
+    exten = str(data.get('exten') or '').strip()
+    if not exten:
+        return jsonify({'status': 'error', 'message': 'Не указан номер'})
+    cfg = load_integrations()
+    store = cfg.get('webrtc_extensions', {})
+    if exten in store:
+        store[exten]['enabled'] = False
+    cfg['webrtc_extensions'] = store
+    save_integrations(cfg)
+    generate_pjsip_conf()
+    auth_mgr.audit(session.get('username'), 'webrtc_disable', exten)
+    return jsonify({'status': 'ok'})
+
+
+
 
 def _get_ami_secret():
     global AMI_SECRET
@@ -5652,12 +5861,15 @@ def load_sip_accounts():
         accounts.append({
             'exten': ext,
             'password': pwd,
-            'name': name
+            'name': name,
+            'context': body.get('context', 'from-internal'),
+            'webrtc': body.get('webrtc', 'no') == 'yes' or body.get('media_use_received_transport') == 'yes'
         })
     return sorted(accounts, key=lambda x: x['exten'])
 
-def generate_pjsip_conf():
-    accounts = load_sip_accounts()
+def generate_pjsip_conf(accounts=None):
+    if accounts is None:
+        accounts = load_sip_accounts()
     cfg = load_integrations()
     trunks = cfg.get('sip_trunks', [])
 
@@ -5680,12 +5892,28 @@ def generate_pjsip_conf():
         ""
     ]
 
+    if webrtc_ws_enabled():
+        out += [
+            "; --- WebRTC (WSS) transport для софтфона в браузере ---",
+            "; Реальный TLS-порт и сертификат задаются в http.conf (tlsbindaddr/tlscertfile)",
+            "[transport-wss]",
+            "type=transport",
+            "protocol=wss",
+            "bind=0.0.0.0",
+            "allow_reload=yes",
+            "",
+        ]
+
     # 1. Внутренние софтфоны (Internal Extensions)
     out.append("; --- Внутренние SIP-аккаунты и софтфоны (Internal Extensions) ---")
+    webrtc_store = get_webrtc_extensions()
     for acc in accounts:
         ext = acc['exten']
         pwd = acc['password']
         name = acc.get('name', f"Оператор {ext}")
+        is_webrtc = acc.get('webrtc') or (str(ext) in webrtc_store and webrtc_store[str(ext)].get('enabled', True))
+        if str(ext) in webrtc_store and webrtc_store[str(ext)].get('password'):
+            pwd = webrtc_store[str(ext)]['password']
 
         out.append(f"; Аккаунт {name} ({ext})")
         out.append(f"[{ext}]")
@@ -5707,6 +5935,15 @@ def generate_pjsip_conf():
         out.append("allow=ulaw")
         out.append("allow=g722")
         out.append("allow=slin16")
+        if acc.get('webrtc') or is_webrtc:
+            out.append("allow=opus")
+            out.append("webrtc=yes")
+            out.append("media_encryption=dtls")
+            out.append("dtls_auto_generate_cert=yes")
+            out.append("media_use_received_transport=yes")
+            out.append("rtcp_mux=yes")
+            out.append("ice_support=yes")
+            out.append("use_avpf=yes")
         out.append("direct_media=no")
         out.append("rtp_symmetric=yes")
         out.append("force_rport=yes")
@@ -6317,17 +6554,27 @@ exten => _[1-9]XX,1,NoOp(Внутренний вызов 3-значный: ${{CA
  same => n,Hangup()
 
 exten => _[1-9]XXX,1,NoOp(Внутренний вызов 4-значный: ${{CALLERID(num)}} -> ${{EXTEN}})
- same => n,Set(REC_FILE=${{STRFTIME(${{EPOCH}},,%Y%m%d-%H%M%S)}}_${{CALLERID(num)}}_${{EXTEN}}.wav)
- same => n,Set(__CALL_ID=${{UNIQUEID}})
- same => n,Set(__CALL_SRC=${{CALLERID(num)}})
- same => n,Set(__CALL_DST=${{EXTEN}})
- same => n,Set(__CALL_DIRECTION=internal)
- same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})
- same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)
- same => n,Answer()
- same => n,MixMonitor(${{REC_PATH}},r(${{REC_PATH}}_rx.wav)t(${{REC_PATH}}_tx.wav))
- same => n,Dial(PJSIP/${{EXTEN}},60)
- same => n,Hangup()
+  same => n,Set(REC_FILE=${{STRFTIME(${{EPOCH}},,%Y%m%d-%H%M%S)}}_${{CALLERID(num)}}_${{EXTEN}}.wav)
+  same => n,Set(__CALL_ID=${{UNIQUEID}})
+  same => n,Set(__CALL_SRC=${{CALLERID(num)}})
+  same => n,Set(__CALL_DST=${{EXTEN}})
+  same => n,Set(__CALL_DIRECTION=internal)
+  same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})
+  same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)
+  same => n,Answer()
+  same => n,MixMonitor(${{REC_PATH}},r(${{REC_PATH}}_rx.wav)t(${{REC_PATH}}_tx.wav))
+  same => n,Dial(PJSIP/${{EXTEN}},60)
+  same => n,Hangup()
+
+exten => _[1-9]XXXX,1,NoOp(Внутренний вызов 5-значный: ${{CALLERID(num)}} -> ${{EXTEN}})
+  same => n,Set(__CALL_ID=${{UNIQUEID}})
+  same => n,Set(__CALL_SRC=${{CALLERID(num)}})
+  same => n,Set(__CALL_DST=${{EXTEN}})
+  same => n,Set(__CALL_DIRECTION=internal)
+  same => n,Answer()
+  same => n,Dial(PJSIP/${{EXTEN}},60)
+  same => n,Hangup()
+
 
 {groups_dialplan_block}
 
