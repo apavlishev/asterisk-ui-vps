@@ -762,5 +762,12 @@
   "no_changelog": "لا يوجد وصف للتغييرات.",
   "current_version_label": "الإصدار الحالي",
   "released_at": "تاريخ الإصدار",
-  "update_badge": "جديد"
+  "update_badge": "جديد",
+  "tg_trunk_online": "الخط نشط",
+  "tg_gateway_offline": "البوابة غير متصلة",
+  "tg_checking": "جارٍ التحقق...",
+  "tg_building": "جارٍ البناء...",
+  "tg_installed": "مثبّت",
+  "tg_not_installed": "معطّل",
+  "tg_install_confirm": "هل تريد بناء بوابة tg2sip-webrtc؟ قد يستغرق ذلك أكثر من 30 دقيقة ويتطلب 4 غيغابايت من الذاكرة (سيتم إنشاء swap عند الحاجة)."
 }

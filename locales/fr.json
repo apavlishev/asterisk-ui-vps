@@ -762,5 +762,12 @@
   "no_changelog": "Aucune description des changements.",
   "current_version_label": "Version actuelle",
   "released_at": "Date de publication",
-  "update_badge": "Nouveau"
+  "update_badge": "Nouveau",
+  "tg_trunk_online": "Trunk en ligne",
+  "tg_gateway_offline": "Passerelle hors ligne",
+  "tg_checking": "Vérification...",
+  "tg_building": "Compilation...",
+  "tg_installed": "Installé",
+  "tg_not_installed": "désactivé",
+  "tg_install_confirm": "Compiler la passerelle tg2sip-webrtc ? Cela peut prendre plus de 30 minutes et nécessite 4 Go de RAM (un swap sera créé si nécessaire)."
 }

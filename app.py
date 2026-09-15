@@ -5,6 +5,7 @@ import plugin_manager
 
 import license_mgr
 import marketplace_data
+import telegram_trunk_mgr
 from flask import render_template
 import secrets
 import time
@@ -4687,7 +4688,72 @@ def get_available_gateways(cfg=None):
     for t in cfg.get('sip_trunks', []):
         if t.get('enabled', True):
             gateways.append({'id': t['id'], 'name': f"🌐 SIP-Транк: {t['name']} ({t.get('host', '')})"})
+    tg = cfg.get('telegram_trunk', {})
+    if tg.get('enabled'):
+        gateways.append({'id': 'telegram_trunk', 'name': '✈️ SIP-Транк: Telegram'})
     return gateways
+
+
+TELEGRAM_TRUNK_ID = 'telegram-trunk'
+
+
+def get_telegram_trunk_config(cfg=None):
+    """Normalised Telegram SIP trunk settings with safe defaults."""
+    if cfg is None:
+        cfg = load_integrations()
+    tg = cfg.get('telegram_trunk', {}) or {}
+    try:
+        port = int(tg.get('port', 5062) or 5062)
+    except Exception:
+        port = 5062
+    return {
+        'enabled': bool(tg.get('enabled')),
+        'installed': bool(tg.get('installed')),
+        'port': port,
+        'api_id': str(tg.get('api_id', '') or '').strip(),
+        'api_hash': str(tg.get('api_hash', '') or '').strip(),
+        'phone': str(tg.get('phone', '') or '').strip(),
+        'inbound_target': str(tg.get('inbound_target', 'ALL') or 'ALL').strip(),
+        'account_info': tg.get('account_info') or {},
+    }
+
+
+def build_telegram_trunk_pjsip(cfg=None):
+    """Generates the PJSIP endpoint/aor/identify block for the Telegram gateway."""
+    tg = get_telegram_trunk_config(cfg)
+    if not tg['enabled']:
+        return []
+
+    out = [
+        "; --- Telegram SIP Trunk (tg2sip-webrtc on 127.0.0.1) ---",
+        f"[{TELEGRAM_TRUNK_ID}]",
+        "type=aor",
+        f"contact=sip:127.0.0.1:{tg['port']}",
+        "qualify_frequency=30",
+        "",
+        f"[{TELEGRAM_TRUNK_ID}]",
+        "type=identify",
+        f"endpoint={TELEGRAM_TRUNK_ID}",
+        "match=127.0.0.1",
+        "",
+        f"[{TELEGRAM_TRUNK_ID}]",
+        "type=endpoint",
+        "transport=transport-udp",
+        f"context=from-telegram",
+        "disallow=all",
+        "allow=opus",
+        "allow=alaw",
+        "allow=ulaw",
+        "allow=slin16",
+        "direct_media=no",
+        "rtp_symmetric=yes",
+        "force_rport=yes",
+        "rewrite_contact=yes",
+        f"aors={TELEGRAM_TRUNK_ID}",
+        "callerid=Telegram <000>",
+        "",
+    ]
+    return out
 
 def load_integrations():
     data = {}
@@ -5022,6 +5088,9 @@ def generate_pjsip_conf():
             out.append(f"callerid={t_cid}")
         out.append("")
 
+    # 3. Telegram SIP Trunk (tg2sip-webrtc gateway bound to 127.0.0.1)
+    out.extend(build_telegram_trunk_pjsip(cfg))
+
     try:
         with open(PJSIP_CONF, 'w', encoding='utf-8') as f:
             f.write('\n'.join(out))
@@ -5069,6 +5138,8 @@ def build_outbound_dialplan_lines(cfg):
     def get_dial_str(gw, exten_var="${EXTEN}"):
         if not gw or gw == 'dongle0' or gw == 'dongle_pool':
             return f"Dongle/dongle0/{exten_var}"
+        elif gw == 'telegram_trunk':
+            return f"PJSIP/{TELEGRAM_TRUNK_ID}/{exten_var}"
         else:
             return f"PJSIP/{exten_var}@{gw}"
 
@@ -5351,6 +5422,11 @@ exten => i,1,NoOp({trunk_title} IVR {n_id}: Неверный ввод клави
         t_name = t.get('name', t_id)
         trunk_tree = ivr_trees.get(t_id) or ivr_trees.get('default') or default_ivr_tree
         all_ivr_contexts.append(compile_tree_to_contexts(trunk_tree, f"trunk-in-{t_id}", f"SIP Trunk {t_name}"))
+
+    # 3. Telegram SIP Trunk incoming (from-telegram) — only when enabled
+    if get_telegram_trunk_config(cfg).get('enabled'):
+        tg_tree = ivr_trees.get('telegram') or ivr_trees.get('default') or default_ivr_tree
+        all_ivr_contexts.append(compile_tree_to_contexts(tg_tree, 'from-telegram', 'Telegram Gateway'))
 
     ivr_sections = "\n\n".join(all_ivr_contexts)
 
@@ -7357,36 +7433,90 @@ def tg_login():
         return jsonify({"success": False, "error": str(e)})
 
 @app.route('/api/telegram/start_tg2sip', methods=['POST'])
-
 def tg_start_tg2sip():
-    data = request.json
+    data = request.get_json(silent=True) or {}
     port = data.get('port', 5062)
     api_id = data.get('api_id', '')
     api_hash = data.get('api_hash', '')
     phone = data.get('phone', '')
-    
+    inbound_target = data.get('inbound_target', 'ALL')
+
     cfg = load_integrations()
-    if 'telegram_trunk' not in cfg:
+    if 'telegram_trunk' not in cfg or not isinstance(cfg.get('telegram_trunk'), dict):
         cfg['telegram_trunk'] = {}
-    
+
+    try:
+        port = int(port)
+    except Exception:
+        port = 5062
+
     cfg['telegram_trunk']['port'] = port
     cfg['telegram_trunk']['api_id'] = api_id
     cfg['telegram_trunk']['api_hash'] = api_hash
     cfg['telegram_trunk']['phone'] = phone
-    
+    cfg['telegram_trunk']['inbound_target'] = inbound_target
+    cfg['telegram_trunk']['enabled'] = True
     save_integrations(cfg)
 
-    
-    # Mocking the docker run command for tg2sip
-    return jsonify({"success": True, "msg": f"tg2sip scheduled on port {port}"})
+    # Regenerate core config so the PJSIP endpoint and from-telegram context appear
+    try:
+        generate_pjsip_conf()
+        generate_dialplan_from_tree()
+    except Exception as e:
+        return jsonify({"success": False, "error": f"Настройки сохранены, но не удалось применить конфигурацию: {e}"})
+
+    status = telegram_trunk_mgr.get_status(cfg)
+    if not status['installed']:
+        return jsonify({
+            "success": True,
+            "installed": False,
+            "msg": "Настройки сохранены. Шлюз tg2sip-webrtc ещё не собран — выполните установку.",
+            "status": status,
+        })
+
+    telegram_trunk_mgr.write_config(cfg)
+    ok, msg = telegram_trunk_mgr.restart_service()
+    return jsonify({"success": ok, "installed": True, "msg": msg, "status": telegram_trunk_mgr.get_status(cfg)})
+
+
+@app.route('/api/telegram/trunk/install', methods=['POST'])
+def tg_trunk_install():
+    """Starts the (long) background build of the tg2sip-webrtc gateway."""
+    ok, msg = telegram_trunk_mgr.start_build()
+    return jsonify({"success": ok, "msg": msg, "status": telegram_trunk_mgr.get_status(load_integrations())})
+
+
+@app.route('/api/telegram/trunk/action', methods=['POST'])
+def tg_trunk_action():
+    data = request.get_json(silent=True) or {}
+    action = (data.get('action') or '').strip()
+    cfg = load_integrations()
+
+    if action == 'start':
+        ok, msg = telegram_trunk_mgr.start_service()
+    elif action == 'stop':
+        ok, msg = telegram_trunk_mgr.stop_service()
+    elif action == 'restart':
+        ok, msg = telegram_trunk_mgr.restart_service()
+    elif action == 'uninstall':
+        ok, msg = telegram_trunk_mgr.uninstall()
+        if ok:
+            cfg = load_integrations()
+            if isinstance(cfg.get('telegram_trunk'), dict):
+                cfg['telegram_trunk']['installed'] = False
+                save_integrations(cfg)
+    else:
+        return jsonify({"success": False, "error": f"Неизвестное действие: {action}"})
+
+    return jsonify({"success": ok, "msg": msg, "status": telegram_trunk_mgr.get_status(load_integrations())})
+
 
 @app.route('/api/telegram/status', methods=['GET'])
-
 def tg_status():
     cfg = load_integrations()
     tg = cfg.get('telegram_trunk', {})
     port = int(tg.get('port', 5062))
-    
+
     import socket
     is_online = False
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
@@ -7397,10 +7527,24 @@ def tg_status():
         except OSError:
             # If we CANNOT bind, something (tg2sip) is using it!
             is_online = True
-            
+
+    status = telegram_trunk_mgr.get_status(cfg)
+    status['online'] = is_online
+    status['port'] = port
+    return jsonify(status)
+
+
+@app.route('/api/telegram/trunk/logs', methods=['GET'])
+def tg_trunk_logs():
+    lines = request.args.get('lines', '60')
+    try:
+        lines = int(lines)
+    except Exception:
+        lines = 60
     return jsonify({
-        "online": is_online,
-        "port": port
+        "success": True,
+        "build_log": telegram_trunk_mgr.build_log_tail(lines),
+        "state": telegram_trunk_mgr.read_build_state(),
     })
 
 

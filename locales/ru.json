@@ -760,5 +760,12 @@
   "no_changelog": "Описание изменений не указано.",
   "current_version_label": "Текущая версия",
   "released_at": "Дата релиза",
-  "update_badge": "New"
+  "update_badge": "New",
+  "tg_trunk_online": "Транк Онлайн",
+  "tg_gateway_offline": "Шлюз Отключен",
+  "tg_checking": "Проверка...",
+  "tg_building": "Сборка...",
+  "tg_installed": "Установлен",
+  "tg_not_installed": "не включён",
+  "tg_install_confirm": "Собрать шлюз tg2sip-webrtc? Это может занять 30+ минут и требует 4 ГБ RAM (будет создан swap при необходимости)."
 }

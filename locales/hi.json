@@ -762,5 +762,12 @@
   "no_changelog": "परिवर्तनों का विवरण नहीं है।",
   "current_version_label": "वर्तमान संस्करण",
   "released_at": "रिलीज़ दिनांक",
-  "update_badge": "नया"
+  "update_badge": "नया",
+  "tg_trunk_online": "ट्रंक ऑनलाइन",
+  "tg_gateway_offline": "गेटवे ऑफ़लाइन",
+  "tg_checking": "जांच हो रही है...",
+  "tg_building": "बिल्ड हो रहा है...",
+  "tg_installed": "स्थापित",
+  "tg_not_installed": "अक्षम",
+  "tg_install_confirm": "tg2sip-webrtc गेटवे बिल्ड करें? इसमें 30+ मिनट लग सकते हैं और 4 GB RAM चाहिए (आवश्यकता पड़ने पर swap बनाया जाएगा)।"
 }

@@ -762,5 +762,12 @@
   "no_changelog": "No hay descripción de cambios.",
   "current_version_label": "Versión actual",
   "released_at": "Fecha de lanzamiento",
-  "update_badge": "Nuevo"
+  "update_badge": "Nuevo",
+  "tg_trunk_online": "Troncal en línea",
+  "tg_gateway_offline": "Puerta de enlace desconectada",
+  "tg_checking": "Comprobando...",
+  "tg_building": "Compilando...",
+  "tg_installed": "Instalado",
+  "tg_not_installed": "desactivado",
+  "tg_install_confirm": "¿Compilar la puerta de enlace tg2sip-webrtc? Puede tardar más de 30 minutos y requiere 4 GB de RAM (se creará swap si es necesario)."
 }

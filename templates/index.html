@@ -1730,6 +1730,8 @@
                             <select id="ivr-trunk-selector" onchange="switchIvrTrunkRoute(this.value)" class="px-3.5 py-1.5 rounded-xl bg-surface border border-outline text-xs font-bold text-primary cursor-pointer shadow-sm min-w-[260px]">
                                 <option value="default">🌐 {{ t.ivr_opt_default or "Общий сценарий (По умолчанию)" }}</option>
                                 <option value="gsm_pool">{{ t.gsm_modemy_pul_sim_kart }}</option>
+                                {% set tg_cfg = integrations.get('telegram_trunk', {}) %}
+                                <option value="telegram">✈️ Telegram{% if not tg_cfg.get('enabled') %} ({{ t.tg_not_installed or 'не включён' }}){% endif %}</option>
                                 {% for trk in sip_trunks %}
                                 <option value="{{ trk.id }}">📞 SIP Транк: {{ trk.name }} ({{ trk.host }})</option>
                                 {% endfor %}

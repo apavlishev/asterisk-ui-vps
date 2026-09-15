@@ -762,5 +762,12 @@
   "no_changelog": "変更内容の説明がありません。",
   "current_version_label": "現在のバージョン",
   "released_at": "リリース日",
-  "update_badge": "新着"
+  "update_badge": "新着",
+  "tg_trunk_online": "トランク オンライン",
+  "tg_gateway_offline": "ゲートウェイ オフライン",
+  "tg_checking": "確認中...",
+  "tg_building": "ビルド中...",
+  "tg_installed": "インストール済み",
+  "tg_not_installed": "無効",
+  "tg_install_confirm": "tg2sip-webrtc ゲートウェイをビルドしますか？30分以上かかり、4 GB の RAM が必要です（必要に応じて swap を作成します）。"
 }

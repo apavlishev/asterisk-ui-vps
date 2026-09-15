@@ -762,5 +762,12 @@
   "no_changelog": "Nenhuma descrição de alterações.",
   "current_version_label": "Versão atual",
   "released_at": "Data de lançamento",
-  "update_badge": "Novo"
+  "update_badge": "Novo",
+  "tg_trunk_online": "Tronco online",
+  "tg_gateway_offline": "Gateway offline",
+  "tg_checking": "Verificando...",
+  "tg_building": "Compilando...",
+  "tg_installed": "Instalado",
+  "tg_not_installed": "desativado",
+  "tg_install_confirm": "Compilar o gateway tg2sip-webrtc? Isso pode levar mais de 30 minutos e requer 4 GB de RAM (swap será criado se necessário)."
 }
