@@ -811,5 +811,9 @@
   "fw_edit_source": "Quelle (any oder IP/Subnetz)",
   "fw_confirm_delete": "Diese Regel löschen?",
   "fw_pending_warning": "Regeln angewendet. Wenn das Panel erreichbar ist, bestätigen Sie; sonst wird in 90 Sekunden automatisch zurückgesetzt.",
-  "fw_confirm": "Bestätigen"
+  "fw_confirm": "Bestätigen",
+  "fw_open_ports": "Offene Ports auf dem Server",
+  "fw_open_ports_desc": "Tatsächlich erlaubte Ports aus der aktiven Firewall (inkl. außerhalb des Panels erstellter Regeln).",
+  "fw_no_open_ports": "Keine aktiven Erlaubnisregeln (Firewall ist aus oder leer).",
+  "fw_backend": "Firewall"
 }

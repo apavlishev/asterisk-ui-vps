@@ -811,5 +811,9 @@
   "fw_edit_source": "来源（any 或 IP/子网）",
   "fw_confirm_delete": "删除此规则？",
   "fw_pending_warning": "规则已应用。如果面板仍可访问，请确认；否则将在 90 秒后自动回滚。",
-  "fw_confirm": "确认"
+  "fw_confirm": "确认",
+  "fw_open_ports": "服务器上开放的端口",
+  "fw_open_ports_desc": "从活动防火墙读取的实际允许端口（包括在面板外创建的规则）。",
+  "fw_no_open_ports": "没有活动的允许规则（防火墙已关闭或为空）。",
+  "fw_backend": "防火墙"
 }

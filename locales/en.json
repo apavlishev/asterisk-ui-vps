@@ -811,5 +811,9 @@
   "fw_edit_source": "Source (any or IP/subnet)",
   "fw_confirm_delete": "Delete this rule?",
   "fw_pending_warning": "Rules applied. If the panel is still reachable, confirm; otherwise changes revert automatically in 90 seconds.",
-  "fw_confirm": "Confirm"
+  "fw_confirm": "Confirm",
+  "fw_open_ports": "Open ports on the server",
+  "fw_open_ports_desc": "Actual allowed ports read from the active firewall (including rules created outside the panel).",
+  "fw_no_open_ports": "No active allow rules (firewall is off or empty).",
+  "fw_backend": "Firewall"
 }

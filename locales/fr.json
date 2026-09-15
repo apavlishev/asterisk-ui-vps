@@ -811,5 +811,9 @@
   "fw_edit_source": "Source (any ou IP/sous-réseau)",
   "fw_confirm_delete": "Supprimer cette règle ?",
   "fw_pending_warning": "Règles appliquées. Si le panneau reste accessible, confirmez ; sinon l'annulation est automatique après 90 secondes.",
-  "fw_confirm": "Confirmer"
+  "fw_confirm": "Confirmer",
+  "fw_open_ports": "Ports ouverts sur le serveur",
+  "fw_open_ports_desc": "Ports réellement autorisés lus depuis le pare-feu actif (y compris les règles créées hors du panneau).",
+  "fw_no_open_ports": "Aucune règle d'autorisation active (pare-feu désactivé ou vide).",
+  "fw_backend": "Pare-feu"
 }

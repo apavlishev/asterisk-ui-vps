@@ -95,9 +95,11 @@ else
     echo "    [!] Fail2ban не запустился. Проверьте: systemctl status fail2ban"
 fi
 
-# Настройка фаервола: открываем только необходимые для работы порты
-echo "2.2 Настройка фаервола (nftables/iptables)..."
-apt-get install -y nftables iptables || true
+# Настройка фаервола: открываем только необходимые для работы порты.
+# Панель сама определит уже установленный фаервол (ufw/firewalld/nft/iptables),
+# а при их отсутствии поставит ufw.
+echo "2.2 Настройка фаервола (автоопределение: ufw/firewalld/nftables/iptables)..."
+apt-get install -y ufw nftables iptables || true
 
 # Развертывание исходного кода (self-bootstrap: работает и из клона, и из curl | bash)
 echo "3. Развертывание исходного кода..."
@@ -336,13 +338,14 @@ import sys
 sys.path.insert(0, "/opt/asterisk-gui")
 import firewall_mgr
 if not firewall_mgr.is_available():
-    print("   [!] nft/iptables не найдены — пропуск настройки фаервола.")
+    print("   [!] Фаервол не найден и ufw не установился — пропуск настройки фаервола.")
     sys.exit(1)
 state = firewall_mgr.load_state()
 state = firewall_mgr.ensure_defaults(state)
 state["enabled"] = True
 firewall_mgr.save_state(state)
-ok, msg = firewall_mgr.apply_rules(state)
+# safe=False: это первичная установка, watchdog-откат не нужен (SSH уже открыт)
+ok, msg = firewall_mgr.apply_rules(state, safe=False)
 print("   ", msg)
 sys.exit(0 if ok else 1)
 FWEOF

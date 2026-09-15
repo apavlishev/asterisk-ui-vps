@@ -811,5 +811,9 @@
   "fw_edit_source": "Origem (any ou IP/sub-rede)",
   "fw_confirm_delete": "Eliminar esta regra?",
   "fw_pending_warning": "Regras aplicadas. Se o painel ainda estiver acessível, confirme; caso contrário, as alterações revertem em 90 segundos.",
-  "fw_confirm": "Confirmar"
+  "fw_confirm": "Confirmar",
+  "fw_open_ports": "Portas abertas no servidor",
+  "fw_open_ports_desc": "Portas realmente permitidas lidas do firewall ativo (incluindo regras criadas fora do painel).",
+  "fw_no_open_ports": "Nenhuma regra de permissão ativa (firewall desligado ou vazio).",
+  "fw_backend": "Firewall"
 }

@@ -3611,7 +3611,7 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
-                                <span id="fw-backend-badge" class="text-xs px-3 py-1 rounded-full bg-surface-container-high text-on-surface font-mono font-bold border border-outline/30">{{ fw.backend }}</span>
+                                <span id="fw-backend-badge" class="text-xs px-3 py-1 rounded-full bg-surface-container-high text-on-surface font-mono font-bold border border-outline/30">{{ fw.backend_label or fw.backend }}</span>
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" id="fw-enabled-toggle" onchange="toggleFirewall(this.checked)" class="sr-only peer" {% if fw.enabled %}checked{% endif %} {% if not fw.available %}disabled{% endif %}>
                                     <div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
@@ -3724,6 +3724,53 @@
                                 <span>{{ t.fw_apply or 'Применить правила' }}</span>
                             </button>
                             <span class="text-[11px] text-on-surface-variant">{{ t.fw_hint or 'Базовые порты (SSH, 8888, SIP, RTP) добавляются автоматически при установке.' }}</span>
+                        </div>
+                    </div>
+
+                    <!-- LIVE OPEN PORTS ON THE SERVER -->
+                    <div class="bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-surface-container">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-success text-2xl">lan</span>
+                                <div>
+                                    <h2 class="text-base font-bold text-on-surface">{{ t.fw_open_ports or 'Открытые порты на сервере' }}</h2>
+                                    <p class="text-xs text-on-surface-variant">{{ t.fw_open_ports_desc or 'Фактические разрешённые порты, считанные из активного фаервола (включая правила, созданные вне панели).' }}</p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="refreshFirewall()" class="px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-xs font-semibold text-on-surface border border-outline/30 flex items-center gap-1.5 transition-all">
+                                <span class="material-symbols-outlined text-[16px]">refresh</span>
+                                <span>{{ t.obnovit or 'Обновить' }}</span>
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto rounded-xl border border-outline/30">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-surface-container-low border-b border-surface-container text-on-surface-variant font-semibold uppercase tracking-wider">
+                                        <th class="px-4 py-3">{{ t.fw_col_port or 'Порт' }}</th>
+                                        <th class="px-4 py-3">{{ t.fw_col_proto or 'Протокол' }}</th>
+                                        <th class="px-4 py-3">{{ t.fw_col_source or 'Источник' }}</th>
+                                        <th class="px-4 py-3">{{ t.fw_col_action or 'Действие' }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="fw-open-ports-tbody" class="divide-y divide-surface-container">
+                                    {% if fw.open_ports %}
+                                    {% for p in fw.open_ports %}
+                                    <tr>
+                                        <td class="px-4 py-3 font-mono font-bold text-on-surface">{{ p.port }}</td>
+                                        <td class="px-4 py-3 font-mono uppercase text-on-surface-variant">{{ p.proto }}</td>
+                                        <td class="px-4 py-3 font-mono text-on-surface-variant">{{ p.source }}</td>
+                                        <td class="px-4 py-3"><span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-success/10 text-success border border-success/20">{{ t.fw_allow or 'РАЗРЕШЁН' }}</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="4" class="px-4 py-8 text-center text-on-surface-variant text-xs">
+                                            {{ t.fw_no_open_ports or 'Нет активных разрешающих правил (фаервол выключен или пуст).' }}
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -6744,7 +6791,7 @@
         function renderFirewallState(data) {
             if (!data || !data.rules) return;
             const backendBadge = document.getElementById('fw-backend-badge');
-            if (backendBadge) backendBadge.textContent = data.backend || 'none';
+            if (backendBadge) backendBadge.textContent = data.backend_label || data.backend || '—';
             const toggle = document.getElementById('fw-enabled-toggle');
             if (toggle) toggle.checked = !!data.enabled;
 
@@ -6761,25 +6808,55 @@
             }
 
             const tbody = document.getElementById('fw-rules-tbody');
-            if (!tbody) return;
-            let html = '';
-            for (const r of data.rules) {
-                const badge = r.builtin ? ' <span class="ml-1 text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold">{{ t.fw_builtin or "базовое" }}</span>' : '';
-                const act = r.action === 'allow'
-                    ? '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-success/10 text-success border border-success/20">{{ t.fw_allow or "РАЗРЕШЁН" }}</span>'
-                    : '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-error/10 text-error border border-error/20">{{ t.fw_deny or "ЗАКРЫТ" }}</span>';
-                html += '<tr data-rule-id="' + r.id + '">'
-                    + '<td class="px-4 py-3 font-semibold text-on-surface">' + (r.name || '') + badge + '</td>'
-                    + '<td class="px-4 py-3 font-mono text-on-surface">' + (r.port || '') + '</td>'
-                    + '<td class="px-4 py-3 font-mono uppercase text-on-surface-variant">' + (r.proto || '') + '</td>'
-                    + '<td class="px-4 py-3 font-mono text-on-surface-variant">' + (r.source || 'any') + '</td>'
-                    + '<td class="px-4 py-3">' + act + '</td>'
-                    + '<td class="px-4 py-3 text-right space-x-1">'
-                    + '<button type="button" onclick=\'openEditFirewallRule(' + JSON.stringify(r) + ')\' class="p-1.5 rounded-lg text-primary hover:bg-primary/10 transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button>'
-                    + '<button type="button" onclick="deleteFirewallRule(\'' + r.id + '\')" class="p-1.5 rounded-lg text-error hover:bg-error/10 transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>'
-                    + '</td></tr>';
+            if (tbody) {
+                let html = '';
+                for (const r of data.rules) {
+                    const badge = r.builtin ? ' <span class="ml-1 text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold">{{ t.fw_builtin or "базовое" }}</span>' : '';
+                    const act = r.action === 'allow'
+                        ? '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-success/10 text-success border border-success/20">{{ t.fw_allow or "РАЗРЕШЁН" }}</span>'
+                        : '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-error/10 text-error border border-error/20">{{ t.fw_deny or "ЗАКРЫТ" }}</span>';
+                    html += '<tr data-rule-id="' + r.id + '">'
+                        + '<td class="px-4 py-3 font-semibold text-on-surface">' + (r.name || '') + badge + '</td>'
+                        + '<td class="px-4 py-3 font-mono text-on-surface">' + (r.port || '') + '</td>'
+                        + '<td class="px-4 py-3 font-mono uppercase text-on-surface-variant">' + (r.proto || '') + '</td>'
+                        + '<td class="px-4 py-3 font-mono text-on-surface-variant">' + (r.source || 'any') + '</td>'
+                        + '<td class="px-4 py-3">' + act + '</td>'
+                        + '<td class="px-4 py-3 text-right space-x-1">'
+                        + '<button type="button" onclick=\'openEditFirewallRule(' + JSON.stringify(r) + ')\' class="p-1.5 rounded-lg text-primary hover:bg-primary/10 transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button>'
+                        + '<button type="button" onclick="deleteFirewallRule(\'' + r.id + '\')" class="p-1.5 rounded-lg text-error hover:bg-error/10 transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>'
+                        + '</td></tr>';
+                }
+                tbody.innerHTML = html;
             }
-            tbody.innerHTML = html;
+
+            // Live open ports table
+            const portsBody = document.getElementById('fw-open-ports-tbody');
+            if (portsBody && data.open_ports) {
+                if (!data.open_ports.length) {
+                    portsBody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-on-surface-variant text-xs">{{ t.fw_no_open_ports or "Нет активных разрешающих правил (фаервол выключен или пуст)." }}</td></tr>';
+                } else {
+                    let ph = '';
+                    for (const p of data.open_ports) {
+                        ph += '<tr>'
+                            + '<td class="px-4 py-3 font-mono font-bold text-on-surface">' + (p.port || '') + '</td>'
+                            + '<td class="px-4 py-3 font-mono uppercase text-on-surface-variant">' + (p.proto || '') + '</td>'
+                            + '<td class="px-4 py-3 font-mono text-on-surface-variant">' + (p.source || '') + '</td>'
+                            + '<td class="px-4 py-3"><span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-success/10 text-success border border-success/20">{{ t.fw_allow or "РАЗРЕШЁН" }}</span></td>'
+                            + '</tr>';
+                    }
+                    portsBody.innerHTML = ph;
+                }
+            }
+        }
+
+        async function refreshFirewall() {
+            try {
+                const res = await fetch('/api/security/firewall/status', { cache: 'no-store' });
+                const data = await res.json();
+                renderFirewallState(data);
+            } catch (e) {
+                console.error('firewall refresh failed', e);
+            }
         }
 
         function toggleFirewall(enabled) {

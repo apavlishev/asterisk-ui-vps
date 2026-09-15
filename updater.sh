@@ -116,9 +116,9 @@ EOF_JAIL
     echo "fail2ban reconfigured." >> /tmp/asterisk-update.log
 fi
 
-# Фаервол: гарантируем наличие nftables/iptables и базовых правил (без сброса
-# пользовательских настроек — добавляем только отсутствующие базовые порты).
-apt-get install -y nftables iptables >> /tmp/asterisk-update.log 2>&1 || true
+# Фаервол: автоопределение backend (ufw/firewalld/nft/iptables) и базовые
+# правила без сброса пользовательских настроек.
+apt-get install -y ufw nftables iptables >> /tmp/asterisk-update.log 2>&1 || true
 /usr/bin/python3 - <<'FWEOF' >> /tmp/asterisk-update.log 2>&1 || true
 import sys
 sys.path.insert(0, "/opt/asterisk-gui")
@@ -127,7 +127,8 @@ state = firewall_mgr.load_state()
 had_defaults = state.get("installed_defaults", False)
 state = firewall_mgr.ensure_defaults(state)
 if state.get("enabled"):
-    firewall_mgr.apply_rules(state)
+    # safe=False: обновление в фоне, watchdog-откат не нужен
+    firewall_mgr.apply_rules(state, safe=False)
 print("[firewall] defaults ensured:", had_defaults, "->", state.get("installed_defaults"))
 FWEOF
 

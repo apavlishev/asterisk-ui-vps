@@ -811,5 +811,9 @@
   "fw_edit_source": "Origen (any o IP/subred)",
   "fw_confirm_delete": "¿Eliminar esta regla?",
   "fw_pending_warning": "Reglas aplicadas. Si el panel sigue accesible, confirme; de lo contrario se revertirán en 90 segundos.",
-  "fw_confirm": "Confirmar"
+  "fw_confirm": "Confirmar",
+  "fw_open_ports": "Puertos abiertos en el servidor",
+  "fw_open_ports_desc": "Puertos permitidos reales leídos del cortafuegos activo (incluidas reglas creadas fuera del panel).",
+  "fw_no_open_ports": "No hay reglas de permiso activas (el cortafuegos está desactivado o vacío).",
+  "fw_backend": "Cortafuegos"
 }
