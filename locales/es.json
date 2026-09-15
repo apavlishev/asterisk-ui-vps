@@ -854,5 +854,20 @@
   "confirm_delete_recording": "¿Eliminar grabación?",
   "period_all": "Todo el tiempo",
   "hours": "horas",
-  "days": "días"
+  "days": "días",
+  "users_roles": "Usuarios y roles",
+  "users_roles_desc": "Separación de acceso: admin, operador, solo lectura. Soporte 2FA.",
+  "add_user": "Añadir usuario",
+  "username": "Usuario",
+  "role": "Rol",
+  "password": "Contraseña",
+  "no_users": "Sin usuarios",
+  "setup_2fa": "Configurar 2FA",
+  "role_prompt": "Rol (admin / operator / readonly)",
+  "two_fa_secret": "Secreto 2FA",
+  "two_fa_add": "Añádalo a su app de autenticación y luego active 2FA para el usuario.",
+  "confirm_delete_user": "¿Eliminar usuario?",
+  "audit_log": "Registro de auditoría",
+  "audit_log_desc": "Quién hizo qué y cuándo en el panel.",
+  "no_audit": "El registro está vacío"
 }

@@ -854,5 +854,20 @@
   "confirm_delete_recording": "Delete recording?",
   "period_all": "All time",
   "hours": "hours",
-  "days": "days"
+  "days": "days",
+  "users_roles": "Users and roles",
+  "users_roles_desc": "Access separation: admin, operator, view-only. 2FA support.",
+  "add_user": "Add user",
+  "username": "Username",
+  "role": "Role",
+  "password": "Password",
+  "no_users": "No users",
+  "setup_2fa": "Set up 2FA",
+  "role_prompt": "Role (admin / operator / readonly)",
+  "two_fa_secret": "2FA secret",
+  "two_fa_add": "Add it to your authenticator app, then enable 2FA for the user.",
+  "confirm_delete_user": "Delete user?",
+  "audit_log": "Audit log",
+  "audit_log_desc": "Who did what and when in the control panel.",
+  "no_audit": "Log is empty"
 }

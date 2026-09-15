@@ -854,5 +854,20 @@
   "confirm_delete_recording": "Supprimer l'enregistrement ?",
   "period_all": "Tout l'historique",
   "hours": "heures",
-  "days": "jours"
+  "days": "jours",
+  "users_roles": "Utilisateurs et rôles",
+  "users_roles_desc": "Séparation des droits : admin, opérateur, lecture seule. Support 2FA.",
+  "add_user": "Ajouter un utilisateur",
+  "username": "Identifiant",
+  "role": "Rôle",
+  "password": "Mot de passe",
+  "no_users": "Aucun utilisateur",
+  "setup_2fa": "Configurer 2FA",
+  "role_prompt": "Rôle (admin / operator / readonly)",
+  "two_fa_secret": "Secret 2FA",
+  "two_fa_add": "Ajoutez-le à votre application d'authentification, puis activez la 2FA pour l'utilisateur.",
+  "confirm_delete_user": "Supprimer l'utilisateur ?",
+  "audit_log": "Journal d'audit",
+  "audit_log_desc": "Qui a fait quoi et quand dans le panneau.",
+  "no_audit": "Le journal est vide"
 }

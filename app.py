@@ -8,6 +8,7 @@ import license_mgr
 import marketplace_data
 import telegram_trunk_mgr
 import firewall_mgr
+import auth_mgr
 from flask import render_template
 import secrets
 import time
@@ -246,41 +247,66 @@ def get_client_ip():
 
 @app.before_request
 def check_security_and_auth():
-    if request.path.startswith('/static') or request.path == '/login' or request.path.startswith('/api/'):
+    # Always allow static assets and the login/logout flow
+    if (request.path.startswith('/static') or request.path == '/login'
+            or request.path == '/logout' or request.path.startswith('/set-language')):
         return None
 
     cfg = load_integrations()
     auth_cfg = cfg.get('security_auth', {})
-    if auth_cfg.get('enabled', False):
-        if not session.get('logged_in'):
-            return redirect(url_for('login_page'))
+
+    if not auth_cfg.get('enabled', False):
+        # Auth disabled: behave as a full admin session
+        session['role'] = 'admin'
+        return None
+
+    # API endpoints require an authenticated session too (except the login API)
+    if request.path.startswith('/api/') and not session.get('logged_in'):
+        return jsonify({'success': False, 'error': 'Требуется авторизация'}), 401
+
+    if not session.get('logged_in'):
+        return redirect(url_for('login_page'))
+
+    # Role-based authorization for state-changing requests
+    role = session.get('role', 'admin')
+    if not auth_mgr.can_execute(role, request.path, request.method):
+        auth_mgr.audit(session.get('username'), 'access_denied', f'{request.method} {request.path}')
+        if request.path.startswith('/api/'):
+            return jsonify({'success': False, 'error': 'Недостаточно прав для этого действия'}), 403
+        flash('Недостаточно прав для этого действия.')
+        return redirect(url_for('index'))
     return None
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
     cfg = load_integrations()
     auth_cfg = cfg.get('security_auth', {})
-    
+
     if request.method == 'POST':
         user = request.form.get('username', '').strip()
         pwd = request.form.get('password', '').strip()
-        
-        cfg_user = auth_cfg.get('username', 'admin')
-        cfg_pwd = auth_cfg.get('password', 'admin')
-        
-        if user == cfg_user and pwd == cfg_pwd:
+        totp_code = request.form.get('totp_code', '').strip()
+
+        ok, result = auth_mgr.authenticate(cfg, user, pwd, totp_code)
+        if ok:
+            u = result
             session['logged_in'] = True
-            session['username'] = user
+            session['username'] = u.get('username', user)
+            session['role'] = u.get('role', 'operator')
+            auth_mgr.audit(user, 'login_success', f"role={session['role']}")
             flash('Авторизация успешна!')
             return redirect(url_for('index'))
         else:
-            flash('Неверный логин или пароль!')
-            return render_template('login.html', error="Неверный логин или пароль")
+            auth_mgr.audit(user or 'unknown', 'login_failed', str(result))
+            flash(str(result))
+            return render_template('login.html', error=str(result))
 
     return render_template('login.html')
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout_page():
+    if session.get('username'):
+        auth_mgr.audit(session.get('username'), 'logout')
     session.clear()
     flash('Вы успешно вышли из системы.')
     return redirect(url_for('login_page'))
@@ -626,6 +652,73 @@ def api_firewall_confirm():
     return jsonify(payload)
 
 
+# ================= USERS, ROLES, 2FA & AUDIT =================
+@app.route('/settings/users', methods=['POST'])
+def api_save_user():
+    cfg = load_integrations()
+    action = request.form.get('action', 'save')
+    username = request.form.get('username', '').strip()
+
+    if action == 'delete':
+        ok, msg = auth_mgr.delete_user(cfg, username)
+    else:
+        password = request.form.get('password', '').strip() or None
+        role = request.form.get('role', 'operator').strip()
+        enable_2fa = request.form.get('totp_enabled') == 'on'
+        existing = auth_mgr.find_user(cfg, username) or {}
+        secret = existing.get('totp_secret') or (auth_mgr.generate_totp_secret() if enable_2fa else '')
+        ok, msg = auth_mgr.upsert_user(cfg, username, password=password, role=role,
+                                       totp_enabled=enable_2fa, totp_secret=secret)
+    if ok:
+        save_integrations(cfg)
+        auth_mgr.audit(session.get('username'), f'user_{action}', username)
+    flash(msg)
+    return redirect(request.referrer or url_for('index'))
+
+
+@app.route('/api/users', methods=['GET'])
+def api_users_list():
+    cfg = load_integrations()
+    users = []
+    for u in auth_mgr.get_users(cfg):
+        users.append({
+            'username': u.get('username'),
+            'role': u.get('role', 'operator'),
+            'role_label': auth_mgr.ROLES.get(u.get('role'), u.get('role')),
+            'totp_enabled': bool(u.get('totp_enabled')),
+            'created_at': u.get('created_at', ''),
+        })
+    return jsonify({'success': True, 'users': users, 'roles': auth_mgr.ROLES})
+
+
+@app.route('/api/users/2fa/setup', methods=['POST'])
+def api_user_2fa_setup():
+    """Generates (or returns) a TOTP secret + otpauth URL for a user."""
+    data = request.get_json(silent=True) or {}
+    username = (data.get('username') or '').strip()
+    cfg = load_integrations()
+    user = auth_mgr.find_user(cfg, username)
+    if not user:
+        return jsonify({'success': False, 'error': 'Пользователь не найден'})
+    secret = user.get('totp_secret') or auth_mgr.generate_totp_secret()
+    user['totp_secret'] = secret
+    save_integrations(cfg)
+    return jsonify({
+        'success': True,
+        'secret': secret,
+        'otpauth_url': auth_mgr.otpauth_url(secret, username),
+    })
+
+
+@app.route('/api/audit', methods=['GET'])
+def api_audit_log():
+    try:
+        limit = int(request.args.get('limit', 200))
+    except Exception:
+        limit = 200
+    return jsonify({'success': True, 'entries': auth_mgr.read_audit(limit)})
+
+
 
 @app.route('/settings/live_transcribe', methods=['POST'])
 def save_live_transcribe():
@@ -693,16 +786,26 @@ def save_security_auth():
     if request.form.get('dismiss_prompt'):
         cfg['security_auth']['prompt_dismissed'] = True
 
+    # Keep the modern users table in sync with the legacy single-user form
+    auth_mgr.get_users(cfg)  # ensures migration has run
+    existing = auth_mgr.find_user(cfg, username)
+    if existing:
+        if password:
+            existing['password_hash'] = auth_mgr.hash_password(password)
+        existing['role'] = 'admin'
+    else:
+        auth_mgr.upsert_user(cfg, username, password=password or 'admin', role='admin')
+
     save_integrations(cfg)
 
-    
+    session['role'] = 'admin'
     if enabled:
         session['logged_in'] = True
         session['username'] = username
         flash('Парольная защита панели успешно активирована!')
     else:
         flash('Настройки безопасности сохранены.')
-        
+
     return redirect(url_for('index'))
 
 
@@ -6358,6 +6461,8 @@ def index():
         is_client_local=is_client_local,
         auth_enabled=auth_enabled,
         auth_username=auth_cfg.get('username', 'admin'),
+        current_user=session.get('username', ''),
+        current_role=session.get('role', 'admin'),
         show_security_prompt=show_security_prompt,
         accounts=accounts,
         available_contexts=get_available_sip_contexts(),

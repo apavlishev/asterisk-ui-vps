@@ -854,5 +854,20 @@
   "confirm_delete_recording": "حذف التسجيل؟",
   "period_all": "كل الوقت",
   "hours": "ساعات",
-  "days": "أيام"
+  "days": "أيام",
+  "users_roles": "المستخدمون والأدوار",
+  "users_roles_desc": "فصل الصلاحيات: مسؤول، مشغل، عرض فقط. دعم 2FA.",
+  "add_user": "إضافة مستخدم",
+  "username": "اسم المستخدم",
+  "role": "الدور",
+  "password": "كلمة المرور",
+  "no_users": "لا يوجد مستخدمون",
+  "setup_2fa": "إعداد 2FA",
+  "role_prompt": "الدور (admin / operator / readonly)",
+  "two_fa_secret": "سر 2FA",
+  "two_fa_add": "أضفه إلى تطبيق المصادقة ثم فعّل 2FA للمستخدم.",
+  "confirm_delete_user": "حذف المستخدم؟",
+  "audit_log": "سجل التدقيق",
+  "audit_log_desc": "من فعل ماذا ومتى في لوحة التحكم.",
+  "no_audit": "السجل فارغ"
 }

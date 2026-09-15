@@ -854,5 +854,20 @@
   "confirm_delete_recording": "録音を削除しますか？",
   "period_all": "全期間",
   "hours": "時間",
-  "days": "日"
+  "days": "日",
+  "users_roles": "ユーザーと役割",
+  "users_roles_desc": "権限分離：管理者、オペレーター、閲覧のみ。2FA 対応。",
+  "add_user": "ユーザーを追加",
+  "username": "ユーザー名",
+  "role": "役割",
+  "password": "パスワード",
+  "no_users": "ユーザーがいません",
+  "setup_2fa": "2FA を設定",
+  "role_prompt": "役割（admin / operator / readonly）",
+  "two_fa_secret": "2FA シークレット",
+  "two_fa_add": "認証アプリに追加し、ユーザーの 2FA を有効にします。",
+  "confirm_delete_user": "ユーザーを削除しますか？",
+  "audit_log": "監査ログ",
+  "audit_log_desc": "誰がいつ何をしたかの記録。",
+  "no_audit": "ログは空です"
 }

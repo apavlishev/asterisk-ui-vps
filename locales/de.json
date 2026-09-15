@@ -854,5 +854,20 @@
   "confirm_delete_recording": "Aufzeichnung löschen?",
   "period_all": "Gesamter Zeitraum",
   "hours": "Stunden",
-  "days": "Tage"
+  "days": "Tage",
+  "users_roles": "Benutzer & Rollen",
+  "users_roles_desc": "Rechtetrennung: Admin, Operator, Nur-Lesen. 2FA-Unterstützung.",
+  "add_user": "Benutzer hinzufügen",
+  "username": "Benutzername",
+  "role": "Rolle",
+  "password": "Passwort",
+  "no_users": "Keine Benutzer",
+  "setup_2fa": "2FA einrichten",
+  "role_prompt": "Rolle (admin / operator / readonly)",
+  "two_fa_secret": "2FA-Geheimnis",
+  "two_fa_add": "Fügen Sie es Ihrer Authenticator-App hinzu und aktivieren Sie dann 2FA für den Benutzer.",
+  "confirm_delete_user": "Benutzer löschen?",
+  "audit_log": "Audit-Protokoll",
+  "audit_log_desc": "Wer hat wann was im Panel getan.",
+  "no_audit": "Protokoll ist leer"
 }

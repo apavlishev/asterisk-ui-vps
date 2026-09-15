@@ -854,5 +854,20 @@
   "confirm_delete_recording": "删除录音？",
   "period_all": "全部时间",
   "hours": "小时",
-  "days": "天"
+  "days": "天",
+  "users_roles": "用户与角色",
+  "users_roles_desc": "权限分离：管理员、坐席、只读。支持 2FA。",
+  "add_user": "添加用户",
+  "username": "用户名",
+  "role": "角色",
+  "password": "密码",
+  "no_users": "没有用户",
+  "setup_2fa": "设置 2FA",
+  "role_prompt": "角色（admin / operator / readonly）",
+  "two_fa_secret": "2FA 密钥",
+  "two_fa_add": "将其添加到身份验证器应用，然后为该用户启用 2FA。",
+  "confirm_delete_user": "删除用户？",
+  "audit_log": "审计日志",
+  "audit_log_desc": "谁在何时做了什么。",
+  "no_audit": "日志为空"
 }

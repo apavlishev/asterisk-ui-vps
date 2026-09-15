@@ -854,5 +854,20 @@
   "confirm_delete_recording": "रिकॉर्डिंग हटाएँ?",
   "period_all": "सभी समय",
   "hours": "घंटे",
-  "days": "दिन"
+  "days": "दिन",
+  "users_roles": "उपयोगकर्ता और भूमिकाएँ",
+  "users_roles_desc": "पहुँच अलगाव: एडमिन, ऑपरेटर, केवल-पढ़ें। 2FA समर्थन।",
+  "add_user": "उपयोगकर्ता जोड़ें",
+  "username": "उपयोगकर्ता नाम",
+  "role": "भूमिका",
+  "password": "पासवर्ड",
+  "no_users": "कोई उपयोगकर्ता नहीं",
+  "setup_2fa": "2FA सेट करें",
+  "role_prompt": "भूमिका (admin / operator / readonly)",
+  "two_fa_secret": "2FA सीक्रेट",
+  "two_fa_add": "इसे अपने ऑथेंटिकेटर ऐप में जोड़ें, फिर उपयोगकर्ता के लिए 2FA सक्षम करें।",
+  "confirm_delete_user": "उपयोगकर्ता हटाएँ?",
+  "audit_log": "ऑडिट लॉग",
+  "audit_log_desc": "पैनल में किसने क्या और कब किया।",
+  "no_audit": "लॉग खाली है"
 }

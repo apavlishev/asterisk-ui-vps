@@ -854,5 +854,20 @@
   "confirm_delete_recording": "Excluir gravação?",
   "period_all": "Todo o período",
   "hours": "horas",
-  "days": "dias"
+  "days": "dias",
+  "users_roles": "Usuários e funções",
+  "users_roles_desc": "Separação de acesso: admin, operador, somente leitura. Suporte 2FA.",
+  "add_user": "Adicionar usuário",
+  "username": "Usuário",
+  "role": "Função",
+  "password": "Senha",
+  "no_users": "Nenhum usuário",
+  "setup_2fa": "Configurar 2FA",
+  "role_prompt": "Função (admin / operator / readonly)",
+  "two_fa_secret": "Segredo 2FA",
+  "two_fa_add": "Adicione ao seu app autenticador e depois ative o 2FA para o usuário.",
+  "confirm_delete_user": "Excluir usuário?",
+  "audit_log": "Registro de auditoria",
+  "audit_log_desc": "Quem fez o quê e quando no painel.",
+  "no_audit": "O registro está vazio"
 }
