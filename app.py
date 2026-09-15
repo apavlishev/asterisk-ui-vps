@@ -7598,6 +7598,220 @@ def wallboard_page():
     return resp
 
 
+# ================= SYSTEM HEALTH-CHECK =================
+def _svc_active(name):
+    try:
+        res = subprocess.run(['systemctl', 'is-active', name], capture_output=True, text=True, timeout=4)
+        out = res.stdout.strip()
+        if out in ('active', 'activating'):
+            return True, 'active'
+        if out in ('inactive', 'failed', 'deactivating'):
+            return False, out
+        return False, (out or res.stderr.strip() or 'unknown')
+    except FileNotFoundError:
+        # No systemd in this environment — report as unknown-but-not-fatal
+        return True, 'systemd недоступен (проверка пропущена)'
+    except Exception as e:
+        return True, f'проверка недоступна: {e}'
+
+
+def _cmd_ok(cmd, timeout=4):
+    try:
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        return res.returncode == 0, (res.stdout or res.stderr or '').strip()[:200]
+    except Exception as e:
+        return False, str(e)
+
+
+def _check_asterisk_cli():
+    try:
+        out = run_asterisk('core show version') or ''
+        return ('Asterisk' in out), out.splitlines()[0] if out else 'no response'
+    except Exception as e:
+        return False, str(e)
+
+
+def _check_ami():
+    sec = _get_ami_secret()
+    if not sec:
+        return False, 'AMI secret not found'
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(2)
+        s.connect((AMI_HOST, AMI_PORT))
+        s.recv(256)
+        s.close()
+        return True, f'{AMI_HOST}:{AMI_PORT} открыт'
+    except Exception as e:
+        return False, str(e)
+
+
+def _check_dir(path, need_write=False):
+    if not os.path.exists(path):
+        return False, 'не найден'
+    if not os.path.isdir(path):
+        return False, 'не каталог'
+    if need_write and not os.access(path, os.W_OK):
+        return False, 'нет прав на запись'
+    return True, 'OK'
+
+
+def _check_file(path):
+    if os.path.exists(path):
+        try:
+            return True, f'{os.path.getsize(path)} байт'
+        except Exception:
+            return True, 'OK'
+    return False, 'не найден'
+
+
+def _disk_usage():
+    try:
+        import shutil as _sh
+        total, used, free = _sh.disk_usage('/')
+        pct = round(used / total * 100, 1) if total else 0
+        return {
+            'total': total, 'used': used, 'free': free, 'percent': pct,
+            'total_h': f'{total/1024**3:.1f} GB', 'used_h': f'{used/1024**3:.1f} GB',
+            'free_h': f'{free/1024**3:.1f} GB',
+        }
+    except Exception:
+        return {}
+
+
+def _load_metrics():
+    try:
+        if psutil:
+            return {
+                'cpu': round(psutil.cpu_percent(interval=None), 1),
+                'memory': round(psutil.virtual_memory().percent, 1),
+                'uptime_seconds': int(time.time() - psutil.boot_time()),
+            }
+    except Exception:
+        pass
+    return {}
+
+
+def collect_health():
+    """Runs a full system health-check suite and returns structured results."""
+    items = []
+
+    def add(category, name, ok, detail=''):
+        items.append({'category': category, 'name': name, 'ok': bool(ok), 'detail': str(detail)})
+
+    # Services
+    for svc, label in [('asterisk', 'Asterisk PBX'), ('fail2ban', 'Fail2ban'),
+                       ('nginx', 'Nginx (веб-сервер)'), ('asterisk-gui', 'Панель управления (GUI)')]:
+        active, detail = _svc_active(svc)
+        if svc in ('nginx', 'asterisk-gui'):
+            # optional services -> only warn if unit exists
+            exists, _ = _cmd_ok(['systemctl', 'list-unit-files', f'{svc}.service'])
+            if not exists and not active:
+                add('services', label, True, 'не используется')
+                continue
+        add('services', label, active, detail)
+
+    # Asterisk CLI
+    ok, detail = _check_asterisk_cli()
+    add('asterisk', 'Asterisk CLI (asterisk -rx)', ok, detail)
+
+    # AMI
+    ok, detail = _check_ami()
+    add('asterisk', 'AMI (live-контроль вызовов)', ok, detail)
+
+    # Config files
+    for label, path in [
+        ('pjsip.conf', PJSIP_CONF), ('extensions.conf', EXTENSIONS_CONF),
+        ('queues.conf', QUEUES_CONF), ('voicemail.conf', VOICEMAIL_CONF),
+        ('http.conf (WebRTC)', WEBRTC_HTTP_CONF),
+    ]:
+        ok, detail = _check_file(path)
+        add('config', label, ok, detail)
+
+    # Panel config
+    ok, detail = _check_file(CONFIG_FILE)
+    add('config', 'integrations_config.json', ok, detail)
+
+    # Directories
+    for label, path, wr in [('Записи разговоров', RECORD_DIR, True),
+                            ('Голосовая почта', VOICEMAIL_SPOOL, True),
+                            ('Звуки / промпты', SOUNDS_DIR, True)]:
+        ok, detail = _check_dir(path, wr)
+        add('storage', label, ok, detail)
+
+    # TLS certificate
+    cert_pem = os.path.join(WEBRTC_CERT_DIR, 'asterisk.pem')
+    cert_ok = os.path.exists(cert_pem)
+    add('security', 'TLS-сертификат', cert_ok, get_webrtc_cert_fingerprint()[:29] if cert_ok else 'не найден')
+    tls = get_tls_settings()
+    add('security', 'SIP TLS', True, 'включён' if tls.get('sip_tls_enabled') else 'выключен')
+    add('security', 'SRTP', True, tls.get('srtp_mode', 'no'))
+    nl = get_number_lists()
+    add('security', 'Фильтр номеров', True, f"чёрных: {len(nl.get('blacklist', []))}, белых: {len(nl.get('whitelist', []))}")
+
+    # Resources
+    disk = _disk_usage()
+    if disk:
+        add('resources', 'Диск (/)', disk['percent'] < 90, f"{disk['used_h']} / {disk['total_h']} ({disk['percent']}%)")
+    m = _load_metrics()
+    if 'memory' in m:
+        add('resources', 'Память', m['memory'] < 90, f"{m['memory']}% использовано")
+        add('resources', 'CPU', m['cpu'] < 95, f"{m['cpu']}% загрузка")
+    if psutil:
+        try:
+            batt = psutil.sensors_battery()
+            if batt:
+                add('resources', 'Питание', True, f"{round(batt.percent)}%{' (зарядка)' if batt.power_plugged else ''}")
+        except Exception:
+            pass
+
+    # Dialplan sanity
+    try:
+        with open(EXTENSIONS_CONF, 'r', encoding='utf-8', errors='ignore') as f:
+            dp = f.read()
+        add('asterisk', 'Диалплан: внутренние номера', '[from-internal]' in dp, f'{len(dp)} символов')
+        add('asterisk', 'Диалплан: запись разговоров', 'MixMonitor' in dp, 'MixMonitor присутствует' if 'MixMonitor' in dp else 'нет')
+    except Exception as e:
+        add('asterisk', 'Диалплан', False, str(e))
+
+    total = len(items)
+    passed = sum(1 for i in items if i['ok'])
+    failed = total - passed
+    critical_cats = {'services', 'asterisk', 'config'}
+    critical_failed = sum(1 for i in items if not i['ok'] and i['category'] in critical_cats)
+    if critical_failed == 0 and failed == 0:
+        status = 'ok'
+    elif critical_failed == 0:
+        status = 'warning'
+    else:
+        status = 'critical'
+
+    return {
+        'status': status,
+        'total': total,
+        'passed': passed,
+        'failed': failed,
+        'critical_failed': critical_failed,
+        'items': items,
+        'categories': sorted(list({i['category'] for i in items})),
+        'disk': disk,
+        'metrics': m,
+        'checked_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+    }
+
+
+@app.route('/api/health', methods=['GET'])
+def api_health():
+    return jsonify({'status': 'ok', 'health': collect_health()})
+
+
+@app.route('/api/health/run', methods=['POST'])
+def api_health_run():
+    result = collect_health()
+    auth_mgr.audit(session.get('username'), 'health_check', result['status'])
+    return jsonify({'status': 'ok', 'health': result})
+
+
 # ================= MULTILINGUAL (I18N) ENGINE (TOP 10 WORLD LANGUAGES) =================
 LOCALES_DIR = os.path.join(os.path.dirname(__file__), 'locales')
 def get_available_languages():

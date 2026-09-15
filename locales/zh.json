@@ -1039,5 +1039,19 @@
   "wb_no_calls": "无活动通话",
   "wb_no_queues": "无队列",
   "wb_agents": "坐席",
-  "wb_updated": "已更新"
+  "wb_updated": "已更新",
+  "nav_health": "系统检查",
+  "health_desc": "PBX 和面板诊断：服务、配置文件、目录、磁盘、内存和加密。",
+  "health_run": "运行检查",
+  "health_passed": "通过",
+  "health_failed": "问题",
+  "health_ok": "系统正常",
+  "health_warning": "检测到警告",
+  "health_critical": "检测到问题",
+  "health_cat_services": "服务",
+  "health_cat_asterisk": "Asterisk",
+  "health_cat_config": "配置文件",
+  "health_cat_storage": "存储",
+  "health_cat_security": "安全",
+  "health_cat_resources": "资源"
 }

@@ -1039,5 +1039,19 @@
   "wb_no_calls": "कोई सक्रिय कॉल नहीं",
   "wb_no_queues": "कोई कतार नहीं",
   "wb_agents": "एजेंट",
-  "wb_updated": "अद्यतन"
+  "wb_updated": "अद्यतन",
+  "nav_health": "सिस्टम स्वास्थ्य",
+  "health_desc": "PBX और पैनल का निदान: सेवाएँ, कॉन्फ़िग फ़ाइलें, निर्देशिकाएँ, डिस्क, मेमोरी और एन्क्रिप्शन।",
+  "health_run": "जाँच चलाएँ",
+  "health_passed": "पास",
+  "health_failed": "समस्याएँ",
+  "health_ok": "सिस्टम ठीक है",
+  "health_warning": "चेतावनियाँ मिलीं",
+  "health_critical": "समस्याएँ मिलीं",
+  "health_cat_services": "सेवाएँ",
+  "health_cat_asterisk": "Asterisk",
+  "health_cat_config": "कॉन्फ़िगरेशन फ़ाइलें",
+  "health_cat_storage": "संग्रहण",
+  "health_cat_security": "सुरक्षा",
+  "health_cat_resources": "संसाधन"
 }

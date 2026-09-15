@@ -328,6 +328,11 @@
                     <span class="text-xs font-semibold sidebar-text">{{ t.nav_schedule or "Расписания" }}</span>
                 </button>
 
+                <button onclick="switchTab('health')" id="nav-health" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="{{ t.nav_health or 'Проверка системы' }}">
+                    <span class="material-symbols-outlined mr-3.5 text-emerald-500 text-[22px]">health_and_safety</span>
+                    <span class="text-xs font-semibold sidebar-text">{{ t.nav_health or "Проверка системы" }}</span>
+                </button>
+
                 <button onclick="switchTab('modems')" id="nav-modems" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="{{ t.gsm_modemy }}">                    <span class="material-symbols-outlined mr-3.5 text-amber-500 text-[22px]">sim_card</span>
                     <span class="text-xs font-semibold sidebar-text">{{ t.nav_modems or "GSM Модемы" }}</span>
                     <span class="ml-auto text-[11px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 font-mono sidebar-badge">{{ modems_list|length }}</span>
@@ -2299,6 +2304,36 @@
                         <button type="button" onclick="saveHoliday()" class="px-6 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all">{{ t.sohranit or 'Сохранить' }}</button>
                     </div>
                 </div>
+            </div>
+
+            <!-- // ================= TAB: SYSTEM HEALTH ================= -->
+            <div id="tab-health" class="tab-pane space-y-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-on-surface">{{ t.nav_health or 'Проверка системы' }}</h1>
+                        <p class="text-on-surface-variant text-sm">{{ t.health_desc or 'Диагностика АТС и панели: сервисы, файлы конфигурации, каталоги, диск, память и шифрование.' }}</p>
+                    </div>
+                    <button type="button" onclick="runHealthCheck()" class="px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-all flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[16px]">health_and_safety</span>
+                        <span>{{ t.health_run or 'Запустить проверку' }}</span>
+                    </button>
+                </div>
+
+                <div id="health-summary" class="hidden p-6 rounded-2xl border shadow-sm flex items-center gap-4">
+                    <div id="health-icon" class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-3xl" id="health-icon-sym">check_circle</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-lg font-bold" id="health-status-text">—</div>
+                        <div class="text-xs text-on-surface-variant" id="health-status-sub">—</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl font-mono font-bold" id="health-score">—</div>
+                        <div class="text-[10px] uppercase tracking-wider text-on-surface-variant">{{ t.health_passed or 'пройдено' }}</div>
+                    </div>
+                </div>
+
+                <div id="health-list" class="space-y-2"></div>
             </div>
 
                         <!-- // ================= TAB: GSM MODEMS POOL (TABLE LIST VIEW) // ================= -->
@@ -7548,6 +7583,9 @@
             if (tabId === 'schedule' && typeof loadSchedule === 'function') {
                 setTimeout(loadSchedule, 50);
             }
+            if (tabId === 'health' && typeof loadHealth === 'function') {
+                setTimeout(loadHealth, 50);
+            }
         }
 
         // Restore active tab
@@ -9968,6 +10006,73 @@
             if (!confirm('{{ t.sched_delete_confirm or "Удалить?" }}')) return;
             await fetch('/api/holidays/delete', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ id }) });
             loadSchedule();
+        }
+
+        // ================= SYSTEM HEALTH-CHECK =================
+        const HEALTH_CAT_LABELS = {
+            services: '{{ t.health_cat_services or "Сервисы" }}',
+            asterisk: '{{ t.health_cat_asterisk or "Asterisk" }}',
+            config: '{{ t.health_cat_config or "Файлы конфигурации" }}',
+            storage: '{{ t.health_cat_storage or "Хранилища" }}',
+            security: '{{ t.health_cat_security or "Безопасность" }}',
+            resources: '{{ t.health_cat_resources or "Ресурсы" }}'
+        };
+
+        async function loadHealth() {
+            try {
+                const res = await fetch('/api/health', { cache: 'no-store' });
+                const data = await res.json();
+                renderHealth(data.health);
+            } catch (e) { console.error('[health] load', e); }
+        }
+
+        async function runHealthCheck() {
+            const btn = event && event.currentTarget;
+            const res = await fetch('/api/health/run', { method: 'POST' });
+            const data = await res.json();
+            renderHealth(data.health);
+        }
+
+        function renderHealth(h) {
+            if (!h) return;
+            const summary = document.getElementById('health-summary');
+            const iconBox = document.getElementById('health-icon');
+            const iconSym = document.getElementById('health-icon-sym');
+            const statusText = document.getElementById('health-status-text');
+            const statusSub = document.getElementById('health-status-sub');
+            const score = document.getElementById('health-score');
+            const map = {
+                ok: ['bg-success/10 text-success border-success/30', 'check_circle', '{{ t.health_ok or "Система в порядке" }}'],
+                warning: ['bg-amber-500/10 text-amber-600 border-amber-500/30', 'warning', '{{ t.health_warning or "Есть предупреждения" }}'],
+                critical: ['bg-error/10 text-error border-error/30', 'error', '{{ t.health_critical or "Обнаружены проблемы" }}']
+            };
+            const m = map[h.status] || map.warning;
+            if (summary) summary.className = 'p-6 rounded-2xl border shadow-sm flex items-center gap-4 ' + m[0];
+            if (iconBox) iconBox.className = 'w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ' + m[0];
+            if (iconSym) iconSym.textContent = m[1];
+            if (statusText) statusText.textContent = m[2];
+            if (statusSub) statusSub.textContent = (h.checked_at || '') + ' · ' + (h.failed || 0) + ' {{ t.health_failed or "проблем" }}';
+            if (score) score.textContent = (h.passed || 0) + '/' + (h.total || 0);
+            summary && summary.classList.remove('hidden');
+
+            const byCat = {};
+            (h.items || []).forEach(i => { (byCat[i.category] = byCat[i.category] || []).push(i); });
+            const box = document.getElementById('health-list');
+            if (!box) return;
+            box.innerHTML = Object.keys(byCat).map(cat => {
+                const items = byCat[cat];
+                const label = HEALTH_CAT_LABELS[cat] || cat;
+                return `<div class="p-4 rounded-2xl bg-surface border border-outline/30 shadow-sm space-y-2">
+                    <div class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">${label}</div>
+                    <div class="space-y-1">
+                        ${items.map(i => `<div class="flex items-center gap-2 text-xs py-1.5 border-b border-surface-container/50 last:border-0">
+                            <span class="material-symbols-outlined text-[18px] ${i.ok ? 'text-success' : 'text-error'}">${i.ok ? 'check_circle' : 'cancel'}</span>
+                            <span class="font-semibold text-on-surface">${(i.name || '').replace(/[<>]/g, '')}</span>
+                            <span class="ml-auto font-mono text-[10px] text-on-surface-variant truncate max-w-[45%] text-right">${(i.detail || '').replace(/[<>]/g, '')}</span>
+                        </div>`).join('')}
+                    </div>
+                </div>`;
+            }).join('');
         }
     </script>
 

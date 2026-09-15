@@ -1039,5 +1039,19 @@
   "wb_no_calls": "لا مكالمات نشطة",
   "wb_no_queues": "لا طوابير",
   "wb_agents": "وكلاء",
-  "wb_updated": "تم التحديث"
+  "wb_updated": "تم التحديث",
+  "nav_health": "حالة النظام",
+  "health_desc": "تشخيص المقسم واللوحة: الخدمات وملفات الإعدادات والمجلدات والقرص والذاكرة والتشفير.",
+  "health_run": "تشغيل الفحص",
+  "health_passed": "ناجح",
+  "health_failed": "مشاكل",
+  "health_ok": "النظام سليم",
+  "health_warning": "تم اكتشاف تحذيرات",
+  "health_critical": "تم اكتشاف مشاكل",
+  "health_cat_services": "الخدمات",
+  "health_cat_asterisk": "Asterisk",
+  "health_cat_config": "ملفات الإعدادات",
+  "health_cat_storage": "التخزين",
+  "health_cat_security": "الأمان",
+  "health_cat_resources": "الموارد"
 }

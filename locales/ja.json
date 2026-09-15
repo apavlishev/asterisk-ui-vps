@@ -1039,5 +1039,19 @@
   "wb_no_calls": "通話はありません",
   "wb_no_queues": "キューなし",
   "wb_agents": "エージェント",
-  "wb_updated": "更新"
+  "wb_updated": "更新",
+  "nav_health": "システム診断",
+  "health_desc": "PBXとパネルの診断: サービス、設定ファイル、ディレクトリ、ディスク、メモリ、暗号化。",
+  "health_run": "チェック実行",
+  "health_passed": "合格",
+  "health_failed": "問題",
+  "health_ok": "システムは正常です",
+  "health_warning": "警告があります",
+  "health_critical": "問題が検出されました",
+  "health_cat_services": "サービス",
+  "health_cat_asterisk": "Asterisk",
+  "health_cat_config": "設定ファイル",
+  "health_cat_storage": "ストレージ",
+  "health_cat_security": "セキュリティ",
+  "health_cat_resources": "リソース"
 }

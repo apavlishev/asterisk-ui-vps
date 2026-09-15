@@ -1035,5 +1035,19 @@
   "wb_no_calls": "Нет активных вызовов",
   "wb_no_queues": "Нет очередей",
   "wb_agents": "агентов",
-  "wb_updated": "Обновлено"
+  "wb_updated": "Обновлено",
+  "nav_health": "Проверка системы",
+  "health_desc": "Диагностика АТС и панели: сервисы, файлы конфигурации, каталоги, диск, память и шифрование.",
+  "health_run": "Запустить проверку",
+  "health_passed": "пройдено",
+  "health_failed": "проблем",
+  "health_ok": "Система в порядке",
+  "health_warning": "Есть предупреждения",
+  "health_critical": "Обнаружены проблемы",
+  "health_cat_services": "Сервисы",
+  "health_cat_asterisk": "Asterisk",
+  "health_cat_config": "Файлы конфигурации",
+  "health_cat_storage": "Хранилища",
+  "health_cat_security": "Безопасность",
+  "health_cat_resources": "Ресурсы"
 }

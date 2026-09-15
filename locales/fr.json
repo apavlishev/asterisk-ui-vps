@@ -1039,5 +1039,19 @@
   "wb_no_calls": "Aucun appel actif",
   "wb_no_queues": "Aucune file",
   "wb_agents": "agents",
-  "wb_updated": "Mis à jour"
+  "wb_updated": "Mis à jour",
+  "nav_health": "État du système",
+  "health_desc": "Diagnostic du PBX et du panneau : services, fichiers de configuration, répertoires, disque, mémoire et chiffrement.",
+  "health_run": "Lancer le contrôle",
+  "health_passed": "réussis",
+  "health_failed": "problèmes",
+  "health_ok": "Système en bonne santé",
+  "health_warning": "Avertissements détectés",
+  "health_critical": "Problèmes détectés",
+  "health_cat_services": "Services",
+  "health_cat_asterisk": "Asterisk",
+  "health_cat_config": "Fichiers de configuration",
+  "health_cat_storage": "Stockage",
+  "health_cat_security": "Sécurité",
+  "health_cat_resources": "Ressources"
 }

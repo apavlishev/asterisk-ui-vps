@@ -1039,5 +1039,19 @@
   "wb_no_calls": "Sin llamadas activas",
   "wb_no_queues": "Sin colas",
   "wb_agents": "agentes",
-  "wb_updated": "Actualizado"
+  "wb_updated": "Actualizado",
+  "nav_health": "Estado del sistema",
+  "health_desc": "Diagnóstico de la central y el panel: servicios, archivos de configuración, directorios, disco, memoria y cifrado.",
+  "health_run": "Ejecutar comprobación",
+  "health_passed": "aprobados",
+  "health_failed": "problemas",
+  "health_ok": "El sistema está correcto",
+  "health_warning": "Se detectaron advertencias",
+  "health_critical": "Se detectaron problemas",
+  "health_cat_services": "Servicios",
+  "health_cat_asterisk": "Asterisk",
+  "health_cat_config": "Archivos de configuración",
+  "health_cat_storage": "Almacenamiento",
+  "health_cat_security": "Seguridad",
+  "health_cat_resources": "Recursos"
 }
