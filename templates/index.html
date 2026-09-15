@@ -4099,6 +4099,10 @@
                         <span class="material-symbols-outlined text-[18px]">shield_lock</span>
                         <span>{{ t.k_firewall or 'Фаервол (Порты)' }}</span>
                     </button>
+                    <button type="button" onclick="switchSecuritySubTab('sec-numbers', this)" class="sec-tab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-surface text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2 border border-outline/30 shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">block</span>
+                        <span>{{ t.nav_number_lists or 'Антиспам (Номера)' }}</span>
+                    </button>
                 </div>
                 
                 <div id="sec-antifraud" class="space-y-6">
@@ -4595,6 +4599,74 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+
+                <!-- SECURITY SUB-TAB: NUMBER BLACKLIST / WHITELIST (ANTI-SPAM) -->
+                <div id="sec-numbers" class="space-y-6 hidden">
+                    <div class="bg-surface rounded-2xl p-6 sm:p-8 border border-outline/30 shadow-sm space-y-5">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-surface-container">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-error text-2xl">block</span>
+                                <div>
+                                    <h2 class="text-base font-bold text-on-surface">{{ t.nl_title or 'Фильтр номеров (Антиспам)' }}</h2>
+                                    <p class="text-xs text-on-surface-variant mt-0.5">{{ t.nl_desc or 'Блокировка входящих по номеру: точное совпадение, префикс 79* или маска *1234*.' }}</p>
+                                </div>
+                            </div>
+                            <label class="flex items-center gap-2 text-xs font-semibold text-on-surface cursor-pointer">
+                                <input type="checkbox" id="nl-enabled" class="rounded text-error w-4 h-4">
+                                <span>{{ t.nl_enabled or 'Фильтр включён' }}</span>
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="p-4 rounded-2xl bg-error/5 border border-error/20 space-y-3">
+                                <h3 class="text-sm font-bold text-error flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[18px]">block</span>
+                                    {{ t.nl_blacklist or 'Чёрный список' }}
+                                    <span id="nl-bl-count" class="text-[10px] px-2 py-0.5 rounded-full bg-error/10 font-mono">0</span>
+                                </h3>
+                                <div class="flex gap-2">
+                                    <input type="text" id="nl-bl-input" placeholder="+79260000000 / 79*" class="flex-1 px-3 py-2 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                                    <button type="button" onclick="addNumber('blacklist')" class="px-3 py-2 rounded-xl bg-error text-white text-xs font-bold hover:bg-error/90 transition-all">
+                                        <span class="material-symbols-outlined text-[16px]">add</span>
+                                    </button>
+                                </div>
+                                <div id="nl-bl-list" class="flex flex-wrap gap-1.5 max-h-56 overflow-y-auto"></div>
+                            </div>
+
+                            <div class="p-4 rounded-2xl bg-success/5 border border-success/20 space-y-3">
+                                <h3 class="text-sm font-bold text-success flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[18px]">verified_user</span>
+                                    {{ t.nl_whitelist or 'Белый список' }}
+                                    <span id="nl-wl-count" class="text-[10px] px-2 py-0.5 rounded-full bg-success/10 font-mono">0</span>
+                                </h3>
+                                <div class="flex gap-2">
+                                    <input type="text" id="nl-wl-input" placeholder="+79260000001" class="flex-1 px-3 py-2 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                                    <button type="button" onclick="addNumber('whitelist')" class="px-3 py-2 rounded-xl bg-success text-white text-xs font-bold hover:bg-success/90 transition-all">
+                                        <span class="material-symbols-outlined text-[16px]">add</span>
+                                    </button>
+                                </div>
+                                <div id="nl-wl-list" class="flex flex-wrap gap-1.5 max-h-56 overflow-y-auto"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-2xl bg-surface-container-low border border-outline/20">
+                            <label class="text-xs font-semibold text-on-surface-variant">{{ t.nl_action or 'Действие для чёрного списка:' }}</label>
+                            <select id="nl-action" class="px-3 py-2 rounded-xl bg-surface border border-outline text-xs font-semibold">
+                                <option value="hangup">{{ t.nl_act_hangup or 'Сбросить вызов' }}</option>
+                                <option value="busy">{{ t.nl_act_busy or 'Сигнал «занято»' }}</option>
+                                <option value="announce">{{ t.nl_act_announce or 'Проиграть сообщение' }}</option>
+                            </select>
+                            <input type="text" id="nl-announce" placeholder="custom/rejected" class="flex-1 px-3 py-2 rounded-xl bg-surface-container-low border border-outline text-xs font-mono">
+                            <button type="button" onclick="saveNumberLists()" class="px-5 py-2 rounded-xl bg-error text-white text-xs font-bold hover:bg-error/90 transition-all">
+                                {{ t.sohranit or 'Сохранить' }}
+                            </button>
+                        </div>
+
+                        <p class="text-[11px] text-on-surface-variant leading-relaxed">
+                            {{ t.nl_hint or 'Фильтр применяется к входящим вызовам из транков и GSM-шлюзов. Белый список имеет приоритет над чёрным.' }}
+                        </p>
                     </div>
                 </div>
 
@@ -7967,11 +8039,13 @@
     <script>
 
         function switchSecuritySubTab(subtabId, btn) {
-            document.getElementById('sec-antifraud').classList.add('hidden');
-            document.getElementById('sec-auth').classList.add('hidden');
-            document.getElementById('sec-logs').classList.add('hidden');
-            document.getElementById('sec-firewall').classList.add('hidden');
-            document.getElementById(subtabId).classList.remove('hidden');
+            ['sec-antifraud','sec-auth','sec-logs','sec-firewall','sec-numbers'].forEach(x => {
+                const el = document.getElementById(x);
+                if (el) el.classList.add('hidden');
+            });
+            const pane = document.getElementById(subtabId);
+            if (pane) pane.classList.remove('hidden');
+            if (subtabId === 'sec-numbers' && typeof loadNumberLists === 'function') loadNumberLists();
 
             document.querySelectorAll('.sec-tab-btn').forEach(b => {
                 b.className = 'sec-tab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-surface text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2 border border-outline/30 shrink-0';
@@ -9143,6 +9217,74 @@
         }
 
         function exportPhonebook() { window.location.href = '/api/phonebook/export'; }
+
+        // ================= NUMBER BLACKLIST / WHITELIST (ANTI-SPAM) =================
+        let nlData = { blacklist: [], whitelist: [], enabled: true, blacklist_action: 'hangup', blacklist_announce: '' };
+
+        async function loadNumberLists() {
+            try {
+                const res = await fetch('/api/number-lists', { cache: 'no-store' });
+                const data = await res.json();
+                if (data.status !== 'ok') return;
+                nlData = data.lists || nlData;
+                const en = document.getElementById('nl-enabled');
+                if (en) en.checked = nlData.enabled !== false;
+                const act = document.getElementById('nl-action');
+                if (act) act.value = nlData.blacklist_action || 'hangup';
+                const ann = document.getElementById('nl-announce');
+                if (ann) ann.value = nlData.blacklist_announce || '';
+                renderNumberLists();
+            } catch (e) { console.error('[numbers] load', e); }
+        }
+
+        function renderNumberLists() {
+            const bl = document.getElementById('nl-bl-list');
+            const wl = document.getElementById('nl-wl-list');
+            const blc = document.getElementById('nl-bl-count');
+            const wlc = document.getElementById('nl-wl-count');
+            if (blc) blc.textContent = (nlData.blacklist || []).length;
+            if (wlc) wlc.textContent = (nlData.whitelist || []).length;
+            if (bl) {
+                bl.innerHTML = (nlData.blacklist || []).length
+                    ? nlData.blacklist.map(n => `<span class="inline-flex items-center gap-1 font-mono text-[11px] font-bold px-2 py-1 rounded-lg bg-error/10 text-error border border-error/20">${n}<button onclick="removeNumber('blacklist','${n}')" class="hover:text-error/70"><span class="material-symbols-outlined text-[13px]">close</span></button></span>`).join('')
+                    : '<span class="text-[11px] text-on-surface-variant">{{ t.nl_empty or "Список пуст" }}</span>';
+            }
+            if (wl) {
+                wl.innerHTML = (nlData.whitelist || []).length
+                    ? nlData.whitelist.map(n => `<span class="inline-flex items-center gap-1 font-mono text-[11px] font-bold px-2 py-1 rounded-lg bg-success/10 text-success border border-success/20">${n}<button onclick="removeNumber('whitelist','${n}')" class="hover:text-success/70"><span class="material-symbols-outlined text-[13px]">close</span></button></span>`).join('')
+                    : '<span class="text-[11px] text-on-surface-variant">{{ t.nl_empty or "Список пуст" }}</span>';
+            }
+        }
+
+        async function addNumber(listType) {
+            const input = document.getElementById(listType === 'blacklist' ? 'nl-bl-input' : 'nl-wl-input');
+            const num = input ? input.value.trim() : '';
+            if (!num) return;
+            const res = await fetch('/api/number-lists/add', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ number: num, list: listType }) });
+            const data = await res.json();
+            if (data.status === 'ok') { nlData = data.lists; if (input) input.value = ''; renderNumberLists(); }
+            else alert(data.message || 'Ошибка');
+        }
+
+        async function removeNumber(listType, num) {
+            const res = await fetch('/api/number-lists/remove', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ number: num, list: listType }) });
+            const data = await res.json();
+            if (data.status === 'ok') { nlData = data.lists; renderNumberLists(); }
+        }
+
+        async function saveNumberLists() {
+            const payload = {
+                enabled: document.getElementById('nl-enabled').checked,
+                blacklist: nlData.blacklist || [],
+                whitelist: nlData.whitelist || [],
+                blacklist_action: document.getElementById('nl-action').value,
+                blacklist_announce: document.getElementById('nl-announce').value.trim()
+            };
+            const res = await fetch('/api/number-lists/save', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+            const data = await res.json();
+            if (data.status === 'ok') { nlData = data.lists; renderNumberLists(); }
+            else alert(data.message || 'Ошибка');
+        }
     </script>
 
 

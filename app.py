@@ -6837,6 +6837,181 @@ def api_phonebook_export():
     return resp
 
 
+# ================= NUMBER BLACKLIST / WHITELIST (ANTI-SPAM) =================
+def get_number_lists():
+    cfg = load_integrations()
+    nl = cfg.get('number_lists', {}) or {}
+    nl.setdefault('blacklist', [])
+    nl.setdefault('whitelist', [])
+    nl.setdefault('enabled', True)
+    nl.setdefault('blacklist_action', 'hangup')   # hangup | busy | announce
+    nl.setdefault('blacklist_announce', '')       # sound file (custom/...) if action=announce
+    return nl
+
+
+def save_number_lists(nl):
+    cfg = load_integrations()
+    cfg['number_lists'] = nl
+    save_integrations(cfg)
+
+
+def _normalize_number(num):
+    """Keeps digits and a leading +, drops spaces/dashes/parens."""
+    s = str(num or '').strip()
+    s = re.sub(r'[^\d+]', '', s)
+    return s
+
+
+def _normalize_rule(rule):
+    """Like _normalize_number but preserves '*' wildcards used in match rules."""
+    s = str(rule or '').strip()
+    s = re.sub(r'[^\d+*]', '', s)
+    return s
+
+
+def _matches_rule(ani, rule):
+    """Supports exact match, prefix wildcard 79* and contains *1234*."""
+    ani = _normalize_number(ani)
+    rule = _normalize_rule(rule)
+    if not ani or not rule:
+        return False
+    if rule.startswith('*') and rule.endswith('*') and len(rule) > 2:
+        return rule.strip('*') in ani
+    if rule.endswith('*'):
+        return ani.startswith(rule[:-1])
+    if rule.startswith('*'):
+        return ani.endswith(rule[1:])
+    return ani == rule
+
+
+def check_number(ani):
+    """Returns 'whitelist' | 'blacklist' | 'allowed' for a caller number."""
+    nl = get_number_lists()
+    if not nl.get('enabled', True):
+        return 'allowed'
+    for rule in nl.get('whitelist', []):
+        if _matches_rule(ani, rule):
+            return 'whitelist'
+    for rule in nl.get('blacklist', []):
+        if _matches_rule(ani, rule):
+            return 'blacklist'
+    return 'allowed'
+
+
+@app.route('/api/number-lists', methods=['GET'])
+def api_number_lists_get():
+    nl = get_number_lists()
+    return jsonify({'status': 'ok', 'lists': nl})
+
+
+@app.route('/api/number-lists/save', methods=['POST'])
+def api_number_lists_save():
+    data = request.get_json() or {}
+
+    def clean_list(key):
+        raw = data.get(key, [])
+        if isinstance(raw, str):
+            raw = re.split(r'[\s,;]+', raw)
+        out = []
+        for item in raw:
+            n = _normalize_rule(item)
+            if n and n not in out:
+                out.append(n)
+        return out
+
+    nl = {
+        'enabled': bool(data.get('enabled', True)),
+        'blacklist': clean_list('blacklist'),
+        'whitelist': clean_list('whitelist'),
+        'blacklist_action': data.get('blacklist_action') if data.get('blacklist_action') in ('hangup', 'busy', 'announce') else 'hangup',
+        'blacklist_announce': str(data.get('blacklist_announce') or '').strip(),
+    }
+    save_number_lists(nl)
+    generate_dialplan_from_tree()
+    auth_mgr.audit(session.get('username'), 'number_lists_save', f"bl={len(nl['blacklist'])} wl={len(nl['whitelist'])}")
+    return jsonify({'status': 'ok', 'lists': nl})
+
+
+@app.route('/api/number-lists/add', methods=['POST'])
+def api_number_lists_add():
+    data = request.get_json() or {}
+    num = _normalize_rule(data.get('number'))
+    list_type = data.get('list') if data.get('list') in ('blacklist', 'whitelist') else 'blacklist'
+    if not num:
+        return jsonify({'status': 'error', 'message': 'Укажите номер'})
+    nl = get_number_lists()
+    if num not in nl[list_type]:
+        nl[list_type].insert(0, num)
+    # remove from the opposite list
+    other = 'whitelist' if list_type == 'blacklist' else 'blacklist'
+    nl[other] = [x for x in nl[other] if x != num]
+    save_number_lists(nl)
+    generate_dialplan_from_tree()
+    auth_mgr.audit(session.get('username'), 'number_list_add', f'{list_type}:{num}')
+    return jsonify({'status': 'ok', 'lists': nl})
+
+
+@app.route('/api/number-lists/remove', methods=['POST'])
+def api_number_lists_remove():
+    data = request.get_json() or {}
+    num = _normalize_rule(data.get('number'))
+    list_type = data.get('list') if data.get('list') in ('blacklist', 'whitelist') else 'blacklist'
+    nl = get_number_lists()
+    nl[list_type] = [x for x in nl[list_type] if x != num]
+    save_number_lists(nl)
+    generate_dialplan_from_tree()
+    auth_mgr.audit(session.get('username'), 'number_list_remove', f'{list_type}:{num}')
+    return jsonify({'status': 'ok', 'lists': nl})
+
+
+@app.route('/api/number-lists/check', methods=['GET'])
+def api_number_lists_check():
+    ani = request.args.get('number', '')
+    return jsonify({'status': 'ok', 'number': _normalize_number(ani), 'result': check_number(ani)})
+
+
+def build_number_filter_dialplan():
+    """Subroutine that blocks blacklisted callers and greys empty ANI."""
+    nl = get_number_lists()
+    if not nl.get('enabled', True):
+        return """
+[sub-number-filter]
+exten => s,1,Return()
+"""
+    lines = ["[sub-number-filter]", "exten => s,1,NoOp(Фильтр номера: ${CALLERID(num)})"]
+    if nl.get('whitelist'):
+        # If the ANI matches a whitelist rule by exact match, allow immediately
+        for rule in nl['whitelist']:
+            lines.append(f" same => n,ExecIf($[\"${{CALLERID(num)}}\" = \"{rule}\"]?Return())")
+    action = nl.get('blacklist_action', 'hangup')
+    announce = nl.get('blacklist_announce', '')
+    for rule in nl.get('blacklist', []):
+        if rule.startswith('*') and rule.endswith('*') and len(rule) > 2:
+            cond = f'$["${{CALLERID(num)}}" =~ "{rule.strip(chr(42))}"]'
+        elif rule.endswith('*'):
+            cond = f'${{CALLERID(num):0:{len(rule) - 1}}} = "{rule[:-1]}"'
+        elif rule.startswith('*'):
+            cond = f'${{CALLERID(num):-{len(rule) - 1}}} = "{rule[1:]}"'
+        else:
+            cond = f'${{CALLERID(num)}} = "{rule}"'
+        lines.append(f" same => n,GotoIf({cond}?blocked,1)")
+    lines.append(" same => n,Return()")
+    lines.append("")
+    lines.append("exten => blocked,1,NoOp(⛔ Заблокированный номер: ${CALLERID(num)})")
+    lines.append(" same => n,Set(CHANNEL(hangup_handler_push)=)")
+    if action == 'busy':
+        lines.append(" same => n,Busy()")
+    elif action == 'announce' and announce:
+        lines.append(f" same => n,Answer()")
+        lines.append(f" same => n,Playback({announce})")
+        lines.append(" same => n,Hangup()")
+    else:
+        lines.append(" same => n,Wait(1)")
+        lines.append(" same => n,Hangup()")
+    lines.append(" same => n,Return()")
+    return "\n".join(lines)
+
+
 # ================= MULTILINGUAL (I18N) ENGINE (TOP 10 WORLD LANGUAGES) =================
 LOCALES_DIR = os.path.join(os.path.dirname(__file__), 'locales')
 def get_available_languages():
@@ -7478,6 +7653,7 @@ exten => _.,1,NoOp(Входящий вызов {trunk_title} -> Прямой в�
  same => n,Set(__CALL_DIRECTION=inbound)
  same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})
  same => n,Set(CHANNEL(hangup_handler_push)=sub-post-call-sync,s,1)
+ same => n,Gosub(sub-number-filter,s,1)
  same => n,Dial({get_dial_target('ALL', all_extens)},60,U(sub-record-start))
  same => n,Hangup()
 """
@@ -7512,15 +7688,21 @@ exten => s,1,NoOp({trunk_title}: Вызов в нерабочее время)
         entry_section = f"""
 [{entry_ctx_name}]
 exten => _X.,1,NoOp(Входящий вызов {trunk_title} от ${{CALLERID(num)}})
+ same => n,Gosub(sub-number-filter,s,1)
+ same => n,Set(FILTERED_ANI=${{CALLERID(num)}})
 {offhours_goto}
 
 exten => _+.,1,NoOp(Входящий вызов {trunk_title} (+) от ${{CALLERID(num)}})
+ same => n,Gosub(sub-number-filter,s,1)
+ same => n,Set(FILTERED_ANI=${{CALLERID(num)}})
 {offhours_goto}
 
 exten => s,1,NoOp(Входящий вызов {trunk_title} (s-exten))
+ same => n,Gosub(sub-number-filter,s,1)
 {offhours_goto}
 
 exten => _.,1,NoOp(Входящий вызов {trunk_title} (catch-all) от ${{CALLERID(num)}})
+ same => n,Gosub(sub-number-filter,s,1)
 {offhours_goto}
 
 {offhours_ctx}
@@ -7637,6 +7819,7 @@ exten => i,1,NoOp({trunk_title} IVR {n_id}: Неверный ввод клави
         all_ivr_contexts.append(compile_tree_to_contexts(tg_tree, 'from-telegram', 'Telegram Gateway'))
 
     ivr_sections = "\n\n".join(all_ivr_contexts)
+    number_filter_block = build_number_filter_dialplan()
 
     dialplan = f"""[general]
 static=yes
@@ -7649,6 +7832,8 @@ RECORD_DIR=/var/spool/asterisk/monitor
 exten => s,1,NoOp(=== POST-CALL SYNC TRIGGERED: ${{CALL_ID}}, ${{CALL_SRC}} -> ${{CALL_DST}} (${{CALL_DIRECTION}}, ${{CDR(disposition)}}, ${{CDR(billsec)}}s) ===)
  same => n,System(/usr/bin/python3 /opt/crm-yandex-uploader.py "${{CALL_ID}}" "${{CALL_SRC}}" "${{CALL_DST}}" "${{CALL_DIRECTION}}" "${{CDR(disposition)}}" "${{CDR(billsec)}}" "${{REC_PATH}}" &)
  same => n,Return()
+
+{number_filter_block}
 
 [from-internal]
 ; 1. Тест эхо (777)

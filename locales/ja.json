@@ -963,5 +963,17 @@
   "pb_name_number_required": "名前と番号は必須です",
   "pb_delete_confirm": "この連絡先を削除しますか？",
   "pb_from_ext": "どの内線から発信しますか？",
-  "pb_imported": "追加された連絡先: "
+  "pb_imported": "追加された連絡先: ",
+  "nav_number_lists": "迷惑電話対策（番号）",
+  "nl_title": "番号フィルター（迷惑電話対策）",
+  "nl_desc": "番号で着信をブロック: 完全一致、79* プレフィックス、*1234* マスク。",
+  "nl_enabled": "フィルター有効",
+  "nl_blacklist": "ブラックリスト",
+  "nl_whitelist": "ホワイトリスト",
+  "nl_action": "ブラックリストの動作:",
+  "nl_act_hangup": "切断",
+  "nl_act_busy": "話中音",
+  "nl_act_announce": "アナウンスを再生",
+  "nl_hint": "フィルターはトランクとGSMゲートウェイからの着信に適用されます。ホワイトリストが優先されます。",
+  "nl_empty": "リストは空です"
 }

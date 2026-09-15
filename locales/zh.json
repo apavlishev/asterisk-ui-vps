@@ -963,5 +963,17 @@
   "pb_name_number_required": "姓名和号码为必填",
   "pb_delete_confirm": "删除此联系人？",
   "pb_from_ext": "用哪个分机拨打？",
-  "pb_imported": "已添加联系人："
+  "pb_imported": "已添加联系人：",
+  "nav_number_lists": "防骚扰（号码）",
+  "nl_title": "号码过滤（防骚扰）",
+  "nl_desc": "按号码阻止来电：精确匹配、79* 前缀或 *1234* 掩码。",
+  "nl_enabled": "过滤器已启用",
+  "nl_blacklist": "黑名单",
+  "nl_whitelist": "白名单",
+  "nl_action": "黑名单操作：",
+  "nl_act_hangup": "挂断",
+  "nl_act_busy": "忙音",
+  "nl_act_announce": "播放提示音",
+  "nl_hint": "过滤器适用于来自中继和 GSM 网关的来电。白名单优先于黑名单。",
+  "nl_empty": "列表为空"
 }

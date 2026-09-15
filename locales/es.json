@@ -963,5 +963,17 @@
   "pb_name_number_required": "El nombre y el número son obligatorios",
   "pb_delete_confirm": "¿Eliminar el contacto?",
   "pb_from_ext": "¿Desde qué extensión llamar?",
-  "pb_imported": "Contactos añadidos: "
+  "pb_imported": "Contactos añadidos: ",
+  "nav_number_lists": "Antispam (Números)",
+  "nl_title": "Filtro de números (Antispam)",
+  "nl_desc": "Bloquee llamadas entrantes por número: coincidencia exacta, prefijo 79* o máscara *1234*.",
+  "nl_enabled": "Filtro activado",
+  "nl_blacklist": "Lista negra",
+  "nl_whitelist": "Lista blanca",
+  "nl_action": "Acción para la lista negra:",
+  "nl_act_hangup": "Colgar",
+  "nl_act_busy": "Señal de ocupado",
+  "nl_act_announce": "Reproducir mensaje",
+  "nl_hint": "El filtro se aplica a las llamadas entrantes de troncales y pasarelas GSM. La lista blanca tiene prioridad sobre la negra.",
+  "nl_empty": "La lista está vacía"
 }

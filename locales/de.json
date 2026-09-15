@@ -963,5 +963,17 @@
   "pb_name_number_required": "Name und Nummer sind erforderlich",
   "pb_delete_confirm": "Diesen Kontakt löschen?",
   "pb_from_ext": "Von welcher Nebenstelle anrufen?",
-  "pb_imported": "Kontakte hinzugefügt: "
+  "pb_imported": "Kontakte hinzugefügt: ",
+  "nav_number_lists": "Anti-Spam (Nummern)",
+  "nl_title": "Nummernfilter (Anti-Spam)",
+  "nl_desc": "Eingehende Anrufe nach Nummer blockieren: exakte Übereinstimmung, Präfix 79* oder Maske *1234*.",
+  "nl_enabled": "Filter aktiviert",
+  "nl_blacklist": "Sperrliste",
+  "nl_whitelist": "Positivliste",
+  "nl_action": "Aktion für die Sperrliste:",
+  "nl_act_hangup": "Auflegen",
+  "nl_act_busy": "Besetztzeichen",
+  "nl_act_announce": "Ansage abspielen",
+  "nl_hint": "Der Filter gilt für eingehende Anrufe von Trunks und GSM-Gateways. Positivliste hat Vorrang vor der Sperrliste.",
+  "nl_empty": "Liste ist leer"
 }
