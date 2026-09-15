@@ -994,5 +994,21 @@
   "sounds_upload": "上传音频",
   "sounds_search": "按文件名搜索...",
   "sounds_none": "未找到音频文件",
-  "sounds_delete_confirm": "删除此音频文件？"
+  "sounds_delete_confirm": "删除此音频文件？",
+  "nav_tls": "加密（TLS/SRTP）",
+  "tls_title": "通道加密（TLS / SRTP）",
+  "tls_desc": "使用自签名或自有证书保护信令（SIP over TLS）和媒体（SRTP）。",
+  "tls_sip": "SIP over TLS",
+  "tls_enable_sip": "启用安全信令",
+  "tls_port": "端口",
+  "tls_srtp": "SRTP（媒体加密）",
+  "tls_srtp_off": "已禁用",
+  "tls_srtp_opt": "机会式",
+  "tls_srtp_on": "强制",
+  "tls_srtp_hint": "对于普通 SIP 话机，仅当所有设备都支持 SRTP 时才使用\"强制\"。",
+  "tls_cert": "TLS 证书",
+  "tls_cert_path": "文件",
+  "tls_gen_cert": "生成证书",
+  "tls_gen_confirm": "生成新的 TLS 证书？现有证书将被替换。",
+  "tls_gen_done": "证书已生成。"
 }

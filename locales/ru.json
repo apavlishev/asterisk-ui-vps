@@ -990,5 +990,21 @@
   "sounds_upload": "Загрузить аудио",
   "sounds_search": "Поиск по имени файла...",
   "sounds_none": "Аудиофайлов не найдено",
-  "sounds_delete_confirm": "Удалить аудиофайл?"
+  "sounds_delete_confirm": "Удалить аудиофайл?",
+  "nav_tls": "Шифрование (TLS/SRTP)",
+  "tls_title": "Шифрование каналов (TLS / SRTP)",
+  "tls_desc": "Защита сигнализации (SIP over TLS) и медиа (SRTP) с самоподписанным или своим сертификатом.",
+  "tls_sip": "SIP over TLS",
+  "tls_enable_sip": "Включить защищённую сигнализацию",
+  "tls_port": "Порт",
+  "tls_srtp": "SRTP (шифрование медиа)",
+  "tls_srtp_off": "Выключено",
+  "tls_srtp_opt": "По возможности (opportunistic)",
+  "tls_srtp_on": "Обязательно (mandatory)",
+  "tls_srtp_hint": "Для обычных SIP-телефонов рекомендуется «Обязательно» только если все устройства поддерживают SRTP.",
+  "tls_cert": "TLS-сертификат",
+  "tls_cert_path": "Файл",
+  "tls_gen_cert": "Сгенерировать сертификат",
+  "tls_gen_confirm": "Сгенерировать новый TLS-сертификат? Существующий будет заменён.",
+  "tls_gen_done": "Сертификат сгенерирован."
 }

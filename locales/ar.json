@@ -994,5 +994,21 @@
   "sounds_upload": "رفع الصوت",
   "sounds_search": "بحث حسب اسم الملف...",
   "sounds_none": "لم يتم العثور على ملفات صوتية",
-  "sounds_delete_confirm": "حذف الملف الصوتي؟"
+  "sounds_delete_confirm": "حذف الملف الصوتي؟",
+  "nav_tls": "التشفير (TLS/SRTP)",
+  "tls_title": "تشفير القنوات (TLS / SRTP)",
+  "tls_desc": "حماية الإشارات (SIP عبر TLS) والوسائط (SRTP) بشهادة موقعة ذاتياً أو خاصة.",
+  "tls_sip": "SIP عبر TLS",
+  "tls_enable_sip": "تمكين الإشارات الآمنة",
+  "tls_port": "المنفذ",
+  "tls_srtp": "SRTP (تشفير الوسائط)",
+  "tls_srtp_off": "معطّل",
+  "tls_srtp_opt": "حسب الإمكان",
+  "tls_srtp_on": "إلزامي",
+  "tls_srtp_hint": "للهواتف SIP العادية، استخدم «إلزامي» فقط إذا كانت كل الأجهزة تدعم SRTP.",
+  "tls_cert": "شهادة TLS",
+  "tls_cert_path": "الملف",
+  "tls_gen_cert": "إنشاء شهادة",
+  "tls_gen_confirm": "إنشاء شهادة TLS جديدة؟ سيتم استبدال الحالية.",
+  "tls_gen_done": "تم إنشاء الشهادة."
 }

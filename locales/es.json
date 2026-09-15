@@ -994,5 +994,21 @@
   "sounds_upload": "Subir audio",
   "sounds_search": "Buscar por nombre de archivo...",
   "sounds_none": "No se encontraron archivos de audio",
-  "sounds_delete_confirm": "¿Eliminar el archivo de audio?"
+  "sounds_delete_confirm": "¿Eliminar el archivo de audio?",
+  "nav_tls": "Cifrado (TLS/SRTP)",
+  "tls_title": "Cifrado de canales (TLS / SRTP)",
+  "tls_desc": "Proteja la señalización (SIP sobre TLS) y los medios (SRTP) con un certificado autofirmado o propio.",
+  "tls_sip": "SIP sobre TLS",
+  "tls_enable_sip": "Activar señalización segura",
+  "tls_port": "Puerto",
+  "tls_srtp": "SRTP (cifrado de medios)",
+  "tls_srtp_off": "Desactivado",
+  "tls_srtp_opt": "Oportunista",
+  "tls_srtp_on": "Obligatorio",
+  "tls_srtp_hint": "Para teléfonos SIP normales, use «Obligatorio» solo si todos los dispositivos admiten SRTP.",
+  "tls_cert": "Certificado TLS",
+  "tls_cert_path": "Archivo",
+  "tls_gen_cert": "Generar certificado",
+  "tls_gen_confirm": "¿Generar un nuevo certificado TLS? El actual será reemplazado.",
+  "tls_gen_done": "Certificado generado."
 }

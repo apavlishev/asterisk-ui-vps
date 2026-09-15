@@ -4212,6 +4212,10 @@
                         <span class="material-symbols-outlined text-[18px]">block</span>
                         <span>{{ t.nav_number_lists or 'Антиспам (Номера)' }}</span>
                     </button>
+                    <button type="button" onclick="switchSecuritySubTab('sec-tls', this)" class="sec-tab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-surface text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2 border border-outline/30 shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">enhanced_encryption</span>
+                        <span>{{ t.nav_tls or 'Шифрование (TLS/SRTP)' }}</span>
+                    </button>
                 </div>
                 
                 <div id="sec-antifraud" class="space-y-6">
@@ -4776,6 +4780,66 @@
                         <p class="text-[11px] text-on-surface-variant leading-relaxed">
                             {{ t.nl_hint or 'Фильтр применяется к входящим вызовам из транков и GSM-шлюзов. Белый список имеет приоритет над чёрным.' }}
                         </p>
+                    </div>
+                </div>
+
+                <!-- SECURITY SUB-TAB: TLS / SRTP -->
+                <div id="sec-tls" class="space-y-6 hidden">
+                    <div class="bg-surface rounded-2xl p-6 sm:p-8 border border-outline/30 shadow-sm space-y-5">
+                        <div class="flex items-center gap-3 pb-4 border-b border-surface-container">
+                            <span class="material-symbols-outlined text-success text-2xl">enhanced_encryption</span>
+                            <div>
+                                <h2 class="text-base font-bold text-on-surface">{{ t.tls_title or 'Шифрование каналов (TLS / SRTP)' }}</h2>
+                                <p class="text-xs text-on-surface-variant mt-0.5">{{ t.tls_desc or 'Защита сигнализации (SIP over TLS) и медиа (SRTP) с самоподписанным или своим сертификатом.' }}</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="p-4 rounded-2xl bg-success/5 border border-success/20 space-y-3">
+                                <h3 class="text-sm font-bold text-success flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[18px]">lock</span>
+                                    {{ t.tls_sip or 'SIP over TLS' }}
+                                </h3>
+                                <label class="flex items-center gap-2 text-xs font-semibold text-on-surface cursor-pointer">
+                                    <input type="checkbox" id="tls-sip-enabled" class="rounded text-success w-4 h-4">
+                                    <span>{{ t.tls_enable_sip or 'Включить защищённую сигнализацию' }}</span>
+                                </label>
+                                <div class="text-[11px] text-on-surface-variant">
+                                    {{ t.tls_port or 'Порт' }}: <span class="font-mono font-bold" id="tls-sip-port">5061</span> (tcp)
+                                </div>
+                            </div>
+
+                            <div class="p-4 rounded-2xl bg-success/5 border border-success/20 space-y-3">
+                                <h3 class="text-sm font-bold text-success flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[18px]">vpn_lock</span>
+                                    {{ t.tls_srtp or 'SRTP (шифрование медиа)' }}
+                                </h3>
+                                <select id="tls-srtp-mode" class="w-full px-3 py-2 rounded-xl bg-surface-container-low border border-outline text-xs font-semibold">
+                                    <option value="no">{{ t.tls_srtp_off or 'Выключено' }}</option>
+                                    <option value="opportunistic">{{ t.tls_srtp_opt or 'По возможности (opportunistic)' }}</option>
+                                    <option value="mandatory">{{ t.tls_srtp_on or 'Обязательно (mandatory)' }}</option>
+                                </select>
+                                <div class="text-[11px] text-on-surface-variant">{{ t.tls_srtp_hint or 'Для обычных SIP-телефонов рекомендуется «Обязательно» только если все устройства поддерживают SRTP.' }}</div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-surface-container-low border border-outline/20 space-y-3">
+                            <h3 class="text-xs font-bold text-on-surface">{{ t.tls_cert or 'TLS-сертификат' }}</h3>
+                            <div class="text-[11px] text-on-surface-variant space-y-1">
+                                <div>SHA-256: <span class="font-mono break-all" id="tls-fingerprint">—</span></div>
+                                <div>{{ t.tls_cert_path or 'Файл' }}: <span class="font-mono">/etc/asterisk/keys/asterisk.pem</span></div>
+                            </div>
+                            <button type="button" onclick="tlsGenerateCert()" class="px-4 py-2 rounded-xl bg-surface border border-outline/30 text-on-surface-variant text-xs font-semibold hover:bg-surface-container transition-all flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">autorenew</span>
+                                <span>{{ t.tls_gen_cert or 'Сгенерировать сертификат' }}</span>
+                            </button>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="button" onclick="saveTlsSettings()" class="px-5 py-2.5 rounded-xl bg-success text-white text-xs font-bold hover:bg-success/90 transition-all">
+                                {{ t.sohranit or 'Сохранить' }}
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -8154,13 +8218,14 @@
     <script>
 
         function switchSecuritySubTab(subtabId, btn) {
-            ['sec-antifraud','sec-auth','sec-logs','sec-firewall','sec-numbers'].forEach(x => {
+            ['sec-antifraud','sec-auth','sec-logs','sec-firewall','sec-numbers','sec-tls'].forEach(x => {
                 const el = document.getElementById(x);
                 if (el) el.classList.add('hidden');
             });
             const pane = document.getElementById(subtabId);
             if (pane) pane.classList.remove('hidden');
             if (subtabId === 'sec-numbers' && typeof loadNumberLists === 'function') loadNumberLists();
+            if (subtabId === 'sec-tls' && typeof loadTlsSettings === 'function') loadTlsSettings();
 
             document.querySelectorAll('.sec-tab-btn').forEach(b => {
                 b.className = 'sec-tab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-surface text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2 border border-outline/30 shrink-0';
@@ -9552,6 +9617,40 @@
             if (!confirm('{{ t.sounds_delete_confirm or "Удалить аудиофайл?" }}')) return;
             await fetch('/api/sounds/delete', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ filename }) });
             loadSounds();
+        }
+
+        // ================= TLS / SRTP SETTINGS =================
+        async function loadTlsSettings() {
+            try {
+                const res = await fetch('/api/security/tls', { cache: 'no-store' });
+                const data = await res.json();
+                if (data.status !== 'ok') return;
+                const s = data.settings || {};
+                const en = document.getElementById('tls-sip-enabled'); if (en) en.checked = !!s.sip_tls_enabled;
+                const port = document.getElementById('tls-sip-port'); if (port) port.textContent = s.sip_tls_port || 5061;
+                const sr = document.getElementById('tls-srtp-mode'); if (sr) sr.value = s.srtp_mode || 'no';
+                const fp = document.getElementById('tls-fingerprint'); if (fp) fp.textContent = data.fingerprint || '—';
+            } catch (e) { console.error('[tls] load', e); }
+        }
+
+        async function saveTlsSettings() {
+            const payload = {
+                sip_tls_enabled: document.getElementById('tls-sip-enabled').checked,
+                sip_tls_port: 5061,
+                srtp_mode: document.getElementById('tls-srtp-mode').value
+            };
+            const res = await fetch('/api/security/tls/save', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+            const data = await res.json();
+            if (data.status === 'ok') loadTlsSettings();
+            else alert(data.message || 'Ошибка');
+        }
+
+        async function tlsGenerateCert() {
+            if (!confirm('{{ t.tls_gen_confirm or "Сгенерировать новый TLS-сертификат? Существующий будет заменён." }}')) return;
+            const res = await fetch('/api/security/tls/generate-cert', { method: 'POST' });
+            const data = await res.json();
+            if (data.status === 'ok') { loadTlsSettings(); alert('{{ t.tls_gen_done or "Сертификат сгенерирован." }}'); }
+            else alert(data.message || 'Ошибка');
         }
     </script>
 

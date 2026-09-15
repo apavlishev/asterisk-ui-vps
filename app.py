@@ -7206,6 +7206,64 @@ def api_sounds_delete():
     return jsonify({'status': 'ok'})
 
 
+# ================= TLS / SRTP SETTINGS =================
+def get_tls_settings():
+    cfg = load_integrations()
+    tls = cfg.get('tls', {}) or {}
+    tls.setdefault('sip_tls_enabled', False)
+    tls.setdefault('sip_tls_port', 5061)
+    tls.setdefault('srtp_mode', 'no')  # no | opportunistic | mandatory
+    return tls
+
+
+def save_tls_settings(tls):
+    cfg = load_integrations()
+    cfg['tls'] = tls
+    save_integrations(cfg)
+    generate_pjsip_conf()
+
+
+@app.route('/api/security/tls', methods=['GET'])
+def api_tls_get():
+    tls = get_tls_settings()
+    return jsonify({
+        'status': 'ok',
+        'settings': tls,
+        'fingerprint': get_webrtc_cert_fingerprint(),
+        'cert_exists': os.path.exists(os.path.join(WEBRTC_CERT_DIR, 'asterisk.pem')),
+    })
+
+
+@app.route('/api/security/tls/save', methods=['POST'])
+def api_tls_save():
+    data = request.get_json() or {}
+    tls = get_tls_settings()
+    tls['sip_tls_enabled'] = bool(data.get('sip_tls_enabled', tls.get('sip_tls_enabled')))
+    try:
+        tls['sip_tls_port'] = int(data.get('sip_tls_port', tls.get('sip_tls_port', 5061)) or 5061)
+    except Exception:
+        pass
+    if data.get('srtp_mode') in ('no', 'opportunistic', 'mandatory'):
+        tls['srtp_mode'] = data.get('srtp_mode')
+    save_tls_settings(tls)
+    run_asterisk('pjsip reload')
+    auth_mgr.audit(session.get('username'), 'tls_save', f"tls={tls['sip_tls_enabled']} srtp={tls['srtp_mode']}")
+    return jsonify({'status': 'ok', 'settings': tls})
+
+
+@app.route('/api/security/tls/generate-cert', methods=['POST'])
+def api_tls_generate_cert():
+    host = request.host.split(':')[0]
+    ok = ensure_webrtc_http_conf(host=host, force=True)
+    run_asterisk('pjsip reload')
+    auth_mgr.audit(session.get('username'), 'tls_generate_cert', 'ok' if ok else 'failed')
+    return jsonify({
+        'status': 'ok' if ok else 'error',
+        'fingerprint': get_webrtc_cert_fingerprint(),
+        'message': 'Сертификат сгенерирован' if ok else 'Не удалось создать сертификат',
+    })
+
+
 # ================= MULTILINGUAL (I18N) ENGINE (TOP 10 WORLD LANGUAGES) =================
 LOCALES_DIR = os.path.join(os.path.dirname(__file__), 'locales')
 def get_available_languages():
@@ -7380,6 +7438,21 @@ def generate_pjsip_conf(accounts=None):
             "",
         ]
 
+    tls_cfg = get_tls_settings()
+    if tls_cfg.get('sip_tls_enabled'):
+        out += [
+            "; --- SIP over TLS transport (шифрованная сигнализация) ---",
+            "[transport-tls]",
+            "type=transport",
+            "protocol=tls",
+            f"bind=0.0.0.0:{tls_cfg.get('sip_tls_port', 5061)}",
+            "cert_file=/etc/asterisk/keys/asterisk.pem",
+            "priv_key_file=/etc/asterisk/keys/asterisk.key",
+            "method=tlsv1_2",
+            "",
+        ]
+    srtp_mode = tls_cfg.get('srtp_mode', 'no')
+
     # 1. Внутренние софтфоны (Internal Extensions)
     out.append("; --- Внутренние SIP-аккаунты и софтфоны (Internal Extensions) ---")
     webrtc_store = get_webrtc_extensions()
@@ -7420,6 +7493,10 @@ def generate_pjsip_conf(accounts=None):
             out.append("rtcp_mux=yes")
             out.append("ice_support=yes")
             out.append("use_avpf=yes")
+        else:
+            if srtp_mode in ('opportunistic', 'mandatory'):
+                out.append(f"media_encryption=sdes")
+                out.append(f"media_encryption_optimistic={'yes' if srtp_mode == 'opportunistic' else 'no'}")
         out.append("direct_media=no")
         out.append("rtp_symmetric=yes")
         out.append("force_rport=yes")

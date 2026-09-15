@@ -994,5 +994,21 @@
   "sounds_upload": "ऑडियो अपलोड करें",
   "sounds_search": "फ़ाइल नाम से खोजें...",
   "sounds_none": "कोई ऑडियो फ़ाइल नहीं मिली",
-  "sounds_delete_confirm": "यह ऑडियो फ़ाइल हटाएँ?"
+  "sounds_delete_confirm": "यह ऑडियो फ़ाइल हटाएँ?",
+  "nav_tls": "एन्क्रिप्शन (TLS/SRTP)",
+  "tls_title": "चैनल एन्क्रिप्शन (TLS / SRTP)",
+  "tls_desc": "स्व-हस्ताक्षरित या अपने प्रमाणपत्र के साथ सिग्नलिंग (SIP over TLS) और मीडिया (SRTP) की सुरक्षा करें।",
+  "tls_sip": "SIP over TLS",
+  "tls_enable_sip": "सुरक्षित सिग्नलिंग सक्षम करें",
+  "tls_port": "पोर्ट",
+  "tls_srtp": "SRTP (मीडिया एन्क्रिप्शन)",
+  "tls_srtp_off": "अक्षम",
+  "tls_srtp_opt": "अवसरवादी",
+  "tls_srtp_on": "अनिवार्य",
+  "tls_srtp_hint": "सामान्य SIP फ़ोन के लिए «अनिवार्य» तभी चुनें जब सभी डिवाइस SRTP समर्थित हों।",
+  "tls_cert": "TLS प्रमाणपत्र",
+  "tls_cert_path": "फ़ाइल",
+  "tls_gen_cert": "प्रमाणपत्र बनाएँ",
+  "tls_gen_confirm": "नया TLS प्रमाणपत्र बनाएँ? वर्तमान बदल दिया जाएगा।",
+  "tls_gen_done": "प्रमाणपत्र बन गया।"
 }

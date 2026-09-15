@@ -994,5 +994,21 @@
   "sounds_upload": "音声をアップロード",
   "sounds_search": "ファイル名で検索...",
   "sounds_none": "音声ファイルが見つかりません",
-  "sounds_delete_confirm": "この音声ファイルを削除しますか？"
+  "sounds_delete_confirm": "この音声ファイルを削除しますか？",
+  "nav_tls": "暗号化 (TLS/SRTP)",
+  "tls_title": "チャネル暗号化 (TLS / SRTP)",
+  "tls_desc": "自己署名または独自の証明書で信号（SIP over TLS）とメディア（SRTP）を保護します。",
+  "tls_sip": "SIP over TLS",
+  "tls_enable_sip": "安全な信号を有効化",
+  "tls_port": "ポート",
+  "tls_srtp": "SRTP（メディア暗号化）",
+  "tls_srtp_off": "無効",
+  "tls_srtp_opt": "機会的",
+  "tls_srtp_on": "必須",
+  "tls_srtp_hint": "通常のSIP電話では、全端末がSRTP対応の場合のみ「必須」を使用してください。",
+  "tls_cert": "TLS証明書",
+  "tls_cert_path": "ファイル",
+  "tls_gen_cert": "証明書を生成",
+  "tls_gen_confirm": "新しいTLS証明書を生成しますか？既存のものは置き換えられます。",
+  "tls_gen_done": "証明書を生成しました。"
 }
