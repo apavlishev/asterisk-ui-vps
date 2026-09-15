@@ -1,6 +1,7 @@
 import hashlib
 import io
 import ftplib
+import socket
 import plugin_manager
 
 import license_mgr
@@ -3608,6 +3609,154 @@ def run_asterisk(cmd):
     except Exception as e:
         return str(e)
 
+
+# ================= AMI (ASTERISK MANAGER INTERFACE) CALL CONTROL =================
+AMI_HOST = '127.0.0.1'
+AMI_PORT = 5038
+AMI_USER = 'asterisk-gui'
+AMI_SECRET = None
+
+
+def _get_ami_secret():
+    global AMI_SECRET
+    if AMI_SECRET:
+        return AMI_SECRET
+    try:
+        with open('/etc/asterisk/manager.conf', 'r', encoding='utf-8', errors='ignore') as f:
+            content = f.read()
+        # Prefer our dedicated account, else fall back to the first enabled one
+        for block in re.finditer(r'\[([^\]]+)\]\s*([^\[]*)', content):
+            name, body = block.group(1).strip(), block.group(2)
+            if name == AMI_USER:
+                m = re.search(r'^secret\s*=\s*(.+)$', body, re.MULTILINE)
+                if m:
+                    AMI_SECRET = m.group(1).strip()
+                    return AMI_SECRET
+        m = re.search(r'^secret\s*=\s*(.+)$', content, re.MULTILINE)
+        if m:
+            AMI_SECRET = m.group(1).strip()
+    except Exception:
+        pass
+    return AMI_SECRET
+
+
+def ami_read_events(timeout=2.0, max_events=250, action=None):
+    """Reads one AMI action/events exchange. Fully self-contained (no deps)."""
+    secret = _get_ami_secret()
+    if not secret:
+        return None, "AMI недоступен: не найден секрет в /etc/asterisk/manager.conf"
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(timeout)
+    try:
+        sock.connect((AMI_HOST, AMI_PORT))
+        sock.recv(256)
+
+        login = (f"Action: Login\r\nUsername: {AMI_USER}\r\nSecret: {secret}\r\n"
+                 f"Events: on\r\n\r\n")
+        sock.sendall(login.encode())
+
+        resp = b""
+        if action:
+            sock.sendall(action.encode())
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            try:
+                chunk = sock.recv(4096)
+                if not chunk:
+                    break
+                resp += chunk
+                if b"Event: FullyBooted" in resp or resp.count(b"Event: ") > max_events:
+                    break
+            except socket.timeout:
+                break
+
+        sock.sendall(b"Action: Logoff\r\n\r\n")
+        return resp.decode('utf-8', 'ignore'), None
+    except Exception as e:
+        return None, f"AMI соединение не удалось: {e}"
+    finally:
+        try:
+            sock.close()
+        except Exception:
+            pass
+
+
+def parse_ami_events(raw):
+    """Parses raw AMI output into a list of dicts."""
+    events = []
+    if not raw:
+        return events
+    for block in raw.split("\r\n\r\n"):
+        if not block.strip():
+            continue
+        ev = {}
+        for line in block.splitlines():
+            if ": " in line:
+                k, v = line.split(": ", 1)
+                ev[k.strip()] = v.strip()
+        if ev:
+            events.append(ev)
+    return events
+
+
+def ami_action(action_name, params=None):
+    """Runs a single AMI action and returns (Success, Message)."""
+    lines = [f"Action: {action_name}"]
+    for k, v in (params or {}).items():
+        lines.append(f"{k}: {v}")
+    raw, err = ami_read_events(timeout=2.5, action="\r\n".join(lines) + "\r\n\r\n")
+    if err:
+        return False, err
+    for ev in parse_ami_events(raw):
+        if ev.get("Response") == "Success":
+            return True, ev.get("Message", "OK")
+        if ev.get("Response") == "Error":
+            return False, ev.get("Message", "AMI error")
+    return False, "Нет ответа от AMI"
+
+
+def get_active_calls_ami():
+    """Returns live channels via AMI (fallback to dialplan parsing)."""
+    raw, err = ami_read_events(timeout=1.8)
+    if not raw:
+        return None
+    calls = []
+    for ev in parse_ami_events(raw):
+        if ev.get("Event") != "Newchannel":
+            continue
+        calls.append({
+            'channel': ev.get('Channel', ''),
+            'uniqueid': ev.get('Uniqueid', ''),
+            'caller': ev.get('CallerIDNum', '') or ev.get('CallerIDName', ''),
+            'state': ev.get('ChannelStateDesc', ''),
+            'context': ev.get('Context', ''),
+            'exten': ev.get('Exten', ''),
+        })
+    return calls if calls else None
+
+
+def ami_hangup(channel):
+    return ami_action("Hangup", {"Channel": channel})
+
+
+def ami_redirect(channel, exten, context="from-internal"):
+    return ami_action("Redirect", {"Channel": channel, "Exten": exten, "Context": context})
+
+
+def ami_originate(channel, exten, context="from-internal", caller_id=None, timeout=30000):
+    params = {
+        "Channel": channel,
+        "Exten": exten,
+        "Context": context,
+        "Priority": "1",
+        "Async": "true",
+        "Timeout": str(timeout),
+    }
+    if caller_id:
+        params["CallerID"] = caller_id
+    return ami_action("Originate", params)
+
 def format_duration(seconds):
     try:
         s = int(float(seconds))
@@ -6891,6 +7040,78 @@ def restart_dongle():
 @app.route('/recordings/<path:filename>')
 def serve_recording(filename):
     return send_from_directory(RECORD_DIR, filename)
+
+
+# ================= LIVE CALL CONTROL (AMI) & WALLBOARD =================
+@app.route('/api/calls/live', methods=['GET'])
+def api_calls_live():
+    """Live channels: AMI first, dialplan-CLI fallback."""
+    ami = get_active_calls_ami()
+    channels = ami if ami is not None else get_human_active_channels()
+    return jsonify({
+        'success': True,
+        'source': 'ami' if ami is not None else 'cli',
+        'count': len(channels or []),
+        'channels': channels or [],
+    })
+
+
+@app.route('/api/calls/hangup', methods=['POST'])
+def api_calls_hangup():
+    data = request.get_json(silent=True) or {}
+    channel = (data.get('channel') or '').strip()
+    if not channel:
+        return jsonify({'success': False, 'error': 'Не указан канал'})
+    ok, msg = ami_hangup(channel)
+    if not ok:
+        # Fallback: soft hangup via CLI
+        out = run_asterisk(f'channel request hangup {channel}')
+        ok = 'Hangup' in out or 'Requested' in out
+        msg = out or msg
+    return jsonify({'success': ok, 'message': msg})
+
+
+@app.route('/api/calls/transfer', methods=['POST'])
+def api_calls_transfer():
+    data = request.get_json(silent=True) or {}
+    channel = (data.get('channel') or '').strip()
+    exten = (data.get('exten') or '').strip()
+    context = (data.get('context') or 'from-internal').strip()
+    if not channel or not exten:
+        return jsonify({'success': False, 'error': 'Нужны channel и exten'})
+    ok, msg = ami_redirect(channel, exten, context)
+    return jsonify({'success': ok, 'message': msg})
+
+
+@app.route('/api/calls/originate', methods=['POST'])
+def api_calls_originate():
+    """Click-to-call: rings the operator's extension, then dials the target."""
+    data = request.get_json(silent=True) or {}
+    from_ext = (data.get('from') or '').strip()
+    to_ext = (data.get('to') or '').strip()
+    context = (data.get('context') or 'from-internal').strip()
+    if not from_ext or not to_ext:
+        return jsonify({'success': False, 'error': 'Нужны from и to'})
+    channel = f"PJSIP/{from_ext}"
+    ok, msg = ami_originate(channel, to_ext, context=context,
+                            caller_id=f"<{from_ext}>")
+    if not ok:
+        # Fallback: CLI originate
+        out = run_asterisk(f'channel originate PJSIP/{from_ext} extension {to_ext}@{context}')
+        ok = 'Success' in out or 'Originate' in out or not out
+        msg = out or msg
+    return jsonify({'success': ok, 'message': msg})
+
+
+@app.route('/api/calls/park', methods=['POST'])
+def api_calls_park():
+    data = request.get_json(silent=True) or {}
+    channel = (data.get('channel') or '').strip()
+    if not channel:
+        return jsonify({'success': False, 'error': 'Не указан канал'})
+    out = run_asterisk(f'park {channel}')
+    return jsonify({'success': bool(out), 'message': out})
+
 
 @app.route('/api/calls/<filename>/transcripts', methods=['GET'])
 def get_call_transcripts(filename):

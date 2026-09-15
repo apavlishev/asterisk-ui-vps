@@ -450,6 +450,33 @@
 
                 <!-- // ================= SYSTEM MONITORING & TELEMETRY WIDGETS ================= -->
                 <div class="space-y-4">
+                    <!-- LIVE CALL CONTROL (AMI) -->
+                    <div class="bg-surface rounded-2xl p-5 border border-outline/30 shadow-sm">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-surface-container">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-success text-2xl">phone_in_talk</span>
+                                <div>
+                                    <h2 class="text-base font-bold text-on-surface">{{ t.live_calls or 'Активные вызовы (Live)' }}</h2>
+                                    <p class="text-xs text-on-surface-variant">{{ t.live_calls_desc or 'Управление вызовами в реальном времени через AMI: сброс, перевод, клик-ту-колл.' }}</p>
+                                </div>
+                                <span id="live-calls-count" class="ml-2 text-xs px-2.5 py-0.5 rounded-full bg-success/10 text-success font-bold border border-success/20">0</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="openOriginateModal()" class="px-4 py-2 rounded-xl bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition-all shadow-sm flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[16px]">call</span>
+                                    <span>{{ t.click_to_call or 'Позвонить' }}</span>
+                                </button>
+                                <button type="button" onclick="refreshLiveCalls()" class="px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-xs font-semibold text-on-surface border border-outline/30 flex items-center gap-1.5 transition-all">
+                                    <span class="material-symbols-outlined text-[16px]">refresh</span>
+                                    <span>{{ t.obnovit or 'Обновить' }}</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="live-calls-container" class="mt-4 space-y-2">
+                            <div class="text-center text-on-surface-variant text-xs py-6">{{ t.live_calls_empty or 'Нет активных вызовов' }}</div>
+                        </div>
+                    </div>
+
                     <!-- 1. TOP ROW: 4 STATS CARDS WITH SPARKLINES (CPU, RAM, SWAP, DISK) -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                         <!-- CPU CARD -->
@@ -5968,8 +5995,86 @@
             if (modal) modal.classList.add('hidden');
         }
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+        // ================= LIVE CALL CONTROL =================
+        let liveCallsTimer = null;
+
+        async function refreshLiveCalls() {
+            const box = document.getElementById('live-calls-container');
+            if (!box) return;
+            try {
+                const res = await fetch('/api/calls/live', { cache: 'no-store' });
+                const data = await res.json();
+                const list = data.channels || [];
+                const counter = document.getElementById('live-calls-count');
+                if (counter) counter.textContent = list.length;
+
+                if (!list.length) {
+                    box.innerHTML = '<div class="text-center text-on-surface-variant text-xs py-6">{{ t.live_calls_empty or "Нет активных вызовов" }}</div>';
+                    return;
+                }
+                let html = '';
+                for (const c of list) {
+                    const chan = (c.channel || '').replace(/'/g, '');
+                    html += '<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-surface-container-low border border-outline/20">'
+                        + '<div class="flex items-center gap-3 min-w-0">'
+                        + '<span class="material-symbols-outlined text-success">call</span>'
+                        + '<div class="min-w-0">'
+                        + '<div class="text-xs font-bold text-on-surface truncate">' + (c.caller || '—') + ' → ' + (c.callee || c.exten || '—') + '</div>'
+                        + '<div class="text-[10px] font-mono text-on-surface-variant truncate">' + (c.channel || '') + ' • ' + (c.state || '') + (c.duration ? (' • ' + c.duration) : '') + '</div>'
+                        + '</div></div>'
+                        + '<div class="flex items-center gap-1.5 shrink-0">'
+                        + '<button type="button" onclick="transferCall(\'' + chan + '\')" class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-xs font-semibold text-on-surface border border-outline/30">{{ t.transfer or "Перевести" }}</button>'
+                        + '<button type="button" onclick="hangupCall(\'' + chan + '\')" class="px-3 py-1.5 rounded-lg bg-error/10 text-error hover:bg-error/20 text-xs font-semibold border border-error/20">{{ t.hangup_call or "Сбросить" }}</button>'
+                        + '</div></div>';
+                }
+                box.innerHTML = html;
+            } catch (e) {
+                console.error('live calls error', e);
+            }
+        }
+
+        async function hangupCall(channel) {
+            if (!confirm('{{ t.confirm_hangup or "Завершить этот вызов?" }}')) return;
+            try {
+                await fetch('/api/calls/hangup', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({channel})
+                });
+            } catch (e) {}
+            setTimeout(refreshLiveCalls, 500);
+        }
+
+        function transferCall(channel) {
+            const exten = prompt('{{ t.transfer_prompt or "Введите номер для перевода вызова:" }}');
+            if (!exten) return;
+            fetch('/api/calls/transfer', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({channel, exten})
+            }).then(() => setTimeout(refreshLiveCalls, 500)).catch(() => {});
+        }
+
+        function openOriginateModal() {
+            const from = prompt('{{ t.click_to_call_from or "С какого внутреннего номера звонить?" }}', '101');
+            if (!from) return;
+            const to = prompt('{{ t.click_to_call_to or "Кому звонить (номер)?" }}', '');
+            if (!to) return;
+            fetch('/api/calls/originate', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({from, to})
+            }).then(() => setTimeout(refreshLiveCalls, 800)).catch(() => {});
+        }
+
+        function startLiveCallsPolling() {
+            if (liveCallsTimer) return;
+            refreshLiveCalls();
+            liveCallsTimer = setInterval(() => {
+                if (document.getElementById('tab-dashboard') && document.getElementById('tab-dashboard').classList.contains('active')) {
+                    refreshLiveCalls();
+                }
+            }, 4000);
+        }
+
+        function switchTab(tabId) {            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active-nav-item'));
             
             const targetPane = document.getElementById('tab-' + tabId);
@@ -6002,6 +6107,7 @@
             const saved = urlTab || localStorage.getItem('active_tab_vps') || 'dashboard';
             switchTab(saved);
             checkForUpdates(false);
+            startLiveCallsPolling();
         });
 
         // ================= OTA UPDATE INDICATOR =================

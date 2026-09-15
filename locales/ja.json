@@ -815,5 +815,15 @@
   "fw_open_ports": "サーバーで開いているポート",
   "fw_open_ports_desc": "アクティブなファイアウォールから読み取った実際に許可されているポート（パネル外で作成されたルールを含む）。",
   "fw_no_open_ports": "有効な許可ルールがありません（ファイアウォールが無効または空です）。",
-  "fw_backend": "ファイアウォール"
+  "fw_backend": "ファイアウォール",
+  "live_calls": "進行中の通話",
+  "live_calls_desc": "AMI によるリアルタイム通話制御：切断、転送、クリック発信。",
+  "live_calls_empty": "進行中の通話はありません",
+  "click_to_call": "発信",
+  "transfer": "転送",
+  "hangup_call": "切断",
+  "confirm_hangup": "この通話を終了しますか？",
+  "transfer_prompt": "転送先の番号を入力してください：",
+  "click_to_call_from": "どの内線から発信しますか？",
+  "click_to_call_to": "発信先番号は？"
 }

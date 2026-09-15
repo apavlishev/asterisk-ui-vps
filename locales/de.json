@@ -815,5 +815,15 @@
   "fw_open_ports": "Offene Ports auf dem Server",
   "fw_open_ports_desc": "Tatsächlich erlaubte Ports aus der aktiven Firewall (inkl. außerhalb des Panels erstellter Regeln).",
   "fw_no_open_ports": "Keine aktiven Erlaubnisregeln (Firewall ist aus oder leer).",
-  "fw_backend": "Firewall"
+  "fw_backend": "Firewall",
+  "live_calls": "Aktive Anrufe (Live)",
+  "live_calls_desc": "Echtzeit-Anrufsteuerung über AMI: Auflegen, Weiterleiten, Click-to-Call.",
+  "live_calls_empty": "Keine aktiven Anrufe",
+  "click_to_call": "Anrufen",
+  "transfer": "Weiterleiten",
+  "hangup_call": "Auflegen",
+  "confirm_hangup": "Diesen Anruf beenden?",
+  "transfer_prompt": "Zielrufnummer für die Weiterleitung eingeben:",
+  "click_to_call_from": "Von welcher Nebenstelle anrufen?",
+  "click_to_call_to": "Welche Nummer anrufen?"
 }

@@ -132,6 +132,24 @@ if state.get("enabled"):
 print("[firewall] defaults ensured:", had_defaults, "->", state.get("installed_defaults"))
 FWEOF
 
+# AMI: гарантируем наличие аккаунта asterisk-gui для live-контроля вызовов
+if [ -f /etc/asterisk/manager.conf ] && ! grep -q "^\[asterisk-gui\]" /etc/asterisk/manager.conf; then
+    AMI_SECRET="$(python3 -c "import secrets;print(secrets.token_urlsafe(18))")"
+    cat << AMICONF >> /etc/asterisk/manager.conf
+
+[asterisk-gui]
+secret = ${AMI_SECRET}
+deny = 0.0.0.0/0.0.0.0
+permit = 127.0.0.1/255.255.255.255
+read = system,call,log,verbose,command,agent,user,config,dtmf,reporting,cdr,dialplan,originate
+write = system,call,log,verbose,command,agent,user,config,dtmf,reporting,cdr,dialplan,originate
+AMICONF
+    chown asterisk:asterisk /etc/asterisk/manager.conf 2>/dev/null || true
+    chmod 640 /etc/asterisk/manager.conf 2>/dev/null || true
+    asterisk -rx "manager reload" 2>/dev/null || true
+    echo "[firewall] AMI account asterisk-gui created" >> /tmp/asterisk-update.log
+fi
+
 # Запускаем скрипт миграций
 echo "Running migrations..." >> /tmp/asterisk-update.log
 /usr/bin/python3 /opt/asterisk-gui/migrate.py >> /tmp/asterisk-update.log 2>&1 || true

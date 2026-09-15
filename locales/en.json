@@ -815,5 +815,15 @@
   "fw_open_ports": "Open ports on the server",
   "fw_open_ports_desc": "Actual allowed ports read from the active firewall (including rules created outside the panel).",
   "fw_no_open_ports": "No active allow rules (firewall is off or empty).",
-  "fw_backend": "Firewall"
+  "fw_backend": "Firewall",
+  "live_calls": "Live calls",
+  "live_calls_desc": "Real-time call control over AMI: hangup, transfer, click-to-call.",
+  "live_calls_empty": "No active calls",
+  "click_to_call": "Call",
+  "transfer": "Transfer",
+  "hangup_call": "Hang up",
+  "confirm_hangup": "End this call?",
+  "transfer_prompt": "Enter the extension to transfer to:",
+  "click_to_call_from": "From which extension to call?",
+  "click_to_call_to": "Number to call?"
 }

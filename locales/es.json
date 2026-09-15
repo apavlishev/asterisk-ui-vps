@@ -815,5 +815,15 @@
   "fw_open_ports": "Puertos abiertos en el servidor",
   "fw_open_ports_desc": "Puertos permitidos reales leídos del cortafuegos activo (incluidas reglas creadas fuera del panel).",
   "fw_no_open_ports": "No hay reglas de permiso activas (el cortafuegos está desactivado o vacío).",
-  "fw_backend": "Cortafuegos"
+  "fw_backend": "Cortafuegos",
+  "live_calls": "Llamadas en vivo",
+  "live_calls_desc": "Control de llamadas en tiempo real por AMI: colgar, transferir, click-to-call.",
+  "live_calls_empty": "Sin llamadas activas",
+  "click_to_call": "Llamar",
+  "transfer": "Transferir",
+  "hangup_call": "Colgar",
+  "confirm_hangup": "¿Finalizar esta llamada?",
+  "transfer_prompt": "Introduzca la extensión de destino:",
+  "click_to_call_from": "¿Desde qué extensión llamar?",
+  "click_to_call_to": "¿A qué número llamar?"
 }

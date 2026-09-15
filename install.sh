@@ -270,6 +270,69 @@ udevadm trigger 2>/dev/null || true
 echo "5.3 Генерация эталонного диалплана..."
 cd "$INSTALL_DIR" && python3 -c "import sys; sys.path.insert(0, '$INSTALL_DIR'); import app; app.generate_dialplan_from_tree(); app.generate_pjsip_conf()" 2>/dev/null || echo "   [!] Автогенерация диалплана будет выполнена при первом сохранении настроек в UI."
 
+# 5.4 AMI (Asterisk Manager Interface) для live-контроля вызовов
+echo "5.4 Настройка AMI (управление вызовами)..."
+AMI_SECRET="$(python3 -c "import secrets;print(secrets.token_urlsafe(18))")"
+if [ -f /etc/asterisk/manager.conf ] && grep -q "^\[asterisk-gui\]" /etc/asterisk/manager.conf; then
+    # Обновляем секрет нашего аккаунта
+    python3 - "$AMI_SECRET" << 'PYEOF'
+import re, sys
+secret = sys.argv[1]
+path = '/etc/asterisk/manager.conf'
+with open(path, 'r', encoding='utf-8') as f:
+    content = f.read()
+called = False
+def repl(m):
+    global called
+    called = True
+    return f"[{m.group(1)}]"
+content = re.sub(r'\[asterisk-gui\]', repl, content)
+# Replace the secret inside the asterisk-gui block
+def fix_block(text):
+    idx = text.find('[asterisk-gui]')
+    if idx == -1:
+        return text
+    end = text.find('\n[', idx + 1)
+    if end == -1:
+        end = len(text)
+    block = text[idx:end]
+    if re.search(r'^secret\s*=', block, re.MULTILINE):
+        block = re.sub(r'^secret\s*=.*$', f'secret = {secret}', block, flags=re.MULTILINE)
+    else:
+        block = block.rstrip() + f'\nsecret = {secret}\n'
+    return text[:idx] + block + text[end:]
+content = fix_block(content)
+with open(path, 'w', encoding='utf-8') as f:
+    f.write(content)
+PYEOF
+    echo "    AMI аккаунт asterisk-gui обновлён."
+else
+    if ! grep -q "^\[asterisk-gui\]" /etc/asterisk/manager.conf 2>/dev/null; then
+        if ! grep -q "^\[general\]" /etc/asterisk/manager.conf 2>/dev/null; then
+            cat << 'AMICONF' > /etc/asterisk/manager.conf
+[general]
+enabled = yes
+port = 5038
+bindaddr = 127.0.0.1
+
+AMICONF
+        fi
+        cat << AMICONF >> /etc/asterisk/manager.conf
+
+[asterisk-gui]
+secret = ${AMI_SECRET}
+deny = 0.0.0.0/0.0.0.0
+permit = 127.0.0.1/255.255.255.255
+read = system,call,log,verbose,command,agent,user,config,dtmf,reporting,cdr,dialplan,originate
+write = system,call,log,verbose,command,agent,user,config,dtmf,reporting,cdr,dialplan,originate
+AMICONF
+        echo "    AMI аккаунт asterisk-gui создан (localhost only)."
+    fi
+fi
+chown asterisk:asterisk /etc/asterisk/manager.conf 2>/dev/null || true
+chmod 640 /etc/asterisk/manager.conf 2>/dev/null || true
+asterisk -rx "manager reload" 2>/dev/null || true
+
 echo "6. Настройка Systemd сервисов..."
 cat << 'SERVICE' > /etc/systemd/system/asterisk-gui.service
 [Unit]

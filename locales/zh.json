@@ -815,5 +815,15 @@
   "fw_open_ports": "服务器上开放的端口",
   "fw_open_ports_desc": "从活动防火墙读取的实际允许端口（包括在面板外创建的规则）。",
   "fw_no_open_ports": "没有活动的允许规则（防火墙已关闭或为空）。",
-  "fw_backend": "防火墙"
+  "fw_backend": "防火墙",
+  "live_calls": "实时通话",
+  "live_calls_desc": "通过 AMI 实时控制通话：挂断、转接、点击呼叫。",
+  "live_calls_empty": "没有活动通话",
+  "click_to_call": "呼叫",
+  "transfer": "转接",
+  "hangup_call": "挂断",
+  "confirm_hangup": "结束此通话？",
+  "transfer_prompt": "请输入转接号码：",
+  "click_to_call_from": "从哪个分机呼叫？",
+  "click_to_call_to": "呼叫哪个号码？"
 }

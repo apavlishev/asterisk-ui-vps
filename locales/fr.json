@@ -815,5 +815,15 @@
   "fw_open_ports": "Ports ouverts sur le serveur",
   "fw_open_ports_desc": "Ports réellement autorisés lus depuis le pare-feu actif (y compris les règles créées hors du panneau).",
   "fw_no_open_ports": "Aucune règle d'autorisation active (pare-feu désactivé ou vide).",
-  "fw_backend": "Pare-feu"
+  "fw_backend": "Pare-feu",
+  "live_calls": "Appels en direct",
+  "live_calls_desc": "Contrôle des appels en temps réel via AMI : raccrocher, transférer, click-to-call.",
+  "live_calls_empty": "Aucun appel actif",
+  "click_to_call": "Appeler",
+  "transfer": "Transférer",
+  "hangup_call": "Raccrocher",
+  "confirm_hangup": "Terminer cet appel ?",
+  "transfer_prompt": "Entrez le poste de destination :",
+  "click_to_call_from": "Depuis quel poste appeler ?",
+  "click_to_call_to": "Quel numéro appeler ?"
 }

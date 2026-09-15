@@ -815,5 +815,15 @@
   "fw_open_ports": "Portas abertas no servidor",
   "fw_open_ports_desc": "Portas realmente permitidas lidas do firewall ativo (incluindo regras criadas fora do painel).",
   "fw_no_open_ports": "Nenhuma regra de permissão ativa (firewall desligado ou vazio).",
-  "fw_backend": "Firewall"
+  "fw_backend": "Firewall",
+  "live_calls": "Chamadas ao vivo",
+  "live_calls_desc": "Controle de chamadas em tempo real via AMI: desligar, transferir, click-to-call.",
+  "live_calls_empty": "Nenhuma chamada ativa",
+  "click_to_call": "Ligar",
+  "transfer": "Transferir",
+  "hangup_call": "Desligar",
+  "confirm_hangup": "Encerrar esta chamada?",
+  "transfer_prompt": "Informe o ramal de destino:",
+  "click_to_call_from": "De qual ramal ligar?",
+  "click_to_call_to": "Para qual número ligar?"
 }
