@@ -49,6 +49,7 @@ chmod 0440 /etc/sudoers.d/asterisk-gui
 
 # Настройка Fail2ban для защиты Asterisk
 echo "2.1 Настройка Fail2ban & Антифрод-фильтра..."
+apt-get install -y fail2ban ipset iptables || true
 mkdir -p /etc/fail2ban/filter.d
 cat << 'EOF_FILTER' > /etc/fail2ban/filter.d/asterisk-antifraud.conf
 [Definition]
@@ -58,13 +59,14 @@ failregex = Request '(?:REGISTER|INVITE|SUBSCRIBE|OPTIONS)' from .* failed for '
             <HOST> failed to authenticate
             Host <HOST> failed to authenticate
             No registration for peer '.*' \(from <HOST>\)
+            failed to authenticate as '.*' \(from <HOST>\)
 
 ignoreregex =
 EOF_FILTER
 
 cat << 'EOF_JAIL' > /etc/fail2ban/jail.local
 [DEFAULT]
-ignoreip = 127.0.0.1/8 ::1 91.226.93.233
+ignoreip = 127.0.0.1/8 ::1
 bantime  = 86400
 findtime = 300
 maxretry = 3
@@ -83,7 +85,19 @@ bantime  = 86400
 action   = iptables-allports[name=ASTERISK-ANTIFRAUD, protocol=all]
 EOF_JAIL
 
+# Убеждаемся, что fail2ban включён и запущен (иначе защита молча не работает)
+systemctl enable fail2ban 2>/dev/null || true
 systemctl restart fail2ban 2>/dev/null || true
+if systemctl is-active --quiet fail2ban; then
+    echo "    Fail2ban активен. Статус джейла:"
+    fail2ban-client status asterisk-antifraud 2>/dev/null || echo "    [!] Джейл пока не виден, проверьте: journalctl -u fail2ban"
+else
+    echo "    [!] Fail2ban не запустился. Проверьте: systemctl status fail2ban"
+fi
+
+# Настройка фаервола: открываем только необходимые для работы порты
+echo "2.2 Настройка фаервола (nftables/iptables)..."
+apt-get install -y nftables iptables || true
 
 # Развертывание исходного кода (self-bootstrap: работает и из клона, и из curl | bash)
 echo "3. Развертывание исходного кода..."
@@ -314,6 +328,24 @@ systemctl restart asterisk-gui.service
 systemctl restart tg-bot.service 2>/dev/null || true
 systemctl restart live-transcribe.service 2>/dev/null || true
 systemctl restart asterisk.service 2>/dev/null || true
+
+# 6.1 Открываем стандартные порты АТС через встроенный менеджер фаервола
+echo "6.1 Открытие стандартных портов (SSH, 8888, SIP, RTP)..."
+python3 - <<'FWEOF' || echo "   [!] Не удалось применить правила фаервола (сделайте это в панели: Безопасность → Фаервол)."
+import sys
+sys.path.insert(0, "/opt/asterisk-gui")
+import firewall_mgr
+if not firewall_mgr.is_available():
+    print("   [!] nft/iptables не найдены — пропуск настройки фаервола.")
+    sys.exit(1)
+state = firewall_mgr.load_state()
+state = firewall_mgr.ensure_defaults(state)
+state["enabled"] = True
+firewall_mgr.save_state(state)
+ok, msg = firewall_mgr.apply_rules(state)
+print("   ", msg)
+sys.exit(0 if ok else 1)
+FWEOF
 
 # 7. Проверка работоспособности
 echo "7. Проверка работоспособности..."

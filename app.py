@@ -6,6 +6,7 @@ import plugin_manager
 import license_mgr
 import marketplace_data
 import telegram_trunk_mgr
+import firewall_mgr
 from flask import render_template
 import secrets
 import time
@@ -384,10 +385,10 @@ def get_antifraud_status():
         'total_banned': 0,
         'banned_ips': [],
         'banned_items': [],
-        'maxretry': 2,
-        'findtime': 86400,
+        'maxretry': 3,
+        'findtime': 300,
         'bantime': 86400,
-        'whitelist': ['127.0.0.1/8', '::1', '91.226.93.233']
+        'whitelist': ['127.0.0.1/8', '::1']
     }
     
     try:
@@ -509,40 +510,119 @@ def save_security_antifraud_settings():
     save_integrations(cfg)
 
     
-    # Apply to fail2ban jail.local configuration
+    # Apply to fail2ban jail.local configuration.
+    # IMPORTANT: keep this in sync with install.sh. We use the systemd backend
+    # with journalmatch (not logpath) because Asterisk logs may not be written
+    # to /var/log/asterisk/messages depending on logger configuration.
     ignore_str = " ".join(whitelist)
     jail_conf_content = f"""[DEFAULT]
+ignoreip = {ignore_str}
 bantime  = {bantime}
 findtime = {findtime}
 maxretry = {maxretry}
-backend = auto
-ignoreip = {ignore_str}
+backend  = systemd
 
 [asterisk-antifraud]
 enabled  = true
-port     = 5060,5061
+backend  = systemd
+journalmatch = _SYSTEMD_UNIT=asterisk.service
+port     = 5060,5061,5160,10000:20000
 protocol = all
 filter   = asterisk-antifraud
-logpath  = /var/log/asterisk/messages
 maxretry = {maxretry}
 findtime = {findtime}
 bantime  = {bantime}
-action   = iptables-ipset-proto4[name=ASTERISK-ANTIFRAUD, port="5060,5061", protocol=all]
+action   = iptables-allports[name=ASTERISK-ANTIFRAUD, protocol=all]
 """
+    try:
+        # Make sure the action's dependencies exist before enabling the jail
+        subprocess.run(['apt-get', 'install', '-y', 'ipset', 'iptables'], capture_output=True, timeout=60)
+    except Exception:
+        pass
     try:
         with open('/etc/fail2ban/jail.local', 'w') as jf:
             jf.write(jail_conf_content)
+        subprocess.run(['systemctl', 'restart', 'fail2ban'], capture_output=True, timeout=15)
         subprocess.run(['fail2ban-client', 'reload'], capture_output=True, timeout=5)
     except Exception as e:
         print(f"[Apply Fail2ban Error]: {e}")
-        
+
     flash('Настройки Антифрода Fail2ban успешно сохранены и применены!')
-    
-    try:
-        subprocess.run(['apt-get', 'install', '-y', 'ipset'], capture_output=True, timeout=10)
-    except:
-        pass
     return redirect(url_for('index'))
+
+
+# ================= FIREWALL (PORT) MANAGEMENT =================
+@app.route('/api/security/firewall/status', methods=['GET'])
+def api_firewall_status():
+    return jsonify(firewall_mgr.status())
+
+
+@app.route('/api/security/firewall/toggle', methods=['POST'])
+def api_firewall_toggle():
+    data = request.get_json(silent=True) or {}
+    enabled = bool(data.get('enabled'))
+    ok, msg = firewall_mgr.set_enabled(enabled)
+    payload = firewall_mgr.status()
+    payload.update({'success': ok, 'message': msg})
+    return jsonify(payload)
+
+
+@app.route('/api/security/firewall/add', methods=['POST'])
+def api_firewall_add():
+    data = request.get_json(silent=True) or {}
+    ok, msg = firewall_mgr.add_rule(
+        name=data.get('name', ''),
+        port=data.get('port', ''),
+        proto=data.get('proto', 'tcp'),
+        action=data.get('action', 'allow'),
+        source=data.get('source', 'any'),
+    )
+    payload = firewall_mgr.status()
+    payload.update({'success': ok, 'message': msg})
+    return jsonify(payload)
+
+
+@app.route('/api/security/firewall/update', methods=['POST'])
+def api_firewall_update():
+    data = request.get_json(silent=True) or {}
+    ok, msg = firewall_mgr.update_rule(
+        rule_id=data.get('id', ''),
+        name=data.get('name'),
+        port=data.get('port'),
+        proto=data.get('proto'),
+        source=data.get('source'),
+    )
+    payload = firewall_mgr.status()
+    payload.update({'success': ok, 'message': msg})
+    return jsonify(payload)
+
+
+@app.route('/api/security/firewall/delete', methods=['POST'])
+def api_firewall_delete():
+    data = request.get_json(silent=True) or {}
+    ok, msg = firewall_mgr.delete_rule(data.get('id', ''))
+    payload = firewall_mgr.status()
+    payload.update({'success': ok, 'message': msg})
+    return jsonify(payload)
+
+
+@app.route('/api/security/firewall/apply', methods=['POST'])
+def api_firewall_apply():
+    state = firewall_mgr.load_state()
+    state['enabled'] = True
+    firewall_mgr.save_state(state)
+    ok, msg = firewall_mgr.apply_rules(state, safe=True)
+    payload = firewall_mgr.status()
+    payload.update({'success': ok, 'message': msg})
+    return jsonify(payload)
+
+
+@app.route('/api/security/firewall/confirm', methods=['POST'])
+def api_firewall_confirm():
+    ok, msg = firewall_mgr.confirm_rules()
+    payload = firewall_mgr.status()
+    payload.update({'success': ok, 'message': msg})
+    return jsonify(payload)
 
 
 
@@ -5972,6 +6052,7 @@ def index():
         modems_list=get_system_modems_info(),
         amocrm_account=get_amocrm_account_info(),
         antifraud=get_antifraud_status(),
+        firewall=firewall_mgr.status(),
         log_quota=get_log_quota_status(),
         sip_groups=get_sip_groups(),
         server_metrics=get_server_metrics()
