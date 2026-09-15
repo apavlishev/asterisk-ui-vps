@@ -5099,17 +5099,40 @@ def generate_pjsip_conf():
         print("Error saving pjsip.conf:", e)
 
 def get_online_contacts():
-    online = []
-    # 1. PJSIP contacts
+    """Returns {exten: {'ip':..., 'port':..., 'user_agent':...}} for registered SIP peers."""
+    online = {}
     raw_contacts = run_asterisk('pjsip show contacts')
     for line in raw_contacts.splitlines():
-        if 'Contact:' in line and 'sip:' in line:
-            parts = line.split()
-            if len(parts) >= 2:
-                contact_str = parts[1]
-                ext = contact_str.split('/')[0]
-                online.append(ext)
-    # 2. IAX2 peers
+        if 'Contact:' not in line or 'sip:' not in line:
+            continue
+        parts = line.split()
+        if len(parts) < 2:
+            continue
+        contact_str = parts[1]
+        ext = contact_str.split('/')[0]
+        m = re.search(r'sip:([^@]+)@([^;>\s]+)', contact_str)
+        if m:
+            uri_host = m.group(2)
+            if ':' in uri_host:
+                ip, _, port = uri_host.partition(':')
+            else:
+                ip, port = uri_host, '5060'
+        else:
+            # Contact may be "sip:ext@ip:port" without user part
+            m2 = re.search(r'sip:([^;>\s]+)', contact_str)
+            hostpart = m2.group(1) if m2 else contact_str
+            hostpart = hostpart.split('/')[-1]
+            if ':' in hostpart:
+                ip, _, port = hostpart.partition(':')
+            else:
+                ip, port = hostpart, '5060'
+        ua = ''
+        ua_m = re.search(r"UserAgent:\s*'?([^'\n]+)'?", line)
+        if ua_m:
+            ua = ua_m.group(1).strip()
+        online[ext] = {'ip': ip, 'port': port, 'user_agent': ua}
+
+    # IAX2 peers (no reliable IP parse from this output, kept for presence only)
     raw_iax = run_asterisk('iax2 show peers')
     for line in raw_iax.splitlines():
         parts = line.split()
@@ -5118,8 +5141,105 @@ def get_online_contacts():
             host_str = parts[1]
             status_str = " ".join(parts[2:])
             if 'OK' in status_str or 'Unmonitored' in status_str or (host_str != '(null)' and host_str != '(Unspecified)' and not host_str.startswith('(')):
-                online.append(peer_name)
-    return list(set(online))
+                online.setdefault(peer_name, {'ip': host_str, 'port': '', 'user_agent': ''})
+    return online
+
+
+# ================= SIP CONTACT IP HISTORY =================
+CONTACT_HISTORY_FILE = '/opt/sip_contact_history.json'
+
+
+def _load_contact_history():
+    if os.path.exists(CONTACT_HISTORY_FILE):
+        try:
+            with open(CONTACT_HISTORY_FILE, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            if isinstance(data, dict):
+                return data
+        except Exception:
+            pass
+    return {}
+
+
+def _save_contact_history(data):
+    try:
+        os.makedirs(os.path.dirname(CONTACT_HISTORY_FILE), exist_ok=True)
+        tmp = CONTACT_HISTORY_FILE + '.tmp'
+        with open(tmp, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        os.replace(tmp, CONTACT_HISTORY_FILE)
+    except Exception as e:
+        print(f"[contact-history] save failed: {e}")
+
+
+def record_sip_contact_history(online=None, max_entries=50):
+    """Appends newly seen contact IPs per extension (deduplicated, most-recent first)."""
+    if online is None:
+        online = get_online_contacts()
+    if not isinstance(online, dict):
+        return
+
+    history = _load_contact_history()
+    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    changed = False
+
+    for ext, info in online.items():
+        ip = (info or {}).get('ip', '') or ''
+        if not ip or ip in ('0.0.0.0', '(null)'):
+            continue
+        entries = history.get(ext)
+        if not isinstance(entries, list):
+            entries = []
+
+        entry = next((e for e in entries if e.get('ip') == ip), None)
+        if entry:
+            entry['last_seen'] = now
+            entry['count'] = int(entry.get('count', 0)) + 1
+            if info.get('port'):
+                entry['port'] = info['port']
+            if info.get('user_agent'):
+                entry['user_agent'] = info['user_agent']
+            entries.remove(entry)
+            entries.insert(0, entry)
+        else:
+            entries.insert(0, {
+                'ip': ip,
+                'port': info.get('port', ''),
+                'user_agent': info.get('user_agent', ''),
+                'first_seen': now,
+                'last_seen': now,
+                'count': 1,
+            })
+        history[ext] = entries[:max_entries]
+        changed = True
+
+    if changed:
+        _save_contact_history(history)
+
+
+def get_sip_contact_history(exten=None):
+    history = _load_contact_history()
+    if exten:
+        return history.get(str(exten), [])
+    return history
+
+
+def start_contact_history_worker(interval=60):
+    """Background loop that keeps the IP history up to date without user actions."""
+    def _loop():
+        while True:
+            try:
+                record_sip_contact_history()
+            except Exception as e:
+                print(f"[contact-history] worker error: {e}")
+            time.sleep(interval)
+
+    try:
+        t = threading.Thread(target=_loop, daemon=True)
+        t.start()
+    except Exception as e:
+        print(f"[contact-history] worker start failed: {e}")
+
 
 def get_dial_target(target, all_extens):
     if target == 'ALL' or not target:
@@ -5769,6 +5889,11 @@ def index():
     accounts = load_sip_accounts()
     integrations = load_integrations()
     active_contacts = get_online_contacts()
+    try:
+        record_sip_contact_history(active_contacts)
+    except Exception:
+        pass
+    contact_history = get_sip_contact_history()
     inbound_target = integrations.get('routing', {}).get('inbound_target', 'ALL')
     ivr_tree = integrations.get('ivr_tree', {
         'enabled': True,
@@ -5834,6 +5959,7 @@ def index():
         gdrive_account=get_google_drive_account_info(integrations.get('gdrive', {}).get('token', '')),
         amocrm_user_mapping=amocrm_user_mapping,
         active_contacts=active_contacts,
+        contact_history=contact_history,
         inbound_target=inbound_target,
         ivr_tree=ivr_tree,
         host=host,
@@ -7559,9 +7685,33 @@ def toggle_modems_test_mode():
 
     return redirect(request.referrer or url_for('index'))
 
+@app.route('/api/sip/history/<exten>', methods=['GET'])
+def api_sip_history(exten):
+    """Returns the connection (IP) history for a given SIP extension."""
+    history = get_sip_contact_history(exten)
+    current = get_online_contacts()
+    current_info = current.get(str(exten))
+    return jsonify({
+        'success': True,
+        'exten': exten,
+        'history': history,
+        'current': {
+            'exten': exten,
+            'ip': (current_info or {}).get('ip', ''),
+            'port': (current_info or {}).get('port', ''),
+            'user_agent': (current_info or {}).get('user_agent', ''),
+            'online': bool(current_info),
+        } if current_info else {'exten': exten, 'online': False},
+    })
+
+
 if __name__ == '__main__':
     try:
         threading.Thread(target=network_guardian_startup_check, daemon=True).start()
+    except Exception:
+        pass
+    try:
+        start_contact_history_worker(interval=60)
     except Exception:
         pass
     app.run(host='0.0.0.0', port=8888)
