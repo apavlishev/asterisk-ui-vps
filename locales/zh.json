@@ -1028,5 +1028,16 @@
   "sched_name_required": "请输入名称",
   "sched_name_date_required": "请输入名称和日期",
   "sched_delete_confirm": "删除此时间表？",
-  "sched_yes": "是"
+  "sched_yes": "是",
+  "wb_open": "打开看板（TV）",
+  "wb_active": "活动通话",
+  "wb_talking": "通话中",
+  "wb_ringing": "响铃中",
+  "wb_waiting": "等待中",
+  "wb_live_calls": "实时通话",
+  "wb_queues": "队列",
+  "wb_no_calls": "无活动通话",
+  "wb_no_queues": "无队列",
+  "wb_agents": "坐席",
+  "wb_updated": "已更新"
 }

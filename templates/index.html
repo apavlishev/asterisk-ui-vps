@@ -198,6 +198,30 @@
             font-size: 24px !important;
         }
 
+        /* ================= MOBILE RESPONSIVENESS ================= */
+        #mobile-overlay { display: none; }
+        @media (max-width: 1023px) {
+            aside { transform: translateX(-100%); width: 18rem !important; }
+            body.sidebar-open aside { transform: translateX(0); box-shadow: 0 0 40px rgba(0,0,0,.35); }
+            body.sidebar-open #mobile-overlay {
+                display: block; position: fixed; inset: 0; background: rgba(15,23,42,.45);
+                z-index: 45; backdrop-filter: blur(2px);
+            }
+            #main-wrapper { padding-left: 0 !important; }
+            header { left: 0 !important; padding-left: 4.5rem !important; padding-right: 1rem !important; }
+            #mobile-menu-btn { display: inline-flex !important; }
+            .wrap, .tab-pane { padding-left: 0 !important; }
+            main { padding: 1rem !important; }
+            .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: 1fr !important; }
+            table { display: block; overflow-x: auto; white-space: nowrap; }
+            h1 { font-size: 1.35rem !important; }
+        }
+        @media (min-width: 1024px) {
+            #mobile-menu-btn { display: none !important; }
+        }
+        /* Touch-friendly tap targets */
+        button, a.nav-btn { -webkit-tap-highlight-color: transparent; }
+
     </style>
     <!-- OFFICIAL OAUTH SDKs: YANDEX ID & GOOGLE IDENTITY SERVICES -->
     
@@ -206,6 +230,8 @@
 
 </head>
 <body class="bg-background text-on-surface flex min-h-screen">
+
+    <div id="mobile-overlay" onclick="toggleMobileSidebar()"></div>
 
     <!-- SIDEBAR -->
     <aside class="fixed left-0 top-0 h-full w-72 bg-surface border-r border-surface-container flex flex-col z-50 transition-all duration-300">
@@ -392,6 +418,9 @@
         
         <!-- HEADER -->
         <header class="fixed top-0 left-72 right-0 h-16 bg-surface/90 backdrop-blur-md z-40 flex items-center justify-between px-8 border-b border-surface-container">
+            <button id="mobile-menu-btn" onclick="toggleMobileSidebar()" class="hidden items-center justify-center p-2 rounded-xl hover:bg-surface-container text-on-surface-variant" title="Menu">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-success/10 text-success text-xs font-semibold">
                     <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
@@ -403,6 +432,10 @@
             </div>
             
             <div class="flex items-center gap-3">
+                <a href="/wallboard" target="_blank" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface border border-outline/30 hover:bg-surface-container-high transition-all text-xs font-semibold text-on-surface shadow-sm" title="{{ t.wb_open or 'Открыть табло (TV)' }}">
+                    <span class="material-symbols-outlined text-[16px]">tv</span>
+                    <span class="hidden md:inline">{{ t.wb_open or 'Табло' }}</span>
+                </a>
                 <!-- LANGUAGE SWITCHER (TOP 10 WORLD LANGUAGES) -->
                 <div class="relative">
                     <button type="button" id="lang-dropdown-btn" onclick="toggleLangDropdown()" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface border border-outline/30 hover:bg-surface-container-high transition-all text-xs font-semibold text-on-surface shadow-sm">
@@ -7463,6 +7496,15 @@
                 ).join('');
             } catch (e) { console.error('audit', e); }
         }
+
+        function toggleMobileSidebar() {
+            document.body.classList.toggle('sidebar-open');
+        }
+        document.querySelectorAll('aside .nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.innerWidth < 1024) document.body.classList.remove('sidebar-open');
+            });
+        });
 
         function switchTab(tabId) {            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active-nav-item'));

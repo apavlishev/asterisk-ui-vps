@@ -1028,5 +1028,16 @@
   "sched_name_required": "Enter a name",
   "sched_name_date_required": "Enter name and date",
   "sched_delete_confirm": "Delete this schedule?",
-  "sched_yes": "Yes"
+  "sched_yes": "Yes",
+  "wb_open": "Open wallboard (TV)",
+  "wb_active": "Active calls",
+  "wb_talking": "Talking",
+  "wb_ringing": "Ringing",
+  "wb_waiting": "Waiting",
+  "wb_live_calls": "Live calls",
+  "wb_queues": "Queues",
+  "wb_no_calls": "No active calls",
+  "wb_no_queues": "No queues",
+  "wb_agents": "agents",
+  "wb_updated": "Updated"
 }

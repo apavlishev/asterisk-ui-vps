@@ -1024,5 +1024,16 @@
   "sched_name_required": "Укажите название",
   "sched_name_date_required": "Укажите название и дату",
   "sched_delete_confirm": "Удалить расписание?",
-  "sched_yes": "Да"
+  "sched_yes": "Да",
+  "wb_open": "Открыть табло (TV)",
+  "wb_active": "Активные вызовы",
+  "wb_talking": "Разговор",
+  "wb_ringing": "Звонок",
+  "wb_waiting": "Ожидают",
+  "wb_live_calls": "Живые вызовы",
+  "wb_queues": "Очереди",
+  "wb_no_calls": "Нет активных вызовов",
+  "wb_no_queues": "Нет очередей",
+  "wb_agents": "агентов",
+  "wb_updated": "Обновлено"
 }

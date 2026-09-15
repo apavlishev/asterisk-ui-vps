@@ -7426,6 +7426,178 @@ def api_holidays_delete():
     return jsonify({'status': 'ok', 'holidays': items})
 
 
+# ================= WALLBOARD (TV DASHBOARD) =================
+WALLBOARD_HTML = """<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PBX Wallboard</title>
+<style>
+:root{--bg:#0b1220;--card:#121a2b;--fg:#e6edf7;--muted:#7d8aa3;--accent:#38bdf8;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:-apple-system,Segoe UI,Roboto,Inter,sans-serif;height:100vh;overflow:hidden}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid #1e293b}
+.brand{display:flex;align-items:center;gap:14px}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
+h1{font-size:24px;font-weight:800;letter-spacing:-.02em}
+#clock{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums}
+#date{color:var(--muted);font-size:13px;text-align:right}
+.wrap{padding:24px 28px;display:grid;grid-template-rows:auto 1fr;gap:22px;height:calc(100vh - 84px)}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.tile{background:var(--card);border:1px solid #1e293b;border-radius:20px;padding:22px;text-align:center}
+.tile .v{font-size:52px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.tile .l{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin-top:8px}
+.tile.blue .v{color:var(--accent)} .tile.green .v{color:var(--green)}
+.tile.amber .v{color:var(--amber)} .tile.red .v{color:var(--red)}
+.cols{display:grid;grid-template-columns:1.6fr 1fr;gap:22px;min-height:0}
+.panel{background:var(--card);border:1px solid #1e293b;border-radius:20px;padding:20px;display:flex;flex-direction:column;min-height:0}
+.panel h2{font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.panel h2 .n{margin-left:auto;color:var(--accent);font-variant-numeric:tabular-nums}
+.list{overflow:auto;display:flex;flex-direction:column;gap:10px;padding-right:4px}
+.row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;background:#0e1626;border:1px solid #1b2740;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1}}
+.row .ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;background:#132038;color:var(--accent)}
+.row .info{flex:1;min-width:0}
+.row .num{font-weight:800;font-size:20px;font-variant-numeric:tabular-nums}
+.row .sub{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;white-space:nowrap}
+.b-ring{background:rgba(56,189,248,.14);color:var(--accent)}
+.b-up{background:rgba(34,197,94,.14);color:var(--green)}
+.b-wait{background:rgba(245,158,11,.16);color:var(--amber)}
+.queue{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;background:#0e1626;border:1px solid #1b2740}
+.queue .qn{font-weight:700}
+.queue .qv{margin-left:auto;font-size:30px;font-weight:800;color:var(--amber);font-variant-numeric:tabular-nums}
+.empty{color:var(--muted);text-align:center;padding:40px;font-size:15px}
+#update{position:fixed;bottom:10px;right:16px;font-size:11px;color:#475569}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="dot"></div><h1>__BRAND__ &middot; Wallboard</h1></div>
+  <div><div id="clock">--:--:--</div><div id="date"></div></div>
+</header>
+<div class="wrap">
+  <div class="tiles">
+    <div class="tile blue"><div class="v" id="t-active">0</div><div class="l">__L_ACTIVE__</div></div>
+    <div class="tile green"><div class="v" id="t-talking">0</div><div class="l">__L_TALKING__</div></div>
+    <div class="tile amber"><div class="v" id="t-ring">0</div><div class="l">__L_RING__</div></div>
+    <div class="tile red"><div class="v" id="t-wait">0</div><div class="l">__L_WAIT__</div></div>
+  </div>
+  <div class="cols">
+    <div class="panel">
+      <h2>__L_CALLS__<span class="n" id="c-calls">0</span></h2>
+      <div class="list" id="calls"><div class="empty">__L_NOCALLS__</div></div>
+    </div>
+    <div class="panel">
+      <h2>__L_QUEUES__<span class="n" id="c-queues">0</span></h2>
+      <div class="list" id="queues"><div class="empty">__L_NOQUEUES__</div></div>
+    </div>
+  </div>
+</div>
+<div id="update"></div>
+<script>
+function esc(s){return String(s==null?'':s).replace(/[<>]/g,'');}
+function tick(){
+  const d=new Date();
+  document.getElementById('clock').textContent=d.toLocaleTimeString();
+  document.getElementById('date').textContent=d.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'});
+}
+tick(); setInterval(tick,1000);
+
+function stateBadge(ch){
+  const s=(ch.state||'').toLowerCase();
+  if(s.indexOf('ring')>=0) return ['b-ring','__L_RING__'];
+  if(s.indexOf('up')>=0||s.indexOf('answer')>=0) return ['b-up','__L_TALKING__'];
+  return ['b-wait', ch.state||'—'];
+}
+
+async function refresh(){
+  try{
+    const r=await fetch('/api/calls/live',{cache:'no-store'});
+    const d=await r.json();
+    const chs=d.channels||[];
+    document.getElementById('t-active').textContent=chs.length;
+    let talking=0, ring=0;
+    const box=document.getElementById('calls');
+    if(!chs.length){box.innerHTML='<div class="empty">__L_NOCALLS__</div>';}
+    else{
+      box.innerHTML=chs.map(ch=>{
+        const [cls,lbl]=stateBadge(ch);
+        const s=(ch.state||'').toLowerCase();
+        if(cls==='b-up')talking++; else if(cls==='b-ring')ring++;
+        const num=ch.caller||ch.cid||ch.exten||'—';
+        return '<div class="row"><div class="ic">&#9742;</div><div class="info">'
+          +'<div class="num">'+esc(num)+'</div>'
+          +'<div class="sub">'+esc(ch.channel||'')+' &middot; '+esc(ch.context||'')+'</div></div>'
+          +'<div class="badge '+cls+'">'+esc(lbl)+'</div></div>';
+      }).join('');
+    }
+    document.getElementById('t-talking').textContent=talking;
+    document.getElementById('t-ring').textContent=ring;
+    document.getElementById('c-calls').textContent=chs.length;
+  }catch(e){ }
+  try{
+    const r2=await fetch('/api/queues/status',{cache:'no-store'});
+    const d2=await r2.json();
+    const qs=d2.queues||[];
+    let wait=0;
+    const qbox=document.getElementById('queues');
+    if(!qs.length){qbox.innerHTML='<div class="empty">__L_NOQUEUES__</div>';}
+    else{
+      qbox.innerHTML=qs.map(q=>{
+        wait+=(q.waiting||0);
+        return '<div class="queue"><div class="ic" style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#132038;color:var(--amber)">&#9993;</div>'
+          +'<div><div class="qn">'+esc(q.name||q.exten)+'</div>'
+          +'<div class="sub" style="color:var(--muted);font-size:12px">'+esc(q.strategy||'')+' &middot; '+(q.agents||[]).length+' __L_AGENTS__</div></div>'
+          +'<div class="qv">'+(q.waiting||0)+'</div></div>';
+      }).join('');
+    }
+    document.getElementById('t-wait').textContent=wait;
+    document.getElementById('c-queues').textContent=qs.length;
+  }catch(e){ }
+  document.getElementById('update').textContent='__L_UPDATED__ '+new Date().toLocaleTimeString();
+}
+refresh(); setInterval(refresh,3000);
+</script>
+</body>
+</html>"""
+
+
+def render_wallboard(lang='ru'):
+    """Returns the wallboard HTML localized into the requested language."""
+    t = get_locale_translations(lang)
+    brand = 'Asterisk PBX Pro'
+    html = WALLBOARD_HTML
+    repl = {
+        '__BRAND__': brand,
+        '__L_ACTIVE__': t.get('wb_active', 'Активные вызовы'),
+        '__L_TALKING__': t.get('wb_talking', 'Разговор'),
+        '__L_RING__': t.get('wb_ringing', 'Звонок'),
+        '__L_WAIT__': t.get('wb_waiting', 'Ожидают'),
+        '__L_CALLS__': t.get('wb_live_calls', 'Живые вызовы'),
+        '__L_QUEUES__': t.get('wb_queues', 'Очереди'),
+        '__L_NOCALLS__': t.get('wb_no_calls', 'Нет активных вызовов'),
+        '__L_NOQUEUES__': t.get('wb_no_queues', 'Нет очередей'),
+        '__L_AGENTS__': t.get('wb_agents', 'агентов'),
+        '__L_UPDATED__': t.get('wb_updated', 'Обновлено'),
+    }
+    for k, v in repl.items():
+        html = html.replace(k, str(v))
+    return html
+
+
+@app.route('/wallboard')
+def wallboard_page():
+    """Full-screen TV dashboard. ?lang=xx selects a language."""
+    lang = request.args.get('lang') or get_current_language()
+    if lang not in get_available_languages():
+        lang = 'ru'
+    resp = make_response(render_wallboard(lang))
+    resp.headers['Cache-Control'] = 'no-store'
+    return resp
+
+
 # ================= MULTILINGUAL (I18N) ENGINE (TOP 10 WORLD LANGUAGES) =================
 LOCALES_DIR = os.path.join(os.path.dirname(__file__), 'locales')
 def get_available_languages():

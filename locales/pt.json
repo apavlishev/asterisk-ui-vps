@@ -1028,5 +1028,16 @@
   "sched_name_required": "Informe um nome",
   "sched_name_date_required": "Informe nome e data",
   "sched_delete_confirm": "Excluir este horário?",
-  "sched_yes": "Sim"
+  "sched_yes": "Sim",
+  "wb_open": "Abrir painel (TV)",
+  "wb_active": "Chamadas ativas",
+  "wb_talking": "Em chamada",
+  "wb_ringing": "Chamando",
+  "wb_waiting": "Aguardando",
+  "wb_live_calls": "Chamadas ao vivo",
+  "wb_queues": "Filas",
+  "wb_no_calls": "Nenhuma chamada ativa",
+  "wb_no_queues": "Nenhuma fila",
+  "wb_agents": "agentes",
+  "wb_updated": "Atualizado"
 }

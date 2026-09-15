@@ -1028,5 +1028,16 @@
   "sched_name_required": "नाम दर्ज करें",
   "sched_name_date_required": "नाम और दिनांक दर्ज करें",
   "sched_delete_confirm": "यह शेड्यूल हटाएँ?",
-  "sched_yes": "हाँ"
+  "sched_yes": "हाँ",
+  "wb_open": "वॉलबोर्ड खोलें (TV)",
+  "wb_active": "सक्रिय कॉल",
+  "wb_talking": "बात कर रहे",
+  "wb_ringing": "घंटी बज रही",
+  "wb_waiting": "प्रतीक्षारत",
+  "wb_live_calls": "लाइव कॉल",
+  "wb_queues": "कतारें",
+  "wb_no_calls": "कोई सक्रिय कॉल नहीं",
+  "wb_no_queues": "कोई कतार नहीं",
+  "wb_agents": "एजेंट",
+  "wb_updated": "अद्यतन"
 }

@@ -1028,5 +1028,16 @@
   "sched_name_required": "Introduzca un nombre",
   "sched_name_date_required": "Introduzca nombre y fecha",
   "sched_delete_confirm": "¿Eliminar el horario?",
-  "sched_yes": "Sí"
+  "sched_yes": "Sí",
+  "wb_open": "Abrir panel (TV)",
+  "wb_active": "Llamadas activas",
+  "wb_talking": "En llamada",
+  "wb_ringing": "Sonando",
+  "wb_waiting": "En espera",
+  "wb_live_calls": "Llamadas en vivo",
+  "wb_queues": "Colas",
+  "wb_no_calls": "Sin llamadas activas",
+  "wb_no_queues": "Sin colas",
+  "wb_agents": "agentes",
+  "wb_updated": "Actualizado"
 }

@@ -1028,5 +1028,16 @@
   "sched_name_required": "Namen eingeben",
   "sched_name_date_required": "Name und Datum eingeben",
   "sched_delete_confirm": "Diesen Zeitplan löschen?",
-  "sched_yes": "Ja"
+  "sched_yes": "Ja",
+  "wb_open": "Wallboard öffnen (TV)",
+  "wb_active": "Aktive Anrufe",
+  "wb_talking": "Im Gespräch",
+  "wb_ringing": "Klingelt",
+  "wb_waiting": "Wartend",
+  "wb_live_calls": "Live-Anrufe",
+  "wb_queues": "Warteschlangen",
+  "wb_no_calls": "Keine aktiven Anrufe",
+  "wb_no_queues": "Keine Warteschlangen",
+  "wb_agents": "Agenten",
+  "wb_updated": "Aktualisiert"
 }

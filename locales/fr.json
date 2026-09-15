@@ -1028,5 +1028,16 @@
   "sched_name_required": "Saisissez un nom",
   "sched_name_date_required": "Saisissez le nom et la date",
   "sched_delete_confirm": "Supprimer cet horaire ?",
-  "sched_yes": "Oui"
+  "sched_yes": "Oui",
+  "wb_open": "Ouvrir le tableau (TV)",
+  "wb_active": "Appels actifs",
+  "wb_talking": "En ligne",
+  "wb_ringing": "Sonnerie",
+  "wb_waiting": "En attente",
+  "wb_live_calls": "Appels en direct",
+  "wb_queues": "Files",
+  "wb_no_calls": "Aucun appel actif",
+  "wb_no_queues": "Aucune file",
+  "wb_agents": "agents",
+  "wb_updated": "Mis à jour"
 }

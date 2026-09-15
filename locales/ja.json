@@ -1028,5 +1028,16 @@
   "sched_name_required": "名前を入力",
   "sched_name_date_required": "名前と日付を入力",
   "sched_delete_confirm": "このスケジュールを削除しますか？",
-  "sched_yes": "はい"
+  "sched_yes": "はい",
+  "wb_open": "ウォールボードを開く (TV)",
+  "wb_active": "通話中",
+  "wb_talking": "通話中",
+  "wb_ringing": "呼出中",
+  "wb_waiting": "待機中",
+  "wb_live_calls": "ライブ通話",
+  "wb_queues": "キュー",
+  "wb_no_calls": "通話はありません",
+  "wb_no_queues": "キューなし",
+  "wb_agents": "エージェント",
+  "wb_updated": "更新"
 }

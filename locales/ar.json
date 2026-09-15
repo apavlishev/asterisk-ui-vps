@@ -1028,5 +1028,16 @@
   "sched_name_required": "أدخل اسماً",
   "sched_name_date_required": "أدخل الاسم والتاريخ",
   "sched_delete_confirm": "حذف الجدول؟",
-  "sched_yes": "نعم"
+  "sched_yes": "نعم",
+  "wb_open": "فتح اللوحة (TV)",
+  "wb_active": "المكالمات النشطة",
+  "wb_talking": "قيد التحدث",
+  "wb_ringing": "يرن",
+  "wb_waiting": "في الانتظار",
+  "wb_live_calls": "المكالمات المباشرة",
+  "wb_queues": "الطوابير",
+  "wb_no_calls": "لا مكالمات نشطة",
+  "wb_no_queues": "لا طوابير",
+  "wb_agents": "وكلاء",
+  "wb_updated": "تم التحديث"
 }
