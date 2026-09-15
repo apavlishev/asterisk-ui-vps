@@ -946,5 +946,22 @@
   "backup_restore": "Wiederherstellen",
   "backup_delete_confirm": "Dieses Backup löschen?",
   "backup_restore_confirm": "Aus diesem Backup wiederherstellen? Die aktuellen PBX-Einstellungen werden überschrieben.",
-  "backup_restore_done": "Wiederherstellung abgeschlossen. Seite aktualisieren."
+  "backup_restore_done": "Wiederherstellung abgeschlossen. Seite aktualisieren.",
+  "nav_phonebook": "Telefonbuch",
+  "pb_desc": "Kontakte mit Schnellsuche und Klick-zu-Anruf. Wählen Sie *650 an jedem Telefon, um nach Namen zu suchen.",
+  "pb_add_contact": "Kontakt hinzufügen",
+  "pb_search": "Nach Name oder Nummer suchen...",
+  "pb_number": "Telefon",
+  "pb_company": "Firma",
+  "pb_comment": "Kommentar",
+  "pb_favorite": "Favorit",
+  "pb_export": "CSV exportieren",
+  "pb_import": "CSV importieren",
+  "pb_import_hint": "Format: Name,Nr,Firma,Email (eine je Zeile).",
+  "pb_call": "Anrufen",
+  "pb_none": "Noch keine Kontakte",
+  "pb_name_number_required": "Name und Nummer sind erforderlich",
+  "pb_delete_confirm": "Diesen Kontakt löschen?",
+  "pb_from_ext": "Von welcher Nebenstelle anrufen?",
+  "pb_imported": "Kontakte hinzugefügt: "
 }

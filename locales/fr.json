@@ -946,5 +946,22 @@
   "backup_restore": "Restaurer",
   "backup_delete_confirm": "Supprimer cette sauvegarde ?",
   "backup_restore_confirm": "Restaurer depuis cette sauvegarde ? Les réglages actuels du PBX seront écrasés.",
-  "backup_restore_done": "Restauration terminée. Actualisez la page."
+  "backup_restore_done": "Restauration terminée. Actualisez la page.",
+  "nav_phonebook": "Répertoire",
+  "pb_desc": "Contacts avec recherche rapide et cliquez-pour-appeler. Composez *650 depuis n'importe quel téléphone pour chercher par nom.",
+  "pb_add_contact": "Ajouter un contact",
+  "pb_search": "Rechercher par nom ou numéro...",
+  "pb_number": "Téléphone",
+  "pb_company": "Entreprise",
+  "pb_comment": "Commentaire",
+  "pb_favorite": "Favori",
+  "pb_export": "Exporter CSV",
+  "pb_import": "Importer CSV",
+  "pb_import_hint": "Format : nom,numéro,société,email (une par ligne).",
+  "pb_call": "Appeler",
+  "pb_none": "Aucun contact",
+  "pb_name_number_required": "Nom et numéro sont requis",
+  "pb_delete_confirm": "Supprimer ce contact ?",
+  "pb_from_ext": "Depuis quel poste appeler ?",
+  "pb_imported": "Contacts ajoutés : "
 }

@@ -946,5 +946,22 @@
   "backup_restore": "恢复",
   "backup_delete_confirm": "删除此备份？",
   "backup_restore_confirm": "从此备份恢复？当前 PBX 设置将被覆盖。",
-  "backup_restore_done": "恢复完成，请刷新页面。"
+  "backup_restore_done": "恢复完成，请刷新页面。",
+  "nav_phonebook": "电话簿",
+  "pb_desc": "支持快速搜索和点击呼叫的联系人。在任意话机拨 *650 可按姓名查找。",
+  "pb_add_contact": "添加联系人",
+  "pb_search": "按姓名或号码搜索...",
+  "pb_number": "电话",
+  "pb_company": "公司",
+  "pb_comment": "备注",
+  "pb_favorite": "收藏",
+  "pb_export": "导出 CSV",
+  "pb_import": "导入 CSV",
+  "pb_import_hint": "格式：姓名,号码,公司,邮箱（每行一条）。",
+  "pb_call": "拨打",
+  "pb_none": "暂无联系人",
+  "pb_name_number_required": "姓名和号码为必填",
+  "pb_delete_confirm": "删除此联系人？",
+  "pb_from_ext": "用哪个分机拨打？",
+  "pb_imported": "已添加联系人："
 }

@@ -946,5 +946,22 @@
   "backup_restore": "Restore",
   "backup_delete_confirm": "Delete this backup?",
   "backup_restore_confirm": "Restore from this backup? Current PBX settings will be overwritten.",
-  "backup_restore_done": "Restore complete. Refresh the page."
+  "backup_restore_done": "Restore complete. Refresh the page.",
+  "nav_phonebook": "Phonebook",
+  "pb_desc": "Contacts with quick search and click-to-call. Dial *650 from any phone to search by name.",
+  "pb_add_contact": "Add contact",
+  "pb_search": "Search by name or number...",
+  "pb_number": "Phone",
+  "pb_company": "Company",
+  "pb_comment": "Comment",
+  "pb_favorite": "Favorite",
+  "pb_export": "Export CSV",
+  "pb_import": "Import CSV",
+  "pb_import_hint": "Format: name,number,company,email (one per line).",
+  "pb_call": "Call",
+  "pb_none": "No contacts yet",
+  "pb_name_number_required": "Name and number are required",
+  "pb_delete_confirm": "Delete this contact?",
+  "pb_from_ext": "From which extension to call?",
+  "pb_imported": "Contacts added: "
 }

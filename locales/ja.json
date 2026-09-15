@@ -946,5 +946,22 @@
   "backup_restore": "復元",
   "backup_delete_confirm": "このバックアップを削除しますか？",
   "backup_restore_confirm": "このバックアップから復元しますか？現在のPBX設定は上書きされます。",
-  "backup_restore_done": "復元が完了しました。ページを更新してください。"
+  "backup_restore_done": "復元が完了しました。ページを更新してください。",
+  "nav_phonebook": "電話帳",
+  "pb_desc": "クイック検索とクリック通話対応の連絡先。名前で検索するには電話から *650 をダイヤル。",
+  "pb_add_contact": "連絡先を追加",
+  "pb_search": "名前または番号で検索...",
+  "pb_number": "電話番号",
+  "pb_company": "会社",
+  "pb_comment": "コメント",
+  "pb_favorite": "お気に入り",
+  "pb_export": "CSVエクスポート",
+  "pb_import": "CSVインポート",
+  "pb_import_hint": "形式: 名前,番号,会社,メール（1行に1件）。",
+  "pb_call": "発信",
+  "pb_none": "連絡先はまだありません",
+  "pb_name_number_required": "名前と番号は必須です",
+  "pb_delete_confirm": "この連絡先を削除しますか？",
+  "pb_from_ext": "どの内線から発信しますか？",
+  "pb_imported": "追加された連絡先: "
 }

@@ -946,5 +946,22 @@
   "backup_restore": "Restaurar",
   "backup_delete_confirm": "¿Eliminar la copia de seguridad?",
   "backup_restore_confirm": "¿Restaurar desde esta copia? La configuración actual de la central se sobrescribirá.",
-  "backup_restore_done": "Restauración completada. Actualice la página."
+  "backup_restore_done": "Restauración completada. Actualice la página.",
+  "nav_phonebook": "Directorio",
+  "pb_desc": "Contactos con búsqueda rápida y llamada con un clic. Marque *650 desde cualquier teléfono para buscar por nombre.",
+  "pb_add_contact": "Añadir contacto",
+  "pb_search": "Buscar por nombre o número...",
+  "pb_number": "Teléfono",
+  "pb_company": "Empresa",
+  "pb_comment": "Comentario",
+  "pb_favorite": "Favorito",
+  "pb_export": "Exportar CSV",
+  "pb_import": "Importar CSV",
+  "pb_import_hint": "Formato: nombre,número,empresa,email (uno por línea).",
+  "pb_call": "Llamar",
+  "pb_none": "Aún no hay contactos",
+  "pb_name_number_required": "El nombre y el número son obligatorios",
+  "pb_delete_confirm": "¿Eliminar el contacto?",
+  "pb_from_ext": "¿Desde qué extensión llamar?",
+  "pb_imported": "Contactos añadidos: "
 }
