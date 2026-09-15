@@ -3246,16 +3246,44 @@
         
             <!-- // ================= TAB: CALL LOGS // ================= -->
             <div id="tab-calls" class="tab-pane space-y-6">
+                <!-- CALL HISTORY SUB-TABS -->
+                <div class="flex items-center gap-2 border-b border-surface-container pb-2 overflow-x-auto">
+                    <button type="button" onclick="switchCallsSubTab('calls-sub-log', this)" class="calls-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-primary text-on-primary shadow-sm flex items-center gap-2 transition-all shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">history</span>
+                        <span>{{ t.jurnal_poslednih_zvonkov }}</span>
+                    </button>
+                    <button type="button" onclick="switchCallsSubTab('calls-sub-analytics', this)" class="calls-tab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-surface text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2 border border-outline/30 shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">analytics</span>
+                        <span>{{ t.cdr_analytics or 'Аналитика' }}</span>
+                    </button>
+                    <button type="button" onclick="switchCallsSubTab('calls-sub-recordings', this)" class="calls-tab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-surface text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2 border border-outline/30 shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">library_music</span>
+                        <span>{{ t.recordings_mgmt or 'Записи' }}</span>
+                    </button>
+                </div>
+
+                <!-- SUB-TAB: CALL LOG -->
+                <div id="calls-sub-log" class="space-y-6">
                 <div class="bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm">
                     <div class="flex justify-between items-center mb-6">
                         <div>
                             <h1 class="text-2xl font-bold text-on-surface">{{ t.jurnal_poslednih_zvonkov }}</h1>
                             <p class="text-xs text-on-surface-variant mt-0.5">{{ t.istoria_vhodasih_i_ishodasih_s }}</p>
                         </div>
-                        <button onclick="location.reload()" class="px-4 py-2 rounded-xl bg-surface-container-low hover:bg-surface-container text-xs font-semibold text-on-surface flex items-center gap-1.5 transition-colors border border-outline/30">
-                            <span class="material-symbols-outlined text-[16px]">refresh</span>
-                            {{ t.obnovit_cdr }}
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <select onchange="applyCdrPeriod(this.value)" class="px-3 py-2 rounded-xl bg-surface-container-low border border-outline/30 text-xs font-semibold text-on-surface">
+                                <option value="0" {% if cdr_days == 0 %}selected{% endif %}>{{ t.period_all or 'За всё время' }}</option>
+                                <option value="1" {% if cdr_days == 1 %}selected{% endif %}>24 {{ t.hours or 'часа' }}</option>
+                                <option value="7" {% if cdr_days == 7 %}selected{% endif %}>7 {{ t.days or 'дней' }}</option>
+                                <option value="10" {% if cdr_days == 10 %}selected{% endif %}>10 {{ t.days or 'дней' }}</option>
+                                <option value="30" {% if cdr_days == 30 %}selected{% endif %}>30 {{ t.days or 'дней' }}</option>
+                                <option value="90" {% if cdr_days == 90 %}selected{% endif %}>90 {{ t.days or 'дней' }}</option>
+                            </select>
+                            <button onclick="location.reload()" class="px-4 py-2 rounded-xl bg-surface-container-low hover:bg-surface-container text-xs font-semibold text-on-surface flex items-center gap-1.5 transition-colors border border-outline/30">
+                                <span class="material-symbols-outlined text-[16px]">refresh</span>
+                                {{ t.obnovit_cdr }}
+                            </button>
+                        </div>
                     </div>
 
                     
@@ -3325,6 +3353,105 @@
                                         </td>
                                     </tr>
                                     {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+                <!-- SUB-TAB: CDR ANALYTICS -->
+                <div id="calls-sub-analytics" class="space-y-6 hidden">
+                    <div class="flex items-center justify-between flex-wrap gap-3">
+                        <div>
+                            <h2 class="text-xl font-bold text-on-surface">{{ t.cdr_analytics or 'Аналитика вызовов' }}</h2>
+                            <p class="text-xs text-on-surface-variant">{{ t.cdr_analytics_desc or 'Сводная статистика по звонкам, операторам и направлениям.' }}</p>
+                        </div>
+                        <select onchange="loadCdrAnalytics(this.value)" class="px-3 py-2 rounded-xl bg-surface-container-low border border-outline/30 text-xs font-semibold text-on-surface">
+                            <option value="7">7 {{ t.days or 'дней' }}</option>
+                            <option value="30" selected>30 {{ t.days or 'дней' }}</option>
+                            <option value="90">90 {{ t.days or 'дней' }}</option>
+                            <option value="365">365 {{ t.days or 'дней' }}</option>
+                        </select>
+                    </div>
+                    <div id="cdr-stats-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div class="bg-surface rounded-2xl p-4 border border-outline/30 shadow-sm">
+                            <div class="text-[11px] uppercase font-bold text-on-surface-variant">{{ t.cdr_total or 'Всего' }}</div>
+                            <div id="cdr-total" class="text-2xl font-extrabold text-on-surface mt-1">—</div>
+                        </div>
+                        <div class="bg-surface rounded-2xl p-4 border border-outline/30 shadow-sm">
+                            <div class="text-[11px] uppercase font-bold text-on-surface-variant">{{ t.cdr_answered or 'Отвечено' }}</div>
+                            <div id="cdr-answered" class="text-2xl font-extrabold text-success mt-1">—</div>
+                        </div>
+                        <div class="bg-surface rounded-2xl p-4 border border-outline/30 shadow-sm">
+                            <div class="text-[11px] uppercase font-bold text-on-surface-variant">{{ t.cdr_answer_rate or 'Доля отвеченных' }}</div>
+                            <div id="cdr-rate" class="text-2xl font-extrabold text-primary mt-1">—</div>
+                        </div>
+                        <div class="bg-surface rounded-2xl p-4 border border-outline/30 shadow-sm">
+                            <div class="text-[11px] uppercase font-bold text-on-surface-variant">{{ t.cdr_talk_time or 'Время разговоров' }}</div>
+                            <div id="cdr-talk" class="text-2xl font-extrabold text-on-surface mt-1">—</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div class="bg-surface rounded-2xl p-5 border border-outline/30 shadow-sm">
+                            <h3 class="text-sm font-bold text-on-surface mb-3">{{ t.cdr_by_hour or 'Распределение по часам' }}</h3>
+                            <div id="cdr-hour-chart" class="flex items-end gap-1 h-32"></div>
+                        </div>
+                        <div class="bg-surface rounded-2xl p-5 border border-outline/30 shadow-sm">
+                            <h3 class="text-sm font-bold text-on-surface mb-3">{{ t.cdr_directions or 'Направления' }}</h3>
+                            <div id="cdr-directions" class="space-y-2 text-xs"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <div class="bg-surface rounded-2xl p-5 border border-outline/30 shadow-sm">
+                            <h3 class="text-sm font-bold text-on-surface mb-3">{{ t.cdr_top_operators or 'Топ операторов' }}</h3>
+                            <div id="cdr-top-operators" class="space-y-1.5 text-xs"></div>
+                        </div>
+                        <div class="bg-surface rounded-2xl p-5 border border-outline/30 shadow-sm">
+                            <h3 class="text-sm font-bold text-on-surface mb-3">{{ t.cdr_top_destinations or 'Топ направлений' }}</h3>
+                            <div id="cdr-top-dest" class="space-y-1.5 text-xs"></div>
+                        </div>
+                        <div class="bg-surface rounded-2xl p-5 border border-outline/30 shadow-sm">
+                            <h3 class="text-sm font-bold text-on-surface mb-3">{{ t.cdr_top_sources or 'Топ входящих' }}</h3>
+                            <div id="cdr-top-src" class="space-y-1.5 text-xs"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-TAB: RECORDING MANAGEMENT -->
+                <div id="calls-sub-recordings" class="space-y-6 hidden">
+                    <div class="bg-surface rounded-2xl p-5 border border-outline/30 shadow-sm">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <div>
+                                <h2 class="text-lg font-bold text-on-surface">{{ t.recordings_mgmt or 'Управление записями' }}</h2>
+                                <p class="text-xs text-on-surface-variant">{{ t.recordings_mgmt_desc or 'Просмотр, скачивание и очистка записей разговоров.' }}</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="rec-total" class="text-xs px-3 py-1 rounded-full bg-surface-container-high text-on-surface font-mono font-bold border border-outline/30">—</span>
+                                <button type="button" onclick="loadRecordings()" class="px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-xs font-semibold text-on-surface border border-outline/30 flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[16px]">refresh</span>
+                                    <span>{{ t.obnovit or 'Обновить' }}</span>
+                                </button>
+                                <button type="button" onclick="cleanupRecordings()" class="px-4 py-2 rounded-xl text-error bg-error/10 hover:bg-error/20 text-xs font-semibold border border-error/20 flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[16px]">delete_sweep</span>
+                                    <span>{{ t.cleanup_recordings or 'Очистка по сроку' }}</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-4 overflow-x-auto rounded-xl border border-outline/30">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-surface-container-low border-b border-surface-container text-on-surface-variant font-semibold uppercase tracking-wider">
+                                        <th class="px-4 py-3">{{ t.recording or 'Запись' }}</th>
+                                        <th class="px-4 py-3">{{ t.data_i_vremya or 'Дата' }}</th>
+                                        <th class="px-4 py-3">{{ t.size or 'Размер' }}</th>
+                                        <th class="px-4 py-3 text-right">{{ t.dejstvia }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recordings-tbody" class="divide-y divide-surface-container">
+                                    <tr><td colspan="4" class="px-4 py-8 text-center text-on-surface-variant">—</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -6072,6 +6199,129 @@
                     refreshLiveCalls();
                 }
             }, 4000);
+        }
+
+        // ================= CALLS SUB-TABS / ANALYTICS / RECORDINGS =================
+        function switchCallsSubTab(subtabId, btn) {
+            ['calls-sub-log', 'calls-sub-analytics', 'calls-sub-recordings'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(subtabId);
+            if (target) target.classList.remove('hidden');
+            document.querySelectorAll('.calls-tab-btn').forEach(b => {
+                b.className = 'calls-tab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-surface text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-2 border border-outline/30 shrink-0';
+            });
+            if (btn) btn.className = 'calls-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-primary text-on-primary shadow-sm flex items-center gap-2 transition-all shrink-0';
+            if (subtabId === 'calls-sub-analytics') loadCdrAnalytics();
+            if (subtabId === 'calls-sub-recordings') loadRecordings();
+        }
+
+        function applyCdrPeriod(days) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('cdr_days', days);
+            window.location.href = url.toString();
+        }
+
+        function fmtDuration(sec) {
+            sec = parseInt(sec || 0, 10);
+            const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+            if (h > 0) return h + 'ч ' + m + 'м';
+            if (m > 0) return m + 'м ' + s + 'с';
+            return s + 'с';
+        }
+
+        async function loadCdrAnalytics(days) {
+            days = days || 30;
+            try {
+                const res = await fetch('/api/cdr/analytics?days=' + days, { cache: 'no-store' });
+                const data = await res.json();
+                const s = data.stats || {};
+                document.getElementById('cdr-total').textContent = s.total || 0;
+                document.getElementById('cdr-answered').textContent = s.answered || 0;
+                document.getElementById('cdr-rate').textContent = (s.answer_rate || 0) + '%';
+                document.getElementById('cdr-talk').textContent = fmtDuration(s.talk_seconds || 0);
+
+                // By hour chart
+                const hours = s.by_hour || [];
+                const maxH = Math.max(1, ...hours);
+                let chart = '';
+                for (let h = 0; h < 24; h++) {
+                    const v = hours[h] || 0;
+                    const hPct = Math.max(4, Math.round(v / maxH * 100));
+                    chart += '<div class="flex-1 flex flex-col items-center justify-end h-full" title="' + h + ':00 — ' + v + '">'
+                        + '<div class="w-full rounded-t bg-primary/70" style="height:' + hPct + '%"></div>'
+                        + '<div class="text-[8px] text-on-surface-variant mt-1">' + h + '</div></div>';
+                }
+                document.getElementById('cdr-hour-chart').innerHTML = chart;
+
+                // Directions
+                const dirs = [
+                    {label: '{{ t.dir_inbound or "Входящие" }}', v: s.inbound || 0, color: 'success'},
+                    {label: '{{ t.dir_outbound or "Исходящие" }}', v: s.outbound || 0, color: 'primary'},
+                    {label: '{{ t.dir_internal or "Внутренние" }}', v: s.internal || 0, color: 'secondary'},
+                    {label: '{{ t.cdr_no_answer or "Не отвечено" }}', v: (s.no_answer || 0), color: 'warning'},
+                    {label: '{{ t.cdr_busy or "Занято" }}', v: s.busy || 0, color: 'error'},
+                ];
+                const total = Math.max(1, s.total || 1);
+                document.getElementById('cdr-directions').innerHTML = dirs.map(d =>
+                    '<div class="flex items-center gap-2"><span class="w-24 text-on-surface-variant">' + d.label + '</span>'
+                    + '<div class="flex-1 bg-surface-container rounded-full h-2 overflow-hidden"><div class="bg-' + d.color + ' h-full" style="width:' + Math.round(d.v / total * 100) + '%"></div></div>'
+                    + '<span class="w-10 text-right font-semibold text-on-surface">' + d.v + '</span></div>'
+                ).join('');
+
+                const renderTop = (arr) => (arr && arr.length)
+                    ? arr.map(x => '<div class="flex justify-between"><span class="font-mono text-on-surface">' + x.key + '</span><span class="font-semibold text-on-surface-variant">' + x.count + '</span></div>').join('')
+                    : '<div class="text-on-surface-variant">{{ t.cdr_no_data or "Нет данных" }}</div>';
+                document.getElementById('cdr-top-operators').innerHTML = renderTop(s.top_operators);
+                document.getElementById('cdr-top-dest').innerHTML = renderTop(s.top_destinations);
+                document.getElementById('cdr-top-src').innerHTML = renderTop(s.top_sources);
+            } catch (e) { console.error('cdr analytics', e); }
+        }
+
+        async function loadRecordings() {
+            const tbody = document.getElementById('recordings-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-on-surface-variant">…</td></tr>';
+            try {
+                const res = await fetch('/api/recordings', { cache: 'no-store' });
+                const data = await res.json();
+                document.getElementById('rec-total').textContent = (data.count || 0) + ' • ' + (data.total_fmt || '');
+                const items = data.items || [];
+                if (!items.length) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-on-surface-variant">{{ t.no_recordings or "Записей нет" }}</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = items.map(r =>
+                    '<tr>'
+                    + '<td class="px-4 py-3 font-mono text-on-surface truncate max-w-[280px]">' + r.filename + '</td>'
+                    + '<td class="px-4 py-3 font-mono text-on-surface-variant whitespace-nowrap">' + r.date + '</td>'
+                    + '<td class="px-4 py-3 font-mono text-on-surface-variant">' + r.size_fmt + '</td>'
+                    + '<td class="px-4 py-3 text-right space-x-1">'
+                    + '<a href="/recordings/' + encodeURIComponent(r.filename) + '" download class="inline-flex p-1.5 rounded-lg text-primary hover:bg-primary/10" title="{{ t.download or "Скачать" }}"><span class="material-symbols-outlined text-[18px]">download</span></a>'
+                    + '<button type="button" onclick="deleteRecording(\'' + r.filename.replace(/\x27/g, '') + '\')" class="p-1.5 rounded-lg text-error hover:bg-error/10" title="{{ t.udalit }}"><span class="material-symbols-outlined text-[18px]">delete</span></button>'
+                    + '</td></tr>'
+                ).join('');
+            } catch (e) { console.error('recordings', e); }
+        }
+
+        async function deleteRecording(filename) {
+            if (!confirm('{{ t.confirm_delete_recording or "Удалить запись?" }} ' + filename)) return;
+            try {
+                await fetch('/api/recordings/delete', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({filename}) });
+            } catch (e) {}
+            loadRecordings();
+        }
+
+        async function cleanupRecordings() {
+            const days = prompt('{{ t.cleanup_prompt or "Удалить записи старше N дней (0 = все):" }}', '90');
+            if (days === null) return;
+            try {
+                const res = await fetch('/api/recordings/cleanup', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({days: parseInt(days) || 0}) });
+                const data = await res.json();
+                alert('{{ t.cleanup_result or "Удалено файлов" }}: ' + (data.count || 0) + ' (' + (data.freed_fmt || '') + ')');
+            } catch (e) {}
+            loadRecordings();
         }
 
         function switchTab(tabId) {            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));

@@ -4167,7 +4167,7 @@ def get_human_sip_sockets():
                 sockets.append({'exten': ext, 'ip_port': ip_port})
     return sockets
 
-def get_recent_calls():
+def get_recent_calls(days=10, max_calls=500):
     calls = []
     recordings = []
     if os.path.exists(RECORD_DIR):
@@ -4193,7 +4193,11 @@ def get_recent_calls():
                 'fn': fn
             })
 
-    ten_days_ago = datetime.datetime.now() - datetime.timedelta(days=10)
+    try:
+        days = int(days)
+    except Exception:
+        days = 10
+    cutoff = None if days <= 0 else (datetime.datetime.now() - datetime.timedelta(days=days))
     seen_files = set()
 
     if os.path.exists(CSV_PATH):
@@ -4264,7 +4268,7 @@ def get_recent_calls():
 
                         try:
                             calldate = datetime.datetime.strptime(calldate_str, "%Y-%m-%d %H:%M:%S")
-                            if calldate < ten_days_ago:
+                            if cutoff is not None and calldate < cutoff:
                                 continue
                         except Exception:
                             calldate = None
@@ -4325,13 +4329,188 @@ def get_recent_calls():
                             'dir_label': dir_label,
                             'dir_icon': dir_icon
                         })
-                        if len(calls) >= 200:
+                        if len(calls) >= max_calls:
                             break
         except Exception:
             pass
 
     return calls
 
+
+
+# ================= CDR ANALYTICS & RECORDING MANAGEMENT =================
+def analyze_cdr(days=30):
+    """Aggregated CDR statistics for the selected period."""
+    now = datetime.datetime.now()
+    cutoff = now - datetime.timedelta(days=int(days)) if int(days or 0) > 0 else None
+
+    stats = {
+        'period_days': days,
+        'total': 0,
+        'answered': 0,
+        'no_answer': 0,
+        'busy': 0,
+        'failed': 0,
+        'inbound': 0,
+        'outbound': 0,
+        'internal': 0,
+        'talk_seconds': 0,
+        'avg_talk_seconds': 0,
+        'answer_rate': 0,
+        'by_hour': [0] * 24,
+        'by_day': {},
+        'top_operators': {},
+        'top_destinations': {},
+        'top_sources': {},
+    }
+
+    if not os.path.exists(CSV_PATH):
+        return stats
+
+    try:
+        with open(CSV_PATH, 'r', encoding='utf-8', errors='ignore') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if len(row) < 15:
+                    continue
+                src = row[1]
+                dst = row[2]
+                dcontext = row[3]
+                channel = row[5]
+                dstchannel = row[6]
+                lastdata = row[8]
+                calldate_str = row[9]
+                billsec = row[13]
+                disposition = row[14]
+
+                if (not src or src in ['sms', 'ussd']) and dst in ['sms', 'ussd']:
+                    continue
+                if not src and not dst:
+                    continue
+
+                try:
+                    calldate = datetime.datetime.strptime(calldate_str, "%Y-%m-%d %H:%M:%S")
+                except Exception:
+                    continue
+                if cutoff is not None and calldate < cutoff:
+                    continue
+
+                try:
+                    talk = int(billsec or 0)
+                except Exception:
+                    talk = 0
+
+                stats['total'] += 1
+                if disposition == 'ANSWERED':
+                    stats['answered'] += 1
+                    stats['talk_seconds'] += talk
+                elif disposition == 'NO ANSWER':
+                    stats['no_answer'] += 1
+                elif disposition == 'BUSY':
+                    stats['busy'] += 1
+                else:
+                    stats['failed'] += 1
+
+                # Direction
+                if 'dongle-incoming' in dcontext or 'Dongle/' in channel:
+                    stats['inbound'] += 1
+                elif 'from-internal' in dcontext and ('Dongle/' in dstchannel or 'Dongle/' in lastdata or dst.startswith('+') or dst.startswith('0') or len(dst) >= 5):
+                    stats['outbound'] += 1
+                elif 'from-internal' in dcontext and dst.isdigit() and len(dst) <= 4:
+                    stats['internal'] += 1
+
+                # Hour / day buckets
+                stats['by_hour'][calldate.hour] += 1
+                day_key = calldate.strftime('%Y-%m-%d')
+                stats['by_day'][day_key] = stats['by_day'].get(day_key, 0) + 1
+
+                # Operators (internal party)
+                op = None
+                m = re.search(r'PJSIP/(\d{2,5})', dstchannel)
+                if m:
+                    op = m.group(1)
+                elif src.isdigit() and len(src) <= 4:
+                    op = src
+                if op:
+                    stats['top_operators'][op] = stats['top_operators'].get(op, 0) + 1
+
+                # External destinations (for outbound)
+                if dst.startswith('+') or dst.startswith('0') or (dst.isdigit() and len(dst) >= 7):
+                    stats['top_destinations'][dst] = stats['top_destinations'].get(dst, 0) + 1
+                # External sources (for inbound)
+                if src.startswith('+') or src.startswith('0') or (src.isdigit() and len(src) >= 7):
+                    stats['top_sources'][src] = stats['top_sources'].get(src, 0) + 1
+    except Exception as e:
+        print(f"[cdr-analytics] error: {e}")
+
+    if stats['answered']:
+        stats['avg_talk_seconds'] = int(stats['talk_seconds'] / stats['answered'])
+    if stats['total']:
+        stats['answer_rate'] = round(stats['answered'] / stats['total'] * 100, 1)
+
+    def top(d, n=5):
+        return sorted(d.items(), key=lambda kv: kv[1], reverse=True)[:n]
+
+    stats['top_operators'] = [{'key': k, 'count': v} for k, v in top(stats['top_operators'])]
+    stats['top_destinations'] = [{'key': k, 'count': v} for k, v in top(stats['top_destinations'])]
+    stats['top_sources'] = [{'key': k, 'count': v} for k, v in top(stats['top_sources'])]
+    return stats
+
+
+def list_recordings():
+    """Lists all recordings with metadata (name, size, mtime, matched call info)."""
+    items = []
+    if not os.path.exists(RECORD_DIR):
+        return items
+    for f in glob.glob(os.path.join(RECORD_DIR, '*.wav')):
+        fn = os.path.basename(f)
+        if '_rx.wav' in fn or '_tx.wav' in fn:
+            continue
+        try:
+            st = os.stat(f)
+        except Exception:
+            continue
+        time_part = fn.split('_')[0]
+        try:
+            dt = datetime.datetime.strptime(time_part, "%Y%m%d-%H%M%S")
+            dt_str = dt.strftime('%Y-%m-%d %H:%M:%S')
+        except Exception:
+            dt_str = datetime.datetime.fromtimestamp(st.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
+        items.append({
+            'filename': fn,
+            'size_bytes': st.st_size,
+            'size_fmt': format_size(st.st_size),
+            'mtime': int(st.st_mtime),
+            'date': dt_str,
+        })
+    items.sort(key=lambda x: x['mtime'], reverse=True)
+    return items
+
+
+def cleanup_recordings(days=0, dry_run=False):
+    """Deletes recordings older than N days (0 = everything). Returns summary."""
+    removed = []
+    freed = 0
+    now = time.time()
+    cutoff = None if not days or int(days) <= 0 else (now - int(days) * 86400)
+    if not os.path.exists(RECORD_DIR):
+        return {'removed': [], 'freed_bytes': 0, 'dry_run': dry_run}
+    for f in glob.glob(os.path.join(RECORD_DIR, '*')):
+        fn = os.path.basename(f)
+        try:
+            st = os.stat(f)
+        except Exception:
+            continue
+        if cutoff is not None and st.st_mtime > cutoff:
+            continue
+        removed.append(fn)
+        freed += st.st_size
+        if not dry_run:
+            try:
+                os.remove(f)
+            except Exception:
+                pass
+    return {'removed': removed, 'freed_bytes': freed, 'dry_run': dry_run}
 
 
 def get_trunks_status():
@@ -6123,6 +6302,10 @@ def index():
     except Exception:
         pass
     contact_history = get_sip_contact_history()
+    try:
+        cdr_days = int(request.args.get('cdr_days', integrations.get('cdr_days', 10)))
+    except Exception:
+        cdr_days = 10
     inbound_target = integrations.get('routing', {}).get('inbound_target', 'ALL')
     ivr_tree = integrations.get('ivr_tree', {
         'enabled': True,
@@ -6169,7 +6352,8 @@ def index():
     show_security_prompt = (not is_client_local) and (not auth_enabled) and (not prompt_dismissed)
     resp = make_response(render_template(
         'index.html',
-        calls=get_recent_calls(),
+        calls=get_recent_calls(days=cdr_days),
+        cdr_days=cdr_days,
         client_ip=client_ip,
         is_client_local=is_client_local,
         auth_enabled=auth_enabled,
@@ -7111,6 +7295,68 @@ def api_calls_park():
         return jsonify({'success': False, 'error': 'Не указан канал'})
     out = run_asterisk(f'park {channel}')
     return jsonify({'success': bool(out), 'message': out})
+
+
+# ================= CDR ANALYTICS & RECORDINGS API =================
+@app.route('/api/cdr/analytics', methods=['GET'])
+def api_cdr_analytics():
+    try:
+        days = int(request.args.get('days', 30))
+    except Exception:
+        days = 30
+    return jsonify({'success': True, 'stats': analyze_cdr(days)})
+
+
+@app.route('/api/recordings', methods=['GET'])
+def api_recordings():
+    items = list_recordings()
+    total = sum(i['size_bytes'] for i in items)
+    return jsonify({
+        'success': True,
+        'count': len(items),
+        'total_bytes': total,
+        'total_fmt': format_size(total),
+        'items': items[:500],
+    })
+
+
+@app.route('/api/recordings/delete', methods=['POST'])
+def api_recordings_delete():
+    data = request.get_json(silent=True) or {}
+    filename = os.path.basename((data.get('filename') or '').strip())
+    if not filename or '..' in filename:
+        return jsonify({'success': False, 'error': 'Некорректное имя файла'})
+    path = os.path.join(RECORD_DIR, filename)
+    if not os.path.isfile(path):
+        return jsonify({'success': False, 'error': 'Файл не найден'})
+    try:
+        os.remove(path)
+        # Also remove related split channels / transcripts if present
+        for suffix in ['_rx.wav', '_tx.wav', '.jsonl', '.wav.jsonl']:
+            extra = os.path.join(RECORD_DIR, os.path.splitext(filename)[0] + suffix)
+            if os.path.isfile(extra):
+                try:
+                    os.remove(extra)
+                except Exception:
+                    pass
+        return jsonify({'success': True, 'message': 'Запись удалена'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+
+@app.route('/api/recordings/cleanup', methods=['POST'])
+def api_recordings_cleanup():
+    data = request.get_json(silent=True) or {}
+    try:
+        days = int(data.get('days', 0))
+    except Exception:
+        days = 0
+    dry = bool(data.get('dry_run'))
+    result = cleanup_recordings(days=days, dry_run=dry)
+    result['success'] = True
+    result['freed_fmt'] = format_size(result.get('freed_bytes', 0))
+    result['count'] = len(result.get('removed', []))
+    return jsonify(result)
 
 
 @app.route('/api/calls/<filename>/transcripts', methods=['GET'])
