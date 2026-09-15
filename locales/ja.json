@@ -916,5 +916,19 @@
   "vm_delete_confirm": "このボイスメールを削除しますか？",
   "vm_delete_box": "このメールボックスを削除しますか？",
   "vm_enter_exten": "内線番号を入力",
-  "nazvanie": "名前"
+  "nazvanie": "名前",
+  "nav_provision": "IP電話プロビジョニング",
+  "prov_desc": "Grandstream、Yealink、Fanvil、Cisco、Snom などは起動時に設定を自動取得します。",
+  "prov_settings": "プロビジョニング設定",
+  "prov_enabled": "プロビジョニングを有効化",
+  "prov_add_device": "デバイスを追加",
+  "prov_devices": "デバイス",
+  "prov_no_devices": "デバイスはまだありません",
+  "prov_preview": "プレビュー",
+  "prov_config_preview": "設定プレビュー",
+  "prov_reboot": "電話を再起動",
+  "prov_reboot_sent": "再起動コマンドを送信しました",
+  "prov_delete_confirm": "このデバイスを削除しますか？",
+  "prov_enter_mac": "MACアドレスを入力",
+  "prov_empty_pass_hint": "空欄で自動生成"
 }

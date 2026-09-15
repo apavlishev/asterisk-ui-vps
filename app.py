@@ -11,6 +11,7 @@ import firewall_mgr
 import auth_mgr
 from flask import render_template
 import secrets
+import hmac
 import time
 import os
 import subprocess
@@ -250,6 +251,10 @@ def check_security_and_auth():
     # Always allow static assets and the login/logout flow
     if (request.path.startswith('/static') or request.path == '/login'
             or request.path == '/logout' or request.path.startswith('/set-language')):
+        return None
+
+    # Unauthenticated IP-phone provisioning endpoints (phones cannot log in)
+    if request.path.startswith('/provisioning/'):
         return None
 
     cfg = load_integrations()
@@ -6014,6 +6019,476 @@ def save_integrations(data):
 
 
 
+# ================= IP-PHONE AUTO PROVISIONING =================
+PROVISION_VENDORS = ['grandstream', 'yealink', 'fanvil', 'cisco', 'snom', 'generic']
+PROVISION_DEFAULT_SECRET = 'asterisk-ui-provision-secret'
+
+_provision_server_state = {'started': False, 'server': None, 'thread': None, 'port': None}
+
+
+def get_provision_settings():
+    cfg = load_integrations()
+    prov = cfg.get('provision') or {}
+    if not isinstance(prov, dict):
+        prov = {}
+    prov.setdefault('enabled', False)
+    if not prov.get('secret_key'):
+        prov['secret_key'] = secrets.token_hex(16)
+    prov.setdefault('http_port', 8080)
+    prov.setdefault('default_vlan', '')
+    prov.setdefault('template_vendor', 'grandstream')
+    prov.setdefault('ntp_server', 'pool.ntp.org')
+    prov.setdefault('allow_http', True)
+    if not isinstance(prov.get('devices'), list):
+        prov['devices'] = []
+    return prov
+
+
+def save_provision_settings(prov):
+    cfg = load_integrations()
+    cfg['provision'] = prov
+    save_integrations(cfg)
+
+
+def normalize_mac(mac):
+    return re.sub(r'[^0-9a-fA-F]', '', str(mac or '')).lower()
+
+
+def format_mac(mac):
+    m = normalize_mac(mac)
+    return ':'.join(m[i:i + 2] for i in range(0, len(m), 2)) if len(m) == 12 else str(mac or '')
+
+
+def _provision_server_ip():
+    """Best-effort detection of the LAN IP phones should talk to."""
+    host = ''
+    try:
+        host = (request.host or '').split(':')[0]
+    except Exception:
+        host = ''
+    if host and host not in ('localhost', '127.0.0.1'):
+        return host
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return host or '127.0.0.1'
+
+
+def derive_sip_password(mac, secret=None):
+    """Deterministic SIP password derived from MAC + provisioning secret."""
+    if secret is None:
+        secret = get_provision_settings().get('secret_key') or PROVISION_DEFAULT_SECRET
+    mac_n = normalize_mac(mac)
+    digest = hmac.new(str(secret).encode('utf-8'), mac_n.encode('utf-8'), hashlib.sha256).hexdigest()
+    return digest[:16]
+
+
+def find_provision_device(mac):
+    mac_n = normalize_mac(mac)
+    for dev in get_provision_settings().get('devices', []):
+        if normalize_mac(dev.get('mac')) == mac_n and dev.get('enabled', True):
+            return dev
+    return None
+
+
+def _provision_ctx(dev, vendor=None):
+    """Builds the template context (a device may be None => defaults)."""
+    prov = get_provision_settings()
+    server_ip = _provision_server_ip()
+    mac_n = normalize_mac(dev.get('mac')) if dev else ''
+    exten = str((dev or {}).get('exten') or '').strip()
+    password = str((dev or {}).get('password') or '').strip() or (derive_sip_password(mac_n, prov.get('secret_key')) if mac_n else '')
+    name = str((dev or {}).get('name') or (f'Абонент {exten}' if exten else 'IP Phone')).strip()
+    return {
+        'mac': mac_n,
+        'mac_colon': format_mac(mac_n),
+        'exten': exten,
+        'auth_id': exten,
+        'password': password,
+        'display_name': name,
+        'server': server_ip,
+        'sip_port': 5060,
+        'ntp': prov.get('ntp_server') or 'pool.ntp.org',
+        'vlan': prov.get('default_vlan') or '',
+        'register_expiry': 3600,
+        'transport': 'udp',
+        'provision_port': prov.get('http_port', 8080),
+        'vendor': (vendor or (dev or {}).get('vendor') or prov.get('template_vendor') or 'grandstream').lower(),
+    }
+
+
+def render_grandstream(ctx):
+    p = ctx['provision_port']
+    return f"""<!-- GrandStream Provisioning Config (auto-generated) -->
+<!-- Device: {ctx['mac_colon']} | Extension: {ctx['exten'] or '-'} -->
+<?xml version="1.0" encoding="UTF-8" ?>
+<gs_provision version="1">
+ <config version="1">
+  <P271>1</P271>
+  <P270>{p}</P270>
+  <P151>1</P151>
+  <P192>{ctx['ntp']}</P192>
+  <P191>3</P191>
+  <P47>{ctx['server']}</P47>
+  <P2312>1</P2312>
+  <P48>{ctx['server']}</P48>
+  <P35>{ctx['exten']}</P35>
+  <P36>{ctx['auth_id']}</P36>
+  <P34>{ctx['password']}</P34>
+  <P3>{ctx['display_name']}</P3>
+  <P31>1</P31>
+  <P32>1</P32>
+  <P33>1</P33>
+  <P40>5060</P40>
+  <P52>{ctx['register_expiry']}</P52>
+  <P402>1</P402>
+  <P57>1</P57>
+  <P130>0</P130>
+  <P108>0</P108>
+  <P109>1</P109>
+  <P110>2</P110>
+  <P38>0</P38>
+  <P191>3</P191>
+ </config>
+</gs_provision>"""
+
+
+def render_yealink(ctx):
+    p = ctx['provision_port']
+    return f"""#!version:1.0.0.1
+# Yealink Auto Provisioning Config (auto-generated)
+# Device: {ctx['mac_colon']} | Extension: {ctx['exten'] or '-'}
+account.1.enable = 1
+account.1.label = {ctx['display_name']}
+account.1.display_name = {ctx['display_name']}
+account.1.user_name = {ctx['exten']}
+account.1.auth_name = {ctx['auth_id']}
+account.1.password = {ctx['password']}
+account.1.sip_server.1.address = {ctx['server']}
+account.1.sip_server.1.port = {ctx['sip_port']}
+account.1.sip_server.1.transport_type = 0
+account.1.sip_server.1.expires = {ctx['register_expiry']}
+account.1.outbound_proxy.1.address =
+account.1.nat.udp_update_enable = 1
+network.ntp.enable = 1
+network.ntp.server1 = {ctx['ntp']}
+network.vlan.internet_port_enable = 0
+network.provisioning.http_port = {p}
+"""
+
+
+def render_fanvil(ctx):
+    p = ctx['provision_port']
+    return f"""<!-- Fanvil Auto Provisioning Config (auto-generated) -->
+<!-- Device: {ctx['mac_colon']} | Extension: {ctx['exten'] or '-'} -->
+<config version="1">
+  <sip account="1" enable="1">
+    <display_name>{ctx['display_name']}</display_name>
+    <username>{ctx['exten']}</username>
+    <authname>{ctx['auth_id']}</authname>
+    <password>{ctx['password']}</password>
+    <server>{ctx['server']}</server>
+    <port>{ctx['sip_port']}</port>
+    <transport>0</transport>
+    <register_expire>{ctx['register_expiry']}</register_expire>
+    <local_port>5060</local_port>
+  </sip>
+  <ntp>
+    <enable>1</enable>
+    <server>{ctx['ntp']}</server>
+  </ntp>
+  <http>
+    <port>{p}</port>
+  </http>
+</config>"""
+
+
+def render_snom(ctx):
+    p = ctx['provision_port']
+    return f"""<?xml version="1.0" encoding="utf-8"?>
+<!-- Snom Auto Provisioning Config (auto-generated) -->
+<!-- Device: {ctx['mac_colon']} | Extension: {ctx['exten'] or '-'} -->
+<settings>
+  <phone-settings>
+    <identity idx="1" active="on" label="{ctx['display_name']}" user="{ctx['exten']}"
+              authname="{ctx['auth_id']}" pass="{ctx['password']}" />
+    <sip_registration_expiry idx="1" perm="">{ctx['register_expiry']}</sip_registration_expiry>
+    <network_idle_tcp idx="1" perm="">off</network_idle_tcp>
+    <ntp_server perm="">{ctx['ntp']}</ntp_server>
+    <http_port perm="">{p}</http_port>
+  </phone-settings>
+  <templates>
+    <template_download url="http://{ctx['server']}:{p}/provisioning/{ctx['mac']}.xml" />
+  </templates>
+</settings>"""
+
+
+def render_cisco(ctx):
+    p = ctx['provision_port']
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<!-- Cisco SPA Auto Provisioning Config (auto-generated) -->
+<!-- Device: {ctx['mac_colon']} | Extension: {ctx['exten'] or '-'} -->
+<flat-profile>
+  <Admin_Password>admin</Admin_Password>
+  <Primary_NTP_Server>{ctx['ntp']}</Primary_NTP_Server>
+  <Enable_VLAN>No</Enable_VLAN>
+  <Provision_Enable>Yes</Provision_Enable>
+  <Resync_Periodic>3600</Resync_Periodic>
+  <Profile_Rule>http://{ctx['server']}:{p}/provisioning/$MA.xml</Profile_Rule>
+  <Line_Enable_1_>Yes</Line_Enable_1_>
+  <Display_Name_1_>{ctx['display_name']}</Display_Name_1_>
+  <User_ID_1_>{ctx['exten']}</User_ID_1_>
+  <Auth_ID_1_>{ctx['auth_id']}</Auth_ID_1_>
+  <Password_1_>{ctx['password']}</Password_1_>
+  <Proxy_1_>{ctx['server']}</Proxy_1_>
+  <SIP_Port_1_>{ctx['sip_port']}</SIP_Port_1_>
+  <Register_Expires_1_>{ctx['register_expiry']}</Register_Expires_1_>
+</flat-profile>"""
+
+
+def render_generic(ctx):
+    p = ctx['provision_port']
+    return f"""; Generic IP-phone provisioning template (auto-generated)
+; Device MAC : {ctx['mac_colon']}
+; Extension  : {ctx['exten'] or '-'}
+; Server     : {ctx['server']}:{ctx['sip_port']} (udp)
+[account1]
+display_name = {ctx['display_name']}
+sip_user = {ctx['exten']}
+auth_id = {ctx['auth_id']}
+password = {ctx['password']}
+sip_server = {ctx['server']}
+sip_port = {ctx['sip_port']}
+transport = {ctx['transport']}
+register_expires = {ctx['register_expiry']}
+outbound_proxy =
+[dialplan]
+dial_plan = (x|xx|xxx|xxxx|xxxxx|xxxxxx)
+[system]
+ntp_server = {ctx['ntp']}
+vlan_id = {ctx['vlan']}
+provision_http_port = {p}
+"""
+
+
+_PROVISION_RENDERERS = {
+    'grandstream': render_grandstream,
+    'yealink': render_yealink,
+    'fanvil': render_fanvil,
+    'snom': render_snom,
+    'cisco': render_cisco,
+    'generic': render_generic,
+}
+
+
+def render_provision_config(dev, vendor=None, content_type='cfg'):
+    ctx = _provision_ctx(dev, vendor)
+    renderer = _PROVISION_RENDERERS.get(ctx['vendor']) or render_generic
+    body = renderer(ctx)
+    return body, ctx
+
+
+@app.route('/provisioning/<mac_raw>')
+def provisioning_config(mac_raw):
+    """Unauthenticated per-MAC provisioning endpoint for IP phones."""
+    mac = re.sub(r'\.(cfg|xml|txt)$', '', str(mac_raw), flags=re.IGNORECASE)
+    mac = normalize_mac(mac)
+    dev = find_provision_device(mac)
+    if not dev:
+        notice = (
+            "; === UNKNOWN DEVICE ===\n"
+            f"; MAC {format_mac(mac) or mac_raw} is not registered for auto provisioning.\n"
+            "; Please register this phone in the Asterisk GUI > Автопровиженинг.\n"
+        )
+        return Response(notice, status=404, mimetype='text/plain')
+    body, _ctx = render_provision_config(dev)
+    resp = Response(body, mimetype='text/plain')
+    resp.headers['Cache-Control'] = 'no-store'
+    return resp
+
+
+@app.route('/api/provision/settings', methods=['GET'])
+def api_provision_settings_get():
+    prov = get_provision_settings()
+    return jsonify({
+        'status': 'ok',
+        'settings': {k: v for k, v in prov.items() if k != 'devices'},
+        'devices': prov.get('devices', []),
+        'server_ip': _provision_server_ip(),
+        'vendors': PROVISION_VENDORS,
+    })
+
+
+@app.route('/api/provision/settings', methods=['POST'])
+def api_provision_settings_save():
+    data = request.get_json() or {}
+    prov = get_provision_settings()
+    if 'enabled' in data:
+        prov['enabled'] = bool(data.get('enabled'))
+    if 'allow_http' in data:
+        prov['allow_http'] = bool(data.get('allow_http'))
+    if data.get('http_port') not in (None, ''):
+        try:
+            prov['http_port'] = int(data.get('http_port'))
+        except Exception:
+            pass
+    if 'ntp_server' in data:
+        prov['ntp_server'] = str(data.get('ntp_server') or '').strip()
+    if 'default_vlan' in data:
+        prov['default_vlan'] = str(data.get('default_vlan') or '').strip()
+    if data.get('template_vendor') in PROVISION_VENDORS:
+        prov['template_vendor'] = data.get('template_vendor')
+    save_provision_settings(prov)
+    try:
+        auth_mgr.audit(session.get('username'), 'provision_settings_save', f"enabled={prov.get('enabled')} port={prov.get('http_port')}")
+    except Exception:
+        pass
+    if prov.get('enabled'):
+        start_provisioning_server()
+    return jsonify({'status': 'ok', 'settings': {k: v for k, v in prov.items() if k != 'devices'}})
+
+
+@app.route('/api/provision/devices/save', methods=['POST'])
+def api_provision_device_save():
+    data = request.get_json() or {}
+    mac = normalize_mac(data.get('mac'))
+    if len(mac) != 12:
+        return jsonify({'status': 'error', 'message': 'Некорректный MAC-адрес (нужно 12 hex-символов)'})
+    exten = str(data.get('exten') or '').strip()
+    if not exten:
+        return jsonify({'status': 'error', 'message': 'Укажите номер абонента (extension)'})
+    prov = get_provision_settings()
+    devices = prov.get('devices', [])
+    existing = None
+    for d in devices:
+        if normalize_mac(d.get('mac')) == mac:
+            existing = d
+            break
+    payload = {
+        'mac': format_mac(mac),
+        'exten': exten,
+        'password': str(data.get('password') or '').strip(),
+        'name': str(data.get('name') or '').strip() or f'Абонент {exten}',
+        'vendor': (data.get('vendor') if data.get('vendor') in PROVISION_VENDORS else prov.get('template_vendor', 'grandstream')),
+        'model': str(data.get('model') or '').strip(),
+        'enabled': bool(data.get('enabled', True)),
+        'comment': str(data.get('comment') or '').strip(),
+    }
+    if existing:
+        existing.update(payload)
+    else:
+        payload['created_at'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        devices.append(payload)
+    prov['devices'] = devices
+    save_provision_settings(prov)
+    try:
+        auth_mgr.audit(session.get('username'), 'provision_device_save', format_mac(mac))
+    except Exception:
+        pass
+    return jsonify({'status': 'ok', 'device': existing or payload, 'devices': devices})
+
+
+@app.route('/api/provision/devices/delete', methods=['POST'])
+def api_provision_device_delete():
+    data = request.get_json() or {}
+    mac = normalize_mac(data.get('mac'))
+    prov = get_provision_settings()
+    before = len(prov.get('devices', []))
+    prov['devices'] = [d for d in prov.get('devices', []) if normalize_mac(d.get('mac')) != mac]
+    save_provision_settings(prov)
+    try:
+        auth_mgr.audit(session.get('username'), 'provision_device_delete', mac)
+    except Exception:
+        pass
+    return jsonify({'status': 'ok', 'deleted': before - len(prov['devices']), 'devices': prov['devices']})
+
+
+@app.route('/api/provision/phone/<mac_raw>/reboot', methods=['POST'])
+def api_provision_phone_reboot(mac_raw):
+    mac = normalize_mac(mac_raw)
+    dev = find_provision_device(mac)
+    if not dev:
+        return jsonify({'status': 'error', 'message': 'Устройство не найдено'})
+    exten = str(dev.get('exten') or '').strip()
+    endpoint = f'{exten}' if exten else ''
+    out = ''
+    if endpoint:
+        out = run_asterisk(f'pjsip send notify <reboot> endpoint {endpoint}') or ''
+    try:
+        auth_mgr.audit(session.get('username'), 'provision_device_reboot', mac)
+    except Exception:
+        pass
+    return jsonify({'status': 'ok', 'message': 'Команда reboot отправлена (best-effort)', 'output': out})
+
+
+@app.route('/api/provision/generate-config', methods=['GET'])
+def api_provision_generate_config():
+    mac = request.args.get('mac', '')
+    exten = request.args.get('exten', '').strip()
+    vendor = request.args.get('vendor', '')
+    if vendor not in PROVISION_VENDORS:
+        vendor = None
+    dev = find_provision_device(mac)
+    if not dev:
+        dev = {
+            'mac': format_mac(mac),
+            'exten': exten,
+            'password': '',
+            'name': f'Абонент {exten}' if exten else 'IP Phone',
+            'vendor': vendor or get_provision_settings().get('template_vendor', 'grandstream'),
+            'enabled': True,
+        }
+    body, ctx = render_provision_config(dev, vendor)
+    return jsonify({
+        'status': 'ok',
+        'config': body,
+        'sip_user': ctx['exten'],
+        'sip_password': ctx['password'],
+        'server': ctx['server'],
+        'vendor': ctx['vendor'],
+    })
+
+
+def start_provisioning_server():
+    """Runs a lightweight WSGI server on the provisioning port in a daemon thread.
+
+    Idempotent: guarded by a module-level flag so it never double-starts.
+    """
+    global _provision_server_state
+    prov = get_provision_settings()
+    if not prov.get('enabled'):
+        return False
+    port = int(prov.get('http_port', 8080))
+    if _provision_server_state.get('started') and _provision_server_state.get('port') == port:
+        return True
+
+    def _run():
+        try:
+            from werkzeug.serving import make_server
+        except Exception as e:
+            print(f'[provisioning] werkzeug unavailable: {e}')
+            return
+        try:
+            srv = make_server('0.0.0.0', port, app)
+            _provision_server_state['server'] = srv
+            _provision_server_state['port'] = port
+            _provision_server_state['started'] = True
+            print(f'[provisioning] HTTP provisioning server listening on 0.0.0.0:{port}')
+            srv.serve_forever()
+        except Exception as e:
+            _provision_server_state['started'] = False
+            print(f'[provisioning] failed to start on port {port}: {e}')
+
+    t = threading.Thread(target=_run, daemon=True)
+    t.start()
+    _provision_server_state['thread'] = t
+    return True
+
+
 # ================= MULTILINGUAL (I18N) ENGINE (TOP 10 WORLD LANGUAGES) =================
 LOCALES_DIR = os.path.join(os.path.dirname(__file__), 'locales')
 
@@ -9147,6 +9622,10 @@ if __name__ == '__main__':
         pass
     try:
         start_contact_history_worker(interval=60)
+    except Exception:
+        pass
+    try:
+        start_provisioning_server()
     except Exception:
         pass
     app.run(host='0.0.0.0', port=8888)

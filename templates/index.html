@@ -272,8 +272,12 @@
                     <span class="text-xs font-semibold sidebar-text">{{ t.nav_voicemail or "Голосовая почта" }}</span>
                 </button>
 
-                <button onclick="switchTab('modems')" id="nav-modems" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="{{ t.gsm_modemy }}">
-                    <span class="material-symbols-outlined mr-3.5 text-amber-500 text-[22px]">sim_card</span>
+                <button onclick="switchTab('provision')" id="nav-provision" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="{{ t.nav_provision or 'Автопровиженинг IP-телефонов' }}">
+                    <span class="material-symbols-outlined mr-3.5 text-cyan-500 text-[22px]">settings_input_antenna</span>
+                    <span class="text-xs font-semibold sidebar-text">{{ t.nav_provision or "Автопровиженинг" }}</span>
+                </button>
+
+                <button onclick="switchTab('modems')" id="nav-modems" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="{{ t.gsm_modemy }}">                    <span class="material-symbols-outlined mr-3.5 text-amber-500 text-[22px]">sim_card</span>
                     <span class="text-xs font-semibold sidebar-text">{{ t.nav_modems or "GSM Модемы" }}</span>
                     <span class="ml-auto text-[11px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 font-mono sidebar-badge">{{ modems_list|length }}</span>
                 </button>
@@ -1706,9 +1710,164 @@
                 </div>
             </div>
 
-                        <!-- // ================= TAB: GSM MODEMS POOL (TABLE LIST VIEW) // ================= -->
-            <div id="tab-modems" class="tab-pane space-y-6">
+            <!-- // ================= TAB: IP-PHONE PROVISIONING ================= -->
+            <div id="tab-provision" class="tab-pane space-y-6">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-on-surface">{{ t.nav_provision or 'Автопровиженинг IP-телефонов' }}</h1>
+                        <p class="text-on-surface-variant text-sm">{{ t.prov_desc or 'Телефоны Grandstream, Yealink, Fanvil, Cisco, Snom и другие автоматически получают настройки при загрузке.' }}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="loadProvision()" class="px-3 py-2.5 rounded-xl bg-surface border border-outline/30 text-on-surface-variant text-xs font-semibold hover:bg-surface-container transition-all flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[16px]">refresh</span>
+                            <span>{{ t.obnovit or 'Обновить' }}</span>
+                        </button>
+                        <button type="button" onclick="openProvDevice()" class="px-4 py-2.5 rounded-xl bg-cyan-600 text-white text-xs font-bold hover:bg-cyan-700 transition-all flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[16px]">add</span>
+                            <span>{{ t.prov_add_device or 'Добавить устройство' }}</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SETTINGS CARD -->
+                <div class="p-5 rounded-2xl bg-surface border border-outline/30 shadow-sm space-y-4">
+                    <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
+                        <span class="material-symbols-outlined text-cyan-600 text-[18px]">settings</span>
+                        {{ t.prov_settings or 'Настройки провиженинга' }}
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <label class="flex items-center gap-2 text-xs font-semibold text-on-surface cursor-pointer col-span-2 md:col-span-1">
+                            <input type="checkbox" id="prov-enabled" class="rounded text-cyan-600 w-4 h-4">
+                            <span>{{ t.prov_enabled or 'Включить провиженинг' }}</span>
+                        </label>
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">HTTP {{ t.port or 'порт' }}</label>
+                            <input type="number" id="prov-http-port" value="8080" min="1" max="65535" class="w-full px-3 py-2 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">NTP</label>
+                            <input type="text" id="prov-ntp" value="pool.ntp.org" class="w-full px-3 py-2 rounded-xl bg-surface-container-low border border-outline text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">VLAN</label>
+                            <input type="text" id="prov-vlan" placeholder="" class="w-full px-3 py-2 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">Шаблон</label>
+                            <select id="prov-vendor" class="w-full px-3 py-2 rounded-xl bg-surface-container-low border border-outline text-xs font-semibold text-on-surface">
+                                <option value="grandstream">Grandstream</option>
+                                <option value="yealink">Yealink</option>
+                                <option value="fanvil">Fanvil</option>
+                                <option value="cisco">Cisco SPA</option>
+                                <option value="snom">Snom</option>
+                                <option value="generic">Generic</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between gap-3 pt-2">
+                        <div id="prov-url" class="text-xs font-mono font-semibold text-on-surface-variant break-all px-3 py-2 rounded-xl bg-surface-container-low border border-outline/20 flex-1">—</div>
+                        <button type="button" onclick="saveProvSettings()" class="px-5 py-2.5 rounded-xl bg-cyan-600 text-white text-xs font-bold hover:bg-cyan-700 transition-all shrink-0">
+                            {{ t.sohranit or 'Сохранить' }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DEVICES -->
+                <div class="bg-surface rounded-2xl border border-outline/30 shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 border-b border-surface-container flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-on-surface">{{ t.prov_devices or 'Устройства' }}</h3>
+                        <span id="prov-dev-count" class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-700 font-mono font-bold">0</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="bg-surface-container-low border-b border-surface-container text-on-surface-variant font-semibold text-xs uppercase tracking-wider">
+                                    <th class="px-5 py-3">MAC</th>
+                                    <th class="px-5 py-3">{{ t.sotrudnik_nomer or 'Номер' }}</th>
+                                    <th class="px-5 py-3">{{ t.nazvanie or 'Имя' }}</th>
+                                    <th class="px-5 py-3">{{ t.k_1_ispol_zovanie or 'Модель' }}</th>
+                                    <th class="px-5 py-3 text-right">{{ t.dejstvia or 'Действия' }}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prov-device-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROVISION DEVICE MODAL -->
+            <div id="modal-prov-device" class="hidden fixed inset-0 bg-on-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-surface rounded-2xl max-w-md w-full p-6 border border-outline/30 shadow-xl space-y-4">
+                    <div class="flex justify-between items-center pb-2 border-b border-surface-container">
+                        <h3 class="text-lg font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-cyan-600">settings_input_antenna</span>
+                            <span id="prov-dev-modal-title">{{ t.prov_add_device or 'Добавить устройство' }}</span>
+                        </h3>
+                        <button type="button" onclick="closeProvDevice()" class="text-on-surface-variant hover:text-on-surface p-1 rounded-lg">
+                            <span class="material-symbols-outlined text-xl">close</span>
+                        </button>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">MAC</label>
+                            <input type="text" id="prov-dev-mac" placeholder="001565123456" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.sotrudnik_nomer or 'Номер' }}</label>
+                                <input type="text" id="prov-dev-exten" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-on-surface-variant mb-1">Vendor / Model</label>
+                                <select id="prov-dev-vendor" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-xs font-semibold text-on-surface">
+                                    <option value="">(default)</option>
+                                    <option value="grandstream">Grandstream</option>
+                                    <option value="yealink">Yealink</option>
+                                    <option value="fanvil">Fanvil</option>
+                                    <option value="cisco">Cisco SPA</option>
+                                    <option value="snom">Snom</option>
+                                    <option value="generic">Generic</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">{{ t.nazvanie or 'Имя' }}</label>
+                            <input type="text" id="prov-dev-name" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1">PIN / {{ t.password or 'пароль' }}</label>
+                            <input type="text" id="prov-dev-password" placeholder="{{ t.prov_empty_pass_hint or 'Оставьте пустым — сгенерируется автоматически' }}" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm font-mono">
+                        </div>
+                        <label class="flex items-center gap-2 text-xs font-semibold text-on-surface cursor-pointer">
+                            <input type="checkbox" id="prov-dev-enabled" class="rounded text-cyan-600 w-4 h-4" checked>
+                            <span>{{ t.prov_enabled or 'Включить провиженинг' }}</span>
+                        </label>
+                    </div>
+                    <div class="pt-2 flex justify-end gap-3">
+                        <button type="button" onclick="closeProvDevice()" class="px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:bg-surface-container">{{ t.otmena or 'Отмена' }}</button>
+                        <button type="button" onclick="saveProvDevice()" class="px-6 py-2 rounded-xl bg-cyan-600 text-white text-xs font-semibold hover:bg-cyan-700 transition-all">{{ t.sohranit or 'Сохранить' }}</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONFIG PREVIEW MODAL -->
+            <div id="modal-prov-config" class="hidden fixed inset-0 bg-on-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-surface rounded-2xl max-w-2xl w-full p-6 border border-outline/30 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center pb-2 border-b border-surface-container">
+                        <h3 class="text-lg font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-cyan-600">description</span>
+                            {{ t.prov_config_preview or 'Предпросмотр конфигурации' }}
+                        </h3>
+                        <button type="button" onclick="document.getElementById('modal-prov-config').classList.add('hidden')" class="text-on-surface-variant hover:text-on-surface p-1 rounded-lg">
+                            <span class="material-symbols-outlined text-xl">close</span>
+                        </button>
+                    </div>
+                    <pre id="prov-config-text" class="whitespace-pre-wrap font-mono text-[11px] text-on-surface leading-relaxed bg-surface-container-low rounded-xl p-4 border border-outline/20 overflow-x-auto max-h-[60vh]">—</pre>
+                </div>
+            </div>
+
+                        <!-- // ================= TAB: GSM MODEMS POOL (TABLE LIST VIEW) // ================= -->
+            <div id="tab-modems" class="tab-pane space-y-6">                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <div class="flex items-center gap-2.5">
                             <h1 class="text-2xl font-bold text-on-surface">{{ t.gsm_modemy_i_sim_karty }}</h1>
@@ -6791,6 +6950,9 @@
                 window._spLoaded = true;
                 setTimeout(loadSoftphoneConfig, 50);
             }
+            if (tabId === 'provision' && typeof loadProvision === 'function') {
+                setTimeout(loadProvision, 50);
+            }
         }
 
         // Restore active tab
@@ -8473,7 +8635,153 @@
         document.addEventListener('DOMContentLoaded', () => {
             const vmpane = document.getElementById('tab-voicemail');
             if (vmpane) { loadVoicemail(); }
+            if (document.getElementById('tab-provision')) loadProvision();
         });
+
+        // ================= IP-PHONE PROVISIONING =================
+        let provDevices = [];
+        let provServerIp = '';
+
+        function provSetUrl() {
+            const port = document.getElementById('prov-http-port');
+            const el = document.getElementById('prov-url');
+            if (el) el.textContent = `http://${provServerIp || 'SERVER-IP'}:${port ? port.value : 8080}/provisioning/<MAC>.cfg`;
+        }
+
+        async function loadProvision() {
+            try {
+                const res = await fetch('/api/provision/settings', { cache: 'no-store' });
+                const data = await res.json();
+                if (data.status !== 'ok') return;
+                const p = data.settings || {};
+                provServerIp = data.server_ip || '';
+                const g = (id, v) => { const e = document.getElementById(id); if (e) e.value = v; };
+                g('prov-http-port', p.http_port || 8080);
+                g('prov-ntp', p.ntp_server || 'pool.ntp.org');
+                g('prov-vlan', p.default_vlan || '');
+                g('prov-vendor', p.template_vendor || 'grandstream');
+                const en = document.getElementById('prov-enabled');
+                if (en) en.checked = !!p.enabled;
+                provDevices = data.devices || [];
+                renderProvDevices();
+                provSetUrl();
+            } catch (e) { console.error('[provision] load', e); }
+        }
+
+        function renderProvDevices() {
+            const body = document.getElementById('prov-device-list');
+            const cnt = document.getElementById('prov-dev-count');
+            if (cnt) cnt.textContent = provDevices.length;
+            if (!body) return;
+            if (!provDevices.length) {
+                body.innerHTML = '<tr><td colspan="5" class="px-5 py-10 text-center text-on-surface-variant text-sm">'
+                    + '<span class="material-symbols-outlined text-4xl block mb-2">devices_other</span>'
+                    + '{{ t.prov_no_devices or "Устройства ещё не добавлены" }}</td></tr>';
+                return;
+            }
+            body.innerHTML = provDevices.map(d => {
+                const macN = (d.mac || '').toLowerCase();
+                const safeMac = macN.replace(/[^0-9a-f]/g, '');
+                return `<tr class="border-b border-surface-container/50 hover:bg-surface-container-low/50">
+                    <td class="px-5 py-3 font-mono font-bold text-on-surface">${d.mac || ''}</td>
+                    <td class="px-5 py-3 font-mono font-bold text-cyan-600">${d.exten || ''}</td>
+                    <td class="px-5 py-3">${(d.name || '').replace(/[<>]/g, '')}</td>
+                    <td class="px-5 py-3 text-on-surface-variant text-xs">${d.vendor || '(default)'}</td>
+                    <td class="px-5 py-3">
+                        <div class="flex items-center justify-end gap-1">
+                            <button onclick="previewProvConfig('${d.mac || ''}','${d.exten || ''}')" class="p-2 rounded-xl text-cyan-600 hover:bg-cyan-500/10 transition-colors" title="{{ t.prov_preview or 'Предпросмотр' }}">
+                                <span class="material-symbols-outlined text-[18px]">description</span>
+                            </button>
+                            <button onclick="rebootProvPhone('${d.mac || ''}')" class="p-2 rounded-xl text-amber-600 hover:bg-amber-500/10 transition-colors" title="{{ t.prov_reboot or 'Перезагрузить телефон' }}">
+                                <span class="material-symbols-outlined text-[18px]">restart_alt</span>
+                            </button>
+                            <button onclick="editProvDevice('${safeMac}')" class="p-2 rounded-xl text-on-surface-variant hover:bg-surface-container transition-colors" title="{{ t.redaktirovat or 'Редактировать' }}">
+                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                            </button>
+                            <button onclick="deleteProvDevice('${safeMac}')" class="p-2 rounded-xl text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors" title="{{ t.udalit or 'Удалить' }}">
+                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function openProvDevice() {
+            ['prov-dev-mac','prov-dev-exten','prov-dev-name','prov-dev-password'].forEach(x => { const e = document.getElementById(x); if (e) e.value = ''; });
+            const v = document.getElementById('prov-dev-vendor'); if (v) v.value = '';
+            const en = document.getElementById('prov-dev-enabled'); if (en) en.checked = true;
+            const mt = document.getElementById('prov-dev-modal-title');
+            if (mt) mt.textContent = '{{ t.prov_add_device or "Добавить устройство" }}';
+            document.getElementById('modal-prov-device').classList.remove('hidden');
+        }
+        function closeProvDevice() { document.getElementById('modal-prov-device').classList.add('hidden'); }
+
+        function editProvDevice(macN) {
+            const d = provDevices.find(x => (x.mac || '').toLowerCase().replace(/[^0-9a-f]/g, '') === macN);
+            if (!d) return;
+            const g = (id, v) => { const e = document.getElementById(id); if (e) e.value = v || ''; };
+            g('prov-dev-mac', d.mac);
+            g('prov-dev-exten', d.exten);
+            g('prov-dev-name', d.name);
+            g('prov-dev-password', d.password);
+            g('prov-dev-vendor', d.vendor);
+            const en = document.getElementById('prov-dev-enabled'); if (en) en.checked = d.enabled !== false;
+            const mt = document.getElementById('prov-dev-modal-title');
+            if (mt) mt.textContent = '{{ t.redaktirovat or "Редактировать" }}';
+            document.getElementById('modal-prov-device').classList.remove('hidden');
+        }
+
+        async function saveProvDevice() {
+            const payload = {
+                mac: document.getElementById('prov-dev-mac').value.trim(),
+                exten: document.getElementById('prov-dev-exten').value.trim(),
+                name: document.getElementById('prov-dev-name').value.trim(),
+                password: document.getElementById('prov-dev-password').value.trim(),
+                vendor: document.getElementById('prov-dev-vendor').value,
+                enabled: document.getElementById('prov-dev-enabled').checked
+            };
+            if (!payload.mac) { alert('{{ t.prov_enter_mac or "Укажите MAC-адрес" }}'); return; }
+            const res = await fetch('/api/provision/devices/save', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+            const data = await res.json();
+            if (data.status === 'ok') { closeProvDevice(); loadProvision(); }
+            else alert(data.message || 'Ошибка');
+        }
+
+        async function deleteProvDevice(macN) {
+            if (!confirm('{{ t.prov_delete_confirm or "Удалить устройство?" }}')) return;
+            await fetch('/api/provision/devices/delete', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ mac: macN }) });
+            loadProvision();
+        }
+
+        async function saveProvSettings() {
+            const payload = {
+                enabled: document.getElementById('prov-enabled').checked,
+                http_port: parseInt(document.getElementById('prov-http-port').value) || 8080,
+                ntp_server: document.getElementById('prov-ntp').value.trim(),
+                default_vlan: document.getElementById('prov-vlan').value.trim(),
+                template_vendor: document.getElementById('prov-vendor').value
+            };
+            const res = await fetch('/api/provision/settings', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+            const data = await res.json();
+            if (data.status === 'ok') { loadProvision(); }
+            else alert(data.message || 'Ошибка');
+        }
+
+        async function previewProvConfig(mac, exten) {
+            const res = await fetch('/api/provision/generate-config?mac=' + encodeURIComponent(mac) + '&exten=' + encodeURIComponent(exten), { cache: 'no-store' });
+            const data = await res.json();
+            const pre = document.getElementById('prov-config-text');
+            if (pre) pre.textContent = data.config || data.message || '—';
+            document.getElementById('modal-prov-config').classList.remove('hidden');
+        }
+
+        async function rebootProvPhone(mac) {
+            const res = await fetch('/api/provision/phone/' + encodeURIComponent(mac) + '/reboot', { method: 'POST' });
+            const data = await res.json();
+            if (data.status === 'ok') alert('{{ t.prov_reboot_sent or "Команда перезагрузки отправлена" }}');
+            else alert(data.message || 'Ошибка');
+        }
     </script>
 
 
