@@ -930,5 +930,21 @@
   "prov_reboot_sent": "تم إرسال أمر إعادة التشغيل",
   "prov_delete_confirm": "حذف الجهاز؟",
   "prov_enter_mac": "أدخل عنوان MAC",
-  "prov_empty_pass_hint": "اتركه فارغاً ليُنشأ تلقائياً"
+  "prov_empty_pass_hint": "اتركه فارغاً ليُنشأ تلقائياً",
+  "nav_backup": "النسخ الاحتياطية",
+  "backup_desc": "حفظ واستعادة إعدادات المقسم: امتدادات SIP والخطةdialplan والطوابير والبريد الصوتي وإعدادات اللوحة.",
+  "backup_label": "تسمية (اختياري)",
+  "backup_create": "إنشاء نسخة",
+  "backup_restore_hint": "يتم إنشاء نسخة احتياطية للحالة الحالية تلقائياً قبل الاستعادة.",
+  "backup_list": "الأرشيفات",
+  "backup_file": "الملف",
+  "backup_label_col": "التسمية",
+  "backup_size": "الحجم",
+  "backup_date": "أُنشئ",
+  "backup_none": "لا توجد نسخ احتياطية بعد",
+  "backup_download": "تنزيل",
+  "backup_restore": "استعادة",
+  "backup_delete_confirm": "حذف النسخة الاحتياطية؟",
+  "backup_restore_confirm": "الاستعادة من هذه النسخة؟ سيتم استبدال إعدادات المقسم الحالية.",
+  "backup_restore_done": "اكتملت الاستعادة. حدّث الصفحة."
 }

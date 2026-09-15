@@ -930,5 +930,21 @@
   "prov_reboot_sent": "重启命令已发送",
   "prov_delete_confirm": "删除此设备？",
   "prov_enter_mac": "请输入 MAC 地址",
-  "prov_empty_pass_hint": "留空则自动生成"
+  "prov_empty_pass_hint": "留空则自动生成",
+  "nav_backup": "备份",
+  "backup_desc": "保存和恢复 PBX 配置：SIP 分机、拨号方案、队列、语音信箱和面板设置。",
+  "backup_label": "标签（可选）",
+  "backup_create": "创建备份",
+  "backup_restore_hint": "恢复前会自动创建当前状态的安全备份。",
+  "backup_list": "归档",
+  "backup_file": "文件",
+  "backup_label_col": "标签",
+  "backup_size": "大小",
+  "backup_date": "创建时间",
+  "backup_none": "尚无备份",
+  "backup_download": "下载",
+  "backup_restore": "恢复",
+  "backup_delete_confirm": "删除此备份？",
+  "backup_restore_confirm": "从此备份恢复？当前 PBX 设置将被覆盖。",
+  "backup_restore_done": "恢复完成，请刷新页面。"
 }

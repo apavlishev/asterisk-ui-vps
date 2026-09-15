@@ -930,5 +930,21 @@
   "prov_reboot_sent": "Reboot command sent",
   "prov_delete_confirm": "Delete this device?",
   "prov_enter_mac": "Enter a MAC address",
-  "prov_empty_pass_hint": "Leave empty to auto-generate"
+  "prov_empty_pass_hint": "Leave empty to auto-generate",
+  "nav_backup": "Backups",
+  "backup_desc": "Save and restore PBX configuration: SIP extensions, dialplan, queues, voicemail and panel settings.",
+  "backup_label": "Label (optional)",
+  "backup_create": "Create backup",
+  "backup_restore_hint": "A safety backup of the current state is created automatically before restoring.",
+  "backup_list": "Archives",
+  "backup_file": "File",
+  "backup_label_col": "Label",
+  "backup_size": "Size",
+  "backup_date": "Created",
+  "backup_none": "No backups yet",
+  "backup_download": "Download",
+  "backup_restore": "Restore",
+  "backup_delete_confirm": "Delete this backup?",
+  "backup_restore_confirm": "Restore from this backup? Current PBX settings will be overwritten.",
+  "backup_restore_done": "Restore complete. Refresh the page."
 }

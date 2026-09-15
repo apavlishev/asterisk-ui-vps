@@ -930,5 +930,21 @@
   "prov_reboot_sent": "Neustart-Befehl gesendet",
   "prov_delete_confirm": "Dieses Gerät löschen?",
   "prov_enter_mac": "MAC-Adresse eingeben",
-  "prov_empty_pass_hint": "Leer lassen für automatische Erzeugung"
+  "prov_empty_pass_hint": "Leer lassen für automatische Erzeugung",
+  "nav_backup": "Backups",
+  "backup_desc": "PBX-Konfiguration sichern und wiederherstellen: SIP-Nebenstellen, Wählplan, Warteschlangen, Voicemail und Panel-Einstellungen.",
+  "backup_label": "Bezeichnung (optional)",
+  "backup_create": "Backup erstellen",
+  "backup_restore_hint": "Vor dem Wiederherstellen wird automatisch ein Sicherungs-Backup des aktuellen Zustands erstellt.",
+  "backup_list": "Archive",
+  "backup_file": "Datei",
+  "backup_label_col": "Bezeichnung",
+  "backup_size": "Größe",
+  "backup_date": "Erstellt",
+  "backup_none": "Noch keine Backups",
+  "backup_download": "Herunterladen",
+  "backup_restore": "Wiederherstellen",
+  "backup_delete_confirm": "Dieses Backup löschen?",
+  "backup_restore_confirm": "Aus diesem Backup wiederherstellen? Die aktuellen PBX-Einstellungen werden überschrieben.",
+  "backup_restore_done": "Wiederherstellung abgeschlossen. Seite aktualisieren."
 }

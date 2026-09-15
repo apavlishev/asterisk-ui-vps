@@ -2,6 +2,7 @@ import hashlib
 import io
 import ftplib
 import socket
+import tarfile
 import plugin_manager
 
 import license_mgr
@@ -6489,9 +6490,194 @@ def start_provisioning_server():
     return True
 
 
+# ================= BACKUP / RESTORE =================
+BACKUP_DIR = '/opt/asterisk-gui/backups'
+BACKUP_MANIFEST = 'manifest.json'
+
+
+def _backup_targets():
+    """Returns a list of (archive_path, source_path) for configuration files."""
+    return [
+        ('asterisk/pjsip.conf', PJSIP_CONF),
+        ('asterisk/extensions.conf', EXTENSIONS_CONF),
+        ('asterisk/queues.conf', QUEUES_CONF),
+        ('asterisk/voicemail.conf', VOICEMAIL_CONF),
+        ('asterisk/manager.conf', '/etc/asterisk/manager.conf'),
+        ('asterisk/http.conf', WEBRTC_HTTP_CONF),
+        ('panel/integrations_config.json', CONFIG_FILE),
+    ]
+
+
+def list_backups():
+    items = []
+    if not os.path.isdir(BACKUP_DIR):
+        return items
+    for fn in sorted(os.listdir(BACKUP_DIR), reverse=True):
+        if not fn.endswith('.tar.gz'):
+            continue
+        path = os.path.join(BACKUP_DIR, fn)
+        meta = {}
+        try:
+            with tarfile.open(path, 'r:gz') as tar:
+                if BACKUP_MANIFEST in tar.getnames():
+                    f = tar.extractfile(BACKUP_MANIFEST)
+                    if f:
+                        meta = json.loads(f.read().decode('utf-8'))
+        except Exception:
+            pass
+        items.append({
+            'filename': fn,
+            'size': os.path.getsize(path),
+            'created': meta.get('created') or datetime.datetime.fromtimestamp(os.path.getmtime(path)).strftime('%Y-%m-%d %H:%M:%S'),
+            'label': meta.get('label') or '',
+            'files': meta.get('files') or [],
+            'panel_version': meta.get('panel_version') or '',
+        })
+    return items
+
+
+def create_backup(label=''):
+    os.makedirs(BACKUP_DIR, exist_ok=True)
+    ts = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+    filename = f"pbx-backup-{ts}-{secrets.token_hex(2)}.tar.gz"
+    path = os.path.join(BACKUP_DIR, filename)
+    included = []
+    buf_files = []
+    for arc, src in _backup_targets():
+        if os.path.exists(src):
+            included.append({'archive_path': arc, 'source': src, 'size': os.path.getsize(src)})
+    manifest = {
+        'created': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'label': label or '',
+        'panel_version': get_current_version(),
+        'files': included,
+    }
+    with tarfile.open(path, 'w:gz') as tar:
+        for item in included:
+            try:
+                tar.add(item['source'], arcname=item['archive_path'])
+            except Exception as e:
+                print(f'[backup] add failed {item["source"]}: {e}')
+        mbytes = json.dumps(manifest, ensure_ascii=False, indent=2).encode('utf-8')
+        info = tarfile.TarInfo(BACKUP_MANIFEST)
+        info.size = len(mbytes)
+        info.mtime = time.time()
+        tar.addfile(info, io.BytesIO(mbytes))
+    return filename, path, manifest
+
+
+def restore_backup(filename):
+    """Restores config files from a backup archive. Returns (ok, messages)."""
+    safe = os.path.basename(filename)
+    path = os.path.join(BACKUP_DIR, safe)
+    if not os.path.exists(path):
+        return False, [f'Архив {safe} не найден']
+    messages = []
+    try:
+        with tarfile.open(path, 'r:gz') as tar:
+            mapping = {os.path.basename(src): src for _arc, src in _backup_targets()}
+            # Also map by full archive path
+            arc_map = {arc: src for arc, src in _backup_targets()}
+            for member in tar.getmembers():
+                if not member.isfile():
+                    continue
+                if member.name == BACKUP_MANIFEST:
+                    continue
+                dest = arc_map.get(member.name)
+                if not dest:
+                    # match by basename
+                    dest = mapping.get(os.path.basename(member.name))
+                if not dest:
+                    continue
+                f = tar.extractfile(member)
+                if not f:
+                    continue
+                data = f.read()
+                try:
+                    os.makedirs(os.path.dirname(dest), exist_ok=True)
+                    with open(dest, 'wb') as out:
+                        out.write(data)
+                    messages.append(f'✓ {member.name} → {dest}')
+                except Exception as e:
+                    messages.append(f'✗ {member.name}: {e}')
+    except Exception as e:
+        return False, [f'Ошибка чтения архива: {e}']
+
+    # Reload Asterisk and regenerate dialplan from the restored config
+    try:
+        generate_queues_conf()
+        generate_voicemail_conf()
+        run_asterisk('pjsip reload')
+        run_asterisk('dialplan reload')
+        run_asterisk('core reload')
+    except Exception as e:
+        messages.append(f'Перезагрузка Asterisk: {e}')
+    return True, messages
+
+
+@app.route('/api/backup/list', methods=['GET'])
+def api_backup_list():
+    return jsonify({'status': 'ok', 'backups': list_backups()})
+
+
+@app.route('/api/backup/create', methods=['POST'])
+def api_backup_create():
+    data = request.get_json() or {}
+    label = str(data.get('label') or '').strip()
+    try:
+        filename, path, manifest = create_backup(label)
+        auth_mgr.audit(session.get('username'), 'backup_create', filename)
+        return jsonify({
+            'status': 'ok',
+            'filename': filename,
+            'size': os.path.getsize(path),
+            'manifest': manifest,
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
+
+
+@app.route('/api/backup/download/<path:filename>')
+def api_backup_download(filename):
+    safe = os.path.basename(filename)
+    if not os.path.exists(os.path.join(BACKUP_DIR, safe)):
+        abort(404)
+    return send_from_directory(BACKUP_DIR, safe, as_attachment=True)
+
+
+@app.route('/api/backup/delete', methods=['POST'])
+def api_backup_delete():
+    data = request.get_json() or {}
+    filename = os.path.basename(str(data.get('filename') or ''))
+    path = os.path.join(BACKUP_DIR, filename)
+    if not filename or not os.path.exists(path):
+        return jsonify({'status': 'error', 'message': 'Архив не найден'})
+    try:
+        os.remove(path)
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
+    auth_mgr.audit(session.get('username'), 'backup_delete', filename)
+    return jsonify({'status': 'ok'})
+
+
+@app.route('/api/backup/restore', methods=['POST'])
+def api_backup_restore():
+    data = request.get_json() or {}
+    filename = os.path.basename(str(data.get('filename') or ''))
+    if not filename:
+        return jsonify({'status': 'error', 'message': 'Не указан архив'})
+    # Safety snapshot before restoring
+    try:
+        create_backup(label='auto-before-restore')
+    except Exception:
+        pass
+    ok, messages = restore_backup(filename)
+    auth_mgr.audit(session.get('username'), 'backup_restore', filename)
+    return jsonify({'status': 'ok' if ok else 'error', 'messages': messages})
+
+
 # ================= MULTILINGUAL (I18N) ENGINE (TOP 10 WORLD LANGUAGES) =================
 LOCALES_DIR = os.path.join(os.path.dirname(__file__), 'locales')
-
 def get_available_languages():
     lang_file = os.path.join(LOCALES_DIR, 'languages.json')
     if os.path.exists(lang_file):

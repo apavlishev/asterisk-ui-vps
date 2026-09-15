@@ -930,5 +930,21 @@
   "prov_reboot_sent": "रीबूट कमांड भेजा गया",
   "prov_delete_confirm": "यह डिवाइस हटाएँ?",
   "prov_enter_mac": "MAC पता दर्ज करें",
-  "prov_empty_pass_hint": "स्वतः बनाने के लिए खाली छोड़ें"
+  "prov_empty_pass_hint": "स्वतः बनाने के लिए खाली छोड़ें",
+  "nav_backup": "बैकअप",
+  "backup_desc": "PBX कॉन्फ़िगरेशन सहेजें और पुनर्स्थापित करें: SIP एक्सटेंशन, डायलप्लान, कतारें, वॉइसमेल और पैनल सेटिंग्स।",
+  "backup_label": "लेबल (वैकल्पिक)",
+  "backup_create": "बैकअप बनाएँ",
+  "backup_restore_hint": "पुनर्स्थापित करने से पहले वर्तमान स्थिति का सुरक्षा बैकअप स्वतः बनाया जाता है।",
+  "backup_list": "संग्रह",
+  "backup_file": "फ़ाइल",
+  "backup_label_col": "लेबल",
+  "backup_size": "आकार",
+  "backup_date": "बनाया गया",
+  "backup_none": "अभी कोई बैकअप नहीं",
+  "backup_download": "डाउनलोड",
+  "backup_restore": "पुनर्स्थापित करें",
+  "backup_delete_confirm": "यह बैकअप हटाएँ?",
+  "backup_restore_confirm": "इस बैकअप से पुनर्स्थापित करें? वर्तमान PBX सेटिंग्स अधिलेखित हो जाएंगी।",
+  "backup_restore_done": "पुनर्स्थापन पूर्ण। पृष्ठ रीफ़्रेश करें।"
 }

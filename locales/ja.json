@@ -930,5 +930,21 @@
   "prov_reboot_sent": "再起動コマンドを送信しました",
   "prov_delete_confirm": "このデバイスを削除しますか？",
   "prov_enter_mac": "MACアドレスを入力",
-  "prov_empty_pass_hint": "空欄で自動生成"
+  "prov_empty_pass_hint": "空欄で自動生成",
+  "nav_backup": "バックアップ",
+  "backup_desc": "PBX設定の保存と復元: SIP内線、ダイヤルプラン、キュー、ボイスメール、パネル設定。",
+  "backup_label": "ラベル（任意）",
+  "backup_create": "バックアップを作成",
+  "backup_restore_hint": "復元前に現在の状態の安全バックアップが自動的に作成されます。",
+  "backup_list": "アーカイブ",
+  "backup_file": "ファイル",
+  "backup_label_col": "ラベル",
+  "backup_size": "サイズ",
+  "backup_date": "作成日時",
+  "backup_none": "バックアップはまだありません",
+  "backup_download": "ダウンロード",
+  "backup_restore": "復元",
+  "backup_delete_confirm": "このバックアップを削除しますか？",
+  "backup_restore_confirm": "このバックアップから復元しますか？現在のPBX設定は上書きされます。",
+  "backup_restore_done": "復元が完了しました。ページを更新してください。"
 }

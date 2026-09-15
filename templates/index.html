@@ -277,6 +277,11 @@
                     <span class="text-xs font-semibold sidebar-text">{{ t.nav_provision or "Автопровиженинг" }}</span>
                 </button>
 
+                <button onclick="switchTab('backup')" id="nav-backup" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="{{ t.nav_backup or 'Резервные копии' }}">
+                    <span class="material-symbols-outlined mr-3.5 text-teal-500 text-[22px]">archive</span>
+                    <span class="text-xs font-semibold sidebar-text">{{ t.nav_backup or "Резервные копии" }}</span>
+                </button>
+
                 <button onclick="switchTab('modems')" id="nav-modems" class="nav-btn w-full flex items-center px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" title="{{ t.gsm_modemy }}">                    <span class="material-symbols-outlined mr-3.5 text-amber-500 text-[22px]">sim_card</span>
                     <span class="text-xs font-semibold sidebar-text">{{ t.nav_modems or "GSM Модемы" }}</span>
                     <span class="ml-auto text-[11px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 font-mono sidebar-badge">{{ modems_list|length }}</span>
@@ -1863,6 +1868,49 @@
                         </button>
                     </div>
                     <pre id="prov-config-text" class="whitespace-pre-wrap font-mono text-[11px] text-on-surface leading-relaxed bg-surface-container-low rounded-xl p-4 border border-outline/20 overflow-x-auto max-h-[60vh]">—</pre>
+                </div>
+            </div>
+
+            <!-- // ================= TAB: BACKUP / RESTORE ================= -->
+            <div id="tab-backup" class="tab-pane space-y-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-on-surface">{{ t.nav_backup or 'Резервные копии' }}</h1>
+                        <p class="text-on-surface-variant text-sm">{{ t.backup_desc or 'Сохранение и восстановление конфигурации АТС: SIP-абоненты, диалплан, очереди, голосовая почта и настройки панели.' }}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="backup-label" placeholder="{{ t.backup_label or 'Метка (необязательно)' }}" class="px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline text-sm">
+                        <button type="button" onclick="createBackup()" class="px-4 py-2.5 rounded-xl bg-teal-600 text-white text-xs font-bold hover:bg-teal-700 transition-all flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[16px]">save</span>
+                            <span>{{ t.backup_create or 'Создать копию' }}</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 text-amber-700 text-xs font-semibold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">info</span>
+                    <span>{{ t.backup_restore_hint or 'Перед восстановлением автоматически создаётся резервная копия текущего состояния.' }}</span>
+                </div>
+
+                <div class="bg-surface rounded-2xl border border-outline/30 shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 border-b border-surface-container flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-on-surface">{{ t.backup_list or 'Архивы' }}</h3>
+                        <span id="backup-count" class="text-[10px] px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 font-mono font-bold">0</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="bg-surface-container-low border-b border-surface-container text-on-surface-variant font-semibold text-xs uppercase tracking-wider">
+                                    <th class="px-5 py-3">{{ t.backup_file or 'Файл' }}</th>
+                                    <th class="px-5 py-3">{{ t.backup_label_col or 'Метка' }}</th>
+                                    <th class="px-5 py-3">{{ t.backup_size or 'Размер' }}</th>
+                                    <th class="px-5 py-3">{{ t.backup_date or 'Создан' }}</th>
+                                    <th class="px-5 py-3 text-right">{{ t.dejstvia or 'Действия' }}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="backup-list"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -6953,6 +7001,9 @@
             if (tabId === 'provision' && typeof loadProvision === 'function') {
                 setTimeout(loadProvision, 50);
             }
+            if (tabId === 'backup' && typeof loadBackups === 'function') {
+                setTimeout(loadBackups, 50);
+            }
         }
 
         // Restore active tab
@@ -8781,6 +8832,80 @@
             const data = await res.json();
             if (data.status === 'ok') alert('{{ t.prov_reboot_sent or "Команда перезагрузки отправлена" }}');
             else alert(data.message || 'Ошибка');
+        }
+
+        // ================= BACKUP / RESTORE =================
+        let backupsList = [];
+
+        function backupFormatSize(bytes) {
+            if (bytes >= 1024 * 1024) return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+            if (bytes >= 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return bytes + ' B';
+        }
+
+        async function loadBackups() {
+            try {
+                const res = await fetch('/api/backup/list', { cache: 'no-store' });
+                const data = await res.json();
+                backupsList = data.backups || [];
+                const cnt = document.getElementById('backup-count');
+                if (cnt) cnt.textContent = backupsList.length;
+                const body = document.getElementById('backup-list');
+                if (!body) return;
+                if (!backupsList.length) {
+                    body.innerHTML = '<tr><td colspan="5" class="px-5 py-10 text-center text-on-surface-variant text-sm">'
+                        + '<span class="material-symbols-outlined text-4xl block mb-2">archive</span>'
+                        + '{{ t.backup_none or "Резервных копий пока нет" }}</td></tr>';
+                    return;
+                }
+                body.innerHTML = backupsList.map(b => `<tr class="border-b border-surface-container/50 hover:bg-surface-container-low/50">
+                    <td class="px-5 py-3 font-mono text-xs font-bold text-on-surface">${b.filename}</td>
+                    <td class="px-5 py-3 text-on-surface-variant text-xs">${(b.label || '—').replace(/[<>]/g, '')}</td>
+                    <td class="px-5 py-3 font-mono text-xs text-on-surface-variant">${backupFormatSize(b.size || 0)}</td>
+                    <td class="px-5 py-3 text-xs text-on-surface-variant">${b.created || ''}</td>
+                    <td class="px-5 py-3">
+                        <div class="flex items-center justify-end gap-1">
+                            <a href="/api/backup/download/${encodeURIComponent(b.filename)}" class="p-2 rounded-xl text-teal-600 hover:bg-teal-500/10 transition-colors" title="{{ t.backup_download or 'Скачать' }}">
+                                <span class="material-symbols-outlined text-[18px]">download</span>
+                            </a>
+                            <button onclick="restoreBackup('${b.filename}')" class="p-2 rounded-xl text-amber-600 hover:bg-amber-500/10 transition-colors" title="{{ t.backup_restore or 'Восстановить' }}">
+                                <span class="material-symbols-outlined text-[18px]">settings_backup_restore</span>
+                            </button>
+                            <button onclick="deleteBackup('${b.filename}')" class="p-2 rounded-xl text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors" title="{{ t.udalit or 'Удалить' }}">
+                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`).join('');
+            } catch (e) { console.error('[backup] load', e); }
+        }
+
+        async function createBackup() {
+            const labelEl = document.getElementById('backup-label');
+            const res = await fetch('/api/backup/create', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ label: labelEl ? labelEl.value.trim() : '' }) });
+            const data = await res.json();
+            if (data.status === 'ok') {
+                if (labelEl) labelEl.value = '';
+                loadBackups();
+            } else alert(data.message || 'Ошибка создания копии');
+        }
+
+        async function deleteBackup(filename) {
+            if (!confirm('{{ t.backup_delete_confirm or "Удалить резервную копию?" }}')) return;
+            await fetch('/api/backup/delete', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ filename }) });
+            loadBackups();
+        }
+
+        async function restoreBackup(filename) {
+            if (!confirm('{{ t.backup_restore_confirm or "Восстановить из этой копии? Текущие настройки АТС будут перезаписаны." }}')) return;
+            const res = await fetch('/api/backup/restore', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ filename }) });
+            const data = await res.json();
+            if (data.status === 'ok') {
+                alert('{{ t.backup_restore_done or "Восстановление завершено. Обновите страницу." }}\n\n' + (data.messages || []).join('\n'));
+                loadBackups();
+            } else {
+                alert((data.messages || ['Ошибка']).join('\n'));
+            }
         }
     </script>
 

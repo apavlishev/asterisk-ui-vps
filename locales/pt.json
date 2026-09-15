@@ -930,5 +930,21 @@
   "prov_reboot_sent": "Comando de reinicialização enviado",
   "prov_delete_confirm": "Excluir este dispositivo?",
   "prov_enter_mac": "Informe um endereço MAC",
-  "prov_empty_pass_hint": "Deixe vazio para gerar automaticamente"
+  "prov_empty_pass_hint": "Deixe vazio para gerar automaticamente",
+  "nav_backup": "Backups",
+  "backup_desc": "Salvar e restaurar a configuração do PBX: ramais SIP, plano de discagem, filas, correio de voz e ajustes do painel.",
+  "backup_label": "Rótulo (opcional)",
+  "backup_create": "Criar backup",
+  "backup_restore_hint": "Um backup de segurança do estado atual é criado automaticamente antes de restaurar.",
+  "backup_list": "Arquivos",
+  "backup_file": "Arquivo",
+  "backup_label_col": "Rótulo",
+  "backup_size": "Tamanho",
+  "backup_date": "Criado",
+  "backup_none": "Ainda não há backups",
+  "backup_download": "Baixar",
+  "backup_restore": "Restaurar",
+  "backup_delete_confirm": "Excluir este backup?",
+  "backup_restore_confirm": "Restaurar a partir deste backup? As configurações atuais do PBX serão sobrescritas.",
+  "backup_restore_done": "Restauração concluída. Atualize a página."
 }

@@ -930,5 +930,21 @@
   "prov_reboot_sent": "Commande de redémarrage envoyée",
   "prov_delete_confirm": "Supprimer cet appareil ?",
   "prov_enter_mac": "Saisissez une adresse MAC",
-  "prov_empty_pass_hint": "Laisser vide pour générer automatiquement"
+  "prov_empty_pass_hint": "Laisser vide pour générer automatiquement",
+  "nav_backup": "Sauvegardes",
+  "backup_desc": "Sauvegarder et restaurer la configuration du PBX : postes SIP, plan de numérotation, files, messagerie vocale et réglages du panneau.",
+  "backup_label": "Libellé (facultatif)",
+  "backup_create": "Créer une sauvegarde",
+  "backup_restore_hint": "Une sauvegarde de l'état actuel est créée automatiquement avant la restauration.",
+  "backup_list": "Archives",
+  "backup_file": "Fichier",
+  "backup_label_col": "Libellé",
+  "backup_size": "Taille",
+  "backup_date": "Créé le",
+  "backup_none": "Aucune sauvegarde",
+  "backup_download": "Télécharger",
+  "backup_restore": "Restaurer",
+  "backup_delete_confirm": "Supprimer cette sauvegarde ?",
+  "backup_restore_confirm": "Restaurer depuis cette sauvegarde ? Les réglages actuels du PBX seront écrasés.",
+  "backup_restore_done": "Restauration terminée. Actualisez la page."
 }

@@ -930,5 +930,21 @@
   "prov_reboot_sent": "Comando de reinicio enviado",
   "prov_delete_confirm": "¿Eliminar el dispositivo?",
   "prov_enter_mac": "Introduzca una dirección MAC",
-  "prov_empty_pass_hint": "Déjelo vacío para generarlo automáticamente"
+  "prov_empty_pass_hint": "Déjelo vacío para generarlo automáticamente",
+  "nav_backup": "Copias de seguridad",
+  "backup_desc": "Guardar y restaurar la configuración de la central: extensiones SIP, dialplan, colas, correo de voz y ajustes del panel.",
+  "backup_label": "Etiqueta (opcional)",
+  "backup_create": "Crear copia",
+  "backup_restore_hint": "Antes de restaurar se crea automáticamente una copia de seguridad del estado actual.",
+  "backup_list": "Archivos",
+  "backup_file": "Archivo",
+  "backup_label_col": "Etiqueta",
+  "backup_size": "Tamaño",
+  "backup_date": "Creado",
+  "backup_none": "Aún no hay copias",
+  "backup_download": "Descargar",
+  "backup_restore": "Restaurar",
+  "backup_delete_confirm": "¿Eliminar la copia de seguridad?",
+  "backup_restore_confirm": "¿Restaurar desde esta copia? La configuración actual de la central se sobrescribirá.",
+  "backup_restore_done": "Restauración completada. Actualice la página."
 }
