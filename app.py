@@ -8104,11 +8104,12 @@ def generate_pjsip_conf(accounts=None):
     if webrtc_ws_enabled():
         out += [
             "; --- WebRTC (WSS) transport для софтфона в браузере ---",
-            "; Реальный TLS-порт и сертификат задаются в http.conf (tlsbindaddr/tlscertfile)",
+            "; TLS-порт и сертификат задаются в http.conf (tlsbindaddr/tlscertfile).",
+            "; У WSS-транспорта НЕТ параметра bind: транспорты создаются динамически",
+            "; для каждого WebSocket-соединения, принятого на /ws HTTP(S)-сервера.",
             "[transport-wss]",
             "type=transport",
             "protocol=wss",
-            "bind=0.0.0.0",
             "allow_reload=yes",
             "",
         ]
