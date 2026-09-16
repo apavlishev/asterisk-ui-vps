@@ -1,5 +1,5 @@
 {
-  "version": "3.18.1",
+  "version": "3.18.2",
   "released_at": "2026-09-16",
-  "changelog": "Релиз 3.18.1 — Документация отложенной задачи: Device Attestation для Telegram-транка.\n- Добавлен TELEGRAM_DEVICE_ATTESTATION.md: подтверждение подлинности официального Telegram APK и реальности устройства (Google Play Integrity, Huawei Safety Detect/SysIntegrity, Apple App Attest).\n- Описаны архитектура nonce/challenge, серверная верификация, точки интеграции с plugin_telegram_trunk, ограничения и открытые вопросы."
+  "changelog": "Релиз 3.18.2 — Задача лицензирования установки на сервер.\n- LICENSE_SERVER_TASK.md: привязка лицензии к конкретному серверу через fingerprint, чеклист внедрения и список доработок.\n- Компоненты license-server/ (FastAPI + Ed25519) и license_mgr.py уже реализованы."
 }
