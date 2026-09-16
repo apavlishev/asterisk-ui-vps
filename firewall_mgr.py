@@ -177,7 +177,7 @@ def _port_spec(rule, sep="-"):
     return str(start) if start == end else f"{start}{sep}{end}"
 
 
-def _validate(name, port, proto, action="allow"):
+def _validate(name, port, proto, action="allow", source="any"):
     if not _normalize_port(port):
         return None, "Некорректный порт. Примеры: 5060 или 10000-20000."
     proto = (proto or "tcp").lower()
@@ -190,7 +190,7 @@ def _validate(name, port, proto, action="allow"):
         "port": str(port).strip(),
         "proto": proto,
         "action": action,
-        "source": "any",
+        "source": (source or "any").strip() or "any",
     }, None
 
 
@@ -209,6 +209,34 @@ def _ufw_rule_args(rule):
     return [f"{portstr}/{proto}"]
 
 
+def _ufw_spec_from_stored(spec):
+    """Normalizes a stored `applied` entry to a list of ufw rule args.
+
+    Older versions stored UFW specs as plain strings in an nft-like form
+    (e.g. "tcp dport 22 any"), while the current format is a list such as
+    ["22/tcp"] or ["from","10.0.0.1","to","any","port","5060","proto","tcp"].
+    This keeps `apply_rules`/`flush_rules` from crashing on legacy state.
+    """
+    if isinstance(spec, (list, tuple)):
+        return list(spec)
+    s = str(spec or "").strip()
+    if not s:
+        return None
+    # Legacy "proto dport PORT [source]" form
+    m = re.match(r"^(tcp|udp)\s+dport\s+(\S+)(?:\s+(.*))?$", s)
+    if m:
+        proto, port, src = m.group(1), m.group(2), (m.group(3) or "any").strip()
+        # Stored separators may be '-' but ufw expects ':'
+        port = port.replace("-", ":")
+        if src and src != "any":
+            return ["from", src, "to", "any", "port", port, "proto", proto]
+        return [f"{port}/{proto}"]
+    # Already a plain "PORT/proto" string
+    if re.match(r"^[\d:-]+/(tcp|udp)$", s):
+        return [s]
+    return None
+
+
 def _apply_ufw(rules, state):
     _run(["ufw", "--force", "enable"], timeout=30)
     new_specs = []
@@ -221,8 +249,11 @@ def _apply_ufw(rules, state):
 
     old_specs = state.get("applied", []) or []
     errors = []
-    # Remove stale rules we added previously
-    for spec in old_specs:
+    # Remove stale rules we added previously (tolerate legacy string specs)
+    for raw in old_specs:
+        spec = _ufw_spec_from_stored(raw)
+        if not spec:
+            continue
         if spec not in new_specs:
             res = _run(["ufw", "--force", "delete", "allow"] + spec, timeout=20)
             if res.returncode != 0 and "Could not delete" not in (res.stdout + res.stderr):
@@ -556,8 +587,10 @@ def flush_rules():
     be = detect_backend()
     state = load_state()
     if be == "ufw":
-        for spec in state.get("applied", []) or []:
-            _run(["ufw", "--force", "delete", "allow"] + spec, timeout=20)
+        for raw in state.get("applied", []) or []:
+            spec = _ufw_spec_from_stored(raw)
+            if spec:
+                _run(["ufw", "--force", "delete", "allow"] + spec, timeout=20)
         _run(["ufw", "--force", "disable"], timeout=20)
     elif be == "firewalld":
         for spec in state.get("applied", []) or []:
@@ -591,10 +624,9 @@ def set_enabled(enabled):
 
 # ================= CRUD =================
 def add_rule(name, port, proto="tcp", action="allow", source="any"):
-    rule, err = _validate(name, port, proto, action)
+    rule, err = _validate(name, port, proto, action, source)
     if err:
         return False, err
-    rule["source"] = (source or "any").strip() or "any"
     rule["id"] = f"rule_{int(datetime.datetime.now().timestamp() * 1000)}"
     rule["builtin"] = False
     rule["created_at"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
