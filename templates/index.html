@@ -1792,6 +1792,88 @@
                     </div>
                 </div>
 
+                <!-- HOW IT WORKS / DOCUMENTATION -->
+                <div class="rounded-2xl bg-surface border border-outline/30 shadow-sm overflow-hidden">
+                    <button type="button" onclick="toggleProvDocs()" class="w-full px-5 py-4 flex items-center justify-between gap-3 hover:bg-surface-container-low transition-colors">
+                        <span class="text-sm font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-cyan-600 text-[18px]">menu_book</span>
+                            {{ t.prov_docs_title or 'Как это работает: документация автопровиженинга' }}
+                        </span>
+                        <span id="prov-docs-chevron" class="material-symbols-outlined text-on-surface-variant text-[20px]">expand_more</span>
+                    </button>
+                    <div id="prov-docs-body" class="hidden px-5 pb-5 space-y-4 border-t border-surface-container">
+                        <p class="pt-4 text-sm text-on-surface-variant leading-relaxed">
+                            {{ t.prov_docs_intro or 'Автопровиженинг позволяет IP-телефонам самостоятельно получить SIP-настройки при включении — вручную вводить сервер, логин и пароль на каждом аппарате не нужно. Панель раздаёт готовые конфигурации по MAC-адресу телефона, а сам телефон периодически запрашивает их по HTTP.' }}
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-2">
+                                <h4 class="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-cyan-600 text-[16px]">route</span>
+                                    {{ t.prov_docs_how_step1 or '1. Принцип работы' }}
+                                </h4>
+                                <ol class="text-xs text-on-surface-variant space-y-1.5 list-decimal list-inside leading-relaxed">
+                                    <li>{{ t.prov_docs_how_1 or 'Телефон при загрузке отправляет HTTP-запрос на сервер провиженинга, подставляя свой MAC-адрес.' }}</li>
+                                    <li>{{ t.prov_docs_how_2 or 'Панель находит устройство по MAC в списке и генерирует для него конфигурацию в формате производителя.' }}</li>
+                                    <li>{{ t.prov_docs_how_3 or 'Телефон применяет полученные параметры (SIP-сервер, логин, пароль, NTP, VLAN) и регистрируется на АТС.' }}</li>
+                                    <li>{{ t.prov_docs_how_4 or 'Далее телефон периодически перезапрашивает файл — при изменении настроек в панели они применятся автоматически.' }}</li>
+                                </ol>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-2">
+                                <h4 class="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-cyan-600 text-[16px]">dns</span>
+                                    {{ t.prov_docs_arch or '2. Архитектура и адреса' }}
+                                </h4>
+                                <ul class="text-xs text-on-surface-variant space-y-1.5 leading-relaxed">
+                                    <li>{{ t.prov_docs_arch_1 or 'Провиженинг обслуживает отдельный легковесный HTTP-сервер (порт по умолчанию 8080), который запускается автоматически при включении функции.' }}</li>
+                                    <li>{{ t.prov_docs_arch_2 or 'Ссылка для телефонов: http://<IP-панели>:<порт>/provisioning/<MAC> — расширение .cfg/.xml определяется производителем.' }}</li>
+                                    <li>{{ t.prov_docs_arch_3 or 'Эндпоинт не требует авторизации: телефон обращается к нему до регистрации на АТС. Персональные данные телефона защищает уникальный URL с MAC-адресом.' }}</li>
+                                    <li>{{ t.prov_docs_arch_4 or 'IP-адрес сервера панель определяет автоматически; если она за NAT, при раздаче конфигураций используется адрес запроса телефона.' }}</li>
+                                </ul>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-2">
+                                <h4 class="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-cyan-600 text-[16px]">key</span>
+                                    {{ t.prov_docs_pass or '3. Пароли SIP' }}
+                                </h4>
+                                <ul class="text-xs text-on-surface-variant space-y-1.5 leading-relaxed">
+                                    <li>{{ t.prov_docs_pass_1 or 'Если пароль не задан вручную, панель генерирует его детерминированно: HMAC-SHA256 от MAC-адреса и секретного ключа провиженинга.' }}</li>
+                                    <li>{{ t.prov_docs_pass_2 or 'Один и тот же MAC всегда получает одинаковый пароль — телефон перерегистрируется без ручного вмешательства после сброса.' }}</li>
+                                    <li>{{ t.prov_docs_pass_3 or 'Чтобы сменить пароли всех телефонов, сгенерируйте новый секретный ключ в настройках.' }}</li>
+                                </ul>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-2">
+                                <h4 class="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-cyan-600 text-[16px]">devices</span>
+                                    {{ t.prov_docs_vendors or '4. Поддерживаемые вендоры' }}
+                                </h4>
+                                <ul class="text-xs text-on-surface-variant space-y-1.5 leading-relaxed">
+                                    <li>{{ t.prov_docs_vendors_1 or 'Grandstream — XML-формат gs_provision (параметры P-строк), файл обычно запрашивается как cfg<MAC>.xml.' }}</li>
+                                    <li>{{ t.prov_docs_vendors_2 or 'Yealink — текстовый формат с account.1.*, запрашивается как <MAC>.cfg.' }}</li>
+                                    <li>{{ t.prov_docs_vendors_3 or 'Fanvil — XML-конфигурация с секциями sip/ntp/http.' }}</li>
+                                    <li>{{ t.prov_docs_vendors_4 or 'Snom и Cisco SPA — XML-форматы; для остальных моделей доступен универсальный Generic-шаблон.' }}</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-cyan-500/5 border border-cyan-500/20 space-y-2">
+                            <h4 class="text-xs font-bold text-cyan-700 uppercase tracking-wider flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[16px]">checklist</span>
+                                {{ t.prov_docs_setup or '5. Быстрый старт' }}
+                            </h4>
+                            <ol class="text-xs text-on-surface-variant space-y-1.5 list-decimal list-inside leading-relaxed">
+                                <li>{{ t.prov_docs_setup_1 or 'Включите провиженинг и задайте HTTP-порт, шаблон по умолчанию, NTP-сервер и VLAN.' }}</li>
+                                <li>{{ t.prov_docs_setup_2 or 'Нажмите «Добавить устройство» и укажите MAC телефона и номер абонента (пароль можно оставить пустым).' }}</li>
+                                <li>{{ t.prov_docs_setup_3 or 'Проверьте сгенерированную конфигурацию кнопкой «Предпросмотр».' }}</li>
+                                <li>{{ t.prov_docs_setup_4 or 'Укажите адрес провиженинга в самом телефоне (или через DHCP-опцию 66) и перезагрузите его.' }}</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- SETTINGS CARD -->
                 <div class="p-5 rounded-2xl bg-surface border border-outline/30 shadow-sm space-y-4">
                     <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
@@ -8913,15 +8995,14 @@
             return data;
         }
 
+        let spSipJsPromise = null;
         function spLoadSipJs() {
             if (window.SIP) return Promise.resolve();
-            return new Promise((resolve, reject) => {
-                const s = document.createElement('script');
-                s.src = 'https://cdn.jsdelivr.net/npm/sip.js@0.21.2/dist/sip.min.js';
-                s.onload = resolve;
-                s.onerror = () => reject(new Error('Не удалось загрузить SIP.js'));
-                document.head.appendChild(s);
-            });
+            if (spSipJsPromise) return spSipJsPromise;
+            spSipJsPromise = import('https://cdn.jsdelivr.net/npm/sip.js@0.21.2/+esm')
+                .then(mod => { window.SIP = mod; return mod; })
+                .catch(err => { spSipJsPromise = null; throw new Error('Не удалось загрузить SIP.js: ' + (err && err.message ? err.message : err)); });
+            return spSipJsPromise;
         }
 
         async function softphoneToggleRegister() {
@@ -9277,6 +9358,14 @@
         // ================= IP-PHONE PROVISIONING =================
         let provDevices = [];
         let provServerIp = '';
+
+        function toggleProvDocs() {
+            const body = document.getElementById('prov-docs-body');
+            const chev = document.getElementById('prov-docs-chevron');
+            if (!body) return;
+            const hidden = body.classList.toggle('hidden');
+            if (chev) chev.textContent = hidden ? 'expand_more' : 'expand_less';
+        }
 
         function provSetUrl() {
             const port = document.getElementById('prov-http-port');
