@@ -4212,12 +4212,18 @@ AMI_SECRET = None
 
 WEBRTC_CERT_DIR = '/etc/asterisk/keys'
 WEBRTC_HTTP_CONF = '/etc/asterisk/http.conf'
-WEBRTC_WS_PORT = 8089
+# TLS/WSS port. 443 is preferred: it is a standard HTTPS port that passes
+# through almost every proxy, corporate firewall and VPN, whereas a high port
+# like 8089 is frequently blocked or mis-routed (browser WebSocket code 1006).
+WEBRTC_WS_PORT = 443
 # Plain (non-TLS) Asterisk HTTP port. It MUST differ from WEBRTC_WS_PORT:
 # binding both the plain and the TLS listener to the same port makes Asterisk
 # serve plain HTTP on that port and silently drop the TLS listener, which
-# breaks SIP-over-WSS (browsers fail with WebSocket code 1006).
+# breaks SIP-over-WSS.
 WEBRTC_HTTP_PORT = 8088
+# Legacy TLS/WSS port kept for backwards compatibility (opened in the firewall
+# and documented in the UI); the active listener is WEBRTC_WS_PORT.
+WEBRTC_WS_LEGACY_PORT = 8089
 _webrtc_cert_cache = {'fingerprint': None, 'path': None, 'mtime': 0}
 
 
@@ -4305,9 +4311,41 @@ def _disable_legacy_chan_sip():
         return False
 
 
+def _allow_low_tls_port():
+    """Allows Asterisk (running as the unprivileged `asterisk` user) to bind
+    the TLS/WSS port when it is below 1024 (e.g. 443).
+
+    A file capability (setcap) is not enough because Asterisk drops privileges
+    at startup, so we lower the kernel's unprivileged port threshold instead.
+    """
+    if WEBRTC_WS_PORT >= 1024:
+        return True
+    try:
+        with open('/proc/sys/net/ipv4/ip_unprivileged_port_start', 'r') as f:
+            if int(f.read().strip() or '1024') == 0:
+                return True
+    except Exception:
+        pass
+    try:
+        subprocess.run(
+            ['sysctl', '-w', 'net.ipv4.ip_unprivileged_port_start=0'],
+            capture_output=True, timeout=10,
+        )
+        try:
+            with open('/etc/sysctl.d/99-asterisk-unprivileged-ports.conf', 'w') as f:
+                f.write('net.ipv4.ip_unprivileged_port_start=0\n')
+        except Exception:
+            pass
+        return True
+    except Exception as e:
+        print(f"[webrtc] could not lower unprivileged port start: {e}")
+        return False
+
+
 def ensure_webrtc_http_conf(host=None, force=False):
     """Provisions http.conf + self-signed TLS cert so SIP-over-WSS works out of the box."""
     _disable_legacy_chan_sip()
+    _allow_low_tls_port()
     keys_dir = WEBRTC_CERT_DIR
     cert = os.path.join(keys_dir, 'asterisk.pem')
     key = os.path.join(keys_dir, 'asterisk.key')
