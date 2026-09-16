@@ -4320,6 +4320,23 @@ def _disable_legacy_chan_sip():
         return False
 
 
+def _cert_has_san_ip(cert_path, ip):
+    """Returns True if the certificate lists `ip` as an IP SAN entry."""
+    try:
+        out = subprocess.run(
+            ['openssl', 'x509', '-in', cert_path, '-noout', '-ext', 'subjectAltName'],
+            capture_output=True, timeout=10,
+        ).stdout.decode('utf-8', 'ignore')
+    except Exception:
+        return False
+    for entry in out.replace(',', ' ').split():
+        entry = entry.strip()
+        if entry.lower().startswith('ip address:') or entry.lower().startswith('ip:'):
+            if entry.split(':', 1)[1].strip() == ip:
+                return True
+    return False
+
+
 def _allow_low_tls_port():
     """Allows Asterisk (running as the unprivileged `asterisk` user) to bind
     the TLS/WSS port when it is below 1024 (e.g. 443).
@@ -4364,16 +4381,58 @@ def ensure_webrtc_http_conf(host=None, force=False):
         pass
 
     if not os.path.exists(cert) or not os.path.exists(key):
-        host_arg = host or 'localhost'
+        host_arg = (host or 'localhost').strip()
+        # Modern browsers reject a TLS cert whose SAN lists the connection's
+        # IP only as a DNS name. Build a correct SAN: an IPv4/IPv6 literal must
+        # be added as `IP:<addr>`, a hostname as `DNS:<name>`.
+        san_parts = ['DNS:localhost', 'IP:127.0.0.1']
+        is_ip = False
+        try:
+            import ipaddress
+            ipaddress.ip_address(host_arg)
+            is_ip = True
+        except Exception:
+            is_ip = False
+        if host_arg and host_arg not in ('localhost', '127.0.0.1'):
+            san_parts.insert(0, f'IP:{host_arg}' if is_ip else f'DNS:{host_arg}')
+        subj_cn = host_arg or 'localhost'
         try:
             subprocess.run([
                 'openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes',
                 '-keyout', key, '-out', cert, '-days', '3650',
-                '-subj', f'/CN={host_arg}',
-                '-addext', f'subjectAltName=DNS:{host_arg},DNS:localhost,IP:127.0.0.1',
+                '-subj', f'/CN={subj_cn}',
+                '-addext', 'subjectAltName=' + ','.join(san_parts),
             ], capture_output=True, timeout=30)
         except Exception as e:
             print(f"[webrtc] openssl cert generation failed: {e}")
+
+    # If an existing cert lacks the current host in its SAN (e.g. it was
+    # generated with the host as a DNS entry), regenerate it once.
+    if os.path.exists(cert) and host:
+        try:
+            import ipaddress
+            is_ip = False
+            try:
+                ipaddress.ip_address(host.strip())
+                is_ip = True
+            except Exception:
+                is_ip = False
+            if is_ip and not _cert_has_san_ip(cert, host.strip()):
+                print(f"[webrtc] regenerating TLS cert: SAN is missing IP:{host.strip()}")
+                try:
+                    os.remove(cert)
+                    os.remove(key)
+                except Exception:
+                    pass
+                subj_cn = host.strip()
+                subprocess.run([
+                    'openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes',
+                    '-keyout', key, '-out', cert, '-days', '3650',
+                    '-subj', f'/CN={subj_cn}',
+                    '-addext', f'subjectAltName=IP:{subj_cn},DNS:localhost,IP:127.0.0.1',
+                ], capture_output=True, timeout=30)
+        except Exception as e:
+            print(f"[webrtc] cert SAN check failed: {e}")
 
     if not os.path.exists(cert) or not os.path.exists(key):
         return False
