@@ -8105,11 +8105,12 @@ def generate_pjsip_conf(accounts=None):
         out += [
             "; --- WebRTC (WSS) transport для софтфона в браузере ---",
             "; TLS-порт и сертификат задаются в http.conf (tlsbindaddr/tlscertfile).",
-            "; У WSS-транспорта НЕТ параметра bind: транспорты создаются динамически",
-            "; для каждого WebSocket-соединения, принятого на /ws HTTP(S)-сервера.",
+            "; Asterisk 18 требует bind для транспорта, но для WSS он не слушает",
+            "; этот порт: транспорты создаются динамически на каждое соединение /ws.",
             "[transport-wss]",
             "type=transport",
             "protocol=wss",
+            "bind=0.0.0.0:5060",
             "allow_reload=yes",
             "",
         ]
