@@ -1280,8 +1280,8 @@ def save_security_auth():
     cfg['security_auth']['enabled'] = enabled
     if username:
         cfg['security_auth']['username'] = username
-    if password:
-        cfg['security_auth']['password'] = password
+    # The cleartext password is never persisted; only the hash in `users` is.
+    cfg['security_auth'].pop('password', None)
     
     if request.form.get('dismiss_prompt'):
         cfg['security_auth']['prompt_dismissed'] = True
@@ -6200,8 +6200,64 @@ def load_integrations():
         }
     return data
 def save_integrations(data):
-    with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    # Auth hashes are only as safe as the file permissions of the store.
+    flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC
+    try:
+        fd = os.open(CONFIG_FILE, flags, 0o600)
+        with os.fdopen(fd, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        try:
+            os.chmod(CONFIG_FILE, 0o600)
+        except Exception:
+            pass
+    except Exception:
+        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def migrate_auth_secrets():
+    """Hashes any legacy plaintext admin password and removes it from the store.
+
+    Older builds kept `security_auth.password` in cleartext. We now store only
+    a password hash in the `users` list; the legacy field is cleared and the
+    config file is locked down to 0600.
+    """
+    try:
+        cfg = load_integrations()
+        changed = False
+
+        # Build the hashed users list (auth_mgr migrates legacy transparently)
+        users = auth_mgr.get_users(cfg)
+        if users and cfg.get('users') is not users:
+            changed = True
+        if not cfg.get('users') and users:
+            cfg['users'] = users
+            changed = True
+
+        sec = cfg.get('security_auth')
+        if isinstance(sec, dict) and sec.get('password'):
+            # Keep the (hashed) credential available but drop the cleartext.
+            if not cfg.get('users'):
+                cfg['users'] = [{
+                    'username': sec.get('username', 'admin'),
+                    'password_hash': auth_mgr.hash_password(str(sec.get('password'))),
+                    'role': 'admin',
+                    'totp_secret': '',
+                    'totp_enabled': False,
+                    'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                }]
+            sec.pop('password', None)
+            sec['password_hashed'] = True
+            changed = True
+
+        if changed:
+            save_integrations(cfg)
+        try:
+            os.chmod(CONFIG_FILE, 0o600)
+        except Exception:
+            pass
+    except Exception as e:
+        print(f"[auth] migrate_auth_secrets failed: {e}")
 
 
 
@@ -11300,6 +11356,10 @@ def api_sip_history(exten):
 
 
 if __name__ == '__main__':
+    try:
+        migrate_auth_secrets()
+    except Exception:
+        pass
     try:
         threading.Thread(target=network_guardian_startup_check, daemon=True).start()
     except Exception:

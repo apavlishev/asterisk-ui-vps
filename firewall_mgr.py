@@ -38,7 +38,8 @@ DEFAULT_RULES = [
     {"id": "sip_tls", "name": "SIP TLS (защищённый)", "port": "5061", "proto": "tcp", "action": "allow", "source": "any", "builtin": False},
     {"id": "rtp", "name": "RTP (голос, медиапоток)", "port": "10000-20000", "proto": "udp", "action": "allow", "source": "any", "builtin": True},
     {"id": "sip_extra", "name": "Доп. SIP порт", "port": "5160", "proto": "udp", "action": "allow", "source": "any", "builtin": False},
-    {"id": "webrtc_wss", "name": "WebRTC софтфон (SIP over WSS)", "port": "8089", "proto": "tcp", "action": "allow", "source": "any", "builtin": False},
+    {"id": "webrtc_wss", "name": "WebRTC софтфон (SIP over WSS, HTTPS)", "port": "443", "proto": "tcp", "action": "allow", "source": "any", "builtin": False},
+    {"id": "webrtc_wss_legacy", "name": "WebRTC софтфон (устаревший порт WSS)", "port": "8089", "proto": "tcp", "action": "allow", "source": "any", "builtin": False},
     {"id": "dhcp_provision", "name": "Автопровиженинг телефонов (HTTP)", "port": "8080", "proto": "tcp", "action": "allow", "source": "any", "builtin": False},
 ]
 
@@ -49,6 +50,12 @@ BACKEND_LABELS = {
     "iptables": "iptables",
     "none": "—",
 }
+
+# Versioned default-rule migrations: (rule_id, old_default_port, new_default_port).
+# Applied only when the stored port still equals the old default.
+DEFAULT_RULE_MIGRATIONS = [
+    ("webrtc_wss", "8089", "443"),
+]
 
 
 def _run(cmd, timeout=15, input_text=None):
@@ -139,13 +146,26 @@ def save_state(state):
 
 
 def ensure_defaults(state=None):
+    """Adds missing default rules and applies known migrations.
+
+    Migrations update a default rule's port/proto only when its current value
+    still matches the *old* default (i.e. the admin hasn't customised it), so
+    user-edited rules are never silently overwritten.
+    """
     if state is None:
         state = load_state()
-    existing_ids = {r.get("id") for r in state.get("rules", [])}
+    rules = state.setdefault("rules", [])
+    existing = {r.get("id"): r for r in rules}
     changed = False
     for rule in DEFAULT_RULES:
-        if rule["id"] not in existing_ids:
-            state["rules"].append(dict(rule))
+        if rule["id"] not in existing:
+            rules.append(dict(rule))
+            changed = True
+    # Versioned migrations: old default port -> new default port
+    for rule_id, old_port, new_port in DEFAULT_RULE_MIGRATIONS:
+        r = existing.get(rule_id)
+        if r and str(r.get("port")) == str(old_port):
+            r["port"] = str(new_port)
             changed = True
     if changed:
         state["installed_defaults"] = True
@@ -504,6 +524,64 @@ def _backend_active(be=None):
     return False
 
 
+# ================= BOOT-TIME APPLY =================
+BOOT_APPLY_SCRIPT = "/usr/local/bin/asterisk-gui-firewall-apply.sh"
+BOOT_APPLY_UNIT = "asterisk-gui-firewall.service"
+
+
+def install_boot_apply_unit():
+    """Installs a systemd unit that re-applies the stored firewall rules on boot.
+
+    UFW/firewalld persist their own rules, but the panel's rule *set* lives in
+    firewall.json. If an admin (or an update) resets the backend, this unit
+    guarantees the panel's intended rules come back after a reboot.
+    """
+    try:
+        script = f"""#!/bin/bash
+# Re-apply Asterisk GUI firewall rules after boot.
+sleep 5
+python3 - <<'PYEOF'
+import sys
+sys.path.insert(0, "/opt/asterisk-gui")
+try:
+    import firewall_mgr
+    state = firewall_mgr.load_state()
+    if state.get("enabled"):
+        firewall_mgr.apply_rules(state, safe=False)
+        print("[firewall] boot rules applied")
+    else:
+        print("[firewall] disabled, skipping")
+except Exception as e:
+    print("[firewall] boot apply failed:", e)
+PYEOF
+"""
+        with open(BOOT_APPLY_SCRIPT, "w", encoding="utf-8") as f:
+            f.write(script)
+        os.chmod(BOOT_APPLY_SCRIPT, 0o755)
+        unit = f"""[Unit]
+Description=Asterisk GUI firewall rules (apply at boot)
+After=network-online.target ufw.service firewalld.service
+Wants=network-online.target
+Before=asterisk-gui.service
+
+[Service]
+Type=oneshot
+ExecStart={BOOT_APPLY_SCRIPT}
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+"""
+        with open(f"/etc/systemd/system/{BOOT_APPLY_UNIT}", "w", encoding="utf-8") as f:
+            f.write(unit)
+        _run(["systemctl", "daemon-reload"])
+        _run(["systemctl", "enable", BOOT_APPLY_UNIT])
+        return True
+    except Exception as e:
+        print(f"[firewall] boot apply unit install failed: {e}")
+        return False
+
+
 # ================= WATCHDOG =================
 WATCHDOG_SCRIPT = "/usr/local/bin/asterisk-gui-firewall-watchdog.sh"
 WATCHDOG_UNIT = "asterisk-gui-fw-watchdog.service"
@@ -576,6 +654,9 @@ def apply_rules(state=None, safe=True):
         ok, res = _apply_iptables(state.get("rules", []), state)
 
     save_state(state)
+    if ok:
+        # Ensure the panel's rules are re-applied after a reboot.
+        install_boot_apply_unit()
     if ok and safe:
         _schedule_safety_revert()
         res += " Авто-откат через 90 секунд, если не подтвердить."
