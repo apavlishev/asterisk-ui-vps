@@ -24,7 +24,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .config import settings
-from .licensing import activate, deactivate, issue_license, validate
+from .licensing import activate, deactivate, issue_license, issue_nonce, validate
 from .models import Activation, License, get_db, init_db
 from .signing import public_key_base64
 
@@ -62,15 +62,25 @@ def _startup():
 
 
 # ================= CLIENT API =================
+class ChallengeIn(BaseModel):
+    fingerprint: str = Field(min_length=4, max_length=128)
+
+
 class ActivateIn(BaseModel):
     license_key: str = Field(min_length=4, max_length=128)
     fingerprint: str = Field(min_length=4, max_length=128)
     hostname: str = ""
+    nonce: str = ""
+    device_pubkey: str = ""
+    device_sig: str = ""
 
 
 class ValidateIn(BaseModel):
     license_key: str
     fingerprint: str
+    nonce: str = ""
+    device_pubkey: str = ""
+    device_sig: str = ""
 
 
 class DeactivateIn(BaseModel):
@@ -88,11 +98,27 @@ def get_public_key():
     return {"algorithm": "ed25519", "public_key": public_key_base64()}
 
 
+@app.post("/api/v1/challenge")
+def api_challenge(body: ChallengeIn, request: Request, db: Session = Depends(get_db)):
+    """Issues a single-use nonce the device must sign for activate/validate."""
+    rate_limit(request)
+    nonce = issue_nonce(db, body.fingerprint)
+    return {
+        "status": "ok",
+        "nonce": nonce,
+        "ttl": 120,
+        "message_format": "{nonce}|{fingerprint}|{license_key}",
+    }
+
+
 @app.post("/api/v1/activate")
 def api_activate(body: ActivateIn, request: Request, db: Session = Depends(get_db)):
     rate_limit(request)
     ip = request.client.host if request.client else ""
-    payload, err, code = activate(db, body.license_key, body.fingerprint, ip, body.hostname)
+    payload, err, code = activate(
+        db, body.license_key, body.fingerprint, ip, body.hostname,
+        nonce=body.nonce, device_pubkey=body.device_pubkey, device_sig=body.device_sig,
+    )
     if err:
         raise HTTPException(status_code=code, detail=err)
     return {"status": "ok", "license": payload}
@@ -102,7 +128,10 @@ def api_activate(body: ActivateIn, request: Request, db: Session = Depends(get_d
 def api_validate(body: ValidateIn, request: Request, db: Session = Depends(get_db)):
     rate_limit(request)
     ip = request.client.host if request.client else ""
-    payload, err, code = validate(db, body.license_key, body.fingerprint, ip)
+    payload, err, code = validate(
+        db, body.license_key, body.fingerprint, ip,
+        nonce=body.nonce, device_pubkey=body.device_pubkey, device_sig=body.device_sig,
+    )
     if err:
         raise HTTPException(status_code=code, detail=err)
     return {"status": "ok", "license": payload}

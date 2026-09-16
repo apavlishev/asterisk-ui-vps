@@ -1,5 +1,5 @@
 {
-  "version": "3.18.2",
+  "version": "3.19.0",
   "released_at": "2026-09-16",
-  "changelog": "Релиз 3.18.2 — Задача лицензирования установки на сервер.\n- LICENSE_SERVER_TASK.md: привязка лицензии к конкретному серверу через fingerprint, чеклист внедрения и список доработок.\n- Компоненты license-server/ (FastAPI + Ed25519) и license_mgr.py уже реализованы."
+  "changelog": "Релиз 3.19.0 — Строгий challenge-response в лицензировании.\n- Сервер: endpoint /api/v1/challenge (одноразовый nonce, TTL 120с), проверка подписи устройства Ed25519, привязка device_pubkey к fingerprint.\n- Клиент: генерация и хранение Ed25519-ключа устройства (/opt/license_device_key.pem, 0600), подпись challenge при activate/validate.\n- Защита от replay (одноразовый nonce) и подмены ключа устройства.\n- Обновлена документация протокола и чеклист внедрения (LICENSE_SERVER_TASK.md, license-server/README.md)."
 }

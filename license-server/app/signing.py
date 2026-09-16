@@ -73,3 +73,22 @@ def verify_signature(payload: dict, signature_b64: str, public_key_b64: str) -> 
         return True
     except Exception:
         return False
+
+
+def verify_device_signature(message: bytes, signature_b64: str, public_key_b64: str) -> bool:
+    """Verifies a raw Ed25519 signature made by a device key over `message`."""
+    try:
+        pub_raw = base64.b64decode(public_key_b64)
+        pub = Ed25519PublicKey.from_public_bytes(pub_raw)
+        pub.verify(base64.b64decode(signature_b64), message)
+        return True
+    except Exception:
+        return False
+
+
+def challenge_message(nonce: str, fingerprint: str, license_key: str) -> bytes:
+    """Canonical message a device signs to prove ownership of its key.
+
+    Kept identical on the client (`license_mgr.py`) and server.
+    """
+    return f"{nonce}|{fingerprint}|{license_key}".encode("utf-8")

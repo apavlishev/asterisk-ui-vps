@@ -26,6 +26,7 @@ import os
 import time
 
 LICENSE_FILE = '/opt/license.json'
+DEVICE_KEY_FILE = '/opt/license_device_key.pem'
 
 # Ed25519 public key (base64) used to verify signed licenses.
 # Replace with the key printed by the license server (`manage.py public-key`).
@@ -84,6 +85,55 @@ def get_server_fingerprint():
     raw_id = ":".join(components) if components else "DEFAULT_SERVER_ID"
     h = hashlib.sha256(raw_id.encode()).hexdigest().upper()
     return f"LGC-{h[0:4]}-{h[4:8]}-{h[8:12]}-{h[12:16]}"
+
+
+# ================= DEVICE KEY (challenge-response) =================
+def _load_device_key():
+    """Loads (or creates) the device's Ed25519 private key."""
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+    if os.path.exists(DEVICE_KEY_FILE):
+        with open(DEVICE_KEY_FILE, 'rb') as f:
+            return serialization.load_pem_private_key(f.read(), password=None)
+    key = Ed25519PrivateKey.generate()
+    pem = key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
+    try:
+        os.makedirs(os.path.dirname(DEVICE_KEY_FILE), exist_ok=True)
+        with open(DEVICE_KEY_FILE, 'wb') as f:
+            f.write(pem)
+        os.chmod(DEVICE_KEY_FILE, 0o600)
+    except Exception:
+        pass
+    return key
+
+
+def get_device_public_key():
+    """Returns this server's device public key (base64), creating it if needed."""
+    from cryptography.hazmat.primitives import serialization
+    key = _load_device_key()
+    raw = key.public_key().public_bytes(
+        encoding=serialization.Encoding.Raw,
+        format=serialization.PublicFormat.Raw,
+    )
+    return base64.b64encode(raw).decode()
+
+
+def sign_challenge(nonce, fingerprint, license_key):
+    """Signs the canonical challenge message with the device key."""
+    key = _load_device_key()
+    message = f"{nonce}|{fingerprint}|{license_key}".encode("utf-8")
+    return base64.b64encode(key.sign(message)).decode()
+
+
+def _get_nonce(server_url, fingerprint, timeout=8):
+    r = requests.post(f"{server_url}/api/v1/challenge",
+                      json={"fingerprint": fingerprint}, timeout=timeout)
+    r.raise_for_status()
+    return r.json()["nonce"]
 
 
 # ================= SIGNATURE VERIFICATION =================
@@ -161,7 +211,7 @@ def load_license():
 
 # ================= REMOTE ACTIVATION / VALIDATION =================
 def activate(license_key=None, server_url=None, timeout=8):
-    """Activates this server against the license server. Returns (ok, data)."""
+    """Activates this server using challenge-response. Returns (ok, data)."""
     if requests is None:
         return False, {"error": "Библиотека requests недоступна"}
     server_url = (server_url or LICENSE_SERVER_URL or '').rstrip('/')
@@ -170,10 +220,16 @@ def activate(license_key=None, server_url=None, timeout=8):
         return False, {"error": "Не заданы LICENSE_SERVER_URL или LICENSE_KEY"}
     fp = get_server_fingerprint()
     try:
+        nonce = _get_nonce(server_url, fp, timeout=timeout)
+        device_pub = get_device_public_key()
+        device_sig = sign_challenge(nonce, fp, license_key)
         r = requests.post(f"{server_url}/api/v1/activate", json={
             "license_key": license_key,
             "fingerprint": fp,
             "hostname": os.uname().nodename if hasattr(os, "uname") else "",
+            "nonce": nonce,
+            "device_pubkey": device_pub,
+            "device_sig": device_sig,
         }, timeout=timeout)
         data = r.json() if r.content else {}
         if r.status_code == 200 and data.get("license"):
@@ -198,15 +254,23 @@ def revalidate(server_url=None, timeout=8):
     if not server_url:
         return False, {"error": "Не задан LICENSE_SERVER_URL"}
     try:
+        fp = get_server_fingerprint()
+        key = lic["license_key"]
+        nonce = _get_nonce(server_url, fp, timeout=timeout)
+        device_pub = get_device_public_key()
+        device_sig = sign_challenge(nonce, fp, key)
         r = requests.post(f"{server_url}/api/v1/validate", json={
-            "license_key": lic["license_key"],
-            "fingerprint": get_server_fingerprint(),
+            "license_key": key,
+            "fingerprint": fp,
+            "nonce": nonce,
+            "device_pubkey": device_pub,
+            "device_sig": device_sig,
         }, timeout=timeout)
         data = r.json() if r.content else {}
         if r.status_code == 200 and data.get("license"):
             new = data["license"]
             if verify_license_signature(new, LICENSE_PUBLIC_KEY or new.get("public_key")):
-                _store(lic["license_key"], new)
+                _store(key, new)
                 return True, new
         return False, {"error": data.get("detail") or f"HTTP {r.status_code}"}
     except Exception as e:

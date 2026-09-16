@@ -40,8 +40,9 @@ export LICENSE_ADMIN_TOKEN="dev-admin"
 |-------|------|-----------|
 | GET  | `/health` | Проверка живости |
 | GET  | `/api/v1/public-key` | Публичный ключ подписи (Ed25519, base64) |
-| POST | `/api/v1/activate` | `{license_key, fingerprint, hostname}` → подписанная лицензия |
-| POST | `/api/v1/validate` | Продление lease (revalidate) |
+| POST | `/api/v1/challenge` | `{fingerprint}` → одноразовый nonce (TTL 120с) |
+| POST | `/api/v1/activate` | `{license_key, fingerprint, nonce, device_pubkey, device_sig, hostname}` → подписанная лицензия |
+| POST | `/api/v1/validate` | Продление lease (challenge-response) |
 | POST | `/api/v1/deactivate` | Отзыв активации |
 | POST | `/admin/licenses` | (admin) создать лицензию |
 | GET  | `/admin/licenses` | (admin) список |
@@ -49,6 +50,24 @@ export LICENSE_ADMIN_TOKEN="dev-admin"
 | POST | `/admin/licenses/{key}/revoke/{fp}` | (admin) отозвать |
 
 Авторизация админки: `Authorization: Bearer $LICENSE_ADMIN_TOKEN`.
+
+## Протокол (challenge-response)
+
+Два ключа Ed25519:
+- **сервера** — подписывает лицензию (клиент проверяет офлайн);
+- **устройства** — клиент подписывает nonce (сервер проверяет онлайн).
+
+```
+1. POST /api/v1/challenge {fingerprint}          → {nonce}
+2. message = "{nonce}|{fingerprint}|{license_key}"
+   device_sig = Ed25519_sign(device_priv, message)
+3. POST /api/v1/activate {..., nonce, device_pubkey, device_sig}
+   сервер: nonce одноразовый → проверка подписи → привязка fp↔pubkey
+   → подпись лицензии ключом сервера
+```
+
+nonce одноразовый (TTL 120с), `device_pubkey` привязывается к fingerprint при
+первой активации. Это исключает replay и подмену ключа.
 
 ## Формат лицензии (ответ `/activate`)
 ```json
@@ -72,6 +91,8 @@ export LICENSE_ADMIN_TOKEN="dev-admin"
 Клиентская часть — в `license_mgr.py` панели:
 `activate()`, `revalidate()`, `maybe_revalidate_daily()`,
 `load_license()` (проверяет подпись/привязку/срок), откат на Free Core.
+При активации клиент создаёт Ed25519-ключ устройства (`/opt/license_device_key.pem`,
+0600) и проходит challenge-response.
 
 ## Деплой
 См. `deploy/README.md`.

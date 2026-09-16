@@ -76,6 +76,9 @@ class Activation(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     license_id: Mapped[int] = mapped_column(ForeignKey("licenses.id", ondelete="CASCADE"), index=True)
     fingerprint: Mapped[str] = mapped_column(String(128), index=True)
+    # Ed25519 public key of the *device* (panel host), base64. Proves the
+    # activation request really comes from the owner of this fingerprint.
+    device_pubkey: Mapped[str] = mapped_column(String(256), default="")
     ip: Mapped[str] = mapped_column(String(64), default="")
     hostname: Mapped[str] = mapped_column(String(255), default="")
     revoked: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -83,6 +86,19 @@ class Activation(Base):
     activated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     license: Mapped[License] = relationship(back_populates="activations")
+
+
+class Challenge(Base):
+    """One-time nonce issued to a client for challenge-response auth."""
+
+    __tablename__ = "challenges"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    nonce: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    fingerprint: Mapped[str] = mapped_column(String(128), default="")
+    used: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    expires_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
 
 
 class AuditLog(Base):

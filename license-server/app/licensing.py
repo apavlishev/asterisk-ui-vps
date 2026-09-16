@@ -10,12 +10,54 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from .config import settings
-from .models import Activation, AuditLog, License
-from .signing import public_key_base64, sign_payload
+from .models import Activation, AuditLog, Challenge, License
+from .signing import (
+    challenge_message,
+    public_key_base64,
+    sign_payload,
+    verify_device_signature,
+)
+
+NONCE_TTL_SECONDS = 120
 
 
 def now_utc() -> datetime.datetime:
     return datetime.datetime.now(datetime.timezone.utc)
+
+
+def issue_nonce(db: Session, fingerprint: str) -> str:
+    """Creates a single-use nonce for challenge-response authentication."""
+    nonce = secrets.token_urlsafe(24)
+    db.add(Challenge(
+        nonce=nonce,
+        fingerprint=fingerprint or "",
+        expires_at=now_utc() + datetime.timedelta(seconds=NONCE_TTL_SECONDS),
+    ))
+    db.commit()
+    return nonce
+
+
+def consume_nonce(db: Session, nonce: str) -> bool:
+    """Validates a nonce once; returns False if unknown/expired/already used."""
+    if not nonce:
+        return False
+    row = db.scalar(select(Challenge).where(Challenge.nonce == nonce))
+    if not row or row.used:
+        return False
+    if _aware(row.expires_at) and _aware(row.expires_at) < now_utc():
+        return False
+    row.used = True
+    db.commit()
+    return True
+
+
+def verify_device_proof(nonce: str, fingerprint: str, license_key: str,
+                        device_pubkey: str, device_sig: str) -> bool:
+    """Checks the device's Ed25519 signature over (nonce|fingerprint|license_key)."""
+    if not device_pubkey or not device_sig:
+        return False
+    msg = challenge_message(nonce, fingerprint, license_key)
+    return verify_device_signature(msg, device_sig, device_pubkey)
 
 
 def _aware(dt: datetime.datetime | None) -> datetime.datetime | None:
@@ -80,8 +122,15 @@ def issue_license(db: Session, *, tier="Pro", max_users=50, max_activations=None
     return row
 
 
-def activate(db: Session, license_key: str, fingerprint: str, ip: str, hostname: str):
-    """Returns (payload_dict, None) or (None, error_message, status_code)."""
+def activate(db: Session, license_key: str, fingerprint: str, ip: str, hostname: str,
+             nonce: str = "", device_pubkey: str = "", device_sig: str = ""):
+    """Returns (payload_dict, error_message, status_code)."""
+    # 1. Challenge-response: prove ownership of the device key.
+    if not consume_nonce(db, nonce):
+        return None, "Недействительный или истёкший nonce", 401
+    if not verify_device_proof(nonce, fingerprint, license_key, device_pubkey, device_sig):
+        return None, "Неверная подпись устройства", 401
+
     row = db.scalar(select(License).where(License.license_key == license_key))
     if not row:
         return None, "Лицензионный ключ не найден", 404
@@ -99,6 +148,11 @@ def activate(db: Session, license_key: str, fingerprint: str, ip: str, hostname:
         )
     )
     if existing:
+        # Bind the device key on first successful activation; afterwards the
+        # same key must always be presented (defence against key substitution).
+        if existing.device_pubkey and existing.device_pubkey != device_pubkey:
+            return None, "Для этого сервера уже привязан другой ключ устройства", 409
+        existing.device_pubkey = device_pubkey
         existing.ip = ip
         existing.hostname = hostname
         existing.last_seen = now_utc()
@@ -112,8 +166,8 @@ def activate(db: Session, license_key: str, fingerprint: str, ip: str, hostname:
         if row.max_activations and active_count >= row.max_activations:
             return None, f"Достигнут лимит активаций ({row.max_activations}) для этой лицензии", 409
         db.add(Activation(
-            license_id=row.id, fingerprint=fingerprint, ip=ip,
-            hostname=hostname, last_seen=now_utc(),
+            license_id=row.id, fingerprint=fingerprint, device_pubkey=device_pubkey,
+            ip=ip, hostname=hostname, last_seen=now_utc(),
         ))
 
     payload = build_payload(row, fingerprint, settings.LEASE_DAYS)
@@ -123,7 +177,13 @@ def activate(db: Session, license_key: str, fingerprint: str, ip: str, hostname:
     return payload, None, 200
 
 
-def validate(db: Session, license_key: str, fingerprint: str, ip: str):
+def validate(db: Session, license_key: str, fingerprint: str, ip: str,
+             nonce: str = "", device_pubkey: str = "", device_sig: str = ""):
+    if not consume_nonce(db, nonce):
+        return None, "Недействительный или истёкший nonce", 401
+    if not verify_device_proof(nonce, fingerprint, license_key, device_pubkey, device_sig):
+        return None, "Неверная подпись устройства", 401
+
     row = db.scalar(select(License).where(License.license_key == license_key))
     if not row or not row.active:
         return None, "Лицензия неактивна", 403
@@ -139,6 +199,8 @@ def validate(db: Session, license_key: str, fingerprint: str, ip: str):
     )
     if not act:
         return None, "Устройство не активировано для этой лицензии", 404
+    if act.device_pubkey and act.device_pubkey != device_pubkey:
+        return None, "Неверный ключ устройства", 401
     act.last_seen = now_utc()
     act.ip = ip
     payload = build_payload(row, fingerprint, settings.LEASE_DAYS)
