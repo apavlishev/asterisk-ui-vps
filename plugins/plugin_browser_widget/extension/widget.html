@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Виджет-телефон</title>
+<link rel="stylesheet" href="widget.css">
+</head>
+<body>
+<div id="app" class="widget">
+  <header class="w-head">
+    <span class="w-logo">☎</span>
+    <span id="w-title" class="w-title">Виджет-телефон</span>
+    <span id="w-status" class="w-status off">не подключён</span>
+    <button id="w-settings-toggle" class="w-icon-btn" title="Настройки">⚙</button>
+    <button id="w-min" class="w-icon-btn" title="Свернуть">▁</button>
+  </header>
+
+  <section id="w-body" class="w-body">
+    <!-- INCOMING / ACTIVE CALL -->
+    <div id="w-call" class="w-call hidden">
+      <div class="w-peer">
+        <div id="w-peer-num" class="w-peer-num">—</div>
+        <div id="w-peer-name" class="w-peer-name"></div>
+        <div id="w-timer" class="w-timer">00:00</div>
+      </div>
+      <div class="w-call-actions">
+        <button id="w-answer" class="w-btn answer hidden" title="Ответить">Ответить</button>
+        <button id="w-hangup" class="w-btn hangup" title="Завершить">Завершить</button>
+        <button id="w-mute" class="w-btn ghost" title="Микрофон">Mute</button>
+        <button id="w-dtmf" class="w-btn ghost" title="DTMF">DTMF</button>
+      </div>
+      <div id="w-dtmf-pad" class="w-dtmf hidden"></div>
+    </div>
+
+    <!-- IDLE DIALER -->
+    <div id="w-dialer" class="w-dialer">
+      <input id="w-target" class="w-input" type="text" placeholder="Номер или внутренний" autocomplete="off">
+      <div class="w-row">
+        <button id="w-call-webrtc" class="w-btn primary" title="Позвонить из браузера (WebRTC)">Звонок (WebRTC)</button>
+        <button id="w-call-c2c" class="w-btn" title="Позвонить через АТС (click-to-call)">Click-to-call</button>
+      </div>
+      <div class="w-row">
+        <button id="w-register" class="w-btn ghost small">Подключить WebRTC</button>
+        <button id="w-lookup" class="w-btn ghost small" title="Найти номер на странице">Номер со страницы</button>
+      </div>
+    </div>
+
+    <div id="w-log" class="w-log"></div>
+
+    <!-- SETTINGS -->
+    <div id="w-settings" class="w-settings hidden">
+      <label class="w-label">Адрес АТС (панели)</label>
+      <input id="s-server" class="w-input" type="text" placeholder="138.124.229.10:8888">
+
+      <label class="w-label">API-ключ (X-API-Key)</label>
+      <input id="s-apikey" class="w-input" type="text" placeholder="sk_...">
+
+      <label class="w-label">Мой внутренний номер (оператор)</label>
+      <input id="s-exten" class="w-input" type="text" placeholder="101">
+
+      <label class="w-label">Пароль SIP (WebRTC)</label>
+      <input id="s-password" class="w-input" type="text" placeholder="пароль софтфона">
+
+      <label class="w-label">WSS-адрес (WebRTC, необязательно)</label>
+      <input id="s-ws" class="w-input" type="text" placeholder="wss://138.124.229.10/ws">
+
+      <div class="w-row">
+        <button id="s-save" class="w-btn primary small">Сохранить</button>
+        <button id="s-autofill" class="w-btn ghost small">Получить с АТС</button>
+      </div>
+      <div id="s-hint" class="w-hint"></div>
+    </div>
+  </section>
+</div>
+<script type="module">
+  import { boot } from './widget.js';
+  boot();
+</script>
+</body>
+</html>

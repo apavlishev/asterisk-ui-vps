@@ -1,0 +1,125 @@
+<div class="space-y-6">
+    <div class="bg-surface rounded-2xl p-6 sm:p-8 border border-outline/30 shadow-sm">
+        <div class="flex items-start gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 text-cyan-600 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-3xl">phone_in_talk</span>
+            </div>
+            <div class="flex-1">
+                <h2 class="text-xl font-bold text-on-surface">{{ t.bw_title or 'Виджет-телефон для браузера' }}</h2>
+                <p class="text-xs text-on-surface-variant mt-1 max-w-2xl">
+                    {{ t.bw_intro or 'Расширение для Chrome, Edge и Firefox: всплывает как телефон на любой странице (в том числе в CRM), звонит через WebRTC прямо из браузера или через click-to-call API, распознаёт номера на странице и показывает входящие.' }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- STEP 1: API KEY -->
+        <div class="p-5 rounded-2xl bg-surface border border-outline/30 shadow-sm space-y-3">
+            <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-cyan-600 text-[18px]">key</span>
+                {{ t.bw_step1 or '1. API-ключ' }}
+            </h3>
+            <p class="text-xs text-on-surface-variant">
+                {{ t.bw_step1_hint or 'Виджет обращается к панели по API-ключу. Это тот же токен, что и для вебхуков.' }}
+            </p>
+            <div class="flex items-center gap-2">
+                <input id="bw-api-token" type="text" readonly
+                       value="{{ integrations.webhooks.api_token if integrations.webhooks else '' }}"
+                       class="flex-1 px-3 py-2 rounded-xl bg-surface-container-low border border-outline text-xs font-mono text-on-surface">
+                <button type="button" onclick="bwCopy('bw-api-token')" class="px-3 py-2 rounded-xl bg-surface border border-outline/30 text-xs font-semibold hover:bg-surface-container">
+                    {{ t.bw_copy or 'Копировать' }}
+                </button>
+            </div>
+            <p class="text-[11px] text-on-surface-variant">
+                {{ t.bw_step1_more or 'Сменить ключ можно в разделе «Вебхуки / API».' }}
+            </p>
+        </div>
+
+        <!-- STEP 2: DOWNLOAD -->
+        <div class="p-5 rounded-2xl bg-surface border border-outline/30 shadow-sm space-y-3">
+            <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-cyan-600 text-[18px]">download</span>
+                {{ t.bw_step2 or '2. Скачать расширение' }}
+            </h3>
+            <p class="text-xs text-on-surface-variant">
+                {{ t.bw_step2_hint or 'Скачайте архив для вашего браузера и установите его как «распакованное расширение».' }}
+            </p>
+            <div class="flex flex-wrap gap-2">
+                <a href="/api/widget/download?target=chrome" class="px-3.5 py-2 rounded-xl bg-cyan-600 text-white text-xs font-bold hover:bg-cyan-700 transition-all inline-flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[16px]">download</span> Chrome / Edge / Opera
+                </a>
+                <a href="/api/widget/download?target=firefox" class="px-3.5 py-2 rounded-xl bg-surface border border-outline/30 text-xs font-bold hover:bg-surface-container transition-all inline-flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[16px]">download</span> Firefox
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 3: SETTINGS INSIDE WIDGET -->
+    <div class="p-5 rounded-2xl bg-surface border border-outline/30 shadow-sm space-y-3">
+        <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
+            <span class="material-symbols-outlined text-cyan-600 text-[18px]">settings</span>
+            {{ t.bw_step3 or '3. Установка и настройка' }}
+        </h3>
+        <ol class="text-xs text-on-surface-variant space-y-1.5 list-decimal list-inside leading-relaxed">
+            <li>{{ t.bw_step3_1 or 'Chrome/Edge: откройте chrome://extensions → включите «Режим разработчика» → «Загрузить распакованное расширение» → выберите папку из архива.' }}</li>
+            <li>{{ t.bw_step3_2 or 'Firefox: откройте about:debugging#/runtime/this-firefox → «Загрузить временное дополнение» → выберите manifest.json.' }}</li>
+            <li>{{ t.bw_step3_3 or 'Нажмите на иконку расширения, откройте ⚙ и укажите адрес панели и API-ключ, затем «Получить с АТС».' }}</li>
+            <li>{{ t.bw_step3_4 or 'Введите свой внутренний номер — для WebRTC также потребуется SIP-пароль (кнопка «Получить с АТС» подставит его автоматически, если номер включён для WebRTC).' }}</li>
+        </ol>
+    </div>
+
+    <!-- FEATURES / MODES -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-5 rounded-2xl bg-surface-container-low border border-outline/20 space-y-2">
+            <h4 class="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-2">
+                <span class="material-symbols-outlined text-cyan-600 text-[16px]">graphic_eq</span>
+                {{ t.bw_mode_webrtc or 'Режим WebRTC' }}
+            </h4>
+            <p class="text-xs text-on-surface-variant leading-relaxed">
+                {{ t.bw_mode_webrtc_hint or 'Звонок идёт прямо из браузера по SIP-over-WSS (нужен порт 443 на АТС). Входящие всплывают в виджете, доступны ответ, mute и DTMF.' }}
+            </p>
+        </div>
+        <div class="p-5 rounded-2xl bg-surface-container-low border border-outline/20 space-y-2">
+            <h4 class="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-2">
+                <span class="material-symbols-outlined text-cyan-600 text-[16px]">call_made</span>
+                {{ t.bw_mode_c2c or 'Режим Click-to-call' }}
+            </h4>
+            <p class="text-xs text-on-surface-variant leading-relaxed">
+                {{ t.bw_mode_c2c_hint or 'Панель звонит на ваш обычный телефон/софтфон, а затем соединяет с клиентом. Работает без WebRTC и без SIP-пароля.' }}
+            </p>
+        </div>
+    </div>
+
+    <!-- API QUICK REF -->
+    <div class="p-5 rounded-2xl bg-surface border border-outline/30 shadow-sm space-y-3">
+        <h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
+            <span class="material-symbols-outlined text-cyan-600 text-[18px]">api</span>
+            {{ t.bw_api or 'API виджета' }}
+        </h3>
+        <div class="text-[11px] font-mono text-on-surface-variant space-y-2">
+            <div class="p-3 rounded-xl bg-surface-container-low border border-outline/20 overflow-x-auto">
+                <div class="text-cyan-600 font-bold">POST /api/widget/call</div>
+                <div class="mt-1">X-API-Key: {{ integrations.webhooks.api_token if integrations.webhooks else 'sk_...' }}</div>
+                <div>{"operator":"101","phone":"+79260000000"}</div>
+            </div>
+            <div class="p-3 rounded-xl bg-surface-container-low border border-outline/20 overflow-x-auto">
+                <div class="text-cyan-600 font-bold">GET /api/widget/config?exten=101</div>
+                <div class="mt-1">X-API-Key: {{ integrations.webhooks.api_token if integrations.webhooks else 'sk_...' }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function bwCopy(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.select();
+        el.setSelectionRange(0, 99999);
+        try { navigator.clipboard.writeText(el.value); } catch (e) { document.execCommand('copy'); }
+        const btn = el.nextElementSibling;
+        if (btn) { const old = btn.textContent; btn.textContent = '✓'; setTimeout(() => btn.textContent = old, 1200); }
+    }
+</script>

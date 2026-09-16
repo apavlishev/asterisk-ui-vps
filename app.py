@@ -258,6 +258,15 @@ def check_security_and_auth():
     if request.path.startswith('/provisioning/'):
         return None
 
+    # Browser-widget endpoints authenticate via the X-API-Key header inside
+    # the handler (the extension has no panel session), so skip session auth.
+    if request.path.startswith('/api/widget/'):
+        return None
+
+    # Public download of the browser extension package
+    if request.path.startswith('/api/widget/download'):
+        return None
+
     cfg = load_integrations()
     auth_cfg = cfg.get('security_auth', {})
 
@@ -10158,6 +10167,119 @@ def api_calls_park():
         return jsonify({'success': False, 'error': 'Не указан канал'})
     out = run_asterisk(f'park {channel}')
     return jsonify({'success': bool(out), 'message': out})
+
+
+# ================= BROWSER SOFTPHONE WIDGET API =================
+def _widget_cors(resp):
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key'
+    resp.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    return resp
+
+
+def _widget_check_key():
+    """Validates the X-API-Key header against the panel webhook token."""
+    cfg = load_integrations()
+    expected = (cfg.get('webhooks') or {}).get('api_token') or ''
+    provided = (request.headers.get('X-API-Key') or request.args.get('token') or '').strip()
+    return bool(expected) and provided == expected
+
+
+@app.route('/api/widget/ping', methods=['GET', 'OPTIONS'])
+def api_widget_ping():
+    if request.method == 'OPTIONS':
+        return _widget_cors(make_response('', 204))
+    resp = jsonify({'status': 'ok', 'service': 'asterisk-widget', 'version': '1.0.0'})
+    return _widget_cors(resp)
+
+
+@app.route('/api/widget/call', methods=['POST', 'OPTIONS'])
+def api_widget_call():
+    """Click-to-call for the browser widget: rings the operator, then dials out."""
+    if request.method == 'OPTIONS':
+        return _widget_cors(make_response('', 204))
+    if not _widget_check_key():
+        return _widget_cors(jsonify({'status': 'error', 'error': 'Неверный API-ключ'})), 401
+    data = request.get_json(silent=True) or {}
+    cfg = load_integrations()
+    phone = _normalize_number(data.get('phone') or data.get('to') or '')
+    operator = _normalize_number(data.get('operator') or '') or str(
+        (cfg.get('webhooks') or {}).get('default_operator') or '101')
+    if not phone:
+        return _widget_cors(jsonify({'status': 'error', 'error': 'Не указан номер клиента'}))
+    if not operator:
+        return _widget_cors(jsonify({'status': 'error', 'error': 'Не указан оператор'}))
+
+    channel = f"PJSIP/{operator}"
+    ok, msg = ami_originate(channel, phone, context='from-internal', caller_id=f"<{operator}>")
+    if not ok:
+        out = run_asterisk(f'channel originate PJSIP/{operator} extension {phone}@from-internal')
+        ok = 'Success' in out or 'Originate' in out or not out
+        msg = out or msg
+    try:
+        auth_mgr.audit(operator, 'widget_click2call', phone)
+    except Exception:
+        pass
+    return _widget_cors(jsonify({
+        'status': 'success' if ok else 'error',
+        'message': msg if ok else (msg or 'Не удалось инициировать вызов'),
+        'operator': operator,
+        'phone': phone,
+    }))
+
+
+@app.route('/api/widget/config', methods=['GET', 'OPTIONS'])
+def api_widget_config():
+    """Returns everything the extension needs to auto-configure itself."""
+    if request.method == 'OPTIONS':
+        return _widget_cors(make_response('', 204))
+    if not _widget_check_key():
+        return _widget_cors(jsonify({'status': 'error', 'error': 'Неверный API-ключ'})), 401
+    host = request.host.split(':')[0]
+    exten = (request.args.get('exten') or '').strip()
+    password = ''
+    if exten:
+        entry = get_webrtc_extensions().get(exten)
+        if entry:
+            password = entry.get('password') or ''
+    return _widget_cors(jsonify({
+        'status': 'ok',
+        'server': f"{host}:{request.host.split(':')[1]}" if ':' in request.host else host,
+        'ws_url': _webrtc_ws_url(host),
+        'exten': exten,
+        'password': password,
+    }))
+
+
+@app.route('/api/widget/download', methods=['GET'])
+def api_widget_download():
+    """Serves the browser extension as a ZIP (built on the fly)."""
+    import io
+    import zipfile
+    ext_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                           'plugins', 'plugin_browser_widget', 'extension')
+    if not os.path.isdir(ext_dir):
+        return 'Extension bundle not found', 404
+    target = (request.args.get('target') or 'chrome').lower()
+    manifest_src = os.path.join(ext_dir, 'manifest.firefox.json' if target == 'firefox' else 'manifest.chrome.json')
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
+        for root, _dirs, files in os.walk(ext_dir):
+            for fn in files:
+                full = os.path.join(root, fn)
+                rel = os.path.relpath(full, ext_dir)
+                # Manifest variants are folded into a single manifest.json
+                if rel in ('manifest.chrome.json', 'manifest.firefox.json'):
+                    continue
+                zf.write(full, rel)
+        if os.path.exists(manifest_src):
+            with open(manifest_src, 'r', encoding='utf-8') as f:
+                zf.writestr('manifest.json', f.read())
+    buf.seek(0)
+    resp = make_response(buf.read())
+    resp.headers['Content-Type'] = 'application/zip'
+    resp.headers['Content-Disposition'] = f'attachment; filename="asterisk-widget-{target}.zip"'
+    return resp
 
 
 # ================= CDR ANALYTICS & RECORDINGS API =================

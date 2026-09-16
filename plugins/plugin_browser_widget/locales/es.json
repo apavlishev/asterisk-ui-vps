@@ -1,0 +1,4 @@
+{
+  "name": "Browser Softphone Widget",
+  "desc": "Browser extension widget: pops up as a phone on any page, calls via WebRTC or click-to-call, detects numbers and shows incoming calls."
+}

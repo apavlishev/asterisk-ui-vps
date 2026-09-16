@@ -1,0 +1,15 @@
+{
+  "id": "browser_widget",
+  "name": "Browser Softphone Widget",
+  "name_ru": "Виджет-телефон для браузера",
+  "version": "v1.0.0",
+  "author": "Asterisk Logic Core",
+  "description": "Браузерное расширение-виджет: всплывает как телефон на любой странице (в т.ч. в CRM), звонит через WebRTC прямо из браузера или через click-to-call API, распознаёт номера на странице и показывает входящие вызовы.",
+  "category": "crm",
+  "category_name": "CRM & Бизнес",
+  "icon": "phone_in_talk",
+  "color": "cyan-500",
+  "rating": "5.0 (1)",
+  "price": "Free",
+  "price_sub": "Included"
+}
