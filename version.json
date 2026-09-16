@@ -1,5 +1,5 @@
 {
-  "version": "3.17.0",
+  "version": "3.18.0",
   "released_at": "2026-09-16",
-  "changelog": "Релиз 3.17.0 — Безопасность и надёжность фаервола:\n- WSS-порт 443 добавлен в базовые правила фаервола; автоматическая миграция правила webrtc_wss с 8089 на 443 (устаревший 8089 сохранён отдельным правилом).\n- Новый systemd-юнит asterisk-gui-firewall.service: автоматическое применение правил фаервола при загрузке сервера.\n- Пароль администратора больше не хранится в открытом виде: миграция на scrypt-хеш (werkzeug) в таблице users, удаление cleartext из security_auth, chmod 600 на конфиг интеграций.\n- save_integrations сохраняет конфиг с правами 0600."
+  "changelog": "Релиз 3.18.0 — Сервер лицензирования и клиент лицензий:\n- Новый компонент license-server/ (FastAPI + SQLAlchemy): выдача подписанных Ed25519 лицензий, привязанных к fingerprint сервера.\n- Endpoints активации/валидации/деактивации, админ-API, rate-limiting, аудит, CLI управления (manage.py).\n- Клиент license_mgr.py: проверка подписи Ed25519, привязка к железу, offline grace до expires_at, откат на Free Core, методы activate()/revalidate()/maybe_revalidate_daily().\n- Деплой: systemd-юнит и инструкция с nginx/Let's Encrypt (license-server/deploy/)."
 }

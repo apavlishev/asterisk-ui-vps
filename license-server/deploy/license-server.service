@@ -1,0 +1,16 @@
+[Unit]
+Description=Logic Core License Server
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/license-server
+EnvironmentFile=/opt/license-server/.env
+ExecStart=/opt/license-server/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=3
+User=license
+
+[Install]
+WantedBy=multi-user.target
