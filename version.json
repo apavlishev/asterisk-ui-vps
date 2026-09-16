@@ -1,5 +1,5 @@
 {
-  "version": "3.18.0",
+  "version": "3.18.1",
   "released_at": "2026-09-16",
-  "changelog": "Релиз 3.18.0 — Сервер лицензирования и клиент лицензий:\n- Новый компонент license-server/ (FastAPI + SQLAlchemy): выдача подписанных Ed25519 лицензий, привязанных к fingerprint сервера.\n- Endpoints активации/валидации/деактивации, админ-API, rate-limiting, аудит, CLI управления (manage.py).\n- Клиент license_mgr.py: проверка подписи Ed25519, привязка к железу, offline grace до expires_at, откат на Free Core, методы activate()/revalidate()/maybe_revalidate_daily().\n- Деплой: systemd-юнит и инструкция с nginx/Let's Encrypt (license-server/deploy/)."
+  "changelog": "Релиз 3.18.1 — Документация отложенной задачи: Device Attestation для Telegram-транка.\n- Добавлен TELEGRAM_DEVICE_ATTESTATION.md: подтверждение подлинности официального Telegram APK и реальности устройства (Google Play Integrity, Huawei Safety Detect/SysIntegrity, Apple App Attest).\n- Описаны архитектура nonce/challenge, серверная верификация, точки интеграции с plugin_telegram_trunk, ограничения и открытые вопросы."
 }
