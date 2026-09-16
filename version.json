@@ -1,5 +1,5 @@
 {
-  "version": "3.14.0",
+  "version": "3.15.0",
   "released_at": "2026-09-16",
-  "changelog": "Релиз 3.14.0 — Документация автопровиженинга и починка веб-софтфона:\n- На странице «Автопровиженинг IP-телефонов» добавлен раскрывающийся раздел справки «Как это работает».\n- Описаны принцип работы, архитектура и адреса, генерация SIP-паролей, поддерживаемые вендоры и быстрый старт.\n- Новые ключи локализации prov_docs_* в ru/en (остальные языки — через tools/translate_locales.py).\n- Исправлен веб-софтфон: sip.js@0.21.2 не содержит UMD-сборки dist/sip.min.js (404).\n- Загрузка SIP.js переведена на динамический import() ESM-бандла jsDelivr с кешированием и присвоением window.SIP."
+  "changelog": "Релиз 3.15.0 — Починка SIP-over-WSS (веб-софтфон):\n- Исправлен конфликт портов в http.conf: HTTP (8088) и HTTPS/WSS (8089) больше не занимают один порт.\n- ensure_webrtc_http_conf теперь жёстко приводит bindaddr/bindport/tlsbindaddr/tlscertfile/tlsprivatekey к корректным значениям.\n- Автоматическое исправление прав на TLS-ключ (asterisk:asterisk 640) — иначе TLS-листенер не поднимался.\n- Автоматическое отключение legacy chan_sip (noload), который регистрирует WebSocket-протокол 'sip' и блокирует res_pjsip_transport_websocket.\n- Эндпоинт /api/webrtc/setup теперь перезапускает Asterisk (http reload не существует, res_http_websocket не перезагружается)."
 }

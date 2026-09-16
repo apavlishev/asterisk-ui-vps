@@ -4213,6 +4213,11 @@ AMI_SECRET = None
 WEBRTC_CERT_DIR = '/etc/asterisk/keys'
 WEBRTC_HTTP_CONF = '/etc/asterisk/http.conf'
 WEBRTC_WS_PORT = 8089
+# Plain (non-TLS) Asterisk HTTP port. It MUST differ from WEBRTC_WS_PORT:
+# binding both the plain and the TLS listener to the same port makes Asterisk
+# serve plain HTTP on that port and silently drop the TLS listener, which
+# breaks SIP-over-WSS (browsers fail with WebSocket code 1006).
+WEBRTC_HTTP_PORT = 8088
 _webrtc_cert_cache = {'fingerprint': None, 'path': None, 'mtime': 0}
 
 
@@ -4271,8 +4276,38 @@ def _webrtc_ws_url(host):
     return f"wss://{host}:{WEBRTC_WS_PORT}/ws"
 
 
+def _disable_legacy_chan_sip():
+    """Ensures `chan_sip` is not autoloaded.
+
+    The legacy chan_sip driver registers the `sip` WebSocket sub-protocol at
+    startup, which makes `res_pjsip_transport_websocket` decline to load. As a
+    result SIP-over-WSS (the browser softphone) never comes up. chan_sip is
+    deprecated and, when this panel manages pjsip.conf, unused.
+    """
+    modules_conf = '/etc/asterisk/modules.conf'
+    if not os.path.exists(modules_conf):
+        return False
+    try:
+        with open(modules_conf, 'r', encoding='utf-8') as f:
+            content = f.read()
+        if re.search(r'^\s*noload\s*=>\s*chan_sip\.so\s*$', content, re.MULTILINE):
+            return True
+        entry = 'noload => chan_sip.so'
+        if re.search(r'^\[modules\]\s*$', content, re.MULTILINE):
+            content = re.sub(r'^\[modules\]\s*$', f'[modules]\n{entry}', content, count=1, flags=re.MULTILINE)
+        else:
+            content = f'[modules]\n{entry}\n' + content
+        with open(modules_conf, 'w', encoding='utf-8') as f:
+            f.write(content)
+        return True
+    except Exception as e:
+        print(f"[webrtc] could not disable chan_sip: {e}")
+        return False
+
+
 def ensure_webrtc_http_conf(host=None, force=False):
     """Provisions http.conf + self-signed TLS cert so SIP-over-WSS works out of the box."""
+    _disable_legacy_chan_sip()
     keys_dir = WEBRTC_CERT_DIR
     cert = os.path.join(keys_dir, 'asterisk.pem')
     key = os.path.join(keys_dir, 'asterisk.key')
@@ -4296,12 +4331,30 @@ def ensure_webrtc_http_conf(host=None, force=False):
     if not os.path.exists(cert) or not os.path.exists(key):
         return False
 
+    # Asterisk drops privileges to the `asterisk` user; a root-only private
+    # key makes the TLS listener fail to start.
+    try:
+        import grp
+        import pwd
+        uid = pwd.getpwnam('asterisk').pw_uid
+        gid = grp.getgrnam('asterisk').gr_gid
+        os.chown(key, uid, gid)
+        os.chmod(key, 0o640)
+        os.chown(cert, uid, gid)
+        os.chmod(cert, 0o644)
+    except Exception:
+        # Non-Asterisk/rootless setups: fall back to world-readable key
+        try:
+            os.chmod(key, 0o640)
+        except Exception:
+            pass
+
     http_conf = WEBRTC_HTTP_CONF
     desired = [
         '[general]',
         'enabled=yes',
-        f'bindaddr=0.0.0.0',
-        f'bindport={WEBRTC_WS_PORT}',
+        'bindaddr=0.0.0.0',
+        f'bindport={WEBRTC_HTTP_PORT}',
         'tlsenable=yes',
         f'tlsbindaddr=0.0.0.0:{WEBRTC_WS_PORT}',
         f'tlscertfile={cert}',
@@ -4316,14 +4369,23 @@ def ensure_webrtc_http_conf(host=None, force=False):
             with open(http_conf, 'r', encoding='utf-8') as f:
                 content = f.read()
             changed = False
-            for line in desired[1:5]:
-                k = line.split('=')[0]
-                if not re.search(rf'^\s*{re.escape(k)}\s*=', content, re.MULTILINE):
+            # Ports and TLS bind must be hardened to specific values, because a
+            # plain/TLS port collision silently disables the WSS listener.
+            overrides = {
+                'bindaddr': 'bindaddr=0.0.0.0',
+                'bindport': f'bindport={WEBRTC_HTTP_PORT}',
+                'tlsenable': 'tlsenable=yes',
+                'tlsbindaddr': f'tlsbindaddr=0.0.0.0:{WEBRTC_WS_PORT}',
+                'tlscertfile': f'tlscertfile={cert}',
+                'tlsprivatekey': f'tlsprivatekey={key}',
+            }
+            for key_name, line in overrides.items():
+                if re.search(rf'^\s*{re.escape(key_name)}\s*=', content, re.MULTILINE):
+                    content = re.sub(rf'^\s*{re.escape(key_name)}\s*=.*$', line, content, flags=re.MULTILINE)
+                    changed = True
+                else:
                     content = content.rstrip() + '\n' + line + '\n'
                     changed = True
-            if 'tlscertfile' not in content:
-                content = content.rstrip() + f'\ntlscertfile={cert}\ntlsprivatekey={key}\n'
-                changed = True
             if changed:
                 with open(http_conf, 'w', encoding='utf-8') as f:
                     f.write(content)
@@ -4354,16 +4416,34 @@ def api_webrtc_info():
 
 @app.route('/api/webrtc/setup', methods=['POST'])
 def api_webrtc_setup():
-    """One-click provisioning of TLS cert + http.conf and a reload of Asterisk HTTP/WS."""
+    """One-click provisioning of TLS cert + http.conf so SIP-over-WSS works."""
     host = request.host.split(':')[0]
     ok = ensure_webrtc_http_conf(host=host)
+    restarted = False
     if ok:
-        run_asterisk('http reload')
-        run_asterisk('module reload res_http_websocket.so')
+        # The built-in HTTP/HTTPS server reads http.conf only at startup
+        # (`http reload` does not exist and res_http_websocket is not
+        # reloadable), so a full Asterisk restart is required to (re)bind the
+        # plain HTTP and TLS/WSS listeners.
+        try:
+            subprocess.run(
+                ['systemctl', 'restart', 'asterisk'],
+                capture_output=True, timeout=30,
+            )
+            restarted = True
+        except Exception as e:
+            print(f"[webrtc] asterisk restart failed: {e}")
+        if not restarted:
+            # Best-effort fallbacks on hosts without systemd
+            run_asterisk('http reload')
+            run_asterisk('module reload res_http_websocket.so')
     auth_mgr.audit(session.get('username'), 'webrtc_setup', 'ok' if ok else 'failed')
     return jsonify({
         'status': 'ok' if ok else 'error',
-        'message': 'WebRTC-сервер настроен.' if ok else 'Не удалось создать сертификат или http.conf',
+        'message': ('WebRTC-сервер настроен. Asterisk перезапущен.' if restarted
+                    else ('WebRTC-сервер настроен. Требуется перезапуск Asterisk.' if ok
+                          else 'Не удалось создать сертификат или http.conf')),
+        'restarted': restarted,
         'ws_url': _webrtc_ws_url(host),
         'fingerprint': get_webrtc_cert_fingerprint(),
     })
