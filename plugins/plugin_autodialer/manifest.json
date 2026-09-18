@@ -1,0 +1,23 @@
+{
+  "id": "autodialer",
+  "name": "Auto Dialer & Base Cleanser",
+  "name_ru": "Автопрозвон и Очистка Базы",
+  "version": "1.0.0",
+  "author": "Logic Core Team",
+  "category": "crm",
+  "category_name": "Телефония & Автоматизация",
+  "icon": "phone_in_talk",
+  "color": "primary",
+  "rating": "5.0 (210)",
+  "price": "Free",
+  "price_sub": "/ included",
+  "description": "Интеллектуальный автопрозвон базы номеров: голосовые сообщения (информатор/IVR) и высокоскоростной PING-анализ для валидации и очистки базы от неликвида (недоступен, не в сети, сброс, автоответчики антиспама/Олег/Алиса).",
+  "permissions": [
+    "ami_events",
+    "cdr_read",
+    "call_originate",
+    "dialplan_manage",
+    "audio_prompts"
+  ],
+  "entry_point": "plugin_main.py"
+}

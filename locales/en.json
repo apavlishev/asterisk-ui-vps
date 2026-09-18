@@ -971,7 +971,7 @@
   "bw_step3_3": "Click the extension icon, open ⚙, enter the panel address and API key, then press \"Get from PBX\".",
   "bw_step3_4": "Enter your extension — WebRTC also needs the SIP password (\"Get from PBX\" fills it automatically if the extension is enabled for WebRTC).",
   "bw_mode_webrtc": "WebRTC mode",
-  "bw_mode_webrtc_hint": "The call goes straight from the browser over SIP-over-WSS (port 443 required on the PBX). Incoming calls pop up in the widget with answer, mute and DTMF.",
+  "bw_mode_webrtc_hint": "The call goes straight from the browser over SIP-over-WSS (port 1443 required on the PBX). Incoming calls pop up in the widget with answer, mute and DTMF.",
   "bw_mode_c2c": "Click-to-call mode",
   "bw_mode_c2c_hint": "The PBX rings your regular phone/softphone and then connects it to the client. Works without WebRTC and without a SIP password.",
   "bw_api": "Widget API",

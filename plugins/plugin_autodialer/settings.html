@@ -1,0 +1,973 @@
+<div class="space-y-6 max-w-6xl" id="autodialer-app">
+    <!-- TOP HEADER -->
+    <div class="bg-surface rounded-2xl p-6 border border-outline/30 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-surface-container">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold shadow-inner">
+                    <span class="material-symbols-outlined text-3xl">phone_in_talk</span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-xl font-bold text-on-surface">Интеллектуальный Автопрозвон и Очистка Базы</h2>
+                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold border border-primary/20 flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span> Модуль Активен
+                        </span>
+                    </div>
+                    <p class="text-xs text-on-surface-variant mt-1">
+                        Массовый прозвон базы: голосовые сообщения (IVR) и высокоскоростной PING для очистки от неликвида и антиспам-помощников.
+                    </p>
+                </div>
+            </div>
+
+            <!-- SUB-TABS NAVIGATION -->
+            <div class="flex items-center gap-1 bg-surface-container-high p-1.5 rounded-xl border border-outline/20">
+                <button type="button" onclick="adSwitchTab('new')" id="ad-btn-tab-new" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-surface text-primary shadow-sm flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[16px]">add_call</span>
+                    <span>Новая кампания</span>
+                </button>
+                <button type="button" onclick="adSwitchTab('monitor')" id="ad-btn-tab-monitor" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[16px]">monitoring</span>
+                    <span>Мониторинг</span>
+                    <span id="ad-running-count" class="hidden px-1.5 py-0.2 rounded-full bg-primary text-on-primary text-[10px] font-bold">0</span>
+                </button>
+                <button type="button" onclick="adSwitchTab('cleanse')" id="ad-btn-tab-cleanse" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[16px]">cleaning_services</span>
+                    <span>Очистка & Экспорт</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= SUB-TAB 1: NEW CAMPAIGN BUILDER ================= -->
+        <div id="ad-tab-new" class="mt-6 space-y-6">
+            <form id="ad-campaign-form" onsubmit="adSubmitCampaign(event)" class="space-y-6">
+                <!-- 1. CAMPAIGN INFO -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">Название кампании</label>
+                        <input type="text" id="ad-input-name" required placeholder="Например: Проверка базы клиентов май 2026" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-xs text-on-surface focus:border-primary focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">Исходящий шлюз / Транк</label>
+                        <select id="ad-input-trunk" class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline/40 text-xs text-on-surface focus:border-primary focus:outline-none">
+                            <option value="default">Авто (По умолчанию / Маршруты АТС)</option>
+                            <option value="dongle0">GSM Модем (dongle0 / SIM-карта)</option>
+                            <!-- Dynamically loaded -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 2. MODE SELECTION (2 MODES) -->
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-2">Выберите вид автопрозвона</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- MODE 1: BROADCAST -->
+                        <div onclick="adSelectMode('broadcast')" id="ad-mode-card-broadcast" class="p-5 rounded-2xl border-2 border-primary bg-primary/5 cursor-pointer transition-all hover:shadow-md relative">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-primary text-on-primary flex items-center justify-center shrink-0">
+                                    <span class="material-symbols-outlined text-2xl">campaign</span>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-sm font-bold text-on-surface">Вид 1: Голосовое сообщение (IVR)</h4>
+                                        <span id="ad-badge-broadcast" class="text-[10px] px-2 py-0.5 rounded-full bg-primary text-on-primary font-bold">Выбран</span>
+                                    </div>
+                                    <p class="text-xs text-on-surface-variant mt-1 leading-relaxed">
+                                        Прозвон по списку номеров с воспроизведением аудиозаписи при ответе абонента. Возможность интерактива: перевод на оператора по нажатию [1] или повтор сообщения.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MODE 2: PING / DATABASE CLEANSER -->
+                        <div onclick="adSelectMode('ping')" id="ad-mode-card-ping" class="p-5 rounded-2xl border border-outline/30 bg-surface-container-low cursor-pointer transition-all hover:shadow-md relative">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-secondary-container text-secondary flex items-center justify-center shrink-0">
+                                    <span class="material-symbols-outlined text-2xl">verified_user</span>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-sm font-bold text-on-surface">Вид 2: PING-Валидация и Очистка Базы</h4>
+                                        <span id="ad-badge-ping" class="hidden text-[10px] px-2 py-0.5 rounded-full bg-primary text-on-primary font-bold">Выбран</span>
+                                    </div>
+                                    <p class="text-xs text-on-surface-variant mt-1 leading-relaxed">
+                                        Анализ состояния номера с начала вызова: отбивки оператора («не доступен», «не в сети», «не существует», «сброс»), а также выявление автоответчиков и антиспам-помощников (Олег, Алиса, Ева).
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3A. MODE 1 PARAMETERS (AUDIO & DTMF) -->
+                <div id="ad-section-broadcast" class="p-5 rounded-2xl bg-surface-container-low border border-outline/20 space-y-4">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[18px]">audiotrack</span>
+                        <span>Настройки голосового сообщения</span>
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">Аудиофайл сообщения</label>
+                            <div class="flex items-center gap-2">
+                                <select id="ad-input-audio" class="flex-1 px-4 py-2.5 rounded-xl bg-surface border border-outline/40 text-xs text-on-surface focus:border-primary focus:outline-none">
+                                    <option value="">-- Выберите файл из медиатеки --</option>
+                                </select>
+                                <label class="px-3.5 py-2.5 rounded-xl bg-surface-container-high hover:bg-surface-container text-on-surface border border-outline/30 text-xs font-semibold cursor-pointer flex items-center gap-1 shrink-0" title="Загрузить MP3 или WAV">
+                                    <span class="material-symbols-outlined text-[16px]">upload_file</span>
+                                    <span>Загрузить</span>
+                                    <input type="file" accept=".mp3,.wav,.gsm" onchange="adUploadAudio(this)" class="hidden">
+                                </label>
+                            </div>
+                            <div id="ad-audio-preview" class="hidden mt-2 flex items-center gap-2">
+                                <audio id="ad-audio-element" controls class="w-full h-8"></audio>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">Интерактивное действие (DTMF)</label>
+                            <select id="ad-input-dtmf" onchange="adToggleDtmfTarget()" class="w-full px-4 py-2.5 rounded-xl bg-surface border border-outline/40 text-xs text-on-surface focus:border-primary focus:outline-none">
+                                <option value="none">Только воспроизведение (завершить вызов после аудио)</option>
+                                <option value="operator">Клавиша [1] — Соединить с оператором / очередью</option>
+                                <option value="repeat">Клавиша [2] — Повторить воспроизведение сообщения</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="ad-dtmf-target-box" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">Внутренний номер или очередь оператора</label>
+                            <select id="ad-input-operator" class="w-full px-4 py-2.5 rounded-xl bg-surface border border-outline/40 text-xs text-on-surface focus:border-primary focus:outline-none">
+                                <option value="101">101 (Оператор)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3B. MODE 2 PARAMETERS (PING & BOT DETECTION) -->
+                <div id="ad-section-ping" class="hidden p-5 rounded-2xl bg-surface-container-low border border-outline/20 space-y-4">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[18px]">rule</span>
+                        <span>Стратегия PING-анализа и выявления ботов</span>
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">Режим прозвона (тарификация)</label>
+                            <select id="ad-input-ping-mode" class="w-full px-4 py-2.5 rounded-xl bg-surface border border-outline/40 text-xs text-on-surface focus:border-primary focus:outline-none">
+                                <option value="flash">Flash-Call: Сброс на первых гудках (0 руб / без снятия трубки)</option>
+                                <option value="deep">Глубокий анализ: Ответ 1-3 сек для детекции антиспам-помощников</option>
+                            </select>
+                            <p class="text-[11px] text-on-surface-variant mt-1.5 leading-tight">
+                                Flash-Call проверяет доступность номера в сотовой сети и моментально сбрасывает звонок при получении первых гудков (180 Ringing), исключая списание средств у оператора.
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">Детектор антиспам-помощников</label>
+                            <div class="p-3 rounded-xl bg-surface border border-outline/30 space-y-2">
+                                <label class="flex items-center gap-2 text-xs text-on-surface cursor-pointer">
+                                    <input type="checkbox" checked disabled class="rounded text-primary">
+                                    <span>Анализ скорости ответа и непрерывной речи робота</span>
+                                </label>
+                                <label class="flex items-center gap-2 text-xs text-on-surface cursor-pointer">
+                                    <input type="checkbox" checked disabled class="rounded text-primary">
+                                    <span>Сигнатуры: Олег (Тинькофф), Алиса (Яндекс), Ева (МегаФон), Салют, МТС</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. DATABASE INPUT -->
+                <div class="p-5 rounded-2xl bg-surface-container-low border border-outline/20 space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-on-surface flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[18px]">contact_phone</span>
+                                <span>База номеров для прозвона</span>
+                            </h4>
+                            <p class="text-xs text-on-surface-variant">Введите номера построчно или загрузите файл .txt / .csv</p>
+                        </div>
+                        <div>
+                            <label class="px-4 py-2 rounded-xl bg-surface border border-outline/30 text-xs font-bold text-on-surface hover:bg-surface-container cursor-pointer flex items-center gap-1.5 shadow-sm transition-all">
+                                <span class="material-symbols-outlined text-[16px] text-primary">file_upload</span>
+                                <span>Загрузить базу (.TXT / .CSV)</span>
+                                <input type="file" accept=".txt,.csv" onchange="adLoadNumbersFile(this)" class="hidden">
+                            </label>
+                        </div>
+                    </div>
+
+                    <textarea id="ad-input-numbers" required rows="6" oninput="adUpdateNumbersCount()" placeholder="+79991234567&#10;89265554433&#10;79031112233" class="w-full p-4 rounded-xl bg-surface border border-outline/40 font-mono text-xs text-on-surface focus:border-primary focus:outline-none leading-relaxed"></textarea>
+
+                    <div class="flex items-center justify-between text-xs text-on-surface-variant font-mono pt-1">
+                        <span id="ad-counter-text">Распознано уникальных номеров: 0</span>
+                        <button type="button" onclick="adClearNumbers()" class="text-error hover:underline text-xs">Очистить поле</button>
+                    </div>
+                </div>
+
+                <!-- 5. SPEED & SPEED LIMITERS -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Линий одновременно</label>
+                        <input type="number" id="ad-input-concurrency" min="1" max="30" value="3" class="w-full px-3.5 py-2 rounded-xl bg-surface-container-low border border-outline/40 text-xs text-on-surface">
+                        <span class="text-[10px] text-on-surface-variant">Параллельных каналов</span>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Пауза между вызовами (сек)</label>
+                        <input type="number" id="ad-input-delay" min="0.1" max="10" step="0.1" value="0.5" class="w-full px-3.5 py-2 rounded-xl bg-surface-container-low border border-outline/40 text-xs text-on-surface">
+                        <span class="text-[10px] text-on-surface-variant">Интервал старта вызовов</span>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Таймаут дозвона (сек)</label>
+                        <input type="number" id="ad-input-timeout" min="10" max="90" value="30" class="w-full px-3.5 py-2 rounded-xl bg-surface-container-low border border-outline/40 text-xs text-on-surface">
+                        <span class="text-[10px] text-on-surface-variant">Время ожидания ответа</span>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-on-surface-variant mb-1">Исходящий CallerID</label>
+                        <input type="text" id="ad-input-callerid" placeholder="Например: 74951234567" class="w-full px-3.5 py-2 rounded-xl bg-surface-container-low border border-outline/40 text-xs text-on-surface">
+                        <span class="text-[10px] text-on-surface-variant">АОН (если транк поддерживает)</span>
+                    </div>
+                </div>
+
+                <!-- SUBMIT BUTTON -->
+                <div class="flex justify-end gap-3 pt-4 border-t border-surface-container">
+                    <button type="submit" id="ad-btn-launch" class="px-6 py-3 rounded-xl bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition-all shadow-md flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">rocket_launch</span>
+                        <span>Создать и запустить автопрозвон</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ================= SUB-TAB 2: MONITORING & ACTIVE CAMPAIGNS ================= -->
+        <div id="ad-tab-monitor" class="hidden mt-6 space-y-6">
+            <!-- CAMPAIGNS CARDS LIST -->
+            <div id="ad-campaigns-list" class="space-y-4">
+                <!-- Dynamically injected -->
+                <div class="text-center py-10 text-on-surface-variant text-xs">
+                    Загрузка списка кампаний...
+                </div>
+            </div>
+
+            <!-- LIVE CALLS TABLE FOR SELECTED CAMPAIGN -->
+            <div id="ad-calls-container" class="hidden bg-surface-container-low rounded-2xl p-5 border border-outline/20 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-surface-container">
+                    <div>
+                        <h3 id="ad-monitor-title" class="text-sm font-bold text-on-surface">Детализация вызовов</h3>
+                        <p id="ad-monitor-subtitle" class="text-xs text-on-surface-variant">Обновляется автоматически в реальном времени</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-on-surface-variant font-mono" id="ad-monitor-counter">0 / 0</span>
+                        <button type="button" onclick="adRefreshMonitor()" class="p-1.5 rounded-lg bg-surface border border-outline/30 text-on-surface hover:bg-surface-container">
+                            <span class="material-symbols-outlined text-[16px]">refresh</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="text-[11px] uppercase tracking-wider text-on-surface-variant border-b border-outline/20 sticky top-0 bg-surface-container-low">
+                            <tr>
+                                <th class="pb-2">Номер</th>
+                                <th class="pb-2">Статус</th>
+                                <th class="pb-2">Причина / Отбивка оператора</th>
+                                <th class="pb-2">Длительность</th>
+                                <th class="pb-2">DTMF</th>
+                                <th class="pb-2">Время</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ad-monitor-tbody" class="divide-y divide-outline/10 font-mono">
+                            <!-- Injected dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SUB-TAB 3: DATABASE CLEANSER & EXPORT ================= -->
+        <div id="ad-tab-cleanse" class="hidden mt-6 space-y-6">
+            <!-- SELECT CAMPAIGN FOR EXPORT -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-surface-container-low border border-outline/20">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary text-2xl">filter_alt</span>
+                    <div>
+                        <h4 class="text-xs font-bold text-on-surface">Выберите кампанию для анализа и выгрузки</h4>
+                        <p class="text-[11px] text-on-surface-variant">Сегментация результатов по отбивкам операторов и качеству базы</p>
+                    </div>
+                </div>
+                <div class="min-w-[240px]">
+                    <select id="ad-cleanse-campaign-select" onchange="adLoadCleanseStats()" class="w-full px-3.5 py-2 rounded-xl bg-surface border border-outline/30 text-xs text-on-surface focus:border-primary focus:outline-none">
+                        <!-- Options injected dynamically -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- STATS TILES -->
+            <div id="ad-cleanse-stats-tiles" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="p-4 rounded-xl bg-success/10 border border-success/20">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-success">Чистая база (Живые)</span>
+                        <span class="material-symbols-outlined text-success text-[18px]">verified</span>
+                    </div>
+                    <div id="ad-stat-clean" class="text-2xl font-black text-on-surface mt-2">0</div>
+                    <p class="text-[10px] text-on-surface-variant mt-1">Ответили, гудки, сброс</p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-warning/10 border border-warning/20">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-warning">Антиспам & Боты</span>
+                        <span class="material-symbols-outlined text-warning text-[18px]">smart_toy</span>
+                    </div>
+                    <div id="ad-stat-bots" class="text-2xl font-black text-on-surface mt-2">0</div>
+                    <p class="text-[10px] text-on-surface-variant mt-1">Олег, Алиса, Ева, автоответчики</p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-error/10 border border-error/20">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-error">Недоступны / Не в сети</span>
+                        <span class="material-symbols-outlined text-error text-[18px]">phone_disabled</span>
+                    </div>
+                    <div id="ad-stat-unavail" class="text-2xl font-black text-on-surface mt-2">0</div>
+                    <p class="text-[10px] text-on-surface-variant mt-1">Вне зоны, выключен, таймаут</p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-surface-container-high border border-outline/20">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-on-surface">Не существуют</span>
+                        <span class="material-symbols-outlined text-on-surface-variant text-[18px]">block</span>
+                    </div>
+                    <div id="ad-stat-notexist" class="text-2xl font-black text-on-surface mt-2">0</div>
+                    <p class="text-[10px] text-on-surface-variant mt-1">Номер не существует / Заблокирован</p>
+                </div>
+            </div>
+
+            <!-- EXPORT ACTION BUTTONS -->
+            <div class="p-5 rounded-2xl bg-surface-container-low border border-outline/20 space-y-4">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-on-surface flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[18px]">download</span>
+                    <span>Экспорт сегментированных списков</span>
+                </h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <button type="button" onclick="adExportCategory('clean')" class="p-3.5 rounded-xl bg-success text-on-primary hover:bg-success/90 font-bold text-xs flex flex-col items-start gap-1 shadow-sm transition-all">
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[18px]">file_download</span>
+                            <span>Скачать Чистую Базу</span>
+                        </div>
+                        <span class="text-[10px] opacity-80 font-normal">Только живые номера (.TXT)</span>
+                    </button>
+
+                    <button type="button" onclick="adExportCategory('bots')" class="p-3.5 rounded-xl bg-surface border border-outline/30 hover:bg-surface-container font-bold text-xs text-on-surface flex flex-col items-start gap-1 shadow-sm transition-all">
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[18px] text-warning">smart_toy</span>
+                            <span>Скачать Ботов</span>
+                        </div>
+                        <span class="text-[10px] text-on-surface-variant font-normal">Антиспам и автоответчики (.CSV)</span>
+                    </button>
+
+                    <button type="button" onclick="adExportCategory('unavailable')" class="p-3.5 rounded-xl bg-surface border border-outline/30 hover:bg-surface-container font-bold text-xs text-on-surface flex flex-col items-start gap-1 shadow-sm transition-all">
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[18px] text-error">phone_disabled</span>
+                            <span>Скачать Недоступные</span>
+                        </div>
+                        <span class="text-[10px] text-on-surface-variant font-normal">Вне зоны и выключенные (.CSV)</span>
+                    </button>
+
+                    <button type="button" onclick="adExportCategory('all')" class="p-3.5 rounded-xl bg-primary text-on-primary hover:bg-primary/90 font-bold text-xs flex flex-col items-start gap-1 shadow-sm transition-all">
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[18px]">table_chart</span>
+                            <span>Полный Отчет</span>
+                        </div>
+                        <span class="text-[10px] opacity-80 font-normal">Все номера и отбивки (.CSV)</span>
+                    </button>
+                </div>
+
+                <!-- BLACKLIST DIRECT INTEGRATION -->
+                <div class="pt-4 border-t border-surface-container flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h5 class="text-xs font-bold text-on-surface flex items-center gap-1">
+                            <span class="material-symbols-outlined text-error text-[16px]">security</span>
+                            <span>Интеграция с Черным списком АТС</span>
+                        </h5>
+                        <p class="text-[11px] text-on-surface-variant">Добавить неликвидные номера или ботов в систему блокировки входящих спам-звонков</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="adAddToBlacklist('bots')" class="px-3 py-1.5 rounded-xl border border-outline/30 bg-surface hover:bg-surface-container text-xs font-semibold text-on-surface flex items-center gap-1">
+                            <span>Заблокировать ботов</span>
+                        </button>
+                        <button type="button" onclick="adAddToBlacklist('not_exist')" class="px-3 py-1.5 rounded-xl border border-outline/30 bg-surface hover:bg-surface-container text-xs font-semibold text-on-surface flex items-center gap-1">
+                            <span>Заблокировать несуществующие</span>
+                        </button>
+                        <button type="button" onclick="adAddToBlacklist('all_bad')" class="px-3 py-1.5 rounded-xl bg-error/10 text-error hover:bg-error/20 border border-error/20 text-xs font-bold flex items-center gap-1">
+                            <span>Заблокировать весь неликвид</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let adCurrentMode = 'broadcast';
+    let adPollTimer = null;
+    let adSelectedCampId = null;
+
+    // --- TAB SWITCHER ---
+    function adSwitchTab(tab) {
+        document.getElementById('ad-tab-new').classList.toggle('hidden', tab !== 'new');
+        document.getElementById('ad-tab-monitor').classList.toggle('hidden', tab !== 'monitor');
+        document.getElementById('ad-tab-cleanse').classList.toggle('hidden', tab !== 'cleanse');
+
+        const btnNew = document.getElementById('ad-btn-tab-new');
+        const btnMon = document.getElementById('ad-btn-tab-monitor');
+        const btnCln = document.getElementById('ad-btn-tab-cleanse');
+
+        const activeClass = 'bg-surface text-primary shadow-sm';
+        const inactiveClass = 'text-on-surface-variant hover:text-on-surface';
+
+        btnNew.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ' + (tab === 'new' ? activeClass : inactiveClass);
+        btnMon.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ' + (tab === 'monitor' ? activeClass : inactiveClass);
+        btnCln.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ' + (tab === 'cleanse' ? activeClass : inactiveClass);
+
+        if (tab === 'monitor') {
+            adLoadCampaigns();
+            adStartPolling();
+        } else if (tab === 'cleanse') {
+            adStopPolling();
+            adPopulateCleanseCampaigns();
+        } else {
+            adStopPolling();
+        }
+    }
+
+    // --- MODE SWITCHER ---
+    function adSelectMode(mode) {
+        adCurrentMode = mode;
+        const cardB = document.getElementById('ad-mode-card-broadcast');
+        const cardP = document.getElementById('ad-mode-card-ping');
+        const secB = document.getElementById('ad-section-broadcast');
+        const secP = document.getElementById('ad-section-ping');
+        const badgeB = document.getElementById('ad-badge-broadcast');
+        const badgeP = document.getElementById('ad-badge-ping');
+
+        if (mode === 'broadcast') {
+            cardB.className = 'p-5 rounded-2xl border-2 border-primary bg-primary/5 cursor-pointer transition-all hover:shadow-md relative';
+            cardP.className = 'p-5 rounded-2xl border border-outline/30 bg-surface-container-low cursor-pointer transition-all hover:shadow-md relative';
+            secB.classList.remove('hidden');
+            secP.classList.add('hidden');
+            badgeB.classList.remove('hidden');
+            badgeP.classList.add('hidden');
+        } else {
+            cardB.className = 'p-5 rounded-2xl border border-outline/30 bg-surface-container-low cursor-pointer transition-all hover:shadow-md relative';
+            cardP.className = 'p-5 rounded-2xl border-2 border-secondary bg-secondary/5 cursor-pointer transition-all hover:shadow-md relative';
+            secB.classList.add('hidden');
+            secP.classList.remove('hidden');
+            badgeB.classList.add('hidden');
+            badgeP.classList.remove('hidden');
+        }
+    }
+
+    function adToggleDtmfTarget() {
+        const val = document.getElementById('ad-input-dtmf').value;
+        const box = document.getElementById('ad-dtmf-target-box');
+        box.classList.toggle('hidden', val !== 'operator');
+    }
+
+    // --- AUDIO UPLOAD & PREVIEW ---
+    async function adUploadAudio(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        const fd = new FormData();
+        fd.append('file', file);
+
+        try {
+            const res = await fetch('/api/autodialer/audio/upload', { method: 'POST', body: fd });
+            const data = await res.json();
+            if (data.success) {
+                const sel = document.getElementById('ad-input-audio');
+                const opt = document.createElement('option');
+                opt.value = data.filename;
+                opt.textContent = data.filename;
+                opt.selected = true;
+                sel.appendChild(opt);
+
+                // Preview player
+                const player = document.getElementById('ad-audio-element');
+                player.src = data.url;
+                document.getElementById('ad-audio-preview').classList.remove('hidden');
+            } else {
+                alert('Ошибка загрузки аудио: ' + (data.error || 'Неизвестная ошибка'));
+            }
+        } catch (e) {
+            alert('Сетевая ошибка при загрузке аудио: ' + e);
+        }
+    }
+
+    // --- NUMBERS COUNTER & PARSER ---
+    function adUpdateNumbersCount() {
+        const text = document.getElementById('ad-input-numbers').value;
+        const raw = text.split(/[\r\n,;\t]+/);
+        const seen = new Set();
+        for (let item of raw) {
+            let digits = item.replace(/\D/g, '');
+            if (digits.length === 11 && digits.startsWith('8')) digits = '7' + digits.substring(1);
+            else if (digits.length === 10) digits = '7' + digits;
+            if (digits.length >= 5) seen.add(digits);
+        }
+        document.getElementById('ad-counter-text').textContent = 'Распознано уникальных номеров: ' + seen.size;
+    }
+
+    function adClearNumbers() {
+        document.getElementById('ad-input-numbers').value = '';
+        adUpdateNumbersCount();
+    }
+
+    function adLoadNumbersFile(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('ad-input-numbers').value = e.target.result;
+            adUpdateNumbersCount();
+        };
+        reader.readAsText(file);
+    }
+
+    // --- LOAD RESOURCES (TRUNKS, OPERATORS, SOUNDS) ---
+    async function adLoadResources() {
+        try {
+            const res = await fetch('/api/autodialer/resources');
+            const data = await res.json();
+            if (!data.success) return;
+
+            // Populate trunks
+            const trunkSel = document.getElementById('ad-input-trunk');
+            trunkSel.innerHTML = '<option value="default">Авто (По умолчанию / Маршруты АТС)</option>';
+            for (let t of (data.trunks || [])) {
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                opt.textContent = t.name + ' (' + t.type.toUpperCase() + ')';
+                trunkSel.appendChild(opt);
+            }
+
+            // Populate sounds
+            const soundSel = document.getElementById('ad-input-audio');
+            soundSel.innerHTML = '<option value="">-- Выберите файл из медиатеки --</option>';
+            for (let s of (data.sounds || [])) {
+                const opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = s;
+                soundSel.appendChild(opt);
+            }
+
+            // Populate operators
+            const opSel = document.getElementById('ad-input-operator');
+            opSel.innerHTML = '';
+            for (let ext of (data.extensions || [])) {
+                const opt = document.createElement('option');
+                opt.value = ext.exten;
+                opt.textContent = ext.exten + ' (' + ext.name + ')';
+                opSel.appendChild(opt);
+            }
+            for (let q of (data.queues || [])) {
+                const opt = document.createElement('option');
+                opt.value = q.exten;
+                opt.textContent = 'Очередь: ' + q.name + ' (' + q.exten + ')';
+                opSel.appendChild(opt);
+            }
+        } catch (e) {
+            console.error('Failed to load autodialer resources:', e);
+        }
+    }
+
+    // --- CREATE & SUBMIT CAMPAIGN ---
+    async function adSubmitCampaign(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('ad-input-name').value.trim();
+        const trunk = document.getElementById('ad-input-trunk').value;
+        const numbersText = document.getElementById('ad-input-numbers').value;
+        const concurrency = parseInt(document.getElementById('ad-input-concurrency').value) || 3;
+        const delay = parseFloat(document.getElementById('ad-input-delay').value) || 0.5;
+        const timeout = parseInt(document.getElementById('ad-input-timeout').value) || 30;
+        const callerid = document.getElementById('ad-input-callerid').value.trim();
+
+        const payload = {
+            name: name,
+            mode: adCurrentMode,
+            trunk: trunk,
+            numbers: numbersText,
+            concurrency: concurrency,
+            delay_between_calls: delay,
+            ring_timeout: timeout,
+            caller_id: callerid
+        };
+
+        if (adCurrentMode === 'broadcast') {
+            payload.audio_file = document.getElementById('ad-input-audio').value;
+            payload.dtmf_action = document.getElementById('ad-input-dtmf').value;
+            payload.dtmf_operator = document.getElementById('ad-input-operator').value;
+            if (!payload.audio_file) {
+                alert('Пожалуйста, выберите аудиофайл для воспроизведения сообщения.');
+                return;
+            }
+        } else {
+            payload.ping_mode = document.getElementById('ad-input-ping-mode').value;
+        }
+
+        const btn = document.getElementById('ad-btn-launch');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span><span>Создание и запуск...</span>';
+
+        try {
+            const res = await fetch('/api/autodialer/campaigns', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                // Auto-start
+                await fetch('/api/autodialer/campaigns/' + data.campaign.id + '/start', { method: 'POST' });
+                adSwitchTab('monitor');
+                adSelectCampaign(data.campaign.id);
+            } else {
+                alert('Ошибка создания кампании: ' + (data.error || 'Неизвестно'));
+            }
+        } catch (err) {
+            alert('Сетевая ошибка: ' + err);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">rocket_launch</span><span>Создать и запустить автопрозвон</span>';
+        }
+    }
+
+    // --- CAMPAIGNS MONITORING ---
+    async function adLoadCampaigns() {
+        try {
+            const res = await fetch('/api/autodialer/campaigns');
+            const data = await res.json();
+            const container = document.getElementById('ad-campaigns-list');
+            const badgeRunning = document.getElementById('ad-running-count');
+
+            if (!data.success || !data.campaigns || data.campaigns.length === 0) {
+                container.innerHTML = '<div class="text-center py-10 text-on-surface-variant text-xs">Кампаний пока нет. Создайте первую кампанию во вкладке «Новая кампания».</div>';
+                badgeRunning.classList.add('hidden');
+                return;
+            }
+
+            let runningCount = 0;
+            let html = '';
+            for (let c of data.campaigns) {
+                if (c.status === 'running') runningCount++;
+                const isSelected = (c.id === adSelectedCampId);
+                const progressPct = c.stats.total > 0 ? Math.round((c.stats.processed / c.stats.total) * 100) : 0;
+
+                let statusBadge = '';
+                if (c.status === 'running') {
+                    statusBadge = '<span class="text-xs px-2.5 py-0.5 rounded-full bg-success/10 text-success font-bold flex items-center gap-1 border border-success/30"><span class="w-2 h-2 rounded-full bg-success animate-pulse"></span> Выполняется (' + progressPct + '%)</span>';
+                } else if (c.status === 'paused') {
+                    statusBadge = '<span class="text-xs px-2.5 py-0.5 rounded-full bg-warning/10 text-warning font-bold border border-warning/30">На паузе</span>';
+                } else if (c.status === 'completed') {
+                    statusBadge = '<span class="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold border border-primary/30">Завершена</span>';
+                } else if (c.status === 'stopped') {
+                    statusBadge = '<span class="text-xs px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-semibold border border-outline/30">Остановлена</span>';
+                } else {
+                    statusBadge = '<span class="text-xs px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-semibold">Готова к запуску</span>';
+                }
+
+                html += `
+                <div class="p-5 rounded-2xl bg-surface border ${isSelected ? 'border-primary ring-1 ring-primary' : 'border-outline/20'} shadow-sm space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-3 cursor-pointer" onclick="adSelectCampaign('${c.id}')">
+                            <div class="w-10 h-10 rounded-xl ${c.mode === 'broadcast' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'} flex items-center justify-center font-bold">
+                                <span class="material-symbols-outlined text-xl">${c.mode === 'broadcast' ? 'campaign' : 'verified_user'}</span>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h4 class="text-sm font-bold text-on-surface hover:text-primary transition-colors">${c.name}</h4>
+                                    ${statusBadge}
+                                </div>
+                                <p class="text-xs text-on-surface-variant font-mono mt-0.5">
+                                    Режим: ${c.mode === 'broadcast' ? 'Голосовое сообщение' : 'PING-очистка'} &bull; Номеров: ${c.stats.total} &bull; Потоков: ${c.concurrency}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- ACTIONS -->
+                        <div class="flex items-center gap-2">
+                            ${c.status === 'running' ? `
+                                <button type="button" onclick="adCampaignAction('${c.id}', 'pause')" class="px-3 py-1.5 rounded-xl bg-warning/10 text-warning hover:bg-warning/20 border border-warning/30 text-xs font-semibold flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[16px]">pause</span>
+                                    <span>Пауза</span>
+                                </button>
+                                <button type="button" onclick="adCampaignAction('${c.id}', 'stop')" class="px-3 py-1.5 rounded-xl text-error hover:bg-error/10 border border-error/20 text-xs font-semibold flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[16px]">stop</span>
+                                    <span>Стоп</span>
+                                </button>
+                            ` : c.status === 'paused' ? `
+                                <button type="button" onclick="adCampaignAction('${c.id}', 'resume')" class="px-3 py-1.5 rounded-xl bg-success text-on-primary hover:bg-success/90 text-xs font-semibold flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+                                    <span>Возобновить</span>
+                                </button>
+                                <button type="button" onclick="adCampaignAction('${c.id}', 'stop')" class="px-3 py-1.5 rounded-xl text-error hover:bg-error/10 border border-error/20 text-xs font-semibold flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[16px]">stop</span>
+                                    <span>Стоп</span>
+                                </button>
+                            ` : c.status === 'ready' ? `
+                                <button type="button" onclick="adCampaignAction('${c.id}', 'start')" class="px-3.5 py-1.5 rounded-xl bg-primary text-on-primary hover:bg-primary/90 text-xs font-semibold flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+                                    <span>Запустить</span>
+                                </button>
+                            ` : ''}
+
+                            <button type="button" onclick="adSelectCampaign('${c.id}')" class="px-3 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-container text-on-surface text-xs font-semibold flex items-center gap-1 border border-outline/20">
+                                <span class="material-symbols-outlined text-[16px]">list</span>
+                                <span>Вызовы</span>
+                            </button>
+
+                            <button type="button" onclick="adDeleteCampaign('${c.id}')" class="p-1.5 rounded-xl text-on-surface-variant hover:text-error hover:bg-error/10 text-xs transition-colors" title="Удалить">
+                                <span class="material-symbols-outlined text-[16px]">delete</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PROGRESS BAR -->
+                    <div class="space-y-1.5">
+                        <div class="w-full bg-surface-container-high rounded-full h-2.5 overflow-hidden flex">
+                            <div class="bg-success h-2.5 transition-all" style="width: ${c.stats.total ? (c.stats.answered / c.stats.total)*100 : 0}%" title="Отвечено"></div>
+                            <div class="bg-primary h-2.5 transition-all" style="width: ${c.stats.total ? (c.stats.active_ringing / c.stats.total)*100 : 0}%" title="Гудки"></div>
+                            <div class="bg-warning h-2.5 transition-all" style="width: ${c.stats.total ? (c.stats.antispam_bots / c.stats.total)*100 : 0}%" title="Боты"></div>
+                            <div class="bg-error h-2.5 transition-all" style="width: ${c.stats.total ? ((c.stats.unavailable + c.stats.not_exist) / c.stats.total)*100 : 0}%" title="Недоступны"></div>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-between text-[11px] text-on-surface-variant font-mono">
+                            <span>Обработано: ${c.stats.processed} / ${c.stats.total}</span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-success font-semibold">Живые: ${c.stats.answered + c.stats.active_ringing + c.stats.rejected}</span>
+                                <span class="text-warning font-semibold">Боты: ${c.stats.antispam_bots}</span>
+                                <span class="text-error font-semibold">Недоступны: ${c.stats.unavailable + c.stats.not_exist}</span>
+                                <span>Очередь: ${c.stats.total - c.stats.processed}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            if (runningCount > 0) {
+                badgeRunning.textContent = runningCount;
+                badgeRunning.classList.remove('hidden');
+            } else {
+                badgeRunning.classList.add('hidden');
+            }
+
+            if (adSelectedCampId) {
+                adRenderLiveCalls(adSelectedCampId);
+            }
+        } catch (e) {
+            console.error('Failed to load campaigns:', e);
+        }
+    }
+
+    async function adCampaignAction(campId, action) {
+        try {
+            await fetch(`/api/autodialer/campaigns/${campId}/${action}`, { method: 'POST' });
+            adLoadCampaigns();
+        } catch (e) {
+            alert('Ошибка действия: ' + e);
+        }
+    }
+
+    async function adDeleteCampaign(campId) {
+        if (!confirm('Удалить кампанию и историю звонков?')) return;
+        try {
+            await fetch(`/api/autodialer/campaigns/${campId}`, { method: 'DELETE' });
+            if (adSelectedCampId === campId) adSelectedCampId = null;
+            adLoadCampaigns();
+        } catch (e) {
+            alert('Ошибка удаления: ' + e);
+        }
+    }
+
+    function adSelectCampaign(campId) {
+        adSelectedCampId = campId;
+        adRenderLiveCalls(campId);
+        adLoadCampaigns();
+    }
+
+    async function adRenderLiveCalls(campId) {
+        const box = document.getElementById('ad-calls-container');
+        box.classList.remove('hidden');
+
+        try {
+            const res = await fetch(`/api/autodialer/campaigns/${campId}`);
+            const data = await res.json();
+            if (!data.success || !data.campaign) return;
+
+            const camp = data.campaign;
+            document.getElementById('ad-monitor-title').textContent = `Вызовы: ${camp.name}`;
+            document.getElementById('ad-monitor-counter').textContent = `${camp.stats.processed} / ${camp.stats.total}`;
+
+            const tbody = document.getElementById('ad-monitor-tbody');
+            let rows = '';
+
+            const numbersList = Object.values(camp.numbers || {});
+            // Sort by called_at desc, then pending
+            numbersList.sort((a, b) => (b.called_at || 0) - (a.called_at || 0));
+
+            for (let item of numbersList.slice(0, 100)) {
+                let badge = '';
+                const st = item.status;
+                if (st === 'answered') {
+                    badge = '<span class="px-2 py-0.5 rounded-full bg-success/15 text-success font-bold text-[10px]">Отвечен</span>';
+                } else if (st === 'active_ringing') {
+                    badge = '<span class="px-2 py-0.5 rounded-full bg-primary/15 text-primary font-bold text-[10px]">Гудки (Flash)</span>';
+                } else if (st === 'antispam_bot') {
+                    badge = '<span class="px-2 py-0.5 rounded-full bg-warning/15 text-warning font-bold text-[10px]">Бот/Ассистент</span>';
+                } else if (st === 'unavailable') {
+                    badge = '<span class="px-2 py-0.5 rounded-full bg-error/15 text-error font-bold text-[10px]">Недоступен</span>';
+                } else if (st === 'not_exist') {
+                    badge = '<span class="px-2 py-0.5 rounded-full bg-gray-500/15 text-gray-400 font-bold text-[10px]">Не существует</span>';
+                } else if (st === 'busy') {
+                    badge = '<span class="px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-400 font-bold text-[10px]">Занято</span>';
+                } else if (st === 'no_answer') {
+                    badge = '<span class="px-2 py-0.5 rounded-full bg-error/15 text-error font-bold text-[10px]">Не ответил</span>';
+                } else if (st === 'rejected') {
+                    badge = '<span class="px-2 py-0.5 rounded-full bg-success/15 text-success font-bold text-[10px]">Сброшен (Живой)</span>';
+                } else if (st === 'calling') {
+                    badge = '<span class="px-2 py-0.5 rounded-full bg-primary text-on-primary font-bold text-[10px] animate-pulse">Звонок...</span>';
+                } else {
+                    badge = '<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-semibold text-[10px]">В очереди</span>';
+                }
+
+                const calledTime = item.called_at ? new Date(item.called_at * 1000).toLocaleTimeString() : '—';
+
+                rows += `
+                <tr class="hover:bg-surface-container transition-colors">
+                    <td class="py-2.5 font-bold text-on-surface">${item.phone}</td>
+                    <td class="py-2.5">${badge}</td>
+                    <td class="py-2.5 text-on-surface-variant truncate max-w-xs" title="${item.operator_cause || ''}">${item.operator_cause || '—'}</td>
+                    <td class="py-2.5">${item.billsec ? item.billsec + ' сек' : '—'}</td>
+                    <td class="py-2.5">${item.dtmf_pressed ? '[' + item.dtmf_pressed + ']' : '—'}</td>
+                    <td class="py-2.5 text-on-surface-variant">${calledTime}</td>
+                </tr>
+                `;
+            }
+
+            tbody.innerHTML = rows;
+        } catch (e) {
+            console.error('Failed to render live calls:', e);
+        }
+    }
+
+    function adStartPolling() {
+        if (adPollTimer) clearInterval(adPollTimer);
+        adPollTimer = setInterval(() => {
+            adLoadCampaigns();
+        }, 2500);
+    }
+
+    function adStopPolling() {
+        if (adPollTimer) {
+            clearInterval(adPollTimer);
+            adPollTimer = null;
+        }
+    }
+
+    function adRefreshMonitor() {
+        if (adSelectedCampId) adRenderLiveCalls(adSelectedCampId);
+        adLoadCampaigns();
+    }
+
+    // --- CLEANSE & EXPORT ---
+    async function adPopulateCleanseCampaigns() {
+        try {
+            const res = await fetch('/api/autodialer/campaigns');
+            const data = await res.json();
+            const sel = document.getElementById('ad-cleanse-campaign-select');
+            sel.innerHTML = '';
+
+            if (!data.campaigns || data.campaigns.length === 0) {
+                sel.innerHTML = '<option value="">Нет созданных кампаний</option>';
+                return;
+            }
+
+            for (let c of data.campaigns) {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = `${c.name} (${c.stats.total} ном., ${c.mode === 'broadcast' ? 'IVR' : 'PING'})`;
+                sel.appendChild(opt);
+            }
+
+            adLoadCleanseStats();
+        } catch (e) {
+            console.error('Failed to populate cleanse campaigns:', e);
+        }
+    }
+
+    async function adLoadCleanseStats() {
+        const campId = document.getElementById('ad-cleanse-campaign-select').value;
+        if (!campId) return;
+
+        try {
+            const res = await fetch(`/api/autodialer/campaigns/${campId}`);
+            const data = await res.json();
+            if (!data.success || !data.campaign) return;
+
+            const s = data.campaign.stats;
+            const cleanCount = (s.answered || 0) + (s.active_ringing || 0) + (s.rejected || 0);
+            const botsCount = s.antispam_bots || 0;
+            const unavailCount = (s.unavailable || 0) + (s.no_answer || 0);
+            const notExistCount = s.not_exist || 0;
+
+            document.getElementById('ad-stat-clean').textContent = cleanCount;
+            document.getElementById('ad-stat-bots').textContent = botsCount;
+            document.getElementById('ad-stat-unavail').textContent = unavailCount;
+            document.getElementById('ad-stat-notexist').textContent = notExistCount;
+        } catch (e) {
+            console.error('Failed to load cleanse stats:', e);
+        }
+    }
+
+    function adExportCategory(category) {
+        const campId = document.getElementById('ad-cleanse-campaign-select').value;
+        if (!campId) {
+            alert('Пожалуйста, выберите кампанию для экспорта.');
+            return;
+        }
+        window.location.href = `/api/autodialer/campaigns/${campId}/export?category=${category}`;
+    }
+
+    async function adAddToBlacklist(category) {
+        const campId = document.getElementById('ad-cleanse-campaign-select').value;
+        if (!campId) {
+            alert('Выберите кампанию.');
+            return;
+        }
+
+        if (!confirm('Добавить номера выбранной группы в Черный список АТС для блокировки?')) return;
+
+        try {
+            const res = await fetch(`/api/autodialer/campaigns/${campId}/blacklist`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category: category })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(data.message || 'Номера успешно добавлены в черный список!');
+            } else {
+                alert('Ошибка: ' + (data.error || 'Не удалось добавить'));
+            }
+        } catch (e) {
+            alert('Ошибка запроса: ' + e);
+        }
+    }
+
+    // Initialize on DOM load
+    document.addEventListener('DOMContentLoaded', () => {
+        adLoadResources();
+    });
+    // Call immediately in case DOM is already loaded
+    adLoadResources();
+</script>

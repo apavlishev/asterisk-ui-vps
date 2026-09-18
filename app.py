@@ -3,6 +3,7 @@ import io
 import ftplib
 import socket
 import tarfile
+import sys
 import plugin_manager
 
 import license_mgr
@@ -37,6 +38,16 @@ app.jinja_loader = jinja2.ChoiceLoader([
     jinja2.FileSystemLoader(plugins_dir)
 ])
 app.secret_key = 'asterisk-web-secret-key-2026'
+
+# AutoDialer Blueprint Registration
+if plugins_dir not in sys.path:
+    sys.path.insert(0, plugins_dir)
+
+try:
+    from plugin_autodialer.routes import autodialer_bp
+    app.register_blueprint(autodialer_bp)
+except Exception as e:
+    print(f"[app] Error registering autodialer_bp: {e}")
 
 
 def get_yandex_disk_account_info(token):
@@ -4221,10 +4232,8 @@ AMI_SECRET = None
 
 WEBRTC_CERT_DIR = '/etc/asterisk/keys'
 WEBRTC_HTTP_CONF = '/etc/asterisk/http.conf'
-# TLS/WSS port. 443 is preferred: it is a standard HTTPS port that passes
-# through almost every proxy, corporate firewall and VPN, whereas a high port
-# like 8089 is frequently blocked or mis-routed (browser WebSocket code 1006).
-WEBRTC_WS_PORT = 443
+# TLS/WSS port. Changed to 1443 (previously 443, which often conflicts with Nginx/web servers).
+WEBRTC_WS_PORT = 1443
 # Plain (non-TLS) Asterisk HTTP port. It MUST differ from WEBRTC_WS_PORT:
 # binding both the plain and the TLS listener to the same port makes Asterisk
 # serve plain HTTP on that port and silently drop the TLS listener, which
@@ -4234,6 +4243,11 @@ WEBRTC_HTTP_PORT = 8088
 # and documented in the UI); the active listener is WEBRTC_WS_PORT.
 WEBRTC_WS_LEGACY_PORT = 8089
 _webrtc_cert_cache = {'fingerprint': None, 'path': None, 'mtime': 0}
+
+
+def get_webrtc_ws_port():
+    cfg = load_integrations()
+    return int(cfg.get('webrtc', {}).get('port', WEBRTC_WS_PORT))
 
 
 def webrtc_ws_enabled():
@@ -4288,7 +4302,7 @@ def save_webrtc_extension(exten, password=None, enabled=True):
 
 
 def _webrtc_ws_url(host):
-    return f"wss://{host}:{WEBRTC_WS_PORT}/ws"
+    return f"wss://{host}:{get_webrtc_ws_port()}/ws"
 
 
 def _disable_legacy_chan_sip():
@@ -4344,7 +4358,7 @@ def _allow_low_tls_port():
     A file capability (setcap) is not enough because Asterisk drops privileges
     at startup, so we lower the kernel's unprivileged port threshold instead.
     """
-    if WEBRTC_WS_PORT >= 1024:
+    if get_webrtc_ws_port() >= 1024:
         return True
     try:
         with open('/proc/sys/net/ipv4/ip_unprivileged_port_start', 'r') as f:
@@ -4456,13 +4470,14 @@ def ensure_webrtc_http_conf(host=None, force=False):
             pass
 
     http_conf = WEBRTC_HTTP_CONF
+    ws_port = get_webrtc_ws_port()
     desired = [
         '[general]',
         'enabled=yes',
         'bindaddr=0.0.0.0',
         f'bindport={WEBRTC_HTTP_PORT}',
         'tlsenable=yes',
-        f'tlsbindaddr=0.0.0.0:{WEBRTC_WS_PORT}',
+        f'tlsbindaddr=0.0.0.0:{ws_port}',
         f'tlscertfile={cert}',
         f'tlsprivatekey={key}',
         '',
@@ -4481,7 +4496,7 @@ def ensure_webrtc_http_conf(host=None, force=False):
                 'bindaddr': 'bindaddr=0.0.0.0',
                 'bindport': f'bindport={WEBRTC_HTTP_PORT}',
                 'tlsenable': 'tlsenable=yes',
-                'tlsbindaddr': f'tlsbindaddr=0.0.0.0:{WEBRTC_WS_PORT}',
+                'tlsbindaddr': f'tlsbindaddr=0.0.0.0:{ws_port}',
                 'tlscertfile': f'tlscertfile={cert}',
                 'tlsprivatekey': f'tlsprivatekey={key}',
             }
@@ -4506,10 +4521,11 @@ def api_webrtc_info():
     accounts = load_sip_accounts()
     webrtc = get_webrtc_extensions()
     host = request.host.split(':')[0]
+    ws_port = get_webrtc_ws_port()
     payload = {
         'enabled': webrtc_ws_enabled() and get_webrtc_cert_fingerprint() is not None,
         'ws_url': _webrtc_ws_url(host),
-        'ws_port': WEBRTC_WS_PORT,
+        'ws_port': ws_port,
         'fingerprint': get_webrtc_cert_fingerprint(),
         'extensions': [
             {'exten': a['exten'], 'name': a.get('name', ''), 'webrtc': str(a['exten']) in webrtc}
@@ -8609,6 +8625,60 @@ def build_outbound_dialplan_lines(cfg):
 
     return "\n".join(lines)
 
+
+def build_autodialer_dialplan():
+    base_gui = "/opt/asterisk-gui"
+    if not os.path.exists(base_gui):
+        base_gui = os.path.dirname(os.path.abspath(__file__))
+    hangup_script = os.path.join(base_gui, 'plugins', 'plugin_autodialer', 'hangup_handler.py')
+    detect_script = os.path.join(base_gui, 'plugins', 'plugin_autodialer', 'detect_bot.py')
+
+    return f"""; ================= AUTODIALER & DATABASE CLEANSER DIALPLAN =================
+[autodialer-broadcast]
+exten => s,1,NoOp(=== Autodialer Voice Broadcast: ${{AUTODIAL_PHONE}} (Camp ${{AUTODIAL_CAMP_ID}}) ===)
+ same => n,Set(CHANNEL(hangup_handler_push)=sub-autodial-hangup,s,1)
+ same => n,Answer()
+ same => n,Wait(0.5)
+ same => n,Set(REC_FILE=${{STRFTIME(${{EPOCH}},,%Y%m%d-%H%M%S)}}_${{AUTODIAL_PHONE}}_autodial.wav)
+ same => n,Set(__REC_PATH=${{RECORD_DIR}}/${{REC_FILE}})
+ same => n,MixMonitor(${{REC_PATH}},b)
+ same => n,Playback(/var/lib/asterisk/sounds/custom/${{AUTODIAL_SOUND}})
+ same => n,GotoIf($["${{AUTODIAL_DTMF_ENABLE}}" = "1"]?wait_key:finish)
+ same => n(wait_key),WaitExten(5)
+ same => n(finish),Hangup()
+
+exten => 1,1,NoOp(Autodialer DTMF 1 -> Transfer to operator ${{AUTODIAL_OPERATOR}})
+ same => n,Set(AUTODIAL_DTMF=1)
+ same => n,Dial(PJSIP/${{AUTODIAL_OPERATOR}},60)
+ same => n,Hangup()
+
+exten => 2,1,NoOp(Autodialer DTMF 2 -> Repeat audio)
+ same => n,Set(AUTODIAL_DTMF=2)
+ same => n,Playback(/var/lib/asterisk/sounds/custom/${{AUTODIAL_SOUND}})
+ same => n,Hangup()
+
+exten => t,1,Hangup()
+exten => i,1,Hangup()
+
+[autodialer-ping]
+exten => s,1,NoOp(=== Autodialer PING: ${{AUTODIAL_PHONE}} (Camp ${{AUTODIAL_CAMP_ID}}, Mode ${{AUTODIAL_PING_MODE}}) ===)
+ same => n,Set(CHANNEL(hangup_handler_push)=sub-autodial-hangup,s,1)
+ same => n,GotoIf($["${{AUTODIAL_PING_MODE}}" = "flash"]?flash_drop:analyze_answer)
+ same => n(flash_drop),Wait(0.2)
+ same => n,Hangup()
+ same => n(analyze_answer),Answer()
+ same => n,Set(SAMPLE_FILE=/tmp/autodial_sample_${{UNIQUEID}}.wav)
+ same => n,Record(${{SAMPLE_FILE}}:wav,1,3,k)
+ same => n,System(/usr/bin/python3 {detect_script} "${{SAMPLE_FILE}}" "${{AUTODIAL_CAMP_ID}}" "${{AUTODIAL_PHONE}}" "${{UNIQUEID}}" &)
+ same => n,Wait(0.5)
+ same => n,Hangup()
+
+[sub-autodial-hangup]
+exten => s,1,NoOp(=== Autodialer Hangup Handler: ${{AUTODIAL_PHONE}} (Cause: ${{HANGUPCAUSE}}, DialStatus: ${{DIALSTATUS}}) ===)
+ same => n,System(/usr/bin/python3 {hangup_script} "${{AUTODIAL_CAMP_ID}}" "${{AUTODIAL_PHONE}}" "${{UNIQUEID}}" "${{HANGUPCAUSE}}" "${{DIALSTATUS}}" "${{CDR(disposition)}}" "${{CDR(billsec)}}" "${{CDR(duration)}}" "${{AUTODIAL_DTMF}}" &)
+ same => n,Return()
+"""
+
 def generate_dialplan_from_tree():
     cfg = load_integrations()
     accounts = load_sip_accounts()
@@ -8904,6 +8974,7 @@ exten => i,1,NoOp({trunk_title} IVR {n_id}: Неверный ввод клави
     ivr_sections = "\n\n".join(all_ivr_contexts)
     number_filter_block = build_number_filter_dialplan()
     schedule_block = build_schedule_dialplan()
+    autodialer_dialplan_block = build_autodialer_dialplan()
 
     dialplan = f"""[general]
 static=yes
@@ -8996,6 +9067,8 @@ exten => 650,1,NoOp(Телефонная книга: поиск по имени 
 
 
 {ivr_sections}
+ 
+{autodialer_dialplan_block}
 """
     with open(EXTENSIONS_CONF, 'w', encoding='utf-8') as f:
         f.write(dialplan)

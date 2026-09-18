@@ -38,7 +38,7 @@ DEFAULT_RULES = [
     {"id": "sip_tls", "name": "SIP TLS (защищённый)", "port": "5061", "proto": "tcp", "action": "allow", "source": "any", "builtin": False},
     {"id": "rtp", "name": "RTP (голос, медиапоток)", "port": "10000-20000", "proto": "udp", "action": "allow", "source": "any", "builtin": True},
     {"id": "sip_extra", "name": "Доп. SIP порт", "port": "5160", "proto": "udp", "action": "allow", "source": "any", "builtin": False},
-    {"id": "webrtc_wss", "name": "WebRTC софтфон (SIP over WSS, HTTPS)", "port": "443", "proto": "tcp", "action": "allow", "source": "any", "builtin": False},
+    {"id": "webrtc_wss", "name": "WebRTC софтфон (SIP over WSS, HTTPS)", "port": "1443", "proto": "tcp", "action": "allow", "source": "any", "builtin": False},
     {"id": "webrtc_wss_legacy", "name": "WebRTC софтфон (устаревший порт WSS)", "port": "8089", "proto": "tcp", "action": "allow", "source": "any", "builtin": False},
     {"id": "dhcp_provision", "name": "Автопровиженинг телефонов (HTTP)", "port": "8080", "proto": "tcp", "action": "allow", "source": "any", "builtin": False},
 ]
@@ -54,7 +54,8 @@ BACKEND_LABELS = {
 # Versioned default-rule migrations: (rule_id, old_default_port, new_default_port).
 # Applied only when the stored port still equals the old default.
 DEFAULT_RULE_MIGRATIONS = [
-    ("webrtc_wss", "8089", "443"),
+    ("webrtc_wss", "8089", "1443"),
+    ("webrtc_wss", "443", "1443"),
 ]
 
 
